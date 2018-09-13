@@ -85,7 +85,7 @@ y^{<{1}>} &= g_2\left(W_{ya}\cdot a^{<{1}>} + b_y \right)
 Single Loss Function: $$ L^{<{t}>}\left( \hat y^{<{t}>},  y^{<{t}>} \right) = - y^{<{t}>}log \left( \hat y^{<{t}>} \right) - 
     \left( 1- y^{<{t}>} \right) log\left(1- \hat y^{<{t}>} \right) $$ <br/>
 
-Overall Loss Function:  $$ L \left( \hat y , y \right) = \sum_{t=1}^T_x L^{<{t}>} \left( \hat y^{<{t}>}, y^{<{t}>} \right)  $$
+Overall Loss Function:  $$ L \left(  \hat y , y \right) =  \displaystyle \sum_{t=1}^{T_x} {L^{<{t}>} \left( \hat y^{<{t}>}, y^{<{t}>} \right) } $$
 
 </span>
 
