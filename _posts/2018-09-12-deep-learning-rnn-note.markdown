@@ -65,6 +65,7 @@ One weakness: only use information that is earlier in the sequence to make a pre
 Forward Propagation:
 
 $$\begin{align} a^{<{0}>} &= \vec0
+a^{<{1}>} &= g_1\left(W_{aa}\cdot a^{0}+ W_{ax}\cdot X^{<{a}>} + b_aa \right)
 \end{align}$$ 
 <br/> activations function often use tanh or Relu. if it is binary classification, can use sigmoid function. The choice of activation 取决于what type of output y you have
 
