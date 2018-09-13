@@ -1,7 +1,7 @@
 ---
 layout:     post
 title:      "Deep Learning —— Sequence Model 笔记"
-subtitle:   ""
+subtitle:   "深度学习 Deep Learning —— Sequence Model note"
 date:       2018-09-12 19:00:00
 author:     "Becks"
 header-img: "img/about-bg.jpg"
@@ -76,7 +76,14 @@ y^{<{1}>} &= g_2\left(W_{ya}\cdot a^{<{1}>} + b_y \right)
 简化符号
 ![](/img/post/Deep_Learning-Sequence_Model_note/week1pic5.png)
 
+#### Backpropagation through time
 
+Loss Function: $$ L^{<{t}>}\left( \hat y^{<{t}>},  y^{<{t}>} \right) = - y^{<{t}>}log \left( \hat y^{<{t}>} \right) - 
+    \left( 1- y^{<{t}>} \right) log\left(1- \hat y^{<{t}>} \right) \\
+    L \left( \hat y , y \right) = \sum_{t=1}^T_{x} L^{<{t}>} \left( \hat y_{<{t}>}, y^{<{t}>} \right) 
+     $$
+
+foward propation goes from left to right. back propagation go from right to left 
 
 
 <br/> activations function often use tanh or Relu. if it is binary classification, can use sigmoid function. 
