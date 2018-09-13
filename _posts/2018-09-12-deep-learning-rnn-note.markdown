@@ -69,6 +69,7 @@ Forward Propagation:
 $$\begin{align} a^{<{0}>} &= \vec0  \\
 a^{<{1}>} &= g_1\left(W_{aa}\cdot a^{0}+ W_{ax}\cdot X^{<{a}>} + b_aa \right) \\
 y^{<{1}>} &= g_2\left(W_{ya}\cdot a^{1}+ b_y \right)
+\end{align}$$ 
 
 ![](/img/week1pic4.png)
 
@@ -77,7 +78,7 @@ y^{<{1}>} &= g_2\left(W_{ya}\cdot a^{1}+ b_y \right)
 
 
 
-\end{align}$$ 
+
 <br/> activations function often use tanh or Relu. if it is binary classification, can use sigmoid function. The choice of activation 取决于what type of output y you have
 
 [pic3]: https://raw.githubusercontent.com/beckswu/beckswu.github.io/master/img/post/Deep%20Learning%20-%20Sequence%20Model%20note/week1pic3.png
