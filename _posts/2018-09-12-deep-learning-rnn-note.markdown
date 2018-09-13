@@ -46,6 +46,8 @@ $$x^{<{t}>}$$:  是one hot vector, 比如字典的长度是10000, x = apple, app
 $$ vector长度是10000， 只有第100位是1，剩下都是0. if 遇见了word不在字典中，create a new token or a new fake word called unknown word
 
 
+#### Recurrent Neural Network Model:
 
+ 
 
 
