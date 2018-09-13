@@ -32,6 +32,13 @@ $$x^{({i})<{t}>}$$:  表示第i个training example 中第t个word, t 表示tempo
 $$y^{({i})<{t}>}$$:  表示第i个training example 中第t个word的输出label<br/> 
 $$T_x^{i}$$:  表示第i个training example的长度<br/> 
 $$T_y^{i}$$:  表示第i个training example的ouput长度<br/> 
+$$
+    \begin{matrix}
+    1 & x & x^2 \\
+    1 & y & y^2 \\
+    1 & z & z^2 \\
+    \end{matrix}
+$$
 
 
 
