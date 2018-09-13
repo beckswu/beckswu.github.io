@@ -69,4 +69,4 @@ $$\begin{align} a^{<{0}>} &= \vec0 \\
 \end{align}$$ <br/>
  activations function often use tanh or Relu. if it is binary classification, can use sigmoid function. The choice of activation 取决于what type of output y you have
 
-[pic3]: 
+[pic3]: https://raw.githubusercontent.com/beckswu/beckswu.github.io/master/img/post/Deep%20Learning%20-%20Sequence%20Model%20note/week1pic3.png
