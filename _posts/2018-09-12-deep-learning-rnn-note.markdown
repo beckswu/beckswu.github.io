@@ -49,8 +49,7 @@ $$ vector长度是10000， 只有第100位是1，剩下都是0. if 遇见了word
 [![](https://raw.githubusercontent.com/beckswu/beckswu.github.io/master/img/post/Deep%20Learning%20-%20Sequence%20Model%20note/week1pic2.png)](https://raw.githubusercontent.com/beckswu/beckswu.github.io/master/img/post/Deep%20Learning%20-%20Sequence%20Model%20note/week1pic2.png)
 
 #### Recurrent Neural Network Model:
-Why not a standard network?
-
+Why not a standard network? <br/>
 problems:
 1. Input, output can be different lengths in different example (不是所有的input的都是一样长度)
 2. Doesn't share features learned across different positions of text(也许word Harry在位置1，但是也许Harry也许出现在位置7)
@@ -65,10 +64,8 @@ One weakness: only use information that is earlier in the sequence to make a pre
 
 Forward Propagation:
 
-$$\begin{align} a^{<{0}>} &= \vec0 \\
-    a^{<{1}>} &= g_1\left(W_{aa}\cdot a^{0}+ W_{ax}\cdot X^{<{a}>} + b_aa  right)\\
-    y^{<{1}>} &= g_2\left(W_{ya}\cdot a^{1}+ b_y right)
-\end{align}$$ <br/>
- activations function often use tanh or Relu. if it is binary classification, can use sigmoid function. The choice of activation 取决于what type of output y you have
+$$\begin{align} a^{<{0}>} &= \vec0
+\end{align}$$ 
+<br/> activations function often use tanh or Relu. if it is binary classification, can use sigmoid function. The choice of activation 取决于what type of output y you have
 
 [pic3]: https://raw.githubusercontent.com/beckswu/beckswu.github.io/master/img/post/Deep%20Learning%20-%20Sequence%20Model%20note/week1pic3.png
