@@ -27,8 +27,7 @@ sometimes 输入X 和 输出Y 可以是不同的长度，sometimes X和Y(example
 <script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"> </script>
 #### notation: 
 [![](https://raw.githubusercontent.com/beckswu/beckswu.github.io/master/img/post/Deep%20Learning%20-%20Sequence%20Model%20note/week1pic1.png)](https://raw.githubusercontent.com/beckswu/beckswu.github.io/master/img/post/Deep%20Learning%20-%20Sequence%20Model%20note/week1pic1.png)
-example: given a sentence 判断哪个是人名
-
+example: given a sentence 判断哪个是人名<br/> 
 $$x^{({i})<{t}>}$$:  表示第i个training example 中第t个word, t 表示temporal sequences althought whether sequences are temporal one or not<br/> 
 $$y^{({i})<{t}>}$$:  表示第i个training example 中第t个word的输出label<br/> 
 $$T_x^{i}$$:  表示第i个training example的长度<br/> 
