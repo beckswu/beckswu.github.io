@@ -8,8 +8,8 @@ header-img: "img/about-bg.jpg"
 catalog:    true
 tags:
     - Coursera
-    - Deep_Learning
-	- RNN
+    - Deep Learning
+    - RNN
 ---
 
 ## Week1 Recurrent Neural Networks
