@@ -31,11 +31,5 @@ sometimes 输入X 和 输出Y 可以是不同的长度，sometimes X和Y(example
 #### notation: 
 [![](https://raw.githubusercontent.com/beckswu/beckswu.github.io/master/img/post/Deep%20Learning%20-%20Sequence%20Model%20note/week1pic1.png)](https://raw.githubusercontent.com/beckswu/beckswu.github.io/master/img/post/Deep%20Learning%20-%20Sequence%20Model%20note/week1pic1.png)
 example: given a sentence 判断哪个是人名
-$$x^{({i})<{t}>}$$:  表示第i个training example 中第t个word, t 表示temporal sequences althought whether sequences are temporal one or not
-$$y^{({i})<{t}>}$$:  表示第i个training example 中第t个word的输出label
-$$T_x^{i}$$:  表示第i个training example的长度
-$$T_y^{i}$$:  表示第i个training example的ouput长度
-
-
 
 
