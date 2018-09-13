@@ -26,7 +26,7 @@ Examples of sequence data:
 sometimes 输入X 和 输出Y 可以是不同的长度，sometimes X和Y(example 4,7)是同样长度的, sometimes 只有X或者只有Y是sequence的 (example 2)
 <script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"> </script>
 #### notation: 
-[![](https://raw.githubusercontent.com/beckswu/beckswu.github.io/master/img/post/Deep%20Learning%20-%20Sequence%20Model%20note/week1pic1.png)](https://raw.githubusercontent.com/beckswu/beckswu.github.io/master/img/post/Deep%20Learning%20-%20Sequence%20Model%20note/week1pic1.png)
+![](/img/post/Deep_Learning-Sequence_Model_note/week1pic1.png)
 example: given a sentence 判断哪个是人名<br/> 
 $$x^{({i})<{t}>}$$:  表示第i个training example 中第t个word, t 表示temporal sequences althought whether sequences are temporal one or not<br/> 
 $$y^{({i})<{t}>}$$:  表示第i个training example 中第t个word的输出label<br/> 
@@ -46,7 +46,7 @@ $$x^{<{t}>}$$:  是one hot vector, 比如字典的长度是10000, x = apple, app
 $$ vector长度是10000， 只有第100位是1，剩下都是0. if 遇见了word不在字典中，create a new token or a new fake word called unknown word
 
 比如下面看是不是name的，output是长度为9，0代表不是name, 1代表是name
-[![](https://raw.githubusercontent.com/beckswu/beckswu.github.io/master/img/post/Deep%20Learning%20-%20Sequence%20Model%20note/week1pic2.png)](https://raw.githubusercontent.com/beckswu/beckswu.github.io/master/img/post/Deep%20Learning%20-%20Sequence%20Model%20note/week1pic2.png)
+![](/img/post/Deep_Learning-Sequence_Model_note/week1pic2.png)
 
 #### Recurrent Neural Network Model:
 <span style="background-color: #FFFF00">Why not a standard network?</span> <br/>
@@ -79,6 +79,7 @@ y^{<{1}>} &= g_2\left(W_{ya}\cdot a^{<{1}>} + b_y \right)
 
 
 
-<br/> activations function often use tanh or Relu. if it is binary classification, can use sigmoid function. The choice of activation 取决于what type of output y you have
+<br/> activations function often use tanh or Relu. if it is binary classification, can use sigmoid function. 
+<span style="background-color: #FFFF00">The choice of activation 取决于what type of output y you have </span>
 
-[pic3]: https://raw.githubusercontent.com/beckswu/beckswu.github.io/master/img/post/Deep%20Learning%20-%20Sequence%20Model%20note/week1pic3.png
+[pic3]: https://raw.githubusercontent.com/beckswu/beckswu.github.io/master/img/post/Deep_Learning-Sequence_Model_note/week1pic3.png
