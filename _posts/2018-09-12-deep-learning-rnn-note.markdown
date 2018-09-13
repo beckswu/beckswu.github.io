@@ -75,18 +75,18 @@ y^{<{1}>} &= g_2\left(W_{ya}\cdot a^{<{1}>} + b_y \right)
 
 简化符号
 ![](/img/post/Deep_Learning-Sequence_Model_note/week1pic5.png)
+<br/> activations function often use tanh or Relu. if it is binary classification, can use sigmoid function. 
+<span style="background-color: #FFFF00">The choice of activation 取决于what type of output y you have </span>
+
 
 #### Backpropagation through time
 
 Loss Function: $$ L^{<{t}>}\left( \hat y^{<{t}>},  y^{<{t}>} \right) = - y^{<{t}>}log \left( \hat y^{<{t}>} \right) - 
-    \left( 1- y^{<{t}>} \right) log\left(1- \hat y^{<{t}>} \right) \\
-    L \left( \hat y , y \right) = \sum_{t=1}^T_{x} L^{<{t}>} \left( \hat y_{<{t}>}, y^{<{t}>} \right) 
+    \left( 1- y^{<{t}>} \right) log\left(1- \hat y^{<{t}>} \right) 
      $$
 
 foward propation goes from left to right. back propagation go from right to left 
+![](/img/post/Deep_Learning-Sequence_Model_note/week1pic6.png)
 
-
-<br/> activations function often use tanh or Relu. if it is binary classification, can use sigmoid function. 
-<span style="background-color: #FFFF00">The choice of activation 取决于what type of output y you have </span>
 
 [pic3]: https://raw.githubusercontent.com/beckswu/beckswu.github.io/master/img/post/Deep_Learning-Sequence_Model_note/week1pic3.png
