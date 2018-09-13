@@ -34,7 +34,7 @@ $$T_x^{i}$$:  表示第i个training example的长度<br/>
 $$T_y^{i}$$:  表示第i个training example的ouput长度<br/> 
 
 
-###### representing words
+**representing words:** <br/>
 
 use dictionary and give each word an index, </br>
 $$x^{<{t}>}$$:  是one hot vector, 比如字典的长度是10000, x = apple, apple出现在字典的100位, $$x^{<{t}>} = \begin{bmatrix}
@@ -43,7 +43,7 @@ $$x^{<{t}>}$$:  是one hot vector, 比如字典的长度是10000, x = apple, app
     1  \\
 	\vdots\\
     \end{bmatrix}
-$$ vector长度是10000， 只有第100位是1，剩下都是0
+$$ vector长度是10000， 只有第100位是1，剩下都是0. if 遇见了word不在字典中，create a new token or a new fake word called unknown word
 
 
 
