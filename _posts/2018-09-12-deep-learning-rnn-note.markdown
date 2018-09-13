@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      "Deep Learning —— Sequence Model Note"
+title:      "Deep Learning —— Sequence Model 笔记"
 subtitle:   ""
 date:       2018-09-12 19:00:00
 author:     "Becks"
@@ -23,16 +23,16 @@ Examples of sequence data:
 6. video activty recogntion : 给一段录像 -> 在running
 7. Name entity recognation：给一段话 --> 挑出人名
 
-
 sometimes 输入X 和 输出Y 可以是不同的长度，sometimes X和Y(example 4,7)是同样长度的, sometimes 只有X或者只有Y是sequence的 (example 2)
 <script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"> </script>
 #### notation: 
 [![](https://raw.githubusercontent.com/beckswu/beckswu.github.io/master/img/post/Deep%20Learning%20-%20Sequence%20Model%20note/week1pic1.png)](https://raw.githubusercontent.com/beckswu/beckswu.github.io/master/img/post/Deep%20Learning%20-%20Sequence%20Model%20note/week1pic1.png)
 example: given a sentence 判断哪个是人名
-$$x^{({i})<{t}>}$$:  表示第i个training example 中第t个word, t 表示temporal sequences althought whether sequences are temporal one or not
-$$y^{({i})<{t}>}$$:  表示第i个training example 中第t个word的输出label
-$$T_x^{i}$$:  表示第i个training example的长度
-$$T_y^{i}$$:  表示第i个training example的ouput长度
+
+$$x^{({i})<{t}>}$$:  表示第i个training example 中第t个word, t 表示temporal sequences althought whether sequences are temporal one or not<br/> 
+$$y^{({i})<{t}>}$$:  表示第i个training example 中第t个word的输出label<br/> 
+$$T_x^{i}$$:  表示第i个training example的长度<br/> 
+$$T_y^{i}$$:  表示第i个training example的ouput长度<br/> 
 
 
 
