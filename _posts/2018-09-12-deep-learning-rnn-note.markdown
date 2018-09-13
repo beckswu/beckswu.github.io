@@ -8,7 +8,9 @@ header-img: "img/about-bg.jpg"
 catalog:    true
 tags:
     - Coursera
-    
+    - Deep Learning
+	- Machine Learning
+    - Sequence Model
 ---
 
 ## Week1 Recurrent Neural Networks
