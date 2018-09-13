@@ -1,7 +1,7 @@
 ---
 layout:     post
 title:      “Deep Learning - Sequence Model 笔记"
-subtitle:   "Coursera Deeping Learning 笔记"
+subtitle:   ""
 date:       2018-09-12 19:00:00
 author:     "Becks"
 header-img: "img/post-bg-nextgen-web-pwa.jpg"
@@ -24,8 +24,6 @@ Examples of sequence data:
 5. machine translation
 6. video activty recogntion : 给一段录像 -> 在running
 7. Name entity recognation：给一段话 --> 挑出人名
-
-
 
 
 sometimes 输入X 和 输出Y 可以是不同的长度，sometimes X和Y(example 4,7)是同样长度的, sometimes 只有X或者只有Y是sequence的 (example 2)
