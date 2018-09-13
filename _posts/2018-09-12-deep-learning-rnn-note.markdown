@@ -39,15 +39,34 @@ $$T_y^{i}$$:  表示第i个training example的ouput长度<br/>
 use dictionary and give each word an index, </br>
 $$x^{<{t}>}$$:  是one hot vector, 比如字典的长度是10000, x = apple, apple出现在字典的100位, $$x^{<{t}>} = \begin{bmatrix}
     0 \\
-    \vdot \\
+    \vdots \\
     1  \\
 	\vdots\\
     \end{bmatrix}
 $$ vector长度是10000， 只有第100位是1，剩下都是0. if 遇见了word不在字典中，create a new token or a new fake word called unknown word
 
+比如下面看是不是name的，output是长度为9，0代表不是name, 1代表是name
+[![](https://raw.githubusercontent.com/beckswu/beckswu.github.io/master/img/post/Deep%20Learning%20-%20Sequence%20Model%20note/week1pic2.png)](https://raw.githubusercontent.com/beckswu/beckswu.github.io/master/img/post/Deep%20Learning%20-%20Sequence%20Model%20note/week1pic2.png)
 
 #### Recurrent Neural Network Model:
+Why not a standard network?
 
- 
+problems:
+1. Input, output can be differnt lengths in different example (不是所有的input的都是一样长度)
+2. Doesn't share features learned across different positions of text(也许word harry在位置1，但是也许harry也许出现在位置7)
 
+在time 0, have some eith made-up activation or vectors of zeros. step 1: Take a word(first word) to a neural network layer, then try to predict if this word is name or not. 到了第二个位置, instead of predicting y2 using only x2, it aslo gets some input 从step 1. Deactivation value from time 1 被pass 到了step 2. The activation parameters (vertical的, $$W_{ax}$$, 用x得到a like quantity) used in each step are shared. Activation (horizontal的,$$W_{aa}$$) is The same. $$W_{ya}$$ (用x得到y like quantity) 控制governs the output prediction
 
+[![](pic3)](pic3)
+
+One weakness: only use information that is earlier in the sequence to make a prediction （Bidirection RNN (BRNN) 可以解决这个问题）
+
+Forward Propagation:
+
+$$\begin{align} a^{<{0}>} &= \vec0 \\
+    a^{<{1}>} &= g_1\left(W_{aa}\cdot a^{0}+ W_{ax}\cdot X^{<{a}>} + b_aa  right)\\
+    y^{<{1}>} &= g_2\left(W_{ya}\cdot a^{1}+ b_y right)
+\end{align}$$ <br/>
+ activations function often use tanh or Relu. if it is binary classification, can use sigmoid function. The choice of activation 取决于what type of output y you have
+
+[pic3]: 
