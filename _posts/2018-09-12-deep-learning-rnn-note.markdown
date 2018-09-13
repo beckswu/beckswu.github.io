@@ -83,11 +83,12 @@ y^{<{1}>} &= g_2\left(W_{ya}\cdot a^{<{1}>} + b_y \right)
 
 <span style="background-color: #FFFF00">
 Single Loss Function: $$ L^{<{t}>}\left( \hat y^{<{t}>},  y^{<{t}>} \right) = - y^{<{t}>}log \left( \hat y^{<{t}>} \right) - 
-    \left( 1- y^{<{t}>} \right) log\left(1- \hat y^{<{t}>} \right) $$ <br/>
+    \left( 1- y^{<{t}>} \right) log\left(1- \hat y^{<{t}>} \right) $$ </span> <br/>
 
+<span style="background-color: #FFFF00">
 Overall Loss Function:  $$ L \left(  \hat y , y \right) =  \displaystyle \sum_{t=1}^{T_x} {L^{<{t}>} \left( \hat y^{<{t}>}, y^{<{t}>} \right) } $$
-
 </span>
+
 
 foward propation goes from left to right. back propagation go from right to left 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week1pic6.png)
