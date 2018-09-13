@@ -14,7 +14,7 @@ tags:
     - Sequence Model
 ---
 
-##Week1 Recurrent Neural Networks
+## Week1 Recurrent Neural Networks
 Examples of sequence data:
                 
 1. Speech Recognition: given audio clip X ----> text Y (both input and output sequence data)
