@@ -32,13 +32,19 @@ $$x^{({i})<{t}>}$$:  表示第i个training example 中第t个word, t 表示tempo
 $$y^{({i})<{t}>}$$:  表示第i个training example 中第t个word的输出label<br/> 
 $$T_x^{i}$$:  表示第i个training example的长度<br/> 
 $$T_y^{i}$$:  表示第i个training example的ouput长度<br/> 
-$$
-    \begin{bmatrix}
-    1 & x & x^2 \\
-    1 & y & y^2 \\
-    1 & z & z^2 \\
-    \end{bmatrix}
-$$
+
+
+###### representing words
+
+use dictionary and give each word an index, </br>
+$$x^{<{t}>}$$:  是one hot vector, 比如字典的长度是10000, x = apple, apple出现在字典的100位, $$x^{<{t}>} = \begin{matrix}
+    0 \\
+     \\
+    1  \\
+	\vdots\\
+    \end{matrix}
+$$ vector长度是10000， 只有第100位是1，剩下都是0
+
 
 
 
