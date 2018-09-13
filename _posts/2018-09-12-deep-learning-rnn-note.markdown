@@ -52,12 +52,14 @@ $$ vector长度是10000， 只有第100位是1，剩下都是0. if 遇见了word
 Why not a standard network?
 
 problems:
-1. Input, output can be differnt lengths in different example (不是所有的input的都是一样长度)
-2. Doesn't share features learned across different positions of text(也许word harry在位置1，但是也许harry也许出现在位置7)
+1. Input, output can be different lengths in different example (不是所有的input的都是一样长度)
+2. Doesn't share features learned across different positions of text(也许word Harry在位置1，但是也许Harry也许出现在位置7)
 
-在time 0, have some eith made-up activation or vectors of zeros. step 1: Take a word(first word) to a neural network layer, then try to predict if this word is name or not. 到了第二个位置, instead of predicting y2 using only x2, it aslo gets some input 从step 1. Deactivation value from time 1 被pass 到了step 2. The activation parameters (vertical的, $$W_{ax}$$, 用x得到a like quantity) used in each step are shared. Activation (horizontal的,$$W_{aa}$$) is The same. $$W_{ya}$$ (用x得到y like quantity) 控制governs the output prediction
+在time 0, have some eith made-up activation or 全部是0的vector. <br/>
+step 1: Take a word(first word) to a neural network layer, then try to predict if this word is name or not. <br/>
+step 2: 到了第二个位置, instead of predicting y2 using only x2, it aslo gets some input 从step 1. Deactivation value from step 1 被pass 到了step 2. </br>The activation parameters (vertical的, $$W_{ax}$$, 用x得到a like quantity) used in each step are shared. Activation (horizontal的,$$W_{aa}$$) is the same. $$W_{ya}$$ (用x得到y like quantity) 控制governs the output prediction
 
-[![](pic3)](pic3)
+![](pic3)
 
 One weakness: only use information that is earlier in the sequence to make a prediction （Bidirection RNN (BRNN) 可以解决这个问题）
 
