@@ -49,7 +49,7 @@ $$ vector长度是10000， 只有第100位是1，剩下都是0. if 遇见了word
 [![](https://raw.githubusercontent.com/beckswu/beckswu.github.io/master/img/post/Deep%20Learning%20-%20Sequence%20Model%20note/week1pic2.png)](https://raw.githubusercontent.com/beckswu/beckswu.github.io/master/img/post/Deep%20Learning%20-%20Sequence%20Model%20note/week1pic2.png)
 
 #### Recurrent Neural Network Model:
-Why not a standard network? <br/>
+<span style="background-color: #FFFF00">Why not a standard network?</span> <br/>
 problems:
 1. Input, output can be different lengths in different example (不是所有的input的都是一样长度)
 2. Doesn't share features learned across different positions of text(也许word Harry在位置1，但是也许Harry也许出现在位置7)
@@ -60,7 +60,9 @@ step 2: 到了第二个位置, instead of predicting y2 using only x2, it aslo g
 
 ![][pic3]
 
+<span style="background-color: #FFFF00">
 One weakness: only use information that is earlier in the sequence to make a prediction （Bidirection RNN (BRNN) 可以解决这个问题）
+</span>
 
 Forward Propagation:
 
