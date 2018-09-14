@@ -93,11 +93,12 @@ Overall Loss Function:  $$ L \left(  \hat y , y \right) =  \displaystyle \sum_{t
 foward propation goes from left to right. back propagation go from right to left 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week1pic6.png)
 
-Many to Many Architectures: 比如word识别名字，输入的每word，都有输出0，1; 注：many-to-many, input length 和 Output length可以相同，也可以不同，比如翻译先把法语(encoder)句子读完，然后一个一个generate 英语(decoder)的 <br/>
-Many to One Architectures:  Sentiment Classification: 给一个word，只最后输出0-5代表几个星<br/>
-One to One Architectures: standard neural network<br/>
-One to Many Architectures: output set of notes 代表a piece of music (x 可以是null)
+<span style="color: red">Many to Many Architectures</span>: 比如word识别名字，输入的每word，都有输出0，1; 注：many-to-many, input length 和 Output length可以相同，也可以不同，比如翻译先把法语(encoder)句子读完，然后一个一个generate 英语(decoder)的 <br/>
+<span style="color: red">Many to One Architectures</span>:  Sentiment Classification: 给一个word，只最后输出0-5代表几个星<br/>
+<span style="color: red">One to One Architectures</span>: standard neural network<br/>
+<span style="color: red">One to Many Architectures</span>: output set of notes 代表a piece of music (x 可以是null)
 
-![](/img/post/Deep_Learning-Sequence_Model_note/week1pic7.png =200x100)
+![](/img/post/Deep_Learning-Sequence_Model_note/week1pic7.png)
+
 
 [pic3]: https://raw.githubusercontent.com/beckswu/beckswu.github.io/master/img/post/Deep_Learning-Sequence_Model_note/week1pic3.png
