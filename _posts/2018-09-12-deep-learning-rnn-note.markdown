@@ -111,16 +111,16 @@ RNN Model:
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week1pic8.png)
 
-speech generation. 从$$a^{<{1}>} $$到 $$\hat y^{<{1}>}$$ 是softmax matrix，看字典中每个字的概率， $$y^{<{1}>}$$是一个10002(10000 + unknown + EOS) vector，到了$$a^{<{2}>}$$, given the first correct answer, what is the distribution of P(__ \| cats); 到了$$a^{<{3}>}$$, given the first correct answer, P(__ \| cats, average);到最后一个predict P(_ \|....前面所有的), cost function is softmax cost function; given the first word, $$P\left( y^{<{1}>}, y^{<{2}>}, y^{<{3}>} \right) = P\left( y^{<{1}>}\right) \cdot P\left(y^{<{2}>} \| y^{<{1}>} \right)\cdot  P\left(y^{<{3}>} \| y^{<{1}>}, y^{<{2}>} \right) $$
+speech generation. 从$$a^{<{1}>} $$到 $$\hat y^{<{1}>}$$ 是softmax matrix，得到字典中每个字的概率， $$y^{<{1}>}$$是一个10002(10000 + unknown + EOS) vector，到了$$a^{<{2}>}$$, given the first correct answer, what is the distribution of P(__ \| cats); 到了$$a^{<{3}>}$$, given the first correct answer, P(__ \| cats, average);到最后一个predict P(_ \|....前面所有的), cost function is softmax cost function; given the first word, $$P\left( y^{<{1}>}, y^{<{2}>}, y^{<{3}>} \right) = P\left( y^{<{1}>}\right) \cdot P\left(y^{<{2}>} \| y^{<{1}>} \right)\cdot  P\left(y^{<{3}>} \| y^{<{1}>}, y^{<{2}>} \right) $$
 
 
 #### Sampling novel Sequence:
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week1pic9.png)
  
- 得到$$\hat y^{<{1}>}$$后，random sample 选取y 根据softmax的distribution(a的概率多大，aaron的概率多大)， 然后得到的sample作为input在next time step,再得到what is $$\hat y^{<{2}>}$$; 比如$$\hat y^{<{1}>}$$ = The, then figure out what is second word probability given word the P( _ \| the), 再sample $$\hat y^{<{2}>}$$,  把sample的 pass 到next time step. <span style="color: red">When to stop:</span>, keep sampling until generate EOS token. 如果没有设置EOS in vocabulary. then you can also just decide to sample 20 个或者100个words until reach that numer of time steps. This particular procedure will sometimes gnerate an unknown word token, 你可以确保algorithm 生成sample 不是unknown token，可以遇到unknown token就继续keep sampling until get non-unknown word
+ 得到$$\hat y^{<{1}>}$$后，random sample 选取y 根据softmax的distribution(a的概率多大，aaron的概率多大)， 然后得到的sample在next time step作为input,再得到$$\hat y^{<{2}>}$$; 比如$$\hat y^{<{1}>}$$sample = The, 把the 作为input，得到另一个softmax distribution P( _ \| the), 再sample $$\hat y^{<{2}>}$$,  把sample的 pass 到next time step. <span style="color: red">When to stop:</span>, keep sampling until generate EOS token. 如果没有设置EOS. then decide to sample 20 个或者100个words 知道到达这个次数(20 or 100). 有时可能生成unknown word token, 可以确保algorithm 生成sample 不是unknown token，遇到unknown token就继续keep sampling until get non-unknown word
 
-字典除了是vocabulary，也可以是character base， 如果想build character level 而不是word level 的，$$y^{<{1}>}, y^{<{2}>}, y^{<{3}>}$$是individual characters， <span style="background-color: #FFFF00">character 就不会遇见unknown word的情况. Disadvantage: 1. end up much longer sequence. </span> 一句话可能有10个词，但会有很多的char，2.  <span style="background-color: #FFFF00"> character level 不如word level 能capture long range dependencies between how the earlier parts of sentence aslo affect the later part of the sentence. </span> 3. character level more computationally expensive to train. 当计算机变得越来越快，more people look at character level models (not widespread today for character level)
+字典除了是vocabulary，也可以是character base， 如果想build character level 而不是word level 的，$$y^{<{1}>}, y^{<{2}>}, y^{<{3}>}$$是individual characters， <span style="background-color: #FFFF00">character 就不会遇见unknown word的情况. Disadvantage: 1. end up much longer sequence. </span> 一句话可能有10个词，但会有很多的char，<span style="background-color: #FFFF00"> 2. character level 不如word level 能capture long range dependencies between how the earlier parts of sentence aslo affect the later part of the sentence. </span> 3. character level more computationally expensive to train. 当计算机变得越来越快，more people look at character level models (not widespread today for character level)
 
 
 #### Vanishing gradients
