@@ -4,7 +4,7 @@ title:      "Deep Learning —— Sequence Model 笔记"
 subtitle:   "深度学习 Deep Learning —— Sequence Model note"
 date:       2018-09-12 19:00:00
 author:     "Becks"
-header-img: "img/about-bg.jpg"
+header-img: "/img/post/Deep_Learning-Sequence_Model_noteimg/bg.jpg"
 catalog:    true
 tags:
     - Coursera
@@ -99,6 +99,22 @@ foward propation goes from left to right. back propagation go from right to left
 <span style="color: red">One to Many Architectures</span>: output set of notes 代表a piece of music (x 可以是null)
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week1pic7.png)
+
+#### Sequence generation
+Language Model:
+
+analyze the probbility of sequence of words, 比如<br/>
+P(The apple nd pair salad) = $$3.2\times10^{-13} $$<br/>
+P(The apple nd pair salad) = $$5.7\times10^{-10} $$
+
+Training Set: large corpus (set) of English text; >首先<span style="background-color: #FFFF00"tokenize </span>把word map到字典上，生成vector. 有时add extra token EOS 表示句子的结尾。 也可以决定是否把标点符号也tokenize. 如果word 不在字典中，用<span style="color: red">UNK</span> stands for unknown word
+ 
+RNN Model:
+
+![](/img/post/Deep_Learning-Sequence_Model_note/week1pic8.png)
+
+speech generation. 从$$a^{<{1}>} 到 \hat y^{<{1}>}$$ 是softmax matrix，看字典中每个字的概率， $$y^{<{1}>}$$是一个10002(10000 + unknown + EOS) vector
+
 
 
 [pic3]: https://raw.githubusercontent.com/beckswu/beckswu.github.io/master/img/post/Deep_Learning-Sequence_Model_note/week1pic3.png
