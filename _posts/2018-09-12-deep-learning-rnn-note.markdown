@@ -111,7 +111,7 @@ RNN Model:
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week1pic8.png)
 
-speech generation. 从$$a^{<{1}>} $$到 $$\hat y^{<{1}>}$$ 是softmax matrix，看字典中每个字的概率， $$y^{<{1}>}$$是一个10002(10000 + unknown + EOS) vector，到了$$a^{<{2}>}$$, 
+speech generation. 从$$a^{<{1}>} $$到 $$\hat y^{<{1}>}$$ 是softmax matrix，看字典中每个字的概率， $$y^{<{1}>}$$是一个10002(10000 + unknown + EOS) vector，到了$$a^{<{2}>}$$, given the first correct answer, what is the distribution of P(__ | cats); 到了$$a^{<{3}>}$$, given the first correct answer, P(__ | cats, average);到最后一个predict P(_ |....前面所有的), cost function is softmax cost function; given the first word,
 
 
 #### Sampling novel Sequence:
