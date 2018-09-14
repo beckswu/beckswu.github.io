@@ -4,7 +4,7 @@ title:      "Deep Learning —— Sequence Model 笔记"
 subtitle:   "深度学习 Deep Learning —— Sequence Model note"
 date:       2018-09-12 19:00:00
 author:     "Becks"
-header-img: "/img/post/Deep_Learning-Sequence_Model_note/bg.jpg"
+header-img: "img/post/Deep_Learning-Sequence_Model_note/bg.jpg"
 catalog:    true
 tags:
     - Coursera
