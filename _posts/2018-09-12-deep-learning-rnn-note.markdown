@@ -81,13 +81,11 @@ y^{<{1}>} &= g_2\left(W_{ya}\cdot a^{<{1}>} + b_y \right)
 
 #### Backpropagation through time
 
-<span style="background-color: #FFFF00">
 Single Loss Function: $$ L^{<{t}>}\left( \hat y^{<{t}>},  y^{<{t}>} \right) = - y^{<{t}>}log \left( \hat y^{<{t}>} \right) - 
-    \left( 1- y^{<{t}>} \right) log\left(1- \hat y^{<{t}>} \right) $$ </span> <br/>
+    \left( 1- y^{<{t}>} \right) log\left(1- \hat y^{<{t}>} \right) $$<br/>
 
-<span style="background-color: #FFFF00">
 Overall Loss Function:  $$ L \left(  \hat y , y \right) =  \displaystyle \sum_{t=1}^{T_x} {L^{<{t}>} \left( \hat y^{<{t}>}, y^{<{t}>} \right) } $$
-</span>
+
 
 
 foward propation goes from left to right. back propagation go from right to left 
@@ -107,13 +105,29 @@ analyze the probbility of sequence of words, 比如<br/>
 P(The apple nd pair salad) = $$3.2\times10^{-13} $$<br/>
 P(The apple nd pair salad) = $$5.7\times10^{-10} $$
 
-Training Set: large corpus (set) of English text; >首先<span style="background-color: #FFFF00"tokenize </span>把word map到字典上，生成vector. 有时add extra token EOS 表示句子的结尾。 也可以决定是否把标点符号也tokenize. 如果word 不在字典中，用<span style="color: red">UNK</span> stands for unknown word
+Training Set: large corpus (set) of English text; >首先<span style="background-color: #FFFF00"> tokenize </span>把word map到字典上，生成vector. 有时add extra token EOS 表示句子的结尾。 也可以决定是否把标点符号也tokenize. 如果word 不在字典中，用<span style="color: red">UNK</span> stands for unknown word
  
 RNN Model:
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week1pic8.png)
 
-speech generation. 从$$a^{<{1}>} 到 \hat y^{<{1}>}$$ 是softmax matrix，看字典中每个字的概率， $$y^{<{1}>}$$是一个10002(10000 + unknown + EOS) vector
+speech generation. 从$$a^{<{1}>} $$到 $$\hat y^{<{1}>}$$ 是softmax matrix，看字典中每个字的概率， $$y^{<{1}>}$$是一个10002(10000 + unknown + EOS) vector，到了$$a^{<{2}>}$$, given the first correct answer, what is the distribution of P(__ | cats); 到了$$a^{<{3}>}$$, given the first correct answer, P(__ | cats, average);到最后一个predict P(_ |....前面所有的), cost function is softmax cost function; given the first word, $$P\left( y^{<{1}>}, y^{<{2}>}, y^{<{3}>} \right) = P\left( y^{<{1}>}\right) \cdot P\left(y^{<{2}>} | y^{<{1}>} \right)\cdot  P\left(y^{<{3}>} | y^{<{1}>}, y^{<{2}>} \right) $$
+
+
+#### Sampling novel Sequence:
+
+![](/img/post/Deep_Learning-Sequence_Model_note/week1pic9.png)
+ 
+ 得到$$\hat y^{<{1}>}$$后，random sample 选取y 根据softmax的distribution(a的概率多大，aaron的概率多大)， 然后得到的sample作为input在next time step,再得到what is $$\hat y^{<{2}>}$$; 比如$$\hat y^{<{1}>}$$ = The, then figure out what is second word probability given word the P(_ | the), 再sample $$\hat y^{<{2}>}$$,  把sample的 pass 到next time step. <span style="color: red">When to stop:</span>, keep sampling until generate EOS token. 如果没有设置EOS in vocabulary. then you can also just decide to sample 20 个或者100个words until reach that numer of time steps. This particular procedure will sometimes gnerate an unknown word token, 你可以确保algorithm 生成sample 不是unknown token，可以遇到unknown token就继续keep sampling until get non-unknown word
+
+字典除了是vocabulary，也可以是character base， 如果想build character level 而不是word level 的，$$y^{<{1}>}, y^{<{2}>}, y^{<{3}>}$$是individual characters， <span style="background-color: #FFFF00">character 就不会遇见unknown word的情况. Disadvantage: 1. end up much longer sequence. </span> 一句话可能有10个词，但会有很多的char，2.  <span style="background-color: #FFFF00"> character level 不如word level 能capture long range dependencies between how the earlier parts of sentence aslo affect the later part of the sentence. </span> 3. character level more computationally expensive to train. 当计算机变得越来越快，more people look at character level models (not widespread today for character level)
+
+
+#### Vanishing gradients
+
+languages that comes earlier 可以影响 later的，比如前面提到cats, 十个单词后可能需要用were 而不是was， RNN mentioned above not good capure long dependency
+除了vanishing gradient的问题，也有explode gradient的问题（expoentially large gradients can cause parameters become so large that your neural netowrk parameters really messed up, parameters blow up often see NaNs, you have overflow in your neural network computation),  <span style="background-color: #FFFF00"> exploding gradient 可以用gradient clipping</span>，<span style="color: red">但超过某个threshold得时候，rescale避免too large. thare are clips according to some 最大值</span>
+
 
 
 
