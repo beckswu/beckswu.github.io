@@ -111,7 +111,7 @@ RNN Model:
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week1pic8.png)
 
-speech generation. 从$$a^{<{1}>} $$到 $$\hat y^{<{1}>}$$ 是softmax matrix，看字典中每个字的概率， $$y^{<{1}>}$$是一个10002(10000 + unknown + EOS) vector，到了$$a^{<{2}>}$$, given the first correct answer, what is the distribution of P(__ | cats); 到了$$a^{<{3}>}$$, given the first correct answer, P(__ | cats, average);到最后一个predict P(_ |....前面所有的), cost function is softmax cost function; given the first word, $$P\left( y^{<{1}>}, y^{<{2}>}, y^{<{3}>} \right) = P\left( y^{<{1}>}\right) \cdot P\left(y^{<{2}>} | y^{<{1}>} \right)\cdot  P\left(y^{<{3}>} | y^{<{1}>}, y^{<{2}>} \right) $$
+speech generation. 从$$a^{<{1}>} $$到 $$\hat y^{<{1}>}$$ 是softmax matrix，看字典中每个字的概率， $$y^{<{1}>}$$是一个10002(10000 + unknown + EOS) vector，到了$$a^{<{2}>}$$, 
 
 
 #### Sampling novel Sequence:
@@ -125,8 +125,7 @@ speech generation. 从$$a^{<{1}>} $$到 $$\hat y^{<{1}>}$$ 是softmax matrix，�
 
 #### Vanishing gradients
 
-languages that comes earlier 可以影响 later的，比如前面提到cats, 十个单词后可能需要用were 而不是was， RNN mentioned above not good capure long dependency
-除了vanishing gradient的问题，也有explode gradient的问题（expoentially large gradients can cause parameters become so large that your neural netowrk parameters really messed up, parameters blow up often see NaNs, you have overflow in your neural network computation),  <span style="background-color: #FFFF00"> exploding gradient 可以用gradient clipping</span>，<span style="color: red">但超过某个threshold得时候，rescale避免too large. thare are clips according to some 最大值</span>
+languages that comes earlier 可以影响 later的，比如前面提到cats, 十个单词后可能需要用were 而不是was， 除了vanishing gradient的问题，也有explode gradient的问题（expoentially large gradients can cause parameters become so large 导致 parameters blow up, often see NaNs, have overflow in neural network computation),  <span style="background-color: #FFFF00"> exploding gradient 可以用gradient clipping</span>，<span style="color: red">当超过某个threshold得时候，rescale避免too large. thare are clips according to some 最大值</span>
 
 
 
