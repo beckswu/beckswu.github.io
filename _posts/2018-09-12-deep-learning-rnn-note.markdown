@@ -135,10 +135,6 @@ languages that comes earlier 可以影响 later的，比如前面提到cats, 十
 
 
 
-
-[pic3]: https://raw.githubusercontent.com/beckswu/beckswu.github.io/master/img/post/Deep_Learning-Sequence_Model_note/week1pic3.png
-
-
 #### GRU && LSTM
 
 **GRU**:
@@ -163,9 +159,18 @@ languages that comes earlier 可以影响 later的，比如前面提到cats, 十
 1. $$\Gamma_u$$是表示update gate,  $$\Gamma_o$$是表示forget gate, $$\Gamma_o$$是表示output gate
 2. peephole connection($$c^{<{t-1}>}$$): gate value may not only depend on $$a^{<{t-1}>}$$ & $$x^{<{t}>}$$, 也可能depend on $$c^{<{t-1}>}$$, $$\Gamma_o = \sigma \left( W_o \left[ a^{<{t-1}>}, x^{<{t}>}, c^{<{t-1}>}  \right] + b_o \right)$$
 
+![](/img/post/Deep_Learning-Sequence_Model_note/week1pic10.png)
+ 
+
 | GRU | LSTM |
 | ------:| -----------:|
 | $$c^{<{t}>} $$ 等于 $$a^{<{t}>} $$ | $$c^{<{t}>} $$ 不等于 $$a^{<{t}>} $$ |
 | update$$c^{<{t}>} $$是由gate\Gamma_u控制，如果不update, gate = 0, $$c^{<{t}>} $$ = $$c^{<{t-1}>} $$   | 有三个gate  $$\Gamma_u$$,$$\Gamma_f$$,$$\Gamma_o$$ 分别控制update, forget, 和output |
 
 when use GRU or LSTM: isn't widespread consensus in this; Andrew: GRU is simpler model than LSTM, easy to build much bigger network than GRU, LSTM is more powerful and effective since it has three gates instead of two. LSTM is move historical proven
+
+
+
+
+
+[pic3]: https://raw.githubusercontent.com/beckswu/beckswu.github.io/master/img/post/Deep_Learning-Sequence_Model_note/week1pic3.png
