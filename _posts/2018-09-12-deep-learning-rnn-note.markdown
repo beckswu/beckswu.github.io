@@ -147,7 +147,7 @@ languages that comes earlier 可以影响 later的，比如前面提到cats, 十
 3. $$\Gamma_u$$是表示gate, 如果gate = 1, $$c^{<{t}>}$$ 更新值为 candidate 值 $$\tilde c^{<{t}>}$$, 比如遇到cat gate = 1更新 $$c^{<{t}>}$$为1表示单数, the cat, which already ate.... was full, 从cat 到was, gate =0, means don't update, 直到was, $$c^{<{t}>}$$还为1 (without vanishing)
 4. sigmoid function for $$\Gamma_u$$ easy to set zero, 只要 $$ W_u \left[ c^{<{t-1}>}, x^{<{t}>}  \right] + b_u $$ 是非常大的负数
 5. $$c^{<{t}>}$$可以是vector (比如100维，100维都是bits), then$$\Gamma_u$$,$$\tilde c^{<{t}>}$$都是same dimension,  $$ \Gamma_u \cdot \tilde c^{<{t}>}  + \left( 1 - \Gamma_u \right) \cdot  c^{<{t-1}>} $$ 是element wise operation, 点乘告诉哪个bit需要update，哪个保持上一个value，比如用第一个维度代表单数复数，第二维度代表是不是food
-6. $$Gamma_r $$: relevance, how relevant $$c^{<{t-1}>}$$ to update $$c^{<{t}>}$$
+6. $$\Gamma_r $$: relevance, how relevant $$c^{<{t-1}>}$$ to update $$c^{<{t}>}$$
 
 
 **LSTM**:
