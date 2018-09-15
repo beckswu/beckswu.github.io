@@ -141,11 +141,11 @@ languages that comes earlier 可以影响 later的，比如前面提到cats, 十
 
 #### GRU && LSTM
 
+
 | GRU | LSTM |
-|      $$\begin{align} a^{<{0}>} &= \vec0  \\
-a^{<{1}>} &= g_1\left(W_{aa}\cdot a^{<{0}>}+ W_{ax}\cdot X^{<{a}>} + b_aa \right) \\
-y^{<{1}>} &= g_2\left(W_{ya}\cdot a^{<{1}>} + b_y \right)
-\end{align}$$       |     $$\begin{align} a^{<{0}>} &= \vec0  \\
+| ------:| -----------:|
+|      $$\begin{align} a^{<{0}>} &= \vec0  \\ a^{<{1}>} &= g_1\left(W_{aa}\cdot a^{<{0}>}+ W_{ax}\cdot X^{<{a}>} + b_aa \right) \\ y^{<{1}>} &= g_2\left(W_{ya}\cdot a^{<{1}>} + b_y \right)
+\end{align}$$     |    $$\begin{align} a^{<{0}>} &= \vec0  \\
 a^{<{1}>} &= g_1\left(W_{aa}\cdot a^{<{0}>}+ W_{ax}\cdot X^{<{a}>} + b_aa \right) \\
 y^{<{1}>} &= g_2\left(W_{ya}\cdot a^{<{1}>} + b_y \right)
 \end{align}$$        |
