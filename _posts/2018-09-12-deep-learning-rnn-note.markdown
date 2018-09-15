@@ -172,7 +172,7 @@ when use GRU or LSTM: isn't widespread consensus in this; Andrew: GRU is simpler
 
 #### Bidirection RNN && Deep RNNS:
 
-单向的RNN的问题，比如 He said "Teddy bears are on sale"; He said “Teddy Roosevelt was a great President". Teddy都在第三个，而只有第二句话的Teddy表示名字<br/>
+单向的RNN的问题，比如 He said "Teddy bears are on sale"; He said “Teddy Roosevelt was a great President". Teddy都是第三个单词且前两个都一样，而只有第二句话的Teddy表示名字<br/>
 Bidirection RNN: part forward prop从左向右，part forward prop从右向左, 每个Bidirection RNN block还可以是GRU or LSTM的block
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week1pic11.png)
@@ -185,8 +185,7 @@ Bidirection RNN: part forward prop从左向右，part forward prop从右向左, 
 
 For RRN, 三层已经是very deep, $$a^{\left[{1}\right]<{0}>}$$表示第1层第0个input，在output layer也可以有stack recurrent layer，但这些layer没有horizon connection， 每个block 也可以是GRU, 也可以是LSTM, 也可以build deep version of bidirectional RNN, <span style="background-color: #FFFF00">Disadvantage: computational expensive to train</span>
 
-比如计算$$a^{\left[{2}\right]<{3}>}$$ <br/>
-$$a^{\left[{2}\right]<{3}>} = g\left( W_a^2 \left[a^{\left[{2}\right] <{2}>}, a^{\left[ {1}  \right] <{3}>}  \right] \right)$$
+比如计算$$a^{\left[{2}\right]<{3}>}$$   $$a^{\left[{2}\right]<{3}>} = g\left( W_a^2 \left[a^{\left[{2}\right] <{2}>}, a^{\left[ {1}  \right] <{3}>}  \right] \right)$$
 
 
 [pic3]: https://raw.githubusercontent.com/beckswu/beckswu.github.io/master/img/post/Deep_Learning-Sequence_Model_note/week1pic3.png
