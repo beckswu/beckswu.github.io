@@ -148,4 +148,3 @@ languages that comes earlier 可以影响 later的，比如前面提到cats, 十
 
 | GRU | LSTM |
 | ------:| -----------:|
-|        |   |
