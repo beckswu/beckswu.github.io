@@ -167,7 +167,7 @@ languages that comes earlier 可以影响 later的，比如前面提到cats, 十
 | $$c^{<{t}>} $$ 等于 $$a^{<{t}>} $$ | $$c^{<{t}>} $$ 不等于 $$a^{<{t}>} $$ |
 | update$$c^{<{t}>} $$是由gate\Gamma_u控制，如果不update, gate = 0, $$c^{<{t}>} $$ = $$c^{<{t-1}>} $$   | 有三个gate  $$\Gamma_u$$,$$\Gamma_f$$,$$\Gamma_o$$ 分别控制update, forget, 和output |
 
-when use GRU or LSTM: isn't widespread consensus in this; Andrew: GRU is simpler model than LSTM, easy to build much bigger network than GRU, LSTM is more powerful and effective since it has three gates instead of two. LSTM is move historical proven
+when use GRU or LSTM: isn't widespread consensus in this; Andrew: GRU is simpler model than LSTM, <span style="background-color: #FFFF00">easy to build much bigger network</span> than LSFT, LSTM is <span style="background-color: #FFFF00">more powerful and effective</span> since it has three gates instead of two. LSTM is move historical proven
 
 
 
