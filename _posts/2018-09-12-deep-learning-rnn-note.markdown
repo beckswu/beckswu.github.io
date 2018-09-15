@@ -50,7 +50,7 @@ $$ vector长度是10000， 只有第100位是1，剩下都是0. if 遇见了word
 
 比如下面看是不是name的，output是长度为9，0代表不是name, 1代表是name
 ![](/img/post/Deep_Learning-Sequence_Model_note/week1pic2.png)
-<img src="/img/post/Deep_Learning-Sequence_Model_note/week1pic2.png" alt="drawing" style="height:200px;"/> 
+<img src="/img/post/Deep_Learning-Sequence_Model_note/week1pic2.png" alt="drawing" style="height:400px;"/> 
 
 
 #### Recurrent Neural Network Model:
@@ -78,9 +78,12 @@ y^{<{1}>} &= g_2\left(W_{ya}\cdot a^{<{1}>} + b_y \right)
 从$$a^{<{t-1}>} $$和 $$x^{<{t}>}$$ 生成$$a^{<{t}>}$$ 的可以是<span style="color: red">tanh</span>, 从$$a^{<{t}>}$$ 到$$y^{<{t}>}$$的是<span style="color: red">softmax</span>
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week1pic4.png)
+<img src="/img/post/Deep_Learning-Sequence_Model_note/week1pic4.png" alt="drawing" style="height:500px;"/> 
 
 简化符号
 ![](/img/post/Deep_Learning-Sequence_Model_note/week1pic5.png)
+<img src="/img/post/Deep_Learning-Sequence_Model_note/week1pic5.png" alt="drawing" style="height:600px;"/> 
+
 <br/> activations function often use tanh or Relu. if it is binary classification, can use sigmoid function. 
 <span style="background-color: #FFFF00">The choice of activation 取决于what type of output y you have </span>
 
