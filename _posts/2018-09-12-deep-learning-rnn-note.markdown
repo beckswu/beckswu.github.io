@@ -26,7 +26,10 @@ Examples of sequence data:
 sometimes 输入X 和 输出Y 可以是不同的长度，sometimes X和Y(example 4,7)是同样长度的, sometimes 只有X或者只有Y是sequence的 (example 2)
 <script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"> </script>
 #### notation: 
-![](/img/post/Deep_Learning-Sequence_Model_note/week1pic1.png)
+
+[//]: <> (![](/img/post/Deep_Learning-Sequence_Model_note/week1pic1.png))
+
+
 example: given a sentence 判断哪个是人名<br/> 
 $$x^{({i})<{t}>}$$:  表示第i个training example 中第t个word, t 表示temporal sequences althought whether sequences are temporal one or not<br/> 
 $$y^{({i})<{t}>}$$:  表示第i个training example 中第t个word的输出label<br/> 
@@ -47,6 +50,8 @@ $$ vector长度是10000， 只有第100位是1，剩下都是0. if 遇见了word
 
 比如下面看是不是name的，output是长度为9，0代表不是name, 1代表是name
 ![](/img/post/Deep_Learning-Sequence_Model_note/week1pic2.png)
+<img src="/img/post/Deep_Learning-Sequence_Model_note/week1pic2.png" alt="drawing" style="height:200px;"/> 
+
 
 #### Recurrent Neural Network Model:
 <span style="background-color: #FFFF00">Why not a standard network?</span> <br/>
@@ -69,7 +74,8 @@ Forward Propagation:
 $$\begin{align} a^{<{0}>} &= \vec0  \\
 a^{<{1}>} &= g_1\left(W_{aa}\cdot a^{<{0}>}+ W_{ax}\cdot X^{<{a}>} + b_aa \right) \\
 y^{<{1}>} &= g_2\left(W_{ya}\cdot a^{<{1}>} + b_y \right)
-\end{align}$$ 
+\end{align}$$ </br>
+从$$a^{<{t-1}>} $$和 $$x^{<{t}>}$$ 生成$$a^{<{t}>}$$ 的可以是<span style="color: red">tanh</span>, 从$$a^{<{t}>}$$ 到$$y^{<{t}>}$$的是<span style="color: red">softmax</span>
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week1pic4.png)
 
