@@ -143,25 +143,29 @@ languages that comes earlier 可以影响 later的，比如前面提到cats, 十
 
 **GRU**:
 
- $$\begin{align} \tilde c^{<{t}>} &= tanh \left( W_c \left[ \Gamma_r \times c^{<{t-1}>}, x^{<{t}>}  \right] + b_c \right) \\ \Gamma_r &= \sigma \left( W_r \left[ c^{<{t-1}>}, x^{<{t}>}  \right] + b_r \right) \\  \Gamma_u &= \sigma \left( W_u \left[ c^{<{t-1}>}, x^{<{t}>}  \right] + b_u \right) \\ c^{<{t}>} &= \Gamma_u \cdot \tilde c^{<{t}>}  + \left( 1 - \Gamma_u \right) \cdot  c^{<{t-1}>}  \\ a^{<{t}>} &= c^{<{t}>}  \end{align}$$  <br/>
-注\*: 
+ $$\begin{align} \tilde c^{<{t}>} &= tanh \left( W_c \left[ \Gamma_r \times c^{<{t-1}>}, x^{<{t}>}  \right] + b_c \right) \\ \Gamma_r &= \sigma \left( W_r \left[ c^{<{t-1}>}, x^{<{t}>}  \right] + b_r \right) \\  \Gamma_u &= \sigma \left( W_u \left[ c^{<{t-1}>}, x^{<{t}>}  \right] + b_u \right) \\ c^{<{t}>} &= \Gamma_u \cdot \tilde c^{<{t}>}  + \left( 1 - \Gamma_u \right) \cdot  c^{<{t-1}>}  \\ a^{<{t}>} &= c^{<{t}>}  \end{align}$$  
+
+
 1. c是memory cell, a 是output cell, c = memory cell 比如记录cat 是单数还是复数, 用于后面记录是was or were 
 2. $$\tilde c^{<{t}>}$$是candidate value 代替$$c^{<{t}>}$$， 
-3. $$\Gamma_u$$是表示gate,此刻更不更新$$c^{<{t}>}$$, 如果gate = 1, $$c^{<{t}>}$$ = candidate 值 $$\tilde c^{<{t}>}$$, 比如遇到cat gate = 1更新 $$c^{<{t}>}$$为1表示单数, the cat, which already ate.... was full, 从cat 到was, gate =0, means don't update, 直到was, $$c^{<{t}>}$$还为1, 
-4. sigmoid function for $$\Gamma_u$$ easy to set zero, 只要 $$ W_u \left[ c^{<{t-1}>}, x^{<{t}>}  \right] + b_u $$ 是非常大的复数
+3. $$\Gamma_u$$是表示gate, 如果gate = 1, $$c^{<{t}>}$$ 更新值为 candidate 值 $$\tilde c^{<{t}>}$$, 比如遇到cat gate = 1更新 $$c^{<{t}>}$$为1表示单数, the cat, which already ate.... was full, 从cat 到was, gate =0, means don't update, 直到was, $$c^{<{t}>}$$还为1 (without vanishing)
+4. sigmoid function for $$\Gamma_u$$ easy to set zero, 只要 $$ W_u \left[ c^{<{t-1}>}, x^{<{t}>}  \right] + b_u $$ 是非常大的负数
 5. $$c^{<{t}>}$$可以是vector (比如100维，100维都是bits), then$$\Gamma_u$$,$$\tilde c^{<{t}>}$$都是same dimension,  $$ \Gamma_u \cdot \tilde c^{<{t}>}  + \left( 1 - \Gamma_u \right) \cdot  c^{<{t-1}>} $$ 是element wise operation, 点乘告诉哪个bit需要update，哪个保持上一个value，比如用第一个维度代表单数复数，第二维度代表是不是food
 6. $$Gamma_r $$: relevance, how relevant $$c^{<{t-1}>}$$ to update $$c^{<{t}>}$$
 
 
 **LSTM**:
 
- $$\begin{align} \tilde c^{<{t}>} &= tanh \left( W_c \left[ \Gamma_r \times a^{<{t-1}>}, x^{<{t}>}  \right] + b_c \right) \\ \Gamma_u &= \sigma \left( W_u \left[ a^{<{t-1}>}, x^{<{t}>}  \right] + b_u \right) \\  c\\  \Gamma_o &= \sigma \left( W_o \left[ a^{<{t-1}>}, x^{<{t}>}  \right] + b_o \right) \\ c^{<{t}>} &= \Gamma_u \cdot \tilde c^{<{t}>}  + \Gamma_f  \cdot  c^{<{t-1}>}  \\ a^{<{t}>} &= \Gamma_o \cdot tanh\left(c^{<{t}>} \right) \end{align}$$  <br/>
- 注\*: 
-1. $$\Gamma_u$$是表示update gate, $$\Gamma_o$$是表示forget gate,$$\Gamma_o$$是表示output gate
-2. peephole connection($$c^{<{t-1}>}$$): gate value may not only depend on $$a^{<{t-1}>}$$ & $$x^{<{t}>}$$, 也可能depend on $$c^{<{t-1}>}$$, $$\Gamma_o = \sigma \left( W_o \left[ a^{<{t-1}>}, x^{<{t}>, c^{<{t-1}>}}  \right] + b_o \right)$$
+ $$\begin{align} \tilde c^{<{t}>} &= tanh \left( W_c \left[ \Gamma_r \times a^{<{t-1}>}, x^{<{t}>}  \right] + b_c \right) \\ \Gamma_u &= \sigma \left( W_u \left[ a^{<{t-1}>}, x^{<{t}>}  \right] + b_u \right) \\  c\\  \Gamma_o &= \sigma \left( W_o \left[ a^{<{t-1}>}, x^{<{t}>}  \right] + b_o \right) \\ c^{<{t}>} &= \Gamma_u \cdot \tilde c^{<{t}>}  + \Gamma_f  \cdot  c^{<{t-1}>}  \\ a^{<{t}>} &= \Gamma_o \cdot tanh\left(c^{<{t}>} \right) \end{align}$$  
+
+
+
+1. $$\Gamma_u$$是表示update gate,  $$\Gamma_o$$是表示forget gate, $$\Gamma_o$$是表示output gate
+2. peephole connection($$c^{<{t-1}>}$$): gate value may not only depend on $$a^{<{t-1}>}$$ & $$x^{<{t}>}$$, 也可能depend on $$c^{<{t-1}>}$$, $$\Gamma_o = \sigma \left( W_o \left[ a^{<{t-1}>}, x^{<{t}>}, c^{<{t-1}>}  \right] + b_o \right)$$
 
 | GRU | LSTM |
 | ------:| -----------:|
-| $$c^{<{t}>} $$ <span style="color: red">等于</span> $$a^{<{t}>} $$ | $$c^{<{t}>} $$ <span style="color: red">不等于</span> $$a^{<{t}>} $$ |
+| $$c^{<{t}>} $$ 等于 $$a^{<{t}>} $$ | $$c^{<{t}>} $$ 不等于 $$a^{<{t}>} $$ |
 | update$$c^{<{t}>} $$是由gate\Gamma_u控制，如果不update, gate = 0, $$c^{<{t}>} $$ = $$c^{<{t-1}>} $$   | 有三个gate  $$\Gamma_u$$,$$\Gamma_f$$,$$\Gamma_o$$ 分别控制update, forget, 和output |
+
 when use GRU or LSTM: isn't widespread consensus in this; Andrew: GRU is simpler model than LSTM, easy to build much bigger network than GRU, LSTM is more powerful and effective since it has three gates instead of two. LSTM is move historical proven
