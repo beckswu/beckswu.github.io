@@ -144,7 +144,3 @@ languages that comes earlier 可以影响 later的，比如前面提到cats, 十
 **GRU**:
 
  $$\begin{align} \tilde c^{<{t}>} &= tanh \left( W_c \left[ \Gamma_r \times c^{<{t-1}>}, x^{<{t}>}  \right] + b_c \right) \\ \Gamma_r &= \sigma \left( W_r \left[ c^{<{t-1}>}, x^{<{t}>}  \right] + b_r \right) \\  \Gamma_u &= \sigma \left( W_u \left[ c^{<{t-1}>}, x^{<{t}>}  \right] + b_u \right) \\ c^{<{t}>} &= \Gamma_u \cdot \tilde c^{<{t}>}  + \left( 1 - \Gamma_u \right) \cdot \tilde c^{<{t-1}>}   \end{align}$$  
-
-
-| GRU | LSTM |
-| ------:| -----------:|
