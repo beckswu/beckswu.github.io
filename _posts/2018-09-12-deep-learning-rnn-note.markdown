@@ -170,7 +170,23 @@ languages that comes earlier 可以影响 later的，比如前面提到cats, 十
 when use GRU or LSTM: isn't widespread consensus in this; Andrew: GRU is simpler model than LSTM, <span style="background-color: #FFFF00">easy to build much bigger network</span> than LSFT, LSTM is <span style="background-color: #FFFF00">more powerful and effective</span> since it has three gates instead of two. LSTM is move historical proven
 
 
+#### Bidirection RNN && Deep RNNS:
 
+单向的RNN的问题，比如 He said "Teddy bears are on sale"; He said “Teddy Roosevelt was a great President". Teddy都在第三个，而只有第二句话的Teddy表示名字<br/>
+Bidirection RNN: part forward prop从左向右，part forward prop从右向左, 每个Bidirection RNN block还可以是GRU or LSTM的block
+
+![](/img/post/Deep_Learning-Sequence_Model_note/week1pic11.png)
+
+ $$ \tilde y^{<{t}>} = g\left( W_y\left[ \overrightarrow a^{<{t}>}, \overleftarrow a^{<{t}>}   \right] + b_y \right)$$  
+
+<span style="background-color: #FFFF00">disadvantage</span>: 需要entire sequence of data before you can make prediction; 比如speech recognition: 需要person 停止讲话 to get entire utterance before process and make prediction
+
+![](/img/post/Deep_Learning-Sequence_Model_note/week1pic12.png)
+
+For RRN, 三层已经是very deep, $$a^{\left[{1}\right]<{0}>}$$表示第1层第0个input，在output layer也可以有stack recurrent layer，但这些layer没有horizon connection， 每个block 也可以是GRU, 也可以是LSTM, 也可以build deep version of bidirectional RNN, <span style="background-color: #FFFF00">Disadvantage: computational expensive to train</span>
+
+比如计算$$a^{\left[{2}\right]<{3}>}$$ <br/>
+$$a^{\left[{2}\right]<{3}>} = g\left( W_a^2 \left[a^{\left[{2}\right] <{2}>}, a^{\left[ {1}  \right] <{3}>}  \right] \right)$$
 
 
 [pic3]: https://raw.githubusercontent.com/beckswu/beckswu.github.io/master/img/post/Deep_Learning-Sequence_Model_note/week1pic3.png
