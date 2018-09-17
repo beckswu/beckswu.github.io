@@ -131,7 +131,7 @@ speech generation. 从$$a^{<{1}>} $$到 $$\hat y^{<{1}>}$$ 是softmax matrix，�
 
 #### Vanishing gradients
 
-languages that comes earlier 可以影响 later的，比如前面提到cats, 十个单词后可能需要用were 而不是was， 除了vanishing gradient的问题，也有explode gradient的问题（expoentially large gradients can cause parameters become so large 导致 parameters blow up, often see NaNs, have overflow in neural network computation),  <span style="background-color: #FFFF00"> exploding gradient 可以用gradient clipping</span>，<span style="color: red">当超过某个threshold得时候，rescale避免too large. thare are clips according to some 最大值</span>
+languages that comes earlier 可以影响 later的，比如前面提到cats, 十个单词后可能需要用were 而不是was， 除了vanishing gradient的问题，也有explode gradient的问题（expoentially large gradients can cause parameters become so large 导致 parameters blow up, often see NaNs, have overflow in neural network computation),  <span style="background-color: #FFFF00"> exploding gradient 可以用gradient clipping</span>，<span style="color: red">当超过某个threshold得时候，rescale避免too large. thare are clips according to some 最大值</span>, 比如gradient超过[-10,10], 就让gradient 保持10 or -10
 
 
 
@@ -186,6 +186,36 @@ Bidirection RNN: part forward prop从左向右，part forward prop从右向左, 
 For RRN, 三层已经是very deep, $$a^{\left[{1}\right]<{0}>}$$表示第1层第0个input，在output layer也可以有stack recurrent layer，但这些layer没有horizon connection， 每个block 也可以是GRU, 也可以是LSTM, 也可以build deep version of bidirectional RNN, <span style="background-color: #FFFF00">Disadvantage: computational expensive to train</span>
 
 比如计算$$a^{\left[{2}\right]<{3}>}$$:   $$a^{\left[{2}\right]<{3}>} = g\left( W_a^2 \left[a^{\left[{2}\right] <{2}>}, a^{\left[ {1}  \right] <{3}>}  \right] \right)$$
+
+
+
+
+## Week2 NLP & Word Embedding
+
+#### Word Embedding:
+<span style="background-color: #FFFF00">Word Embedding: </span> 让algorithm学会同义词：比如男人vs女人，king vs queen<br/> 
+<span style="background-color: #FFFF00">One hot vector的缺点</span>: 10000中(10000是字典)，只有1个为1表示这个词，不能表示gender. age, fruit..., 因为任何两个one-hot vector的inner product是zero
+
+![](/img/post/Deep_Learning-Sequence_Model_note/week2pic1.png)
+
+可能apple 和orange有的feature不一样比如color，但是a lot feature是一样的， <span style="background-color: #FFFF00">T-SNE</span> 把3000vector visualize 到2-D, analogy tends to close<br/>
+Embed training dataset 需要很大的，会发现比如durian 和orange， farmer 和cultivator是同义词, 1. 所以当training set有限的时候，可以先train 从网上的文本（10billion 个）or use pre-training embedding online，2. 然后再apply <span style="background-color: #FFFF00">transfer learning</span> 到你的task上(size = 100K), then use 300 dimension vector（位置一表示性别，位置二表示color...） to represent word instead of one hot vector(dimension: 10000),<span style="background-color: #FFFF00">**advantage**</span>: use low dimension feature vector.  3. continue to finetuen word embeddings with new data(only 你的task dataset is large)
+
+
+**Cosine Similarity**: 
+
+比如 $$e_{man} - e_{woman} \approx e_{king} - e_{?} $$sim\left( e_{w}, e_{king} - e_{man} + e_{woman} \right)$$, <br/>
+$$sim\left( u, v \right)  = \frac{u^Tv}{{\lVert u\rVert}_2 {\lVert v\rVert}_2 } $$ <br/>
+如果u,v similar, similarity will be large, 因为$$u^Tv$$表示他们的夹角(cos), or measure dissimilarity Euclidian distance: <br/>
+$${\lVert u\rVert}^2$$ 通常measure dissimilarity than similarity
+
+![](/img/post/Deep_Learning-Sequence_Model_note/week2pic2.png)
+
+
+**Embedding Matrix**:
+
+![](/img/post/Deep_Learning-Sequence_Model_note/week2pic3.png)
+可以用embedding matrix 乘以one hot vector得到属于现在词的embedding vector,但是通常用不efficient, in practice用just lookup 那个word的emdding matrix column e
 
 
 [pic3]: https://raw.githubusercontent.com/beckswu/beckswu.github.io/master/img/post/Deep_Learning-Sequence_Model_note/week1pic3.png
