@@ -188,8 +188,6 @@ For RRN, 三层已经是very deep, $$a^{\left[{1}\right]<{0}>}$$表示第1层第
 比如计算$$a^{\left[{2}\right]<{3}>}$$:   $$a^{\left[{2}\right]<{3}>} = g\left( W_a^2 \left[a^{\left[{2}\right] <{2}>}, a^{\left[ {1}  \right] <{3}>}  \right] \right)$$
 
 
-
-
 ## Week2 NLP & Word Embedding
 
 #### Word Embedding:
