@@ -187,6 +187,7 @@ For RRN, 三层已经是very deep, $$a^{\left[{1}\right]<{0}>}$$表示第1层第
 
 比如计算$$a^{\left[{2}\right]<{3}>}$$:   $$a^{\left[{2}\right]<{3}>} = g\left( W_a^2 \left[a^{\left[{2}\right] <{2}>}, a^{\left[ {1}  \right] <{3}>}  \right] \right)$$
 
+<br/><br/><br/>
 
 
 ## Week2 NLP & Word Embedding
@@ -222,5 +223,29 @@ $${||u-v||}^2$$ 通常measure dissimilarity than similarity
 ![](/img/post/Deep_Learning-Sequence_Model_note/week2pic3.png)
 可以用embedding matrix 乘以one hot vector得到属于现在词的embedding vector,但是通常不用，因为不efficient, in practice用just lookup 那个word的emdding matrix column e
 
+#### Word2vec & Negative Sampling & GloVe
+
+**Word2Vec**:
+
+fixed history: 比如I want a glass of orange ___ , 预测填入的是juice，把前四个word, a glass of orange 代入network, 每个词都是300维的embedded vector(来自same embedded matrix),把4个300 stack together, 带入hidden layer, 再用softmax predict;  <span style="background-color: #FFFF00">advantage</span> can deal with arbitrary long 句子，因为input size is fixed 
+
+![](/img/post/Deep_Learning-Sequence_Model_note/week2pic4.png)
+
+Context/target pairs:   Context可以是 last 4 words; Context也可以是4 word on left & right; Context也可以是nearby one word
+
+**Skip-grams**:
+
+比如句子: I want a glass of orange juice to go along with my cereal; 先去<span style="color: red">context word</span> 比如选取了word: content, 随机pick another word within some window as <span style="color: red">target word</span>  比如前后的5个或者10个词; 比如 context: orange -> target: juice; context: orange -> target: glass; context: orange -> target: my; 
+
+Goal: learn from content to target;  vocabulary size  = 10,000, context: orange (vector index 6257) ->  target: juice (4834)  
+
+Model:  $$ O_c \rightarrow E \rightarrow e_c \rightarrow softmax \rightarrow \hat y$$   <br/>
+Softmax: $$ p(t |c) = \frac{ \theta_t^T e_c }{ \sum_{j=1}^{10,000} { e^{ \theta_j^T e_c  }  } } $$  $$\theta_t is parameter associated with output t <br/>
+Loss function: $$ L \left(\hat y , y \right) = - \sum_{i=1}^{10,000} { y_i log\hat{y_i}  }$$ 
+
+<span style="background-color: #FFFF00">Problem with softmax classification</span>: softmax的分母每次都要sum over all words in vocabulary; solution1: hierarchical softmax:有点像segment tree, 把所有的单词分成一半，再分一半。。。每一个parent 记录所有的softmax的和of childs; complexity: log|v| ; 通常不是balanced tree, common words 在top, less common 在deeper(因为不common的，通常不用go that deep in the tree)
+![](/img/post/Deep_Learning-Sequence_Model_note/week2pic5.png)
+
+How to find context c: 如果我们random 选择from training corpus, 可能会选择很多the, a, of, and, to,但我们更想让model训练比如orange, durian这样的词 
 
 [pic3]: https://raw.githubusercontent.com/beckswu/beckswu.github.io/master/img/post/Deep_Learning-Sequence_Model_note/week1pic3.png
