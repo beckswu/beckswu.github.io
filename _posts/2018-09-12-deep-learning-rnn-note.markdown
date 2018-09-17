@@ -205,7 +205,7 @@ Embed training dataset 需要很大的，会发现比如durian 和orange， farm
 **Cosine Similarity**: 
 
 比如 $$e_{man} - e_{woman} \approx e_{king} - e_{?} $$sim\left( e_{w}, e_{king} - e_{man} + e_{woman} \right)$$, <br/>
-$$sim\left( u, v \right)  = \frac{u^Tv}{{||u||}_2 {||v||}_2 } $$ <br/>
+$$sim\left( u, v \right)  = \frac{u^Tv}{||u||_2 ||v||_2 } $$ <br/>
 如果u,v similar, similarity will be large, 因为$$u^Tv$$表示他们的夹角(cos), or measure dissimilarity Euclidian distance: <br/>
 $${||u-v||}^2$$ 通常measure dissimilarity than similarity
 
