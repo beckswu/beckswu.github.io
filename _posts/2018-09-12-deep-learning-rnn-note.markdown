@@ -187,9 +187,11 @@ For RRN, 三层已经是very deep, $$a^{\left[{1}\right]<{0}>}$$表示第1层第
 
 比如计算$$a^{\left[{2}\right]<{3}>}$$:   $$a^{\left[{2}\right]<{3}>} = g\left( W_a^2 \left[a^{\left[{2}\right] <{2}>}, a^{\left[ {1}  \right] <{3}>}  \right] \right)$$
 
+a
 
 ## Week2 NLP & Word Embedding
 
+a
 #### Word Embedding:
 <span style="background-color: #FFFF00">Word Embedding: </span> 让algorithm学会同义词：比如男人vs女人，king vs queen<br/> 
 <span style="background-color: #FFFF00">One hot vector的缺点</span>: 10000中(10000是字典)，只有1个为1表示这个词，不能表示gender. age, fruit..., 因为任何两个one-hot vector的inner product是zero
