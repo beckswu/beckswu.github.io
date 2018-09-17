@@ -198,13 +198,17 @@ For RRN, 三层已经是very deep, $$a^{\left[{1}\right]<{0}>}$$表示第1层第
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week2pic1.png)
 
-可能apple 和orange有的feature不一样比如color，但是a lot feature是一样的， <span style="background-color: #FFFF00">T-SNE</span> 把3000vector visualize 到2-D, analogy tends to close<br/>
-Embed training dataset 需要很大的，会发现比如durian 和orange， farmer 和cultivator是同义词, 1. 所以当training set有限的时候，可以先train 从网上的文本（10billion 个）or use pre-training embedding online，2. 然后再apply <span style="background-color: #FFFF00">transfer learning</span> 到你的task上(size = 100K), then use 300 dimension vector（位置一表示性别，位置二表示color...） to represent word instead of one hot vector(dimension: 10000),<span style="background-color: #FFFF00">**advantage**</span>: use low dimension feature vector.  3. continue to finetuen word embeddings with new data(only 你的task dataset is large)
+可能apple 和orange有的feature不一样比如color，但是a lot feature是一样的， <span style="background-color: #FFFF00">T-SNE</span> 把3000vector visualize 到2-D, analogy tends to close
+
+Embedding training dataset 需要很大的，会发现比如durian 和orange， farmer 和cultivator是同义词, 
+1. 所以当training set有限的时候，可以先train 从网上的文本（10billion 个）or use pre-training embedding online，
+2. 然后再apply <span style="background-color: #FFFF00">transfer learning</span> 到你的task上(size = 100K), then use 300 dimension vector（位置一表示性别，位置二表示color...） to represent word instead of one hot vector(dimension: 10000),<span style="background-color: #FFFF00">**advantage**</span>: use low dimension feature vector.  
+3. continue to fine-tune word embeddings with new data(only 你的task dataset is large)
 
 
 **Cosine Similarity**: 
 
-比如 $$e_{man} - e_{woman} \approx e_{king} - e_{?} $$sim\left( e_{w}, e_{king} - e_{man} + e_{woman} \right)$$, <br/>
+比如 $$e_{man} - e_{woman} \approx e_{king} - e_{?} $$ $$sim\left( e_{w}, e_{king} - e_{man} + e_{woman} \right)$$, <br/>
 $$sim\left( u, v \right)  = \frac{u^Tv}{||u||_2 ||v||_2 } $$ <br/>
 如果u,v similar, similarity will be large, 因为$$u^Tv$$表示他们的夹角(cos), or measure dissimilarity Euclidian distance: <br/>
 $${||u-v||}^2$$ 通常measure dissimilarity than similarity
@@ -215,7 +219,7 @@ $${||u-v||}^2$$ 通常measure dissimilarity than similarity
 **Embedding Matrix**:
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week2pic3.png)
-可以用embedding matrix 乘以one hot vector得到属于现在词的embedding vector,但是通常用不efficient, in practice用just lookup 那个word的emdding matrix column e
+可以用embedding matrix 乘以one hot vector得到属于现在词的embedding vector,但是通常不用，因为不efficient, in practice用just lookup 那个word的emdding matrix column e
 
 
 [pic3]: https://raw.githubusercontent.com/beckswu/beckswu.github.io/master/img/post/Deep_Learning-Sequence_Model_note/week1pic3.png
