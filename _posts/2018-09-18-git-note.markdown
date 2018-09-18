@@ -14,7 +14,7 @@ tags:
 
 ## 初始化
 
-```bash
+```shell
 #设置 global 变量会应用到所有之后建立的git repository
 git config --global user.name "Becks"   
 git config --global user.email "becks@gmail.com" 
