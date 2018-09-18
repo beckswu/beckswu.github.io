@@ -251,4 +251,23 @@ How to find context c: 如果我们random 选择from training corpus, 可能会�
 
 **Negative Sampling**:
 
+
+Given word: orange & juice. Is context - target pair?<br/>
+比如: I want a glass of orange juice to go along with my cereal. <br/>
+| Context | Target | target? |
+| ------:| -----------:| ------:  |
+|orange | juice | 1  |
+|orange | king | 0 |
+|orange | book | 0 |
+|orange | of | 0 |
+
+sample context and target word; <span style="color: red">positive example</span> generated: look at context within windows (5 or 10 word around); <span style="color: red">take the same context word. then pick a word randomly from dictionary </span>; 注意: 上面最后一个例子，"of" is zero even if we have "of"; <br/>
+<span style="background-color: #FFFF00">Generate training set</span>: 先generate positive example. 再生成k个negative examples, it is okay 如果生成的negative example 在context +-5，+-10 window出现; k = [5,20] for small dataset, k = [2,5] for large dataset
+
+**Model**: $$ \theta_t^{T} $$ one parameter theta for each target word, $$ e_c $$ for embedding vector. Instead of 10000 way softmax which is expensive to compute, <span style="background-color: #FFFF00">instead we have 10000 binary classification problem</span>
+
+![](/img/post/Deep_Learning-Sequence_Model_note/week2pic6.png)
+
+Select negative examples: If you choose words 根据its frequence, 可能end up with the, of, and; use $$ P(W_i) =  \frac{ f|left(w_i \right)^{3/4} }{ \sum_{j=1}^{10,000} { f|left(w_i \right)^{3/4}  } } $$
+
 [pic3]: https://raw.githubusercontent.com/beckswu/beckswu.github.io/master/img/post/Deep_Learning-Sequence_Model_note/week1pic3.png
