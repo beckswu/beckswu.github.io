@@ -269,6 +269,6 @@ sample context and target word; <span style="color: red">positive example</span>
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week2pic6.png)
 
-Select negative examples: If you choose words 根据its frequence, 可能end up with the, of, and; use $$ P(W_i) =  \frac{ f \left(w_i \right)^{3/4} }{ \sum_{j=1}^{10,000} { f|left(w_i \right)^{3/4}  } } $$
+Select negative examples: If you choose words 根据its frequence, 可能end up with the, of, and; use $$ P(W_i) =  \frac{ f \left(w_i \right)^{3/4} }{ \sum_{j=1}^{10,000} { f\left(w_i \right)^{3/4}  } } $$
 
 [pic3]: https://raw.githubusercontent.com/beckswu/beckswu.github.io/master/img/post/Deep_Learning-Sequence_Model_note/week1pic3.png
