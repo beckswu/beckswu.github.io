@@ -296,7 +296,7 @@ Aslo cannot 保证embeded vector是可以解释的,parallelogram for analogies s
 Simple Sentiment Classification Model: 用embedded vector which from large training set: so 不通常出现的word 也可以label 他们
 
 
-1. use average of each words output: works for review that are short or long; <span style="background-color: #FFFF00">Problem: Ignore order </span>：比如: completely lacking good service an dgood ambience, 即使有两个good，也是1星review
+1. use average of each words output: used for review that are short or long; <span style="background-color: #FFFF00">Problem: Ignore order </span>：比如: completely lacking good service an dgood ambience, 即使有两个good，也是1星review
 2. RNN for sentiment Classification:  <span style="background-color: #FFFF00">many-to-one architecture </span>
 
 
@@ -310,7 +310,7 @@ Simple Sentiment Classification Model: 用embedded vector which from large train
 Address bias: 
 
 1. Identiy bias direction； 比如用 embeded vector $$ e_{he} - e_{she}; e_{male} - e_{female} $$... averge them 得到bias direction(1 dimension), 垂直的bias direction是 non-bias direction(299 dimension)
-2. Neutralize: 对于不是definitional 的word(definitional的是grandmother, grandfather, 不是definitional比如 doctor, babysitter), project to get rid of bias, project them到non-bias direction; 对于如何选取什么word neutralized, author；train a classifier to try to figure out 什么word是definitional 什么不是; 大多数英语单词都是non-definitional的
+2. Neutralize: 对于不是definitional 的word (_definitional的是grandmother, grandfather, 不是definitional比如 doctor, babysitter_), project to get rid of bias, project them到non-bias direction; 对于如何选取什么word neutralized, author的看法；train a classifier to try to figure out 什么word是definitional 什么不是; 大多数英语单词都是non-definitional的
 3. Equalize pairs: 比如 grandfather vs grandmother, boy vs girl, 比如下图中 babysitter 的project的点距离grandmother比grandfather 更近, which is a bias; 所以移动grandfather 和 grandmother to pair points (到距离Non-bias direction的距离一样的点); 选取equalized pairs不会很多，可以hand-picked
 
 
