@@ -235,7 +235,7 @@ Context/target pairs:   Context可以是 last 4 words; Context也可以是4 word
 
 **Skip-grams**:
 
-比如句子: I want a glass of orange juice to go along with my cereal; 先去<span style="color: red">context word</span> 比如选取了word: content, 随机pick another word within some window as <span style="color: red">target word</span>  比如前后的5个或者10个词; 比如 context: orange -> target: juice; context: orange -> target: glass; context: orange -> target: my; 
+比如句子: I want a glass of orange juice to go along with my cereal; 先去<span style="color: red">context word</span> 比如选取了word: orange, 随机pick another word within some window as <span style="color: red">target word</span>  比如前后的5个或者10个词; 比如 context: orange -> target: juice; context: orange -> target: glass; context: orange -> target: my; 
 
 Goal: learn from content to target;  vocabulary size  = 10,000, context: orange (vector index 6257) ->  target: juice (4834)  
 
@@ -243,7 +243,7 @@ Model:  $$ O_c \rightarrow E \rightarrow e_c \rightarrow softmax \rightarrow \ha
 Softmax: $$ p(t |c) = \frac{ \theta_t^T e_c }{ \sum_{j=1}^{10,000} { e^{ \theta_j^T e_c  }  } } $$  $$\theta_t$$ is parameter associated with output t <br/>
 Loss function: $$ L \left(\hat y , y \right) = - \sum_{i=1}^{10,000} { y_i log\hat{y_i}  }$$ 
 
-<span style="background-color: #FFFF00">Problem with softmax classification</span>: softmax的分母每次都要sum over all words in vocabulary; solution1: hierarchical softmax:有点像segment tree, 把所有的单词分成一半，再分一半。。。每一个parent 记录所有的softmax的和of childs; complexity: log|v| ; 通常不是balanced tree, common words 在top, less common 在deeper(因为不common的，通常不用go that deep in the tree)
+<span style="background-color: #FFFF00">Problem with softmax classification</span>: softmax的分母每次都要sum over all words in vocabulary; solution1: hierarchical softmax:有点像segment tree, 把所有的单词分成一半，再分一半。。。每一个parent 记录所有的softmax的和of all childs; complexity: log|v| ; 通常不是balanced tree, common words 在top, less common 在deeper(因为不common的，通常不用go that deep in the tree)
 ![](/img/post/Deep_Learning-Sequence_Model_note/week2pic5.png)
 
 How to find context c: 如果我们random 选择from training corpus, 可能会选择很多the, a, of, and, to,但我们更想让model训练比如orange, durian这样的词 
@@ -262,14 +262,14 @@ Given word: orange & juice. Is context - target pair?<br/>
 |orange | book | 0 |
 |orange | of | 0 |
 
-sample context and target word; <span style="color: red">positive example</span> generated: look at context within windows (5 or 10 word around); <span style="color: red">take the same context word. then pick a word randomly from dictionary </span>; 注意: 上面最后一个例子，"of" is zero even if we have "of"; <br/>
+sample context and target word; <span style="color: red">Positive example</span> generated: look at context within windows (5 or 10 word around); <span style="color: red">Negative example: take the same context word. then pick a word randomly from dictionary </span>; 注意: 上面最后一个例子，"of" is zero even if we have "of"; <br/>
 <span style="background-color: #FFFF00">Generate training set</span>: 先generate positive example. 再生成k个negative examples, it is okay 如果生成的negative example 在context +-5，+-10 window出现; k = [5,20] for small dataset, k = [2,5] for large dataset
 
 **Model**: $$ \theta_t^{T} $$ one parameter theta for each target word, $$ e_c $$ for embedding vector. Instead of 10000 way softmax which is expensive to compute, <span style="background-color: #FFFF00">instead we have 10000 binary classification problem</span>
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week2pic6.png)
 
-Select negative examples: If you choose words 根据its frequence, 可能end up with the, of, and; use $$ P(W_i) =  \frac{ f \left(w_i \right)^{3/4} }{ \sum_{j=1}^{10,000} { f\left(w_i \right)^{3/4}  } } $$
+Select examples: If you choose words 根据its frequence, 可能end up with the, of, and; use $$ P(W_i) =  \frac{ f \left(w_i \right)^{3/4} }{ \sum_{j=1}^{10,000} { f\left(w_i \right)^{3/4}  } } $$ 这个分布选取
 
 
 
@@ -277,7 +277,7 @@ Select negative examples: If you choose words 根据its frequence, 可能end up 
 
 $$X_{ij} $$ = times  i (target) appears in context of j (context)， i 在j的上下文出现多少次; 如果上下文是前后10个词的话,  也许得到symmetric relationship $$X_{ij} = X_{ji} $$; 当如果只选word before it, may not get symmetric relation ship
 
-Model:  use gradient descent to minimize below function; 为了避免log0 出现, 乘以weight term $$f\left(X_{ij}\right)$$; $$\theta_j$$ 和 $$e_j$$是symmetric的，可以reversed or 对调，会得到同样的目标函数， when do gradient descent, 所以可以取个平均值; <span style="background-color: #FFFF00">Initialize both $$\theta_i & e_j $$ both uniformly around gradient descent to mininze objective </span>
+Model:  use gradient descent to minimize below function; 为了避免log0 出现, 乘以weight term $$f\left(X_{ij}\right)$$; $$\theta_j$$ 和 $$e_j$$是symmetric的，可以reversed or 对调，会得到同样的目标函数， when do gradient descent, 所以可以取个平均值; <span style="background-color: #FFFF00">Initialize</span> both $$\theta_i  e_j $$ both uniformly around gradient descent to mininze objective 
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week2pic7.png)
 
