@@ -10,6 +10,7 @@ tags:
     - Coursera
     - Deep Learning
     - RNN
+    - 学习笔记
 ---
 
 ## Week1 Recurrent Neural Networks
