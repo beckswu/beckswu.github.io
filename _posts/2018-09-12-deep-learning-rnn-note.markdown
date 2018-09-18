@@ -255,7 +255,7 @@ How to find context c: 如果我们random 选择from training corpus, 可能会�
 Given word: orange & juice. Is context - target pair?<br/>
 比如: I want a glass of orange juice to go along with my cereal. <br/>
 | Context | Target | target? |
-| ------:| -----------:| ------:  |
+| ------:| -----------:| ------:|
 |orange | juice | 1  |
 |orange | king | 0 |
 |orange | book | 0 |
