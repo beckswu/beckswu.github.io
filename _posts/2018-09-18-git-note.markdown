@@ -35,8 +35,10 @@ git status
 #添加到管理库当中
 git add 1.py #再使用 git status, 显示文件已经被可以提交修改了
 
+![](/img/git-note/gitpic1.png)
+
 ```
 
-![](/img/git-note/gitpic1.png)
+
 
 untracked: git 就根本不知道我们有这个文件，我们要把文件 添加到git 当中; add 文件 就到了staged 状态了, 然后就可以commit，commit之后就变成了unstaged 的状态;  unmodified, modified 都是属于unstaged的状态
