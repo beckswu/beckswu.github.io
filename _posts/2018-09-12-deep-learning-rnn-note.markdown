@@ -271,4 +271,49 @@ sample context and target word; <span style="color: red">positive example</span>
 
 Select negative examples: If you choose words 根据its frequence, 可能end up with the, of, and; use $$ P(W_i) =  \frac{ f \left(w_i \right)^{3/4} }{ \sum_{j=1}^{10,000} { f\left(w_i \right)^{3/4}  } } $$
 
+
+
+**GloVe**:
+
+$$X_{ij} $$ = times  i (target) appears in context of j (context)， i 在j的上下文出现多少次; 如果上下文是前后10个词的话,  也许得到symmetric relationship $$X_{ij} = X_{ji} $$; 当如果只选word before it, may not get symmetric relation ship
+
+Model:  use gradient descent to minimize below function; 为了避免log0 出现, 乘以weight term $$f\left(X_{ij}\right)$$; $$\theta_j$$ 和 $$e_j$$是symmetric的，可以reversed or 对调，会得到同样的目标函数， when do gradient descent, 所以可以取个平均值
+
+![](/img/post/Deep_Learning-Sequence_Model_note/week2pic7.png)
+
+Aslo cannot 保证embeded vector是可以解释的,parallelogram for analogies still works
+
+
+![](/img/post/Deep_Learning-Sequence_Model_note/week2pic8.png)
+
+
+#### Embedding Application
+
+**Sentiment Classification**
+
+<span style="background-color: #FFFF00">Chanllenge: </span> not have a huge dataset
+
+Simple Sentiment Classification Model: 用embedded vector which from large training set: so 不通常出现的word 也可以label 他们
+
+
+1. use average of each words output: works for review that are short or long; <span style="background-color: #FFFF00">Problem: Ignore order </span>：比如: completely lacking good service an dgood ambience, 即使有两个good，也是1星review
+2. RNN for sentiment Classification:  <span style="background-color: #FFFF00">many-to-one architecture </span>
+
+
+![](/img/post/Deep_Learning-Sequence_Model_note/week2pic9.png)
+![](/img/post/Deep_Learning-Sequence_Model_note/week2pic10.png)
+
+**Debiasing Word Embeddings**
+
+比如消除性别的歧视， 比如 man: programmer as Woman: Homemaker; 比如 man: Doctor as Mother: Nurse; Word embeddings可以reflect gender, ethnicity ages... biases of text used to train to model; 
+
+Address bias: 
+
+1. Identiy bias direction； 比如用 embeded vector $$ e_{he} - e_{she}; e_{male} - e_{female} $$... averge them 得到bias direction(1 dimension), 垂直的bias direction是 non-bias direction(299 dimension)
+2. Neutralize: 对于不是definitional 的word(definitional的是grandmother, grandfather, 不是definitional比如 doctor, babysitter), project to get rid of bias, project them到non-bias direction; 对于如何选取什么word neutralized, author；train a classifier to try to figure out 什么word是definitional 什么不是; 大多数英语单词都是non-definitional的
+3. Equalize pairs: 比如 grandfather vs grandmother, boy vs girl, 比如下图中 babysitter 的project的点距离grandmother比grandfather 更近, which is a bias; 所以移动grandfather 和 grandmother to pair points (到距离Non-bias direction的距离一样的点); 选取equalized pairs不会很多，可以hand-picked
+
+
+![](/img/post/Deep_Learning-Sequence_Model_note/week2pic11.png)
+
 [pic3]: https://raw.githubusercontent.com/beckswu/beckswu.github.io/master/img/post/Deep_Learning-Sequence_Model_note/week1pic3.png
