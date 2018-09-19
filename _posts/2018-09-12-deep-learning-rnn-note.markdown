@@ -324,17 +324,17 @@ Address bias:
 
 **Sequence to Sequence Model**
 
-Machine translation: RNN先用<span style="color: red">encoder network</span> (input one word 每次), figure out some representation of sentence. RNN 最后 output 一个 vector代表input sentence，用这个vector作为<span style="color: red">decode netork</span>的开始 再用decode network 一个一个output 翻译的单词，  <span style="background-color: #FFFF00">difference from synthesizing novel text using language model: 不需要randomly choose translation, want the most likely translation. </span>
+Machine translation: RNN先用<span style="color: red">encoder network</span> (input one word 每次), figure out some representation of sentence. 再output 一个 vector代表input sentence，用这个vector作为<span style="color: red">decode netork</span>的开始, 再用decode network 一个一个output 翻译的单词，  <span style="background-color: #FFFF00">difference from synthesizing novel text using language model: 不需要randomly choose translation, want the most likely translation. </span>
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week3pic1.png)
 
-can think machine translation as building a conditional language model. Machine translation model的decode network 很接近language model. Encode network model the probability $$ P \left( y ^{<{1}>}, y ^{<{2}>},\cdots,  y ^{<{T_x}>} |  x ^{<{1}>}, \cdots \right) $$, output the probability of English Translation condition on some input French sentence
+can think machine translation as building a conditional language model. Machine translation model的decode network 很接近language model. Encode network model the probability $$ P \left( y ^{<{1}>}, y ^{<{2}>},\cdots,  y ^{<{T_x}>} \|  x ^{<{1}>}, \cdots \right) $$, output the probability of English Translation condition on some input French sentence
 
-<span style="background-color: #FFFF00"> Finding the most likely translation </span>: 不能用random sample output from $$y ^{<{1}>$$ to $$y ^{<{2}>$$, 有时候可能得到好的，有时候得到不好的翻译; instead: the goal should maximize the probability  $$ P \left( y ^{<{1}>}, y ^{<{2}>},\cdots,  y ^{<{T_x}>} |  x \right) $$
+<span style="background-color: #FFFF00"> Finding the most likely translation </span>: 不能用random sample output from $$y ^{<{1}>$$ to $$y ^{<{2}>$$, 有时候可能得到好的，有时候得到不好的翻译; instead: the goal should maximize the probability  $$ P \left( y ^{<{1}>}, y ^{<{2}>},\cdots,  y ^{<{T_x}>} \|  x \right) $$
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week3pic2.png)
 
-**Why not Greedy Search** Greedy Search: 在pick 第一个word 后，选择概率最高的第二个单词，再选择概率最高的第三个单词，我们需要的是最大化joint probability $$ P \left( y ^{<{1}>}, y ^{<{2}>},\cdots,  y ^{<{T_x}>} |  x \right) $$, 这么选出的word 不一定是接近最大的joint proability 的句子; 比如翻译的句子是 Jane is visiting Africa in September这个是perfect翻译, 但是greedy翻译出来的是 Jane is going to be visiting Africa in September. 因为Jane is goint 的概率大于Jane is visiting
+**Why not Greedy Search** Greedy Search: 在pick 第一个word 后，选择概率最高的第二个单词，再选择概率最高的第三个单词，我们需要的是最大化joint probability $$ P \left( y ^{<{1}>}, y ^{<{2}>},\cdots,  y ^{<{T_x}>} \|  x \right) $$, 这么选出的word 不一定是接近最大的joint proability 的句子; 比如翻译的句子是 Jane is visiting Africa in September这个是perfect翻译, 但是greedy翻译出来的是 Jane is going to be visiting Africa in September. 因为Jane is goint 的概率大于Jane is visiting
 
 不能run 全部combination of words，算那个概率最大， 比如有10000个词组成的字典，句子长度为10，总共有 $$10000^{10} $$种组合, 所以需要approximate search algorithm，可能不是总成功，不同 try to find sentences to maximize joint conditional probability.
 
@@ -345,15 +345,15 @@ can think machine translation as building a conditional language model. Machine 
 **Beam Search Algorithm**, <span style="background-color: #FFFF00"> B = beam width</span>: 不像greedy search 每次只考虑最大可能的一个词，beam search 会考虑最大可能的B个词； 注: 当B=1, 相当于greedy search
 
 Example： B = 3
-1. Step1: evulate $$ P\left(y^{<{1}>} | x\right) $$, 发现 in, jane, september是根据概率最的可能的三个词, keep [in, jane, september]
-2. Step2: evulate $$ P\left(y^{<{2}>} | y^{<{1}>}, x\right) $$, $$ P\left(y^{<{1}>},  y^{<{1}>} | x\right) = P\left(y^{<{1}>} | x\right) P\left(y^{<{2}>} | y^{<{1}>}, x\right) $$  比如字典有10000个词，考虑来自step1三个词作为开始，只用考虑10000*3个词, then pick top3; 比如发现算上第二词 最大可能性的三个词 [In september, jane is, jane visit] -> reject september 作为第一个词的可能
+1. Step1: evulate $$ P\left(y^{<{1}>} \| x\right) $$, 发现 in, jane, september是根据概率最的可能的三个词, keep [in, jane, september]
+2. Step2: evulate $$ P\left(y^{<{2}>} \| y^{<{1}>}, x\right) $$, $$ P\left(y^{<{1}>},  y^{<{1}>} \| x\right) = P\left(y^{<{1}>} \| x\right) P\left(y^{<{2}>} \| y^{<{1}>}, x\right) $$  比如字典有10000个词，考虑来自step1三个词作为开始，只用考虑10000*3个词, then pick top3; 比如发现算上第二词 最大可能性的三个词 [In september, jane is, jane visit] -> reject september 作为第一个词的可能
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week3pic3.png)
 
 
 **Length normalization**,
 
-可能$$ P\left(y^{<{t}>} | x, y^{<{1}>}, y^{<{2}>}, \cdots, y^{<{t-1}>}    \right) $$概率的乘积越来的越小，不好记录，与其记录乘积，也可记录sum of log, more stable to avoid overflow and numeric rounding error;  <span style="background-color: #FFFF00">problem: 可能prefer更短的句子, 因为probability都是小于1，句子越长概率乘积越小，同样log都是0，句子越长加的负数越大</span>, <span style="background-color: #FFFF00">Solution: normalize 概率，除以句子长度</span> $$ 1/{T_y^\alpha}$$ maybe $$\alpha$$ = 0.7,当$$\alpha$$=1, complete normalize by length; 当$$\alpha$$=0, $$ 1/{T_y^\alpha} = 1/1$$: not normalized at all. 0.7是between full normalization and no normalization; <span style="color: red">同时alpha也可以作为hyperparameter 用来tune</span>
+可能$$ P\left(y^{<{t}>} \| x, y^{<{1}>}, y^{<{2}>}, \cdots, y^{<{t-1}>}    \right) $$概率的乘积越来的越小，不好记录，与其记录乘积，也可记录sum of log, more stable to avoid overflow and numeric rounding error;  <span style="background-color: #FFFF00">problem: 可能prefer更短的句子, 因为probability都是小于1，句子越长概率乘积越小，同样log都是0，句子越长加的负数越大</span>, <span style="background-color: #FFFF00">Solution: normalize 概率，除以句子长度</span> $$ 1/{T_y^\alpha}$$ maybe $$\alpha$$ = 0.7,当$$\alpha$$=1, complete normalize by length; 当$$\alpha$$=0, $$ 1/{T_y^\alpha} = 1/1$$: not normalized at all. 0.7是between full normalization and no normalization; <span style="color: red">同时alpha也可以作为hyperparameter 用来tune</span>
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week3pic4.png)
 
