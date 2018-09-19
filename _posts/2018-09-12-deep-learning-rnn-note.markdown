@@ -360,10 +360,10 @@ Example： B = 3
 比如beam = 3， 看所有top three possibilities of length 1, 2, ...,30 against 上面的normalized probability score, pick the one 有最高score的( <span style="background-color: #FFFF00">highest normalized log likelihood objective</span>) 作为final translation output
 
 How to choose Beam width B? 在实际中可能选择around 10;  100 consider be large; 1000, 3000是not common的, 用越来越大的B, it is diminishing returns; 比如gain很大 当beam从1->3->10, 但是gain不是很大了, 当beam 从1000->3000,
-- large B: pro: better result， con: slower
+- large B: pro: better result, con: slower
 - small B: pro: run faster,  con: worse result
 
-<span style="background-color: #FFFF00"> 不像BFS, DFS, Beam Search runs faster 但是不确保find exact maximum for 最大化 P(y\|x) </span>
+<span style="background-color: #FFFF00"> 不像BFS, DFS. Beam Search runs faster 但是不确保find exact maximum for 最大化 P(y\|x) </span>
 
 **Beam Search Error Analysis**
 
