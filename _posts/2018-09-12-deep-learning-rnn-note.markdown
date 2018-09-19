@@ -328,9 +328,9 @@ Machine translation: RNN先用<span style="color: red">encoder network</span> (i
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week3pic1.png)
 
-can think machine translation as building a conditional language model. Machine translation model的decode network 很接近language model. Encode network model the probability $$P \left( y ^{<{1}>}, y ^{<{2}>},\cdots,  y ^{<{T_x}>}|x ^{<{1}>}, \cdots \right)$$, output the probability of English Translation condition on some input French sentence
+can think machine translation as building a conditional language model. Machine translation model的decode network 很接近language model. Encode network model the probability $$P \left( y ^{<{1}>}, y ^{<{2}>},\cdots,  y ^{<{T_x}>}\vert x ^{<{1}>}, \cdots \right)$$, output the probability of English Translation condition on some input French sentence
 
-<span style="background-color: #FFFF00"> Finding the most likely translation </span>: 不能用random sample output from $$y^{<{1}>}$$ to $$y^{<{2}>}$$, 有时候可能得到好的，有时候得到不好的翻译; instead: the goal should maximize the probability  $$P \left( y ^{<{1}>}, y ^{<{2}>},\cdots,  y^{<{T_x}>}|x \right)$$
+<span style="background-color: #FFFF00"> Finding the most likely translation </span>: 不能用random sample output from $$y^{<{1}>}$$ to $$y^{<{2}>}$$, 有时候可能得到好的，有时候得到不好的翻译; instead: the goal should maximize the probability  $$P \left( y ^{<{1}>}, y ^{<{2}>},\cdots,  y^{<{T_x}>}\vert x \right)$$
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week3pic2.png)
 
