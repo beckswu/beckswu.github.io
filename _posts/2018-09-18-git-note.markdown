@@ -29,16 +29,64 @@ git init
 #生成一个文件现在repository里,
 touch 1.py #并没有添加到管理库当中
 
-#查看当前文件状态, 可以发现哪些文件还没添加到管理空当中
+#查看当前文件状态, 可以发现哪些文件还没添加到管理空当中, 也可以显示现在修改的文件是不是跟上次commit比被modified
 git status
+git status -s #显示缩写的状态，红色的M表示还没stage, 绿色的M表示已经stage了
+#如果当stage后, 没有commit, 又做了修改, 再git status, 会有两个M, 一个红色，一个绿色
 
-#添加到管理库当中
+#添加到管理库当中, 让文件变成stage 状态
 git add 1.py #再使用 git status, 显示文件已经被可以提交修改了
+git add.   #把所有文件都stage
 
-
+#提交修改 commit 
+git commit -m "create 1.py" #-m 自定义更改的信息
 
 ```
 
 ![](/img/post/git-note/gitpic1.png)
 
 untracked: git 就根本不知道我们有这个文件，我们要把文件 添加到git 当中; add 文件 就到了staged 状态了, 然后就可以commit，commit之后就变成了unstaged 的状态;  unmodified, modified 都是属于unstaged的状态
+
+<span style="background-color: #FFFF00">每次更改文件后需要到先到stage 状态 (git add)才可以commit </span>
+
+## 记录修改
+
+```shell
+git log #显示所有更改的commit的信息，比如commit两回，显示两次commit
+git log --oneline #显示每个commit用1行
+
+#显示现在文件和上次commit的不同
+git diff #红色是之前的commit的, 绿色是现在文件
+
+git diff --cached #当文件已经stage, git diff 显示不出不同，需要这句话，显示staged后的文件和上次commit的不同
+
+#当文件stage, 没有commit, 又做了修改，需要下面cmd看不同，如果用git diff --cached，只会显示staged的部分，不会显示又更改的部分
+git diff HEAD 
+```
+<span style="background-color: #FFFF00">当修改已经被stage (git add) 再看git diff是看不出不同的, 如想看不同需要git diff --cached </span>
+
+## 回到从前
+```shell
+
+#覆盖上次的commit的, amend 把stage 状态放在上个commit当中,  no edit是不更改上次commit的评论
+git commit --amend --no-edit  #改完之后发现message 没变，但是id是会变得
+
+#返回从stage的状态 到modified的状态
+git reset 1.py #把 1.py 返回unstaged的状态
+
+#把commit的过后的版本返回到上一个， 调整head 到上一个，上上一个; 
+git reset --hard HEAD #把head 移到了现在commit上面 #git status会显示没有任何修改了
+git reset --hard HEAD^ #把head 移到前一个commit, git reset --hard HEAD^^ 移到前两个commit
+
+git reset --hard 7a7ecea #把head 移到 7a7ecea这个id上面去 (看id: git status --oneline)
+#再git status --oneline 就不能看现在head未来的commit的
+
+#也可以吧head回到未来, 从上上个移动到现在的
+git reflog #看每一个的变化, 显示每一个head的移动
+git reset --hard 3f27543 #通过reflog 找到未来的head id，可以返回了
+git reset --hard HEAD@{0} #也可以把之前复制过来
+
+![](/img/post/git-note/gitpic2.png)
+```
+
+
