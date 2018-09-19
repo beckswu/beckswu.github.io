@@ -375,8 +375,8 @@ Algorithm 翻译: Jane visited Africa last September ($$\hat y$$)
 ![](/img/post/Deep_Learning-Sequence_Model_note/week3pic6.png)
 
 用RNN 计算 $$P\left( y^{*} \vert x \right) $$, $$P\left( \hat y \vert x \right) $$
-1. Case 1:  $$P\left( y^{*}\vert x \right) $$ > $$P\left(\hat y \vertx \right): Beam choose $$\hat y$$, 但是 $$y^{*}$$ attains 更高的 P(y\|x); <span style="background-color: #FFFF00"> Beam search is at fault </span>
-2. Case 2: $$P\left( y^{*}\vert x \right) $$ <=  $$P\left(\hat y \vert x \right);  $$y^{*}$$  better translation than $$\hat y$$, 但是 RNN预测相反, <span style="background-color: #FFFF00"> RNN is at fault </span>
+1. Case 1:  $$P \left( y^{*} \vert x \right) $$ > $$P\left(\hat y \vert x \right)$$ :: Beam choose $$\hat y$$, 但是 $$y^{*}$$ attains 更高的 P(y\|x); <span style="background-color: #FFFF00"> Beam search is at fault </span>
+2. Case 2: $$P\left( y^{*}\vert x \right) $$ <=  $$P\left(\hat y \vert x \right)$$;  $$y^{*}$$  better translation than $$\hat y$$, 但是 RNN预测相反, <span style="background-color: #FFFF00"> RNN is at fault </span>
 
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week3pic5.png)
