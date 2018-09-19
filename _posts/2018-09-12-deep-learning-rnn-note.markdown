@@ -334,7 +334,7 @@ can think machine translation as building a conditional language model. Machine 
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week3pic2.png)
 
-**Why not Greedy Search** Greedy Search: 在pick 第一个word 后，选择概率最高的第二个单词，再选择概率最高的第三个单词，我们需要的是最大化joint probability $$ P \left( y ^{<{1}>}, y ^{<{2}>},\cdots,  y ^{<{T_x}>} \ver  x \right) $$, 这么选出的word组成的句子 不一定是接近最大的joint proability 的句子; 比如翻译的句子是 Jane is visiting Africa in September这个是perfect翻译, 但是greedy翻译出来的是 Jane is going to be visiting Africa in September. 因为Jane is goint 的概率大于Jane is visiting
+**Why not Greedy Search** Greedy Search: 在pick 第一个word 后，选择概率最高的第二个单词，再选择概率最高的第三个单词，我们需要的是最大化joint probability $$ P \left( y ^{<{1}>}, y ^{<{2}>},\cdots,  y ^{<{T_x}>} \vert  x \right) $$, 这么选出的word组成的句子 不一定是接近最大的joint proability 的句子; 比如翻译的句子是 Jane is visiting Africa in September这个是perfect翻译, 但是greedy翻译出来的是 Jane is going to be visiting Africa in September. 因为Jane is goint 的概率大于Jane is visiting
 
 不能run 全部combination of words，算哪个概率最大， 比如有10000个词组成的字典，句子长度为10，总共有 $$10000^{10} $$种组合, 所以需要approximate search algorithm，可能不是总成功，不同 try to find sentences to maximize joint conditional probability.
 
@@ -363,7 +363,7 @@ How to choose Beam width B? 在实际中可能选择around 10;  100 consider be 
 - large B: pro: better result， con: slower
 - small B: pro: run faster,  con: worse result
 
-<span style="background-color: #FFFF00"> 不像BFS, DFS, Beam Search runs faster 但是不确保find exact maximum for 最大化 P(y|x) </span>
+<span style="background-color: #FFFF00"> 不像BFS, DFS, Beam Search runs faster 但是不确保find exact maximum for 最大化 P(y\|x) </span>
 
 **Beam Search Error Analysis**
 
