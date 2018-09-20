@@ -54,6 +54,7 @@ untracked: git 就根本不知道我们有这个文件，我们要把文件 添�
 ```shell
 git log #显示所有更改的commit的信息，比如commit两回，显示两次commit
 git log --oneline #显示每个commit用1行
+git log --oneline --graph #用图形的方式显示, 当只有一个分支, 会在commit前加上星号成一条线,
 
 #显示现在文件和上次commit的不同
 git diff #红色是之前的commit的, 绿色是现在文件
@@ -66,6 +67,8 @@ git diff HEAD
 <span style="background-color: #FFFF00">当修改已经被stage (git add) 再看git diff是看不出不同的, 如想看不同需要git diff --cached </span>
 
 ## 回到从前
+
+**reset** 
 ```shell
 
 #覆盖上次的commit的, amend 把stage 状态放在上个commit当中,  no edit是不更改上次commit的评论
@@ -85,8 +88,27 @@ git reset --hard 7a7ecea #把head 移到 7a7ecea这个id上面去 (看id: git st
 git reflog #看每一个的变化, 显示每一个head的移动
 git reset --hard 3f27543 #通过reflog 找到未来的head id，可以返回了
 git reset --hard HEAD@{0} #也可以把之前复制过来
-
+```
 ![](/img/post/git-note/gitpic2.png)
+
+**checkout** 
+```shell
+#只让一个文件回到过去
+git checkout 7a7ecea -- 1.py  #7a7ecea是之前commit的id,  只恢复1.py; 2.py 还是现在的状态
+#之后修改再commit, 会建立新的commit的，git log --oneline 显示这次在过去的commit上面，过去的commit不会像reset一样消失
+```
+
+## 管理分支
+
+比如master是client用的，要稳定版，自己要用一个开会的分支
+```shell
+#比如master的分支, 都是
+git branch dev #建立一个名为dev的
+git checkout -b dev #建立一个名为dev的, 并把head移动到dev分支上
+
+git branch #显示现在所有的分支, 星号表示现在的分支
+git checkout dev #从现在分支切换到dev上, 再git branch, dev分支上显示星号
+git branch -d dev #删除dev的分支, 报错，因为现在就在dev分支上, 先切换别的分支，才能删除
 ```
 
 
