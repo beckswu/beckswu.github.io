@@ -41,6 +41,8 @@ git add.   #把所有文件都stage
 #提交修改 commit 
 git commit -m "create 1.py" #-m 自定义更改的信息
 
+#不用add，直接commit; 必须是文件已经被融进仓库了，如果是新文件，还没被融进来，就不行
+git commit -am "change 3 in dev"
 ```
 
 ![](/img/post/git-note/gitpic1.png)
@@ -109,6 +111,10 @@ git checkout -b dev #建立一个名为dev的, 并把head移动到dev分支上
 git branch #显示现在所有的分支, 星号表示现在的分支
 git checkout dev #从现在分支切换到dev上, 再git branch, dev分支上显示星号
 git branch -d dev #删除dev的分支, 报错，因为现在就在dev分支上, 先切换别的分支，才能删除
+
+#把dev merge到master上来, -m "keep merge in info"把信息记录在log, --no-ff, no faster forward, 默认是faster forward是不会留信息
+git merge --no-ff -m "keep merge in info" dev #要确定在master上面不能在dev branch上
+#merge 之后再看git log --oneline --graph #会有图像显示branch的分支产生，merge
 ```
 
 
