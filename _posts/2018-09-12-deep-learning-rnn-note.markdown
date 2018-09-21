@@ -459,7 +459,7 @@ In speech recognition, input time steps are much bigger than output time steps; 
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week3pic12.png)
 
-**Trigger Word Detection** 比如amazon echo; 用audio clip 计算spectrogram generate features; to define target label y before trigger word as 0, after as 1
+**Trigger Word Detection** 比如amazon echo; 用audio clip 计算spectrogram to generate features; to define target label y before trigger word as 0, after as 1
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week3pic13.png)
 
