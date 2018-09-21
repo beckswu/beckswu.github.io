@@ -452,4 +452,15 @@ MT output: the cat the cat on the mat.<br/>
 
 #### Speech recognition
 
+
+**CTC cost for speech recognition (CTC: connectionist temporal classification)** Rule: collapse repeated characters not separated by "blank"
+
+in speech recognition, input time steps is much bigger than output time steps; 比如10 seconds audio, feature come at 100 hertz so 100 samples每秒; 10 seconds audio clip has 1000 inputs; _ called special character: |_|: space character: 1000 inputs has 1000 output, 但是output collapse一起, end up much shorter output 文本
+
+![](/img/post/Deep_Learning-Sequence_Model_note/week3pic12.png)
+
+**Trigger Word Detection** 比如amazon echo; 用audio clip 计算spectrogram generate features; to define target label y before trigger word as 0, after as 1
+
+![](/img/post/Deep_Learning-Sequence_Model_note/week3pic13.png)
+
 [pic3]: https://raw.githubusercontent.com/beckswu/beckswu.github.io/master/img/post/Deep_Learning-Sequence_Model_note/week1pic3.png
