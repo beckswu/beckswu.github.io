@@ -385,7 +385,7 @@ Algorithm 翻译: Jane visited Africa last September ($$\hat y$$)
 
 #### Bleu Score
 
-given French sentence, 有几个英语翻译，how to measure? Bleu(Bilingual evalutation understudy)
+given French sentence, 有几个英语翻译，how to measure? Bleu: Bilingual evalutation understudy
 
 French: Le chat est sur le tapis <br/>
 Reference 1: The cat is on the mat.<br/>
@@ -434,7 +434,7 @@ MT output: the cat the cat on the mat.<br/>
 
 - 用bidirectional RNN, 对于不同位置, 可以得到rick features around the word; 
 - 再用另一组rnn generate translation, 用$$s^{<{t}>}$$ 表示hidden state,  $$s^{<{2}>}$$ 需要 $$s^{<{1}>}$$ (generate的第一个词） 作为input。 
-- 比如当生成第一个词时, 用不着word at the end of 句子, 用attention weight 比如$$\alpha^{<{1,1}>}$$表示产生第一个词时，来自一个features(bidirection rnn output的)的weight, $$\alpha^{<{1,2}>}$$ how much weight(attention) need to put on second input to generate second word; 
+- 比如当生成第一个词时, 不太用着at the end of 句子的word, 用attention weight 比如$$\alpha^{<{1,1}>}$$表示产生第一个词时，来自一个features (bidirection rnn output的) 的weight, $$\alpha^{<{1,2}>}$$ how much weight(attention) need to put on second input to generate first word;  $$\alpha^{<{t,t'}>}$$ amount of attention $$y^{<{t}>}$$ should pay to $$a^{<{t'}>}$$
 - 最后generate EOS
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week3pic9.png)
