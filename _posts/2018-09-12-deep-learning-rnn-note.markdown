@@ -439,7 +439,7 @@ MT output: the cat the cat on the mat.<br/>
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week3pic9.png)
 
-- $$ \overrightarrow a^{0}   \overrightarrow a^{6}$$是zero vector, 用$$ a^{<{t}>}$$ 表示foward 和backword features
+- $$ \overrightarrow a_{0}   \overrightarrow a_{6}$$是zero vector, 用$$ a^{<{t}>}$$ 表示foward 和backword features
 - $$ \sum_{ t }^{} {\alpha^{<{1, t'}>}} = 1$$ all weights which used to generate 第一个的词的和等于1 (适用于每个词)
 - content 是weight sum of activation ($$a^{<{t}>}$$)
 - compute alpha  $$\alpha^{<{t, t'}>}$$用softmax 
