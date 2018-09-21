@@ -382,4 +382,49 @@ Algorithm 翻译: Jane visited Africa last September ($$\hat y$$)
 ![](/img/post/Deep_Learning-Sequence_Model_note/week3pic5.png)
 
 
+
+####Bleu Score
+
+given French sentence, 并有几个英语翻译，how to measure? Bleu (Bilingual evalutation understudy )
+
+French: Le chat est sur le tapis <br/>
+Reference 1: The cat is on the mat.<br/>
+Reference 2: There is a cat on the mat.<br/>
+MT output: the the the the the the the.<br/>
+
+**Precision**: each word either appear in reference 1 or reference 2 / total word.  $$\frac{7}{7} = 1 $$  <span style="background-color: #FFFF00"> (not a particularly useful measure) </span><br/>
+**Modified Precision**: credit only up to maximum appearance in reference 1 or reference. the 在1中出现了2回, $$\frac{2}{7} $$
+
+French: Le chat est sur le tapis <br/>
+Reference 1: The cat is on the mat.<br/>
+Reference 2: There is a cat on the mat.<br/>
+MT output: the cat the cat on the mat.<br/>
+
+**Bleu score on bigrams**: 两个两个词连在一起看有没有在reference 1 or 2中出现， 比如the cat, cat the, cat on... $$ = \frac{4}{6} $$,
+
+
+| Context | Count | Count Clip |
+| ------:| -----------:| ------:|
+|The cat | 2 | 1  |
+|cat the | 1 | 0 |
+|cat on | 1 | 1 |
+|on the | 1 | 1 |
+|the mat | 1 | 1 |
+
+
+| unigram | n-gram |
+| ------:| -----------:|
+|$$\displaystyle p_1 = \frac{ \sum_{unigram \in \hat y }^{} { Count_{clip} \left( unigram \right)} }{ \sum_{unigram \in \hat y }^{} { Count\left( unigram \right)} }  $$ | $$ \displaystyle p_n = \frac{ \sum_{unigram \in \hat y }^{} { Count_{clip} \left( n-gram \right)} }{ \sum_{unigram \in \hat y }^{} { Count\left( n-gram \right)} }  $$ |
+
+ <span style="background-color: #FFFF00"> 如果机器翻译的跟reference 1 or reference 2完全一样, $$P_1$$ and $$P_n$$ 都等于1</span>
+
+ BP: 表示brevity penalty: if output is short, 容易得到high precision; BP is adjustment factor 避免too short
+
+![](/img/post/Deep_Learning-Sequence_Model_note/week3pic7.png)
+
+Bleu Score 应用于machine translation or 给图片起标题 (image caption); not use in speech recognition, 因为speech recognition一般都有one ground truth
+
+
+####Attention Model
+
 [pic3]: https://raw.githubusercontent.com/beckswu/beckswu.github.io/master/img/post/Deep_Learning-Sequence_Model_note/week1pic3.png
