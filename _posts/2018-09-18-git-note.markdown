@@ -118,3 +118,15 @@ git merge --no-ff -m "keep merge in info" dev #要确定在master上面不能在
 ```
 
 
+## 分支冲突
+<span style="background-color: #FFFF00">**Merge** </span> 
+
+比如 两个分支master, dev各有修改, 当git merge dev 时候有conflict, 然后file里显示什么冲突了, 把冲突的部分删除掉，做修改，修改过后的状态是modified, stage (git add .) 再commit(git commit -m "solve conflict") (or 直接 git commit --am "solve conflict"), 再git log --oneline --graph 会显示两个分支合并了
+
+
+<span style="background-color: #FFFF00">**rebase** </span> 
+
+比如branch B是主分支,然后有天有人提交了bug, 在主分支的上进行了提交
+
+
+
