@@ -422,20 +422,23 @@ MT output: the cat the cat on the mat.<br/>
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week3pic7.png)
 
-Bleu Score 应用于machine translation or 给图片起标题 (image caption); not use in speech recognition, 因为speech recognition一般都有one ground truth
+<span style="background-color: #FFFF00"> Bleu Score 应用于machine translation or 给图片起标题 (image caption); not use in speech recognition, 因为speech recognition一般都有one ground truth </span>
 
 
 #### Attention Model
 
-<span style="background-color: #FFFF00">problem with encoder & decoder network:</span> given long sentence, encode 只能读完句子所有内容后, 再通过decoder进行翻译输出;  encoder & decoder network 对于短的句子和很长的句子效果不好。
+<span style="background-color: #FFFF00">problem with encoder & decoder network:</span> given long sentence, encode 只能读完句子所有内容后, 再通过decoder进行翻译输出;  encoder & decoder network 对于<span style="background-color: #FFFF00"> 短的句子和很长的句子效果不好</span>。
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week3pic8.png)
 
-用bidirectional RNN, 对于不同位置, 可以得到rick features around the word; 再用另一组rnn generate translation, 用$$s^{<{t}>}$$ 表示hidden state。比如当生成第一个词时, 用不着word at the end of 句子, 用attention weight 比如$$\alpha^{<{1,1}>}$$表示产生第一个词时，来自一个features(bidirection rnn output的)的weight, $$\alpha^{<{1,2}>}$$ how much weight(attention) need to put on second input to generate second word; $$s^{<{2}>}$$ 需要 $$s^{<{1}>}$$ (generate的第一个词） 作为input。 最后generate EOS
+- 用bidirectional RNN, 对于不同位置, 可以得到rick features around the word; 
+- 再用另一组rnn generate translation, 用$$s^{<{t}>}$$ 表示hidden state,  $$s^{<{2}>}$$ 需要 $$s^{<{1}>}$$ (generate的第一个词） 作为input。 
+- 比如当生成第一个词时, 用不着word at the end of 句子, 用attention weight 比如$$\alpha^{<{1,1}>}$$表示产生第一个词时，来自一个features(bidirection rnn output的)的weight, $$\alpha^{<{1,2}>}$$ how much weight(attention) need to put on second input to generate second word; 
+- 最后generate EOS
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week3pic9.png)
 
-- $$ \rightarrow a^{0} &  \rightarrow a^{6}$$是zero vector, 用$$ a^{<{t}>} 表示foward 和backword features $$
+- $$ \rightarrow a^{0}   \rightarrow a^{6}$$是zero vector, 用$$ a^{<{t}>}$$ 表示foward 和backword features $$
 - $$ \sum_{ t }^{} {\alpha^{<{1, t^'}>}} = 1$$ all weight to generate 第一个的词的和等于1 (适用于每个词)
 - content 是weight sum of weight and activation ($$a^{<{t}>}$$)
 - compute alpha  $$\alpha^{<{t, t^'}>}$$用softmax 
