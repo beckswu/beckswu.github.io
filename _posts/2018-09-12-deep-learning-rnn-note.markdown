@@ -385,22 +385,22 @@ Algorithm 翻译: Jane visited Africa last September ($$\hat y$$)
 
 #### Bleu Score
 
-given French sentence, 并有几个英语翻译，how to measure? Bleu (Bilingual evalutation understudy )
+given French sentence, 有几个英语翻译，how to measure? Bleu (Bilingual evalutation understudy )
 
 French: Le chat est sur le tapis <br/>
 Reference 1: The cat is on the mat.<br/>
 Reference 2: There is a cat on the mat.<br/>
 MT output: the the the the the the the.<br/>
 
-**Precision**: each word either appear in reference 1 or reference 2 / total word.  $$\frac{7}{7} = 1 $$  <span style="background-color: #FFFF00"> (not a particularly useful measure) </span><br/>
-**Modified Precision**: credit only up to maximum appearance in reference 1 or reference. the 在1中出现了2回, $$\frac{2}{7} $$
+**Precision**: each word either appear in reference 1 or reference 2 / total word.  MT = $$\frac{7}{7} = 1 $$  <span style="background-color: #FFFF00"> (not a particularly useful measure) </span><br/>
+**Modified Precision**: credit only up to maximum appearance in reference 1 or reference. the 在1中出现了2回, MT = $$\frac{2}{7} $$
 
 French: Le chat est sur le tapis <br/>
 Reference 1: The cat is on the mat.<br/>
 Reference 2: There is a cat on the mat.<br/>
 MT output: the cat the cat on the mat.<br/>
 
-**Bleu score on bigrams**: 两个两个词连在一起看有没有在reference 1 or 2中出现， 比如the cat, cat the, cat on... $$ = \frac{4}{6} $$,
+**Bleu score on bigrams**: 两个两个词连在一起看有没有在reference 1 or 2中出现， 比如the cat, cat the, cat on...   MT $$ = \frac{4}{6} $$,
 
 
 | Context | Count | Count Clip |
