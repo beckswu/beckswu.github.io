@@ -383,7 +383,7 @@ Algorithm 翻译: Jane visited Africa last September ($$\hat y$$)
 
 
 
-####Bleu Score
+#### Bleu Score
 
 given French sentence, 并有几个英语翻译，how to measure? Bleu (Bilingual evalutation understudy )
 
@@ -425,7 +425,7 @@ MT output: the cat the cat on the mat.<br/>
 Bleu Score 应用于machine translation or 给图片起标题 (image caption); not use in speech recognition, 因为speech recognition一般都有one ground truth
 
 
-####Attention Model
+#### Attention Model
 
 <span style="background-color: #FFFF00">problem with encoder & decoder network:</span> given long sentence, encode 只能读完句子所有内容后, 再通过decoder进行翻译输出;  encoder & decoder network 对于短的句子和很长的句子效果不好。
 
@@ -445,5 +445,7 @@ Bleu Score 应用于machine translation or 给图片起标题 (image caption); n
 ![](/img/post/Deep_Learning-Sequence_Model_note/week3pic10.png)
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week3pic11.png)
+
+#### Speech recognition
 
 [pic3]: https://raw.githubusercontent.com/beckswu/beckswu.github.io/master/img/post/Deep_Learning-Sequence_Model_note/week1pic3.png
