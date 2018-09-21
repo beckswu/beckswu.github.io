@@ -443,7 +443,7 @@ MT output: the cat the cat on the mat.<br/>
 - $$ \sum_{ t }^{} {\alpha^{<{1, t'}>}} = 1$$ all weights which used to generate 第一个的词的和等于1 (适用于每个词)
 - content 是weight sum of activation ($$a^{<{t}>}$$)
 - compute alpha  $$\alpha^{<{t, t'}>}$$用softmax 
-- generate $$e^{<{t, t'}>}$$用smaller neural network(通常只有一个hidden layer): input: feature from $$\alpha^{<{t'}>$$  and $$s^{<{t-1}>}$$ is hidden state 来自上个rnn output, $$s^{<{t-1}>}$$也是现在rnn的input
+- generate $$e^{<{t, t'}>}$$用smaller neural network(通常只有一个hidden layer): input: feature from $$\alpha^{<{t'}>}$$  and $$s^{<{t-1}>}$$ is hidden state 来自上个rnn output, $$s^{<{t-1}>}$$也是现在rnn的input
 - <span style="background-color: #FFFF00">Downside</span>: take quadratic time to run this algorithm
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week3pic10.png)
