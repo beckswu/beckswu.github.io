@@ -385,7 +385,7 @@ Algorithm 翻译: Jane visited Africa last September ($$\hat y$$)
 
 #### Bleu Score
 
-given French sentence, 有几个英语翻译，how to measure? Bleu (Bilingual evalutation understudy )
+given French sentence, 有几个英语翻译，how to measure? Bleu(Bilingual evalutation understudy)
 
 French: Le chat est sur le tapis <br/>
 Reference 1: The cat is on the mat.<br/>
@@ -393,7 +393,7 @@ Reference 2: There is a cat on the mat.<br/>
 MT output: the the the the the the the.<br/>
 
 **Precision**: each word either appear in reference 1 or reference 2 / total word.  MT = $$\frac{7}{7} = 1 $$  <span style="background-color: #FFFF00"> (not a particularly useful measure) </span><br/>
-**Modified Precision**: credit only up to maximum appearance in reference 1 or reference. the 在1中出现了2回, MT = $$\frac{2}{7} $$
+**Modified Precision**: credit only up to maximum appearance in reference 1 or reference. 上面MT翻译中 the 在1中出现了2回, MT = $$\frac{2}{7} $$
 
 French: Le chat est sur le tapis <br/>
 Reference 1: The cat is on the mat.<br/>
@@ -430,6 +430,7 @@ MT output: the cat the cat on the mat.<br/>
 <span style="background-color: #FFFF00">problem with encoder & decoder network:</span> given long sentence, encode 只能读完句子所有内容后, 再通过decoder进行翻译输出;  encoder & decoder network 对于<span style="background-color: #FFFF00"> 短的句子和很长的句子效果不好</span>。
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week3pic8.png)
+
 
 - 用bidirectional RNN, 对于不同位置, 可以得到rick features around the word; 
 - 再用另一组rnn generate translation, 用$$s^{<{t}>}$$ 表示hidden state,  $$s^{<{2}>}$$ 需要 $$s^{<{1}>}$$ (generate的第一个词） 作为input。 
