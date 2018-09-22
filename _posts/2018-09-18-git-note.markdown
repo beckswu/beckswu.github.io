@@ -126,7 +126,25 @@ git merge --no-ff -m "keep merge in info" dev #要确定在master上面不能在
 
 <span style="background-color: #FFFF00">**rebase** </span> 
 
-比如branch B是主分支,然后有天有人提交了bug, 在主分支的上进行了提交
+比如在branch A上工作 c3是基于c1的, branch B是主分支,然后有天有人提交了bug, 在主分支branch b的上进行了提交, 这时如果想把bug融合到c3上; 
+
+方法是: 先把branch A的c3拿走，空出来, 把c2,c4合并到上面去, 再把c3放到合并以后的地方, <span style="background-color: #FFFF00">注:现在c3基于c4, 以前的c3不复存在了</span> 所以rebase是危险的方式, rebase 后c3的commit id和rebase前c3的id是不一样的
 
 
+![](/img/post/git-note/gitpic3.png)
+
+```shell
+#先checkout master,然后再主分支的修改基于dev的修改 (上图的branch A是master, branch b是dev)
+git checkout master
+git rebase dev #(把master分支基于dev分支)
+#如果有conflict, 跟merge一样的, 去修改conflict
+#修改完conflict, git branch  发现不在任何一个分支上
+
+#stage + commit 
+git rebase --continue #继续rebase
+#如果碰到conflict，想放弃rebase
+git rebase --abort
+
+git log --oneline --graph #会发现dev的commit插到master上面来了,
+```
 
