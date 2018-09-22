@@ -91,7 +91,7 @@ git reflog #看每一个的变化, 显示每一个head的移动
 git reset --hard 3f27543 #通过reflog 找到未来的head id，可以返回了
 git reset --hard HEAD@{0} #也可以把之前复制过来
 ```
-![](/img/post/git-note/gitpic2.png)
+![](/img/post/git-note/gitpic2.PNG)
 
 **checkout** 
 ```shell
@@ -131,7 +131,7 @@ git merge --no-ff -m "keep merge in info" dev #要确定在master上面不能在
 方法是: 先把branch A的c3拿走，空出来, 把c2,c4合并到上面去, 再把c3放到合并以后的地方, <span style="background-color: #FFFF00">注:现在c3基于c4, 以前的c3不复存在了</span> 所以rebase是危险的方式, rebase 后c3的commit id和rebase前c3的id是不一样的
 
 
-![](/img/post/git-note/gitpic3.png)
+![](/img/post/git-note/gitpic3.PNG)
 
 ```shell
 #先checkout master,然后再主分支的修改基于dev的修改 (上图的branch A是master, branch b是dev)
