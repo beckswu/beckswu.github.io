@@ -1,0 +1,75 @@
+---
+layout:     post
+title:      "Git - "
+subtitle:   "版"
+date:       2018-09-23 20:00:00
+author:     "Becks"
+header-img: "img/post/Deep_Learning-Sequence_Model_note/bg.jpg"
+catalog:    true
+tags:
+    - Git
+    - 学习笔记
+---
+
+
+## 初始化
+
+```shell
+#设置 global 变量会应用到所有之后建立的git repository
+git config --global user.name "Becks"   
+git config --global user.email "becks@gmail.com" 
+
+#查看global变量
+git config user.name 
+git config user.email 
+
+#初始化git repository
+git init
+
+#生成一个文件现在repository里,
+touch 1.py #并没有添加到管理库当中
+
+#查看当前文件状态, 可以发现哪些文件还没添加到管理空当中, 也可以显示现在修改的文件是不是跟上次commit比被modified
+git status
+git status -s #显示缩写的状态，红色的M表示还没stage, 绿色的M表示已经stage了
+#如果当stage后, 没有commit, 又做了修改, 再git status, 会有两个M, 一个红色，一个绿色
+
+#添加到管理库当中, 让文件变成stage 状态
+git add 1.py #再使用 git status, 显示文件已经被可以提交修改了
+git add.   #把所有文件都stage
+
+#提交修改 commit 
+git commit -m "create 1.py" #-m 自定义更改的信息
+
+#不用add，直接commit; 必须是文件已经被融进仓库了，如果是新文件，还没被融进来，就不行
+git commit -am "change 3 in dev"
+```
+
+![](/img/post/git-note/gitpic1.png)
+
+untracked: git 就根本不知道我们有这个文件，我们要把文件 添加到git 当中; add 文件 就到了staged 状态了, 然后就可以commit，commit之后就变成了unstaged 的状态;  unmodified, modified 都是属于unstaged的状态
+
+<span style="background-color: #FFFF00">每次更改文件后需要到先到stage 状态 (git add)才可以commit </span>
+
+## 记录修改
+
+```shell
+git log #显示所有更改的commit的信息，比如commit两回，显示两次commit
+git log --oneline #显示每个commit用1行
+git log --oneline --graph #用图形的方式显示, 当只有一个分支, 会在commit前加上星号成一条线,
+
+#显示现在文件和上次commit的不同
+git diff #红色是之前的commit的, 绿色是现在文件
+
+git diff --cached #当文件已经stage, git diff 显示不出不同，需要这句话，显示staged后的文件和上次commit的不同
+
+#当文件stage, 没有commit, 又做了修改，需要下面cmd看不同，如果用git diff --cached，只会显示staged的部分，不会显示又更改的部分
+git diff HEAD 
+```
+<span style="background-color: #FFFF00">当修改已经被stage (git add) 再看git diff是看不出不同的, 如想看不同需要git diff --cached </span>
+
+<object data="/document/C#.pdf" type="application/pdf" width="700px" height="700px">
+    <embed src="/document/C#.pdf">
+        <p>This browser does not support PDFs. Please download the PDF to view it: <a href="/document/C#.pdf">Download PDF</a>.</p>
+    </embed>
+</object>
