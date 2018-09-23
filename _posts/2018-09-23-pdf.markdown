@@ -68,4 +68,4 @@ git diff HEAD
 ```
 <span style="background-color: #FFFF00">当修改已经被stage (git add) 再看git diff是看不出不同的, 如想看不同需要git diff --cached </span>
 
-<iframe src="http://docs.google.com/gview?url=https://github.com/beckswu/beckswu.github.io/blob/master/document/C%23.pdf&embedded=true" style="width:718px; height:700px;" frameborder="0"></iframe>
+[here we go](https://github.com/beckswu/beckswu.github.io/blob/master/document/C%23.pdf "here we go")
