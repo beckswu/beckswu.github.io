@@ -68,7 +68,7 @@ git diff HEAD
 ```
 <span style="background-color: #FFFF00">当修改已经被stage (git add) 再看git diff是看不出不同的, 如想看不同需要git diff --cached </span>
 
-[file](https://docs.google.com/viewer?url=http://nbviewer.jupyter.org/github/beckswu/beckswu.github.io/blob/master/img/CSharp.pdf "file")
+[file](https://docs.google.com/viewer?url=http://nbviewer.jupyter.org/github/beckswu/beckswu.github.io/blob/master/document/Data-Structure-and-Algorithms.pdf "file")
 
 
 <object data="https://docs.google.com/viewer?url=http://nbviewer.jupyter.org/github/beckswu/beckswu.github.io/blob/master/img/CSharp.pdf" type="application/pdf" width="700px" height="700px">
