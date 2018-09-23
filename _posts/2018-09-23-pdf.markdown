@@ -67,8 +67,4 @@ git diff --cached #当文件已经stage, git diff 显示不出不同，需要这
 git diff HEAD 
 ```
 <span style="background-color: #FFFF00">当修改已经被stage (git add) 再看git diff是看不出不同的, 如想看不同需要git diff --cached </span>
-
-
-<embed src="https://drive.google.com/viewerng/
-viewer?embedded=true&url=https://github.com/beckswu/beckswu.github.io/blob/master/document/C%23.pdf" width="500" height="375">
-
+<embed src="http://nbviewer.jupyter.org/github/beckswu/beckswu.github.io/blob/master/img/CSharp.pdf" width="500" height="375">
