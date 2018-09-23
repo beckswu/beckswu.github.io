@@ -14,7 +14,7 @@ tags:
 > note from youtube khan Academy
 > 
 
-##Properties: 
+## Properties: 
 
 Matrix: A\*B 不一定等于 B\*A
 
