@@ -12,8 +12,13 @@ tags:
 ---
 
 > note from youtube khan Academy
+> 
 
+##Properties: 
 
+Matrix: A\*B 不一定等于 B\*A
+
+![](/img/post/Linear-Algebra/pic1.png)
 
 [file](https://docs.google.com/viewer?url=http://nbviewer.jupyter.org/github/beckswu/beckswu.github.io/blob/master/document/Data-Structure-and-Algorithms.pdf "file")
 
