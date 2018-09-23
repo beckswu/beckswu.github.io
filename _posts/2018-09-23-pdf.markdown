@@ -68,8 +68,4 @@ git diff HEAD
 ```
 <span style="background-color: #FFFF00">当修改已经被stage (git add) 再看git diff是看不出不同的, 如想看不同需要git diff --cached </span>
 
-<object data="/document/C#.pdf" type="application/pdf" width="700px" height="700px">
-    <embed src="/document/C#.pdf">
-        <p>This browser does not support PDFs. Please download the PDF to view it: <a href="/document/C#.pdf">Download PDF</a>.</p>
-    </embed>
-</object>
+<iframe src="http://docs.google.com/gview?url=https://github.com/beckswu/beckswu.github.io/blob/master/document/C%23.pdf&embedded=true" style="width:718px; height:700px;" frameborder="0"></iframe>
