@@ -164,3 +164,12 @@ git stash pop #就会把之前修改暂存的返回回来
 ```
 
 <span style="background-color: #FFFF00">当stash后再建立新的branch, stash缓存的内容不会出现的新的branch中, 新的branch只显示上次commit 的内容 </span> 
+
+## GitHub
+
+```shell
+git push -u origin master #把master分支推到origin上面, origin指得是online的管理库
+git push -u origin dev #把dev分支推到origin上面
+```
+
+origin指得是online的管理库, history显示所有的改变, change显示每次commit发生变化, 本地的.git文件也被上传到管理库
