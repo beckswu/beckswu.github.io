@@ -111,6 +111,7 @@ git checkout -b dev #建立一个名为dev的, 并把head移动到dev分支上
 git branch #显示现在所有的分支, 星号表示现在的分支
 git checkout dev #从现在分支切换到dev上, 再git branch, dev分支上显示星号
 git branch -d dev #删除dev的分支, 报错，因为现在就在dev分支上, 先切换别的分支，才能删除
+git branch -D dev #如果git branch -d dev, 大写的D表示强行删除
 
 #把dev merge到master上来, -m "keep merge in info"把信息记录在log, --no-ff, no faster forward, 默认是faster forward是不会留信息
 git merge --no-ff -m "keep merge in info" dev #要确定在master上面不能在dev branch上
@@ -147,4 +148,19 @@ git rebase --abort
 
 git log --oneline --graph #会发现dev的commit插到master上面来了,
 ```
+## 临时修复
 
+比如要改之前的程序, 而现在的改进程序还没有完成, 不想把改进的和要改的程序放在一起, 用stash可以改进的code暂存一下, 等改后之前的, 再继续工作, 有不同的commit, 不会有冲突
+```shell
+git checkout dev
+#git status -s 显示文件已经被更改
+git stash #把现在的文件放在缓存区
+git status -s #此时就没有任何的modified 文件了
+#此时再建一个新的branc: git checkout -b boss; 在这个branch中修改之前的code, stash缓存的更改不会建立在这个branch中
+
+#修改完boss分支后, 再checkout 回dev: 
+git checkout dev
+git stash pop #就会把之前修改暂存的返回回来
+```
+
+<span style="background-color: #FFFF00">当stash后再建立新的branch, stash缓存的内容不会出现的新的branch中, 新的branch只显示上次commit 的内容 </span> 
