@@ -1,7 +1,7 @@
 ---
 layout:     post
-title:      "vcpkg 安装"
-subtitle:   "Linear Algebra basic learning note"
+title:      "Vcpkg Installation"
+subtitle:   "vcpkg installation on Windows"
 date:       2018-09-28 10:00:00
 author:     "Becks"
 header-img: "img/post/math.jpg"
