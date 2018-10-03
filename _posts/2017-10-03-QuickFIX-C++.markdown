@@ -27,3 +27,26 @@ tags:
 > C/C++ | General | Additional Include Directories add the root quickfix directory.
 > Linker | Input | Additional Dependencies, must contain quickfix.lib and ws2_32.lib.
 > Linker | General | Additional Library Directories, add the quickfix/lib directory.
+
+## Settings File
+Settings File是用于FIX::SessionSettings settings读取用, DataDictionary 是用来规定incoming FIX messages的xml file, datadictionary在下载的quickfix spec的文件夹中
+
+client端
+```
+[DEFAULT]
+ConnectionType=initiator
+ReconnectInterval=60
+SenderCompID=**
+TargetCompID=**
+FileLogPath=log
+FileStorePath=log2
+TimeZone=America/New_York
+[SESSION]
+BeginString=FIX.4.4
+StartTime=17:05:30
+EndTime=17:05:00
+HeartBtInt=30
+SocketConnectPort=**
+SocketConnectHost=***
+DataDictionary=\spec\FIX44.xml
+```
