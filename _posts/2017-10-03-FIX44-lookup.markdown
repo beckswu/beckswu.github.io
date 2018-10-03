@@ -33,8 +33,12 @@ tags:
 | 110 |  minimum quantity of an order to by executed | |
 | 115 | OnBehalfOfCompID | Assigned value used to identify firm originating message 
 if the message was delivered by a third party |
+ | 146  | NoRelatedSym  |  Specifies the number of repeating symbols specified. Used in Market Data Request 35=V; 连续subscribe几个 | 
 | 150 |  ExecType | Describes the specific ExecutionRpt (i.e. Pending Cancel) while OrdStatus <39> (39) will always identify the current order status (i.e. Partially Filled) F = Trade (partial fill or fill) |
 | 151 |  LeavesQty | open for further execution |
+| 262 | Unique identifier for Market Data Request | used for pricing: 35 = V marketdatarequest |
+| 263 | SubscriptionRequestType | used for pricing: 35 = V marketdatarequest; 0 = Snapshot, 1 = Snapshot + Updates (Subscribe), 2 = Disable previous Snapshot + Update Request (Unsubscribe) |
+| 264 |  Depth of market for Book Snapshot  | Valid values: 0 = Full Book 1 = Top of Book   |
 | 526 | SecondaryClOrdID | |
 
 当发送35=D时候, acceptor会发送35=8告诉order confirmation or rejection
