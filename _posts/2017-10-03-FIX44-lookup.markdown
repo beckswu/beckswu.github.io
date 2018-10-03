@@ -31,8 +31,7 @@ tags:
 |  60  |  Time of execution/order creation   | used in trading as requested time  |
 | 64 |  TransactTime  | Time of execution/order creation (expressed in UTC (Universal Time Coordinated, also known as "GMT") |
 | 110 |  minimum quantity of an order to by executed | |
-| 115 | OnBehalfOfCompID | Assigned value used to identify firm originating message 
-if the message was delivered by a third party |
+| 115 | OnBehalfOfCompID | Assigned value used to identify firm originating message if the message was delivered by a third party |
  | 146  | NoRelatedSym  |  Specifies the number of repeating symbols specified. Used in Market Data Request 35=V; 连续subscribe几个 | 
 | 150 |  ExecType | Describes the specific ExecutionRpt (i.e. Pending Cancel) while OrdStatus <39> (39) will always identify the current order status (i.e. Partially Filled) F = Trade (partial fill or fill) |
 | 151 |  LeavesQty | open for further execution |
