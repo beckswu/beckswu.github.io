@@ -19,4 +19,11 @@ tags:
 
 ![](/img/post/quickfixpic1.PNG)
 
+## include in project
 
+
+> C/C++ | Code Generation | Enable C++ Exceptions, should be Yes.
+> C/C++ | Code Generation | Runtime Library, should be set to Multithreaded DLL or Debug Multithreaded DLL.
+> C/C++ | General | Additional Include Directories add the root quickfix directory.
+> Linker | Input | Additional Dependencies, must contain quickfix.lib and ws2_32.lib.
+> Linker | General | Additional Library Directories, add the quickfix/lib directory.
