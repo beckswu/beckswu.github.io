@@ -50,3 +50,18 @@ SocketConnectPort=**
 SocketConnectHost=***
 DataDictionary=\spec\FIX44.xml
 ```
+
+## Logon
+
+client端用toAdmin()  callback, server 端用fromAdmin() callback
+```C++
+void YourMessageCracker::toAdmin( FIX::Message& message, const FIX::SessionID& sessionID)
+{
+    if (FIX::MsgType_Logon == message.getHeader().getField(FIX::FIELD::MsgType))
+    {
+        //FIX44::Logon& logon_message = dynamic_cast<FIX44::Logon&>(message);
+        message.setField(FIX::Username("my_username"));
+        message.setField(FIX::Password("my_password"));
+    }
+}
+```
