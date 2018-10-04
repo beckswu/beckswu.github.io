@@ -57,6 +57,10 @@ DataDictionary=\spec\FIX44.xml
 需要更改的datadictionary: FIX44.xml
 ![](/img/post/quickfixpic2.PNG)
 
+更改后的datadictionary: 去掉不需要的field(去掉TotNoQuoteEntries), 加上需要的field
+![](/img/post/quickfixpic3.PNG)
+
+
 ## Logon
 
 client端用toAdmin()  callback, server 端用fromAdmin() callback
