@@ -50,6 +50,12 @@ SocketConnectPort=**
 SocketConnectHost=***
 DataDictionary=\spec\FIX44.xml
 ```
+## Customized DataDic
+
+对方来的Message的要满足一定格式; 比如使用默认datadictionary, 当subscribe massquote, 对方的message特殊, 对方send的message并没有tag = 304(TotQuoteEntrie), 但是默认的datadictionary 默认必须有这个tag, 发显示(Message 2 Rejected: Required tag missing:304), client端就会发送(35=3\|58=Required tag missing\|371=304). 而实际上没必要发送, 需要改变的是我们data dictionary 
+
+需要更改的datadictionary: FIX44.xml
+![](/img/post/quickfixpic2.PNG)
 
 ## Logon
 
