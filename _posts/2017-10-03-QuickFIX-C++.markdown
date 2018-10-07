@@ -4,7 +4,7 @@ title:      "QuickFIX —— C++ 配置"
 subtitle:   "FIX Engine C++ library —— QuickFix"
 date:       2018-10-03 19:00:00
 author:     "Becks"
-header-img: "img/post/Deep_Learning-Sequence_Model_note/bg.jpg"
+header-img: "img/post/post-bg1.jpg"
 catalog:    true
 tags:
     - Fix Engine
