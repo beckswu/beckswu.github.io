@@ -4,7 +4,7 @@ title:      "Git - 笔记"
 subtitle:   "版本管理库 Git learning note "
 date:       2018-09-18 20:00:00
 author:     "Becks"
-header-img: "img/post/post-bg2.jpg"
+header-img: "img/post-bg2.jpg"
 catalog:    true
 tags:
     - Git
