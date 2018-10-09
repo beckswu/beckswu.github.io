@@ -75,3 +75,11 @@ void YourMessageCracker::toAdmin( FIX::Message& message, const FIX::SessionID& s
     }
 }
 ```
+
+## note
+1. 需要接受的message 类型都必须要继承MessageCracker的onMessage function. E.g. 如果没有下面function，假如收到35=W的信息，会给对方发送unsupported Message Type信息
+```C++
+void Application::onMessage(const FIX44::MarketDataSnapshotFullRefresh& message, const FIX::SessionID& sessionID) {
+	//
+}
+```
