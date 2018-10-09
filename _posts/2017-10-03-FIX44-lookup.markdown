@@ -38,6 +38,11 @@ tags:
 | 262 | Unique identifier for Market Data Request | used for pricing: 35 = V marketdatarequest |
 | 263 | SubscriptionRequestType | used for pricing: 35 = V marketdatarequest; 0 = Snapshot, 1 = Snapshot + Updates (Subscribe), 2 = Disable previous Snapshot + Update Request (Unsubscribe) |
 | 264 |  Depth of market for Book Snapshot  | Valid values: 0 = Full Book 1 = Top of Book   |
+| 268 |  NoMDEntries   | Number of entries in Market Data message. Used in 35=W   |
+| 269 | MDEntryType | 0 = Bid; 1 = Offer. Used in 35=W |
+| 270 | MDEntryPx | Price of the Market Data Entry. Used in 35=W |
+| 271 | MDEntrySize | Quantity or volume represented by the Market Data Entry. Used in 35=W |
+| 299 |  QuoteEntryID  | Uniquely identifies the quote as part of a QuoteSet. |
 | 526 | SecondaryClOrdID | |
 
 当发送35=D时候, acceptor会发送35=8告诉order confirmation or rejection
