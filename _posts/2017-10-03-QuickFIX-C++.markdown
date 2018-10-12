@@ -54,7 +54,7 @@ DataDictionary=\spec\FIX44.xml
 ```C++
 FIX::SessionSettings settings("文件位置");
 
-#获取settings file内容, 注意如果想get return想要的, 必须放在Default下，若放在session下会return no key error
+//获取settings file内容, 注意如果想get return想要的, 必须放在Default下，若放在session下会return no key error
 header.setField(FIX::SenderCompID(settings.get().getString("SenderCompID")));
 header.setField(FIX::TargetCompID(settings.get().getString("TargetCompID")));
 ```
