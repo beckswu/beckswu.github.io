@@ -83,3 +83,20 @@ void Application::onMessage(const FIX44::MarketDataSnapshotFullRefresh& message,
 	//
 }
 ```
+
+## SSL
+下载stunnel，更改stunnel.conf目录，在下面添加下面行, 在C++程序里用socket initiator即可
+```C++
+initiator = new FIX::SocketInitiator(application, storeFactory, settings, logFactory);
+```
+stunnel.conf 设置
+```
+[client end]
+client = yes
+accept = 127.0.0.1:5001
+connect = ip/hostname:port
+cert = stunnel.pem
+verify = 0
+
+```
+
