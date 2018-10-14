@@ -50,6 +50,15 @@ SocketConnectPort=**
 SocketConnectHost=***
 DataDictionary=\spec\FIX44.xml
 ```
+
+```C++
+FIX::SessionSettings settings("文件位置");
+
+//获取settings file内容, 注意如果想get return想要的, 必须放在Default下，若放在session下会return no key error
+header.setField(FIX::SenderCompID(settings.get().getString("SenderCompID")));
+header.setField(FIX::TargetCompID(settings.get().getString("TargetCompID")));
+```
+
 ## Customized DataDic
 
 对方来的Message的要满足一定格式; 比如使用默认datadictionary, 当subscribe massquote, 对方的message特殊, 对方send的message并没有tag = 304(TotQuoteEntrie), 但是默认的datadictionary 默认必须有这个tag, 发显示(Message 2 Rejected: Required tag missing:304), client端就会发送(35=3\|58=Required tag missing\|371=304). 而实际上没必要发送, 需要改变的是我们data dictionary 
@@ -83,3 +92,20 @@ void Application::onMessage(const FIX44::MarketDataSnapshotFullRefresh& message,
 	//
 }
 ```
+
+## SSL
+下载stunnel，更改stunnel.conf目录，在下面添加下面行, 在C++程序里用socket initiator即可
+```C++
+initiator = new FIX::SocketInitiator(application, storeFactory, settings, logFactory);
+```
+stunnel.conf 设置
+```
+[client end]
+client = yes
+accept = 127.0.0.1:5001
+connect = ip/hostname:port
+cert = stunnel.pem
+verify = 0
+
+```
+
