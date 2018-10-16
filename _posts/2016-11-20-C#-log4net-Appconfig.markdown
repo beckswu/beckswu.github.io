@@ -12,7 +12,7 @@ tags:
 ---
 
 ## Size Rotation log
-放在<configuration> 下面, 
+放在\<configuration\> 下面, 
 ```Shell
   <configSections>
     <section name="log4net" type="log4net.Config.Log4NetConfigurationSectionHandler, log4net" />
