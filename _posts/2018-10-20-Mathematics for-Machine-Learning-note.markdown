@@ -4,7 +4,7 @@ title:      "Mathematics for Machine Learning 笔记"
 subtitle:   "机器学习数学基础  —— 学习笔记"
 date:       2018-10-20 19:00:00
 author:     "Becks"
-header-img: "img/post/post-bg2.jpg"
+header-img: "img/post-bg2.jpg"
 catalog:    true
 tags:
     - Coursera
@@ -22,7 +22,7 @@ tags:
 
 <span style="background-color: #FFFF00">property: </span>
 
-1. Communicative: $$ \vecv \cdot \vecw  =  \vecw \cdot \vecv $$
-2. Distributive: $$ \left(\vecw + \vecv \right)\cdot \vecx  =  \vecw \cdot \vecx + \vecv \cdot \vecx  $$
-3. Associative over scaler multiplication: $$ \left(c\vecv \right)\cdot \vecw  =  c \left(\vecv \cdot \vecw \right)  $$
-4. Dot product self is the length square: $$ c\vecv \cdot \vecv  =  ||v||^2 = v_1^2 + v_2^2 + ... + v_n^2  $$
+Communicative: $$ \vecv \cdot \vecw  =  \vecw \cdot \vecv $$ <br/>
+Distributive: $$ \left(\vecw + \vecv \right)\cdot \vecx  =  \vecw \cdot \vecx + \vecv \cdot \vecx  $$<br/>
+Associative over scaler multiplication: $$ \left(c\vecv \right)\cdot \vecw  =  c \left(\vecv \cdot \vecw \right)  $$<br/>
+Dot product self is the length square: $$ c\vecv \cdot \vecv  =  ||v||^2 = v_1^2 + v_2^2 + ... + v_n^2  $$<br/>
