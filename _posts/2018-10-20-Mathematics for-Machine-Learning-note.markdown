@@ -29,3 +29,4 @@ Dot product self is the length square: &nbsp;&nbsp;&nbsp; $$ c\vec v \cdot \vec 
 Cosine: &nbsp;&nbsp;&nbsp; $$  \vec a \cdot \vec b  =  ||a||^2||b||^2 cos\theta  $$<br/>
 scaler projection: &nbsp;&nbsp;&nbsp; $$  \vec proj_{L} \left(\vec x\right) =   \frac{ \vec x \cdot \vec v  }{ ||\vec v|| } $$<br/>
 vector projection: &nbsp;&nbsp;&nbsp; $$  \vec proj_{L} \left(\vec x\right) =  c \vec v =  \frac{ \vec x \cdot \vec v  }{ \vec v \cdot \vec v } \vec v $$<br/>
+two vector $$  \vec  x $$ and $$  \vec y $$ are orthorgonal: &nbsp;&nbsp;&nbsp; $$  \vec  x \cdot \vec y  = 0 $$ 注: difference between perpendicular and orthogonal: ; $$  \vec  x \cdot \vec y  = 0 $$   => orthogonal, zero vector is orthogonal to everything; perpendicular is orthogonal, 但是othogonal 不一定是perpendicular, 因为 $$  \vec  x \cdot \vec 0  = 0 $$ 不是perpendicular
