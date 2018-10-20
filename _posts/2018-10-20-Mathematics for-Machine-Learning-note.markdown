@@ -24,4 +24,5 @@ tags:
 
 1. Communicative: $$ \vecv \cdot \vecw  =  \vecw \cdot \vecv $$
 2. Distributive: $$ \left(\vecw + \vecv \right)\cdot \vecx  =  \vecw \cdot \vecx + \vecv \cdot \vecx  $$
-3. Associative over scaler multiplication: $$ \left(\vecw + \vecv \right)\cdot \vecx  =  \vecw \cdot \vecx + \vecv \cdot \vecx  $$
+3. Associative over scaler multiplication: $$ \left(c\vecv \right)\cdot \vecw  =  c \left(\vecv \cdot \vecw \right)  $$
+4. Dot product self is the length square: $$ c\vecv \cdot \vecv  =  ||v||^2 = v_1^2 + v_2^2 + ... + v_n^2  $$
