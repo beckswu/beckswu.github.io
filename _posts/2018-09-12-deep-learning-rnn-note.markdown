@@ -10,6 +10,7 @@ tags:
     - Coursera
     - Deep Learning
     - RNN
+    - Machine Learning
     - 学习笔记
 ---
 
