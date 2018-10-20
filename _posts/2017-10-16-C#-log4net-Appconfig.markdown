@@ -6,6 +6,7 @@ date:       2018-10-16 20:00:00
 author:     "Becks"
 header-img: "img/post-bg3.jpg"
 catalog:    false
+published: false
 tags:
     - C#
   
@@ -13,7 +14,7 @@ tags:
 
 ## Size Rotation log
 放在\<configuration\> 下面, 
-```Shell
+```
   <configSections>
     <section name="log4net" type="log4net.Config.Log4NetConfigurationSectionHandler, log4net" />
 
