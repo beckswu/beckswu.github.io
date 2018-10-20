@@ -22,5 +22,6 @@ tags:
 
 <span style="background-color: #FFFF00">property: </span>
 
-1. Communicative: $$ \vecv \cdot \vecw  =  \vecw \cdot \vecv $$ $$
-2. Distributive: $$ \left(\vecw + \vecv \right)\cdot \vecx  =  \vecw \cdot \vecx + \vecv \cdot \vecx  $$ $$
+1. Communicative: $$ \vecv \cdot \vecw  =  \vecw \cdot \vecv $$
+2. Distributive: $$ \left(\vecw + \vecv \right)\cdot \vecx  =  \vecw \cdot \vecx + \vecv \cdot \vecx  $$
+3. Associative over scaler multiplication: $$ \left(\vecw + \vecv \right)\cdot \vecx  =  \vecw \cdot \vecx + \vecv \cdot \vecx  $$
