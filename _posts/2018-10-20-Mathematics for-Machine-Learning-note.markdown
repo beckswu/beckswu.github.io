@@ -14,7 +14,7 @@ tags:
 > note from Coursera Mathematics for Machine Learning
 > 
 
-## Linear Algebra: 
+## Course 1: Linear Algebra
 
 <script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"> </script>
 
@@ -26,3 +26,4 @@ Communicative: $$ \vec v \cdot \vec w  =  \vec w \cdot \vec v $$ <br/>
 Distributive: $$ \left(\vec w + \vec v \right)\cdot \vec x  =  \vec w \cdot \vec x + \vec v \cdot \vec x  $$<br/>
 AAssociative over scaler multiplication: $$ \left( c \vec v \right) \cdot \vec w  =  c \left( \vec v \cdot \vec w \right)  $$<br/>
 Dot product self is the length square: $$ c\vec v \cdot \vec v  =  ||v||^2 = v_1^2 + v_2^2 + ... + v_n^2  $$<br/>
+$$  \vec a \cdot \vec b  =  ||a||^2||b||^2 cos\theta  $$<br/>
