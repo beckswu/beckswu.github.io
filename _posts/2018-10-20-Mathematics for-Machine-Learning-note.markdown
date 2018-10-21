@@ -84,7 +84,20 @@ def gsBasis(A) :
             
     # Finally, we return the result:
     return B
-    
+
 #dot product @
 B[:, i]@B[:,j]
+
+
+#矩阵乘法 @
+A@B 
+"""
+[1, 2]   [5,  6]  =    [19, 22]
+[3, 4]   [7,  8]  =    [43, 50]
+
+A*B 是elementwise 乘法
+[1, 2]   [5,  6]  =    [5,  12]
+[3, 4]   [7,  8]  =    [21, 32]
+
+"""
 ```
