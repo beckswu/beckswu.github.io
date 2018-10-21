@@ -44,3 +44,47 @@ Basis is a set of n vectors that
 - span the space: <br/> 
    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; every (vector) $$\vec x$$ in V it is possible to choose $$ a_1, …, a_n \subseteq  F $$ such that $$ x = a_1 \vec v_1 + … + a_n \vec vn. $$
 - The space is then n-dimensional 
+
+```python
+import numpy as np
+#calculate inverse
+A = [[1, 1, 3],
+     [1, 2, 4],
+     [1, 1, 2]]
+Ainv = np.linalg.inv(A)
+
+#solve linear system
+A = [[4, 6, 2],
+     [3, 4, 1],
+     [2, 8, 13]]
+
+s = [9, 7, 2]
+
+r = np.linalg.solve(A, s)
+
+#calculate 长度norm
+B = np.array(A, dtype=np.float_)
+la.norm(B[:, 1])
+
+#Gram-Schmidt process
+def gsBasis(A) :
+    B = np.array(A, dtype=np.float_) # Make B as a copy of A, since we're going to alter it's values.
+    # Loop over all vectors, starting with zero, label them with i
+    for i in range(B.shape[1]) :
+        # Inside that loop, loop over all previous vectors, j, to subtract.
+        for j in range(i) :
+            # Complete the code to subtract the overlap with previous vectors.
+            # you'll need the current vector B[:, i] and a previous vector B[:, j]
+            B[:, i] = B[:,i] - B[:, i]@B[:,j]*B[:,j]
+        # Next insert code to do the normalisation test for B[:, i]
+        if la.norm(B[:,i]) > verySmallNumber:
+            B[:, i] = B[:, i] / la.norm(B[:, i])
+        else :
+            B[:, i] = np.zeros_like(B[:, i])     
+            
+    # Finally, we return the result:
+    return B
+    
+#dot product @
+B[:, i]@B[:,j]
+```
