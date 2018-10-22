@@ -30,4 +30,10 @@ Matrix: A\*B 不一定等于 B\*A
 </object>
 
 
+<object data="https://docs.google.com/viewer?url=http://nbviewer.jupyter.org/github/beckswu/beckswu.github.io/blob/master/document/linear%20algebra.pdf" type="application/pdf" width="700px" height="700px">
+    <embed src="https://docs.google.com/viewer?url=http://nbviewer.jupyter.org/github/beckswu/beckswu.github.io/blob/master/document/linear%20algebra.pdf">
+        <p>This browser does not support PDFs. Please download the PDF to view it: <a href="https://docs.google.com/viewer?url=http://nbviewer.jupyter.org/github/beckswu/beckswu.github.io/blob/master/document/linear%20algebra.pdf">Download PDF</a>.</p>
+    </embed>
+</object>
+
 <embed src="" width="500" height="375">
