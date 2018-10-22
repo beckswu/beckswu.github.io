@@ -100,4 +100,12 @@ A*B 是elementwise 乘法
 [3, 4]   [7,  8]  =    [21, 32]
 
 """
+
+#calculate eigenvector and eigenvalue
+
+M = np.array([[1, 0, 0],
+              [0, 2, 0],
+              [0, 0, 3]])
+vals, vecs = np.linalg.eig(M)
+vals
 ```
