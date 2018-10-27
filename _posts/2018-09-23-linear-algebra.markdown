@@ -74,12 +74,22 @@ A square matrix is __not invertible__ is called __singular__ or **degenerate**. 
  - The equation Ax = b has exactly one solution for each b in $$R^N$$
  - The columns of A are linearly independent.
  - The columns of A span $$R^N$$.
- - Col A = Kn.
+ - Col A = $$R^N$$.
  - The columns of A form a basis of $$R^N$$.
  - The linear transformation mapping x to Ax is a bijection(onto and one-to-one) from $$R^N$$ to $$R^N$$.
  - There is an n-by-n matrix B such that AB =  $$I_n$$ = BA.
  - The transpose  $$A^T$$ is an invertible matrix (hence rows of A are linearly independent, span $$R^N$$, and form a basis of  $$R^N$$).
  - The number 0 is not an eigenvalue of A.
+
+## TRANSPOSE
+
+ $$ \left( A^T \right)^{T} = A  $$ <br/>
+ $$ \left( A + B \right)^T = A^T + B^T $$ for nonzero scalar K <br/>
+ $$ \left( AB)^{T} =  B^T A^T  $$   <br/>
+ $$ \left( cA \right)^T = cA^T  $$ for scalar c </br>
+ $$ det\left( A^{T} \right) =  det\left( A \right)  $$  <br/>
+ $$ a \cdot b = a^Tb   $$ for column vectors a and b  <br/>
+
 
 ```python
 import numpy as np
@@ -158,10 +168,6 @@ vals
 </object>
 
 
-<object data="https://docs.google.com/viewer?url=http://nbviewer.jupyter.org/github/beckswu/beckswu.github.io/blob/master/document/linear%20algebra.pdf" type="application/pdf" width="700px" height="700px">
-    <embed src="https://docs.google.com/viewer?url=http://nbviewer.jupyter.org/github/beckswu/beckswu.github.io/blob/master/document/linear%20algebra.pdf">
-        <p>This browser does not support PDFs. Please download the PDF to view it: <a href="https://docs.google.com/viewer?url=http://nbviewer.jupyter.org/github/beckswu/beckswu.github.io/blob/master/document/linear%20algebra.pdf">Download PDF</a>.</p>
-    </embed>
-</object>
+
 
 <embed src="" width="500" height="375">
