@@ -91,13 +91,15 @@ A square matrix is __not invertible__ is called __singular__ or **degenerate**. 
 
 if $$  A^T = A $$, then A is called __symmetric matrix__
 
-## Linear Independence
+## Linear Independence and Span
 
 a set of vectors is __linearly dependent__ if one of the vectors in the st can be defined as a linear combination of the others. 比如$$ \begin{bmatrix} 2 \\ 3 \\ \end{bmatrix}, begin{bmatrix} 4 \\ 6 \\ \end{bmatrix} $$ is linear dependent  If no vector in the set can be written in this way, then vectors are __linearly independent__
 
 n vectors in $$R^N$$ are __linearly independent__ if and only if the <span style="background-color: #FFFF00">determinant </span>of the matrix formed by the vectors as its column is non-zero. ($$det\left(A \right)\neq $$)
 
-## Linear Independence
+$$__span\left(v_1, v_2, ..., v_n\right)__ = \left{ c_1v_1 + c_2v_2 +... + c_nv_n \| c_i \in R}  $$ The space of all of the combination of vectors $$v_1, v_2, ...,v_n$$
+
+## Subspace 
 
 ```python
 import numpy as np
