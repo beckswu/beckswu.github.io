@@ -48,7 +48,7 @@ Basis is a set of n vectors that
 
 ## Inverse:
 
- $$ A =  \begin{bmatrix} a & b  \\ c & d \\ \end{bmatrix} $$
+ $$ A =  \begin{bmatrix} a & b  \\ c & d \\ \end{bmatrix} , A^-1 =  \frac{ 1  }{ det\left(A\right) } \begin{bmatrix} d & -c  \\ -b & a \\ \end{bmatrix} = \frac{ 1  }{ ad - bc } \begin{bmatrix} d & -c  \\ -b & a \\ \end{bmatrix}  $$
 
 
 ```python
