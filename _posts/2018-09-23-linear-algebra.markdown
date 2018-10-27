@@ -52,7 +52,7 @@ Basis is a set of n vectors that
 
 多维的inverse 可以row operation, 需要inverse matrix 在左面，indentity matrix在右侧，把左侧的matrix通过row operation变成indentiy matrix，一样的row operation在apply 在右侧，最后得到右侧的matrix就是inverse 
 
-$$ \left[ \begin{array}{ccc|ccc}  1 & 0 &1 &1 & 0 &0  \\ 0 & 2 & 1 &0 & 1 &0  \\ 1&1&1 &0 & 0 &1 \end{array} \right] $$ => $$ \left[ \begin{array}{ccc|ccc}  1 & 0 &0 & -1 & -1 &2   \\  0 & 1 &0 & -1 & 0 & 1  \\ 0 & 0 &1 & 2&1&0  \end{array} \right] $$
+$$ \left[ \begin{array}{ccc \| ccc}  1 & 0 &1 &1 & 0 &0  \\ 0 & 2 & 1 &0 & 1 &0  \\ 1&1&1 &0 & 0 &1 \end{array} \right] $$ => $$ \left[ \begin{array}{ccc\|ccc}  1 & 0 &0 & -1 & -1 &2   \\  0 & 1 &0 & -1 & 0 & 1  \\ 0 & 0 &1 & 2&1&0  \end{array} \right] $$
 
 ```python
 import numpy as np
