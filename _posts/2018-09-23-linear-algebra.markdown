@@ -18,8 +18,7 @@ tags:
 <script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"> </script>
 
 
-## Properties: 
-#### vector
+## Vector: 
 
 <span style="background-color: #FFFF00">property: </span>
 
