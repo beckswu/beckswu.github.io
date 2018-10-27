@@ -85,7 +85,7 @@ A square matrix is __not invertible__ is called __singular__ or **degenerate**. 
  $$ \left( A^T \right)^{T} = A  $$ <br/>
  $$ \left( A + B \right)^T = A^T + B^T $$ for nonzero scalar K <br/>
  $$ \left( AB \right)^{T} =  B^T A^T  $$   <br/>
- $$ \left( cA \right)^T = cA^T  $$ for scalar c </br>
+ $$ \left( cA \right)^T = cA^T  $$ for scalar c <br/>
  $$ det\left( A^{T} \right) =  det\left( A \right)  $$  <br/>
  $$ a \cdot b = a^Tb   $$ for column vectors a and b  <br/>
 
