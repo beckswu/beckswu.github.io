@@ -48,7 +48,7 @@ Basis is a set of n vectors that
 
 ## INVERSE
 
- $$ A =  \begin{bmatrix} a & b  \\ c & d \\ \end{bmatrix}, A^-1 =  \frac{ 1  }{ det\left(A\right) } \begin{bmatrix} d & -c  \\ -b & a \\ \end{bmatrix} = \frac{ 1  }{ ad - bc } \begin{bmatrix} d & -c  \\ -b & a \\ \end{bmatrix}  $$
+ $$ A =  \begin{bmatrix} a & b  \\ c & d \\ \end{bmatrix}, A^{-1} =  \frac{ 1  }{ det\left(A\right) } \begin{bmatrix} d & -c  \\ -b & a \\ \end{bmatrix} = \frac{ 1  }{ ad - bc } \begin{bmatrix} d & -c  \\ -b & a \\ \end{bmatrix}  $$
 
 多维的inverse 可以row operation, 需要inverse matrix 在左面，indentity matrix在右侧，把左侧的matrix通过row operation变成indentiy matrix，一样的row operation 也apply 在右侧，<span style="color: red">最后得到右侧的matrix</span>就是inverse 
 
@@ -57,10 +57,10 @@ $$ \left[ \begin{array}{ccc \| ccc}  1 & 0 &1 &1 & 0 &0  \\ 0 & 2 & 1 &0 & 1 &0 
 A square matrix is __not invertible__ is called __singular__ or **degenerate**. A square matrix is singular if and only if its __determinant__ is 0. <span style="background-color: #FFFF00">Non-square matrices</span> do not have inverse.
 
 #### properties
- $$ \left( A^-1 \right)^-1 = A  $$ <br/>
- $$ \left( kA \right)^-1 = k^-1 A^-1  $$ for nonzero scalar K <br/>
- $$ \left( A^T \right)^-1 =  \left( A^-1 \right)^T  $$  <br/>
- $$ det\left( A^-1 \right) =  det\left( A \right)^-1  $$  <br/>
+ $$ \left( A^{-1} \right)^{-1} = A  $$ <br/>
+ $$ \left( kA \right)^{-1} = k^{-1} A^{-1}  $$ for nonzero scalar K <br/>
+ $$ \left( A^T \right)^{-1} =  \left( A^{-1} \right)^T  $$  <br/>
+ $$ det\left( A^{-1} \right) =  det\left( A \right)^{-1}  $$  <br/>
 
  if A be a square n by n matrix is invertible, following must be all true of all false
  - A is inveritble, A has an inverse, is nonsingular, or is nondegenerate
