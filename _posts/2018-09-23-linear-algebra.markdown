@@ -62,6 +62,25 @@ A square matrix is __not invertible__ is called __singular__ or **degenerate**. 
  $$ \left( A^T \right)^-1 =  \left( A^-1 \right)^T  $$  <br/>
  $$ det\left( A^-1 \right) =  det\left( A \right)^-1  $$  <br/>
 
+ if A be a square n by n matrix is invertible, following must be all true of all false
+ - A is inveritble, A has an inverse, is nonsingular, or is nondegenerate
+ - A is row-equivalent to the n-by-n identity matrix In.
+ - A is column-equivalent to the n-by-n identity matrix In.
+ - A has n pivot positions.
+ - A has full rank; that is, rank A = n.
+ - The equation Ax = 0 has only the trivial solution x = 0.
+ - The kernel of A is trivial, i.e., it contains only the null vector as an element, ker(A) = {0}.
+ - Null A = {0}.
+ - The equation Ax = b has exactly one solution for each b in $$R^N$$
+ - The columns of A are linearly independent.
+ - The columns of A span $$R^N$$.
+ - Col A = Kn.
+ - The columns of A form a basis of $$R^N$$.
+ - The linear transformation mapping x to Ax is a bijection(onto and one-to-one) from $$R^N$$ to $$R^N$$.
+ - There is an n-by-n matrix B such that AB =  $$I_n$$ = BA.
+ - The transpose  $$A^T$$ is an invertible matrix (hence rows of A are linearly independent, span $$R^N$$, and form a basis of  $$R^N$$).
+ - The number 0 is not an eigenvalue of A.
+
 ```python
 import numpy as np
 #calculate inverse
