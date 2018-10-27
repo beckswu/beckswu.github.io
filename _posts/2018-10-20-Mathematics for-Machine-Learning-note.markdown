@@ -6,6 +6,7 @@ date:       2018-10-20 19:00:00
 author:     "Becks"
 header-img: "img/post-bg2.jpg"
 catalog:    true
+published: false
 tags:
     - Coursera
     - Machine Learning
