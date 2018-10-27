@@ -101,6 +101,11 @@ $$__span\left(v_1, v_2, ..., v_n\right)__ = \left{ c_1v_1 + c_2v_2 +... + c_nv_n
 
 ## Subspace 
 
+if V is subspace of $$R^N$$
+1. The zero vector 0 is in V
+2. if  $$ \vec x $$ in V, any scaler f c, then the scalar product $$ c\vec x $$ is in V (closure under scaler multiplication)
+3. if  $$ \vec a $$ in V and $$ \vec b $$ in V , then $$ \vec a + \vec b $$ also in V (closure under addition)
+
 ```python
 import numpy as np
 #calculate inverse
