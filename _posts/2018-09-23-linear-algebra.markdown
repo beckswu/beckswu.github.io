@@ -46,6 +46,11 @@ Basis is a set of n vectors that
    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; every (vector) $$\vec x$$ in V it is possible to choose $$ a_1, …, a_n \subseteq  F $$ such that $$ x = a_1 \vec v_1 + … + a_n \vec vn. $$
 - The space is then n-dimensional 
 
+## Inverse:
+
+ $$ A =  \begin{matrix} a & b  \\ c & d \\ \end{matrix} $$
+
+
 ```python
 import numpy as np
 #calculate inverse
