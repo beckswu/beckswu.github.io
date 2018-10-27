@@ -107,6 +107,7 @@ if V is subspace of $$R^N$$
 3. if  $$ \vec a $$ in V and $$ \vec b $$ in V , then $$ \vec a + \vec b $$ also in V (closure under addition)
 
 ![](/img⁩/post⁩/Linear_Algebra⁩/pic1.png)
+![](/img⁩/pic1.png)
 ![](/img/post/Deep_Learning-Sequence_Model_note/week1pic2.png)
 
 
