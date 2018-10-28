@@ -266,6 +266,14 @@ $$ T\left(\vec v \right) = \lambda \vec v $$
 
 where $$\lambda$$ is a scalar in the field F, known as __eigenvalue__ associated with __eigenvector__ $$\vec v$$
 
+$$ A \vec v = \lambda \vec v $$
+
+$$ A \vec v - \lambda  I_n \vec v = \vec 0 $$
+
+$$ \left( A - \lambda  I_n  \right) \vec v = \vec 0 $$
+
+因为 $$\vec v $$ is non-zero vector, $$ \left( A - \lambda  I_n  \right) $$ 必须是linear dependent matrix, 否则只有trivial soluion {0}, so $$ det\left( A - \lambda  I_n  \right) = 0 $$ 
+
 
 ```python
 import numpy as np
