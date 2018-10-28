@@ -256,6 +256,14 @@ properties:
 
 __Gram-Schmidt process__, is a procedure which takes a nonorthogonal set of linearly independent functions to constructs an orthogonal basis
 
+
+## Eigenvector & Eigenvalue
+
+if T is a linear transformation from a vector space V over a field F into itself(V) and $$\vec v$$ is a vector in V that is not a zero vector, then  $$\vec v$$ is an eigenvector of T if  $$T\left(\vec v\right)$$  is a scalar multile of v. It can be written: 
+
+$$ T\left(\vec v \right) = \lambda \vec v $$
+
+where $$\lambda$$ is a scalar in the field F, known as __eigenvalue__ associated with non-zero vector  $$\vec v$$ as __eigenvector__
 ![](\img\post\Linear-Algebra\pic2.png)
 
 ```python
@@ -322,6 +330,8 @@ M = np.array([[1, 0, 0],
 vals, vecs = np.linalg.eig(M)
 vals
 ```
+
+注： not include Basis Transformation, least square, function composition, determinant
 
 [file](https://docs.google.com/viewer?url=http://nbviewer.jupyter.org/github/beckswu/beckswu.github.io/blob/master/document/Data-Structure-and-Algorithms.pdf "file")
 
