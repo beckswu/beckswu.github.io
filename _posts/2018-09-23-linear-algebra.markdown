@@ -119,8 +119,6 @@ if V is subspace of $$R^N$$
 
 ![](\img\post\Linear-Algebra\pic1.PNG)
 
-![](https://raw.githubusercontent.com/beckswu/beckswu.github.io/master/img/post/Linear-Algebra/pic1.PNG)
-
 
 ## Null Space and Column Space
 
