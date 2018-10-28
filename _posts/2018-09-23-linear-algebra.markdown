@@ -121,14 +121,18 @@ if V is subspace of $$R^N$$
 
 ## Null Space and Column Space
 
+#### null space
+
 the __kernel(nullspace)__ of a linear map L : V → W between two vector spaces V and W, is the set of all elements v of V for which L(v) = 0, where 0 denotes the zero vector in W: <br/>
-$$ ker\left(L\right) = \{ v \in V \| L\left( v \right) \} $$ <br/>
+$$ ker\left(L\right) = \{ v \in V | L\left( v \right) \} $$ <br/>
 or in $$R^N:  N = \{ \vec x \in R^n \| A \vec x =  \vec 0  \} $$  
 
 Null space is valid subspace 满足: <br/>
 1. $$ \vec 0 $$ in subspace
-2. if $$ \vec v_1, \vec v_1 \in V $$, then  $$ A \left( \vec v_1 +  \vec v_2 \right) = A\vec v_1 + A\vec v_2 = \vec 0 \ in N
-3. if $$ \vec v \ in N $$, $$ A \left(c \vec v \right) = c \left( A\vec v \right) \ in N $$
+2. if $$ \vec v_1, \vec v_1 \in N $$, then  $$ A \left( \vec v_1 +  \vec v_2 \right) = A\vec v_1 + A\vec v_2 = \vec 0 \ in N $$
+3. if $$ \vec v \in N $$, $$ A \left(c \vec v \right) = c \left( A\vec v \right) \in N $$
+
+#### column space
 
 ```python
 import numpy as np
