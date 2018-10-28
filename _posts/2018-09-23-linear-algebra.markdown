@@ -204,10 +204,10 @@ __Not Communicative__: $$AB \neq BA $$
 ## Projection on plane
 
 if A is matrix consists of basis of V, then :<br/>
-$$Proj_v^{\vec x} = A \left( A^T A \right)^-1 A^T \vecx $$
+$$Proj_v \vec x = A \left( A^T A \right)^{-1} A^T \vec x $$
 
-prove: if A is n by k matrix of basis for V $$\{ \vec b_1 , \vec b_2 , \cdots, \vec b_k \}$$, then all vectors on V is linear combination of A columns,  such that $$ y \in R^k, A\vec y = \{ \vec b_1 , \vec b_2 , \cdots, \vec b_k \} \begin{bmatrix} y_1 \\ y_2 \\ \vdots \\ y_n \end{bmatrix} = y_1 \vec b_1 + y_2 \vec b_2 + \cdots + y_n \vec b_n $$, <br/>
-根据projection定义, $$\vec x = Proj_v^{\vec x}  + \vec w$$,$$ Proj_v^{\vec x} = A\vec y$$ 与 $$\vec w$$ orthogonal,$$\vec w$$ is member oof $$V^{\bot} = C\left( A \right)^{\bot} =  N\left( A^T \right) $$. 根据null space 定义    <br/>
+__Prove__: if A is n by k matrix of basis for V $$\{ \vec b_1 , \vec b_2 , \cdots, \vec b_k \}$$, then all vectors on V is linear combination of A columns,  such that $$ y \in R^k, A\vec y = \{ \vec b_1 , \vec b_2 , \cdots, \vec b_k \} \begin{bmatrix} y_1 \\ y_2 \\ \vdots \\ y_n \end{bmatrix} = y_1 \vec b_1 + y_2 \vec b_2 + \cdots + y_n \vec b_n $$, <br/>
+根据projection定义, $$\vec x = Proj_v \vec x  + \vec w $$(构成直角三角形), $$ Proj_v \vec x = A\vec y$$ 与 $$\vec w$$ orthogonal,$$\vec w$$ is member oof $$V^{\bot} = C\left( A \right)^{\bot} =  N\left( A^T \right) $$. 根据null space 定义    <br/>
 $$\begin{align} A^T\left(\vec x - Proj_v^{\vec x} \right) &= \vec 0 \\   A^T \vec x - A^T Proj_v^{\vec x}  &= \vec 0 \\  A^T \vec x &= A^T A \vec y  \\ \vec y &= \left(A^T A \right)^{-1}  A^T \vec x \\   Proj_v^{\vec x}  &= A \left(A^T A \right)^{-1}  A^T \vec x   \end{align}$$
 
 
