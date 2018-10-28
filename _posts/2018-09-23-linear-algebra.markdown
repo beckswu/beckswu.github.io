@@ -119,6 +119,12 @@ if V is subspace of $$R^N$$
 ![](https://raw.githubusercontent.com/beckswu/beckswu.github.io/master/img/post/Linear_Algebra/pic1.png)
 
 
+## Null Space and Column Space
+
+the __kernel(nullspace)__ of a linear map L : V → W between two vector spaces V and W, is the set of all elements v of V for which L(v) = 0, where 0 denotes the zero vector in W: <br/>
+$$ ker\left(L\right) = \{ v \in V \| L\left( v \right) \} $$
+
+
 ```python
 import numpy as np
 #calculate inverse
