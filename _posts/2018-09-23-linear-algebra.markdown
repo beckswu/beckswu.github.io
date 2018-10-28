@@ -53,7 +53,7 @@ Basis is a set of n vectors that
    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; every (vector) $$\vec x$$ in V it is possible to choose $$ a_1, …, a_n \subseteq  F $$ such that $$ x = a_1 \vec v_1 + … + a_n \vec vn. $$
 - The space is then n-dimensional 
 
-## INVERSE
+## Inverse
 
  $$ A =  \begin{bmatrix} a & b  \\ c & d \\ \end{bmatrix}, A^{-1} =  \frac{ 1  }{ det\left(A\right) } \begin{bmatrix} d & -c  \\ -b & a \\ \end{bmatrix} = \frac{ 1  }{ ad - bc } \begin{bmatrix} d & -c  \\ -b & a \\ \end{bmatrix}  $$
 
@@ -88,7 +88,7 @@ A square matrix is __not invertible__ is called __singular__ or **degenerate**. 
  - The transpose  $$A^T$$ is an invertible matrix (hence rows of A are linearly independent, span $$R^N$$, and form a basis of  $$R^N$$).
  - The number 0 is not an eigenvalue of A.
 
-## TRANSPOSE
+## Transpose
 
  $$ \left( A^T \right)^{T} = A  $$ <br/>
  $$ \left( A + B \right)^T = A^T + B^T $$ for nonzero scalar K <br/>
