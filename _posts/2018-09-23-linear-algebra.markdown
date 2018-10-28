@@ -207,7 +207,18 @@ if A is matrix consists of basis of V, then :<br/>
 $$Proj_v \vec x = A \left( A^T A \right)^{-1} A^T \vec x $$
 
 __Prove__: if A is n by k matrix of basis for V $$\{ \vec b_1 , \vec b_2 , \cdots, \vec b_k \}$$, then all vectors on V is linear combination of A's columns,  such that $$ \vec y \in R^k, A\vec y = \{ \vec b_1 , \vec b_2 , \cdots, \vec b_k \} \begin{bmatrix} y_1 \\ y_2 \\ \vdots \\ y_k \end{bmatrix} = y_1 \vec b_1 + y_2 \vec b_2 + \cdots + y_k \vec b_k $$, <br/>
-根据projection定义, $$\vec x = Proj_v \vec x  + \vec w $$(构成直角三角形), $$ Proj_v \vec x = A\vec y$$ 与 $$\vec w$$ orthogonal, $$\vec w$$ is member of $$V^{\bot} = C\left( A \right)^{\bot} =  N\left( A^T \right) $$. 根据null space 定义  <br/>
+根据projection定义, $$\vec x = Proj_v \vec x  + \vec w $$(构成直角三角形), $$ Proj_v \vec x = A\vec y$$ 与 $$\vec w$$ orthogonal, $$\vec w$$ is member of $$V^{\bot} = C\left( A \right)^{\bot} =  N\left( A^T \right) $$. 根据null space 定义  
+
+$$ A^T\left(\vec x - Proj_v \vec x \right) = \vec 0 $$ 
+
+$$ A^T \vec x - A^T Proj_v \vec x  = \vec 0 $$ 
+
+$$  A^T \vec x = A^T A \vec y  $$
+
+$$  \vec y = \left(A^T A \right)^{-1}  A^T \vec x $$ 
+
+$$  Proj_v \vec x  = A \left(A^T A \right)^{-1}  A^T \vec x   $$
+
 $$ \space \space \space \space \space \space \space \space \space \space \space \space \space \space A^T\left(\vec x - Proj_v \vec x \right) = \vec 0 $$ <br/>
 $$ \space \space \space \space \space \space \space \space \space \space \space \space \space \space A^T \vec x - A^T Proj_v \vec x  = \vec 0 $$ <br/>
 $$ \space \space \space \space \space \space \space \space \space \space \space \space \space \space A^T \vec x = A^T A \vec y  $$ <br/>
@@ -245,7 +256,8 @@ properties:
 6. If orthonormal basis 组成的matrix A,  then $$Proj_v \vec x = A \left( A^T A \right)^{-1} A \vec x = A A^T \vec x $$
 7. If orthonormal basis 组成的matrix A, then when do transformation, it will preserve length and angle for transformation <br/>
    prove: 
-   
+
+
    $$ \| C \vec x \|^2 = C\vec x \cdot C \vec x = \left( C\vec x \right)^T C \vec x = \vec x^T C^T C \vec x =\vec x^T \vec x =  \| C \vec x \|   $$ 
 
    $$cos\theta =  \frac{ C\vec w \cdot C \vec v }{ \| C\vec v \| \| C\vec v \| } =  \frac{ \left(C\vec w \right)^T C \vec v }{ \| \vec v \| \| \vec v \| } =  \frac{ \vec w^T C^T C \vec v }{ \| \vec v \| \| \vec v \| }  = \frac{ \vec w^T \vec v }{ \| \vec v \| \| \vec v \| } $$
