@@ -14,6 +14,9 @@ tags:
 
 > note from youtube khan Academy
 
+![](/img⁩/post⁩/Linear_Algebra/pic1.png)
+
+![](https://raw.githubusercontent.com/beckswu/beckswu.github.io/master/img/post/Linear_Algebra/pic1.png)
 
 <script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"> </script>
 
