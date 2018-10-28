@@ -106,11 +106,9 @@ if V is subspace of $$R^N$$
 2. if  $$ \vec x $$ in V, any scaler c, then the scalar product $$ c\vec x $$ is in V (closure under scaler multiplication)
 3. if  $$ \vec a $$ in V and $$ \vec b $$ in V , then $$ \vec a + \vec b $$ also in V (closure under addition)
 
-![](/img⁩/post⁩/Linear_Algebra/pic1.png)
+![](/img⁩/post⁩/Linear_Algebra/pic1.PNG)
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week1pic2.png)
-
-![](/img⁩/post/Deep_Learning-Sequence_Model_note/pic1.jpg)
 
 ```python
 import numpy as np
