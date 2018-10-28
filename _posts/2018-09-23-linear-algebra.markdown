@@ -204,14 +204,14 @@ __Not Communicative__: $$AB \neq BA $$
 
 ## Orthogonal
 
-__Orthogonal Complement__ of V: for some V, $$V^{\bot} = \{ \vec x \in R^n | \vec x \cdot \vec v = 0 for every \vec v \in V \}$$ . Orthogonal complements is valid subspace
+__Orthogonal Complement__ of V: for some V, $$V^{\bot} = \{ \vec x \in R^n  \| \vec x \cdot \vec v = 0 for every \vec v \in V \}$$ . Orthogonal complements is valid subspace
 
 null space is orthogonal complement of row space <br/>
 $$N\left(A \right) = \left(  C\left( A^T \right) \right)^{\bot}, \left(   N\left(A \right) \right)^{\bot}= C\left( A^T \right) $$ <br/>
 left null space is orthgonal complement of column space <br/>
 $$N\left(A^T \right)  = \left(  C\left( A \right) \right)^{\bot},  \left( N\left(A^T \right) \right)^{\bot}  =  C\left( A \right) $$ <br/>
 
-$$Dim\left( V \right) + Dim\left( V^{\bot} \right) = nums of columns $$
+$$Dim\left( V \right) + Dim\left( V^{\bot} \right) = nums \space of \space columns $$
 
 
 ```python
