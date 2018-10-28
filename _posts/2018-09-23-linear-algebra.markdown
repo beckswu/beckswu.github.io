@@ -160,11 +160,11 @@ $$ nullity\left( A \right) + rank\left(  A \right) = dim\left( V \right) $$
 ## Onto and One-to-One
 
 #### Onto
-__Onto (surjective)__: every elements in co-domain y ∈ Y, there exist at least one x ∈ X such that f(x) = y. 每一个Y知至少都有一个X与之相对应, 一个X对应多个 或 有个X 灭有对应Y 无所谓
+__Onto (surjective)__: every elements in co-domain y ∈ Y, there exist at least one x ∈ X such that f(x) = y. 每一个Y都至少都有一个X与之相对应, 一个X对应多个Y 或 有个X 没有对应Y 无所谓
 
 following statements are quivalent: <br/>
 1. T is onto
-2. T(x) = b has at least one solution for b in $$R^m$$
+2. T(x) = b has at least one solution for every b in $$R^m$$
 3. A has a pivot in every row
 4. The columns of A span $$R^m$$
 
