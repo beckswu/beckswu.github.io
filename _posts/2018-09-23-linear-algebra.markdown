@@ -108,6 +108,8 @@ if V is subspace of $$R^N$$
 
 ![](/img⁩/post⁩/Linear_Algebra/pic1.PNG)
 
+![](https://raw.githubusercontent.com/beckswu/beckswu.github.io/master/img/post/Linear_Algebra/pic1.png)
+
 ![](/img/post/Deep_Learning-Sequence_Model_note/week1pic2.png)
 
 ```python
