@@ -157,19 +157,22 @@ __Rank Nullity Theorem__<br/>
 $$ nullity\left( A \right) + rank\left(  A \right) = dim\left( V \right) $$
 
 
-## Onto and One-to-One:
+## Onto and One-to-One
 
+#### Onto
 __Onto (surjective)__: every elements in co-domain y ∈ Y, there exist at least one x ∈ X such that f(x) = y. 每一个Y知至少都有一个X与之相对应, 一个X对应多个 或 有个X 灭有对应Y 无所谓
 
-following statement are quivalent: <br/>
+following statements are quivalent: <br/>
 1. T is onto
 2. T(x) = b has at least one solution for b in $$R^m$$
 3. A has a pivot in every row
 4. The columns of A span $$R^m$$
 
+#### One-to-One
+
 __One-to-one (injective)__: for every y that map to, there at most at most one x map to it. 每个一个y只有一个x map, 每个x map to unqiue y: f(x)=y, 有的Y没有x对应上 无所谓, 可以有y 没有x map to
 
-following statement are quivalent: <br/>
+following statements are quivalent: <br/>
 1. T is one-to-one
 2. T(x) = b has at most one solution for b in $$R^m$$
 3. The columns of A are linearly independent (因为每一个y最后只有一个x)
@@ -192,7 +195,7 @@ Invertible means For every y ∈ Y f(x) = y has a unique solution, that means on
  __linear transformation__ (linear mapping, linear map) is a mapping V → W between two modules (including vector spaces) that preserves the operations of addition and scalar multiplication. <br/>
 $$ T: R^n -> R^n $$  if and only if  $$\vec a , \vec b \in R^n 1. T\left( \vec a + \vec b \right) = T\left( \vec a \right) + T\left( \vec b \right) 2. T\left(c\vec a\right)  = cT\left(\vec a \right) $$
 
-#### matrix product properties: 
+#### matrix product properties
 
 __Associative__ :  (AB)C = A(BC). 
 __Distributive__:  A(B+C) = AB + BC,  (B+C)A = BA + CA
