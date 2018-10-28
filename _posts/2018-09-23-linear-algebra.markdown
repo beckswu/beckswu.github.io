@@ -227,6 +227,21 @@ $$N\left(A^T \right)  = \left(  C\left( A \right) \right)^{\bot},  \left( N\left
 
 $$Dim\left( V \right) + Dim\left( V^{\bot} \right) = nums \space of \space columns $$
 
+#### Orthonormal Basis
+
+A subset $$\{ \vec v_1, \vec v2, \cdots, \vec v_k \}$$ of a vector space V withe inner product <,>, is called __orthonormal__ if $$<\vec v_i, \vec v_j> = 0 when i \neq j $$. That is, the vector are mutually orthogonal.Moverover, each length is one  $$<\vec v_i, \vec v_i> = 1.
+
+$$ B = \{ \vec v_1, \vec v2, \cdots, \vec v_k \} $$ is __orthonormal set__ 需满足 1. $$\| \vec v_i \| = 1$$ each vector has length = 1, 2. Each vector is orthogonal to each other. 
+
+An orthonormal set must be  <span style="color: red">linearly independent</span>, and so it is a vector basis for the space it spans. Such a basis is called an __orthonormal basis__
+
+property: 
+1. The column vectors are linearly independent.
+2. if $$ \vec x = c_1 \vec v1 +  c_2 \vec v2 + \cdots +  c_k \vec vk$$, then $$\vec v_i \cdot \ vec x = c_1 \vec v1 \vec v_i +  c_2 \vec v2 \vec v_i + \cdots +  c_k \vec vk \vec v_i = c_i \vec v_i \vec v_i = c_i $$
+3. \left[ \vec x \right]_B = \begin{bmatrix} c_1 \\ c_2 \\ \vdots \\ c_k \end{bmatrix} =  \begin{bmatrix} \vec v_1 \vec x \\ \vec v_2 \vec x  \\ \vdots \\ \vec v_k \vec x  \end{bmatrix}
+4. If orthonormal basis 组成matrix A， 则 $$ A^T A = I_k $$ the identity matrix <br/>
+    prove: $$ A^T A = \begin{bmatrix} -- \vec v_1^T -- \\  --\vec v_2^T-- \\ --\vdots-- \\ --\vec v_k^T-- \end{bmatrix}  \begin{bmatrix} \mid &\mid &\cdots &\mid \\  \vec v_1^T & \vec v_2^T & \cdots  &\vec v_1^T \\ \mid &\mid &\cdots &\mid \end{bmatrix} =  \begin{bmatrix} 1 & 0 &\cdots & 0 \\  0 & 1 & \cdots & 0  \\ \vdots &  \vdots & \ddots & \vdots \\ 0 & 0 & \cdots & 0 \end{bmatrix}  $$
+5. B is n by n matrix whose columns form an orthormal set, then $$B^-1 = B^T $$ (因为是 n by n, 所以是invertible)
 
 ```python
 import numpy as np
