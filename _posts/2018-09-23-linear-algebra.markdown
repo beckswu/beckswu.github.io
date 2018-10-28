@@ -117,7 +117,7 @@ if V is subspace of $$R^N$$
 2. if  $$ \vec x $$ in V, any scaler c, then the scalar product $$ c\vec x $$ is in V (closure under scaler multiplication)
 3. if  $$ \vec a $$ in V and $$ \vec b $$ in V , then $$ \vec a + \vec b $$ also in V (closure under addition)
 
-![](/img⁩/post⁩/Linear-Algebra/pic1.png)
+![](\img\post\Linear-Algebra\pic1.png)
 
 ![](https://raw.githubusercontent.com/beckswu/beckswu.github.io/master/img/post/Linear-Algebra/pic1.png)
 
