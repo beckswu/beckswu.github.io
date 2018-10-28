@@ -145,13 +145,13 @@ $$N\left( A \right) =\left( \vec 0 \right) $$ if and only if column vectors of A
 
  Column space is valid subspace 满足: <br/>
 1. $$ \vec 0 $$ in subspace
-2. if $$ \vec b, \vec c \in C\left(A\right) $$, then $$  \vec b + \vec c = \left( b_1 +  c_1  \right) \vec v_1 + \left( b_2 +  c_2  \right) \vec v_2 + \cdots + \left( b_n +  c_1n  \right) \vec v_n  \in  C\left(A\right) $$
+2. if $$ \vec b, \vec c \in C\left(A\right) $$, then $$  \vec b + \vec c = \left( b_1 +  c_1  \right) \vec v_1 + \left( b_2 +  c_2  \right) \vec v_2 + \cdots + \left( b_n +  c_n  \right) \vec v_n  \in  C\left(A\right) $$
 3. if $$ \vec v \in C\left(A\right) $$, $$ A \left(c \vec v \right) = c \left( A\vec v \right) \in NC\left(A\right)$$
 
 
 
 __Rank Nullity Theorem__<br/>
-$$ nullity\left( A \right) + rank\left(  A \right) = dim\left( V \right)
+$$ nullity\left( A \right) + rank\left(  A \right) = dim\left( V \right) $$
 
 ```python
 import numpy as np
