@@ -16,8 +16,6 @@ tags:
 
 ![](/img⁩/post⁩/Linear_Algebra/pic1.png)
 
-![](https://raw.githubusercontent.com/beckswu/beckswu.github.io/master/img/post/Linear_Algebra/pic1.png)
-
 <script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"> </script>
 
 
@@ -111,9 +109,11 @@ if V is subspace of $$R^N$$
 
 ![](/img⁩/post⁩/Linear_Algebra/pic1.png)
 
-![](https://raw.githubusercontent.com/beckswu/beckswu.github.io/master/img/post/Linear_Algebra/pic1.png)
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week1pic2.png)
+
+![](https://raw.githubusercontent.com/beckswu/beckswu.github.io/master/img/post/Linear_Algebra/pic1.png)
+
 
 ```python
 import numpy as np
