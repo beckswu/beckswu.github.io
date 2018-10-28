@@ -121,6 +121,8 @@ if V is subspace of $$R^N$$
 
 ## Null Space and Column Space
 
+__Dimension__: the number (cardinality) of a basis of V
+
 #### null space
 
 the __kernel(nullspace)__ of a linear map L : V → W between two vector spaces V and W, is the set of all elements v of V for which L(v) = 0, where 0 denotes the zero vector in W: <br/>
@@ -129,10 +131,27 @@ or in $$R^N:  N = \{ \vec x \in R^n | A \vec x =  \vec 0  \} $$
 
 Null space is valid subspace 满足: <br/>
 1. $$ \vec 0 $$ in subspace
-2. if $$ \vec v_1, \vec v_1 \in N $$, then  $$ A \left( \vec v_1 +  \vec v_2 \right) = A\vec v_1 + A\vec v_2 = \vec 0 \in N $$
+2. if $$ \vec v_1, \vec v_2 \in N $$, then  $$ A \left( \vec v_1 +  \vec v_2 \right) = A\vec v_1 + A\vec v_2 = \vec 0 \in N $$
 3. if $$ \vec v \in N $$, $$ A \left(c \vec v \right) = c \left( A\vec v \right) \in N $$
 
+__Nullity__: Dimension of Null space = number of free variables <span style="color: red">free variables (non-pivot) </span> in reduced echelon form in Matrix A
+$$N\left( A \right) =\left( \vec 0 \right) $$ if and only if column vectors of A are linearly independent (only apply when A is n by n matrix)
+
 #### column space
+
+ The __column space (also called the range or image)__ of a matrix A is the span (set of all possible linear combinations) of its column vectors. The column space of a matrix is the __image__ or __range__ of the corresponding matrix transformation.
+
+ $$A = \left[\vec v_1, \vec v_2, \cdots, \vec v_n \right] = span \left(\vec v_1, \vec v_2, \cdots, \vec v_n \right) $$
+
+ Column space is valid subspace 满足: <br/>
+1. $$ \vec 0 $$ in subspace
+2. if $$ \vec b, \vec c \in C\left(A\right) $$, then $$  \vec b + \vec c = \left( b_1 +  c_1  \right) \vec v_1 + \left( b_2 +  c_2  \right) \vec v_2 + \cdots + \left( b_n +  c_1n  \right) \vec v_n  \in  C\left(A\right) $$
+3. if $$ \vec v \in C\left(A\right) $$, $$ A \left(c \vec v \right) = c \left( A\vec v \right) \in NC\left(A\right)$$
+
+
+
+__Rank Nullity Theorem__<br/>
+$$ nullity\left( A \right) + rank\left(  A \right) = dim\left( V \right)
 
 ```python
 import numpy as np
