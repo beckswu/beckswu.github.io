@@ -99,6 +99,8 @@ A square matrix is __not invertible__ is called __singular__ or **degenerate**. 
  $$ a \cdot b = a^Tb   $$ for column vectors a and b  <br/>
  $$ Rank \left(A\right) = Rank \left(A^T\right) $$ <br/>
 
+$$\left( A\vec x \right)  \cdot \vec y = \left( A\vec x \right)^T \vec y = \vec x^T A^T \vec y =  \vec x^T \left( A^T \vec y \right) = \vec x \cdot \left( A^T \vec y \right) $$
+
 if $$  A^T = A $$, then A is called __symmetric matrix__
 
 ## Linear Independence and Span
@@ -209,7 +211,7 @@ $$N\left(A \right) = \left(  C\left( A^T \right) \right)^{\bot}, \left(   N\left
 left null space is orthgonal complement of column space <br/>
 $$N\left(A^T \right)  = \left(  C\left( A \right) \right)^{\bot},  \left( N\left(A^T \right) \right)^{\bot}  =  C\left( A \right) $$ <br/>
 
-
+$$Dim\left( V \right) + Dim\left( V^{\bot} \right) = # columns $$
 
 
 ```python
