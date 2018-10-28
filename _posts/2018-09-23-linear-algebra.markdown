@@ -19,6 +19,8 @@ tags:
 
 ## Vector
 
+__Orthogonal Complement__ of V: for some V, $$V^{\bot} = \{ \vec x \in R^n  \| \vec x \cdot \vec v = 0 for every \vec v \in V \}$$ . Orthogonal complements is valid subspace
+
 
 Communicative: &nbsp;&nbsp;&nbsp;  $$ \vec v \cdot \vec w  =  \vec w \cdot \vec v $$ <br/>
 Distributive: &nbsp;&nbsp;&nbsp;  $$ \left(\vec w + \vec v \right)\cdot \vec x  =  \vec w \cdot \vec x + \vec v \cdot \vec x  $$<br/>
