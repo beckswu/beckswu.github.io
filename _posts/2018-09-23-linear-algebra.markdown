@@ -19,7 +19,7 @@ tags:
 
 ## Vector
 
-__Orthogonal Complement__ of V: for some V, $$V^{\bot} = \{ \vec x \in R^n  \| \vec x \cdot \vec v = 0 for every \vec v \in V \}$$ . Orthogonal complements is valid subspace
+__Orthogonal Complement__ of V: for some V, $$V^{\bot} = \{ \vec x \in R^n  | \vec x \cdot \vec v = 0 for every \vec v \in V \}$$ . Orthogonal complements is valid subspace
 
 
 Communicative: &nbsp;&nbsp;&nbsp;  $$ \vec v \cdot \vec w  =  \vec w \cdot \vec v $$ <br/>
