@@ -69,7 +69,7 @@ A square matrix is __not invertible__ is called __singular__ or **degenerate**. 
  $$ \left( A^T \right)^{-1} =  \left( A^{-1} \right)^T  $$  <br/>
  $$ det\left( A^{-1} \right) =  det\left( A \right)^{-1}  $$  <br/>
 
- if A be a square n by n matrix is invertible, following must be all true of all false
+ if A be a square n by n matrix is invertible, following must be __all true of all false__
  - A is inveritble, A has an inverse, is nonsingular, or is nondegenerate
  - A is row-equivalent to the n-by-n identity matrix In.
  - A is column-equivalent to the n-by-n identity matrix In.
@@ -105,7 +105,7 @@ a set of vectors is __linearly dependent__ if one of the vectors in the st can b
 
 n vectors in $$R^N$$ are __linearly independent__ if and only if the <span style="background-color: #FFFF00">determinant </span>of the matrix formed by the vectors as its column is non-zero. ($$det\left(A \right)\neq 0 $$)
 
-$$span \left( v_1, v_2, \cdots, v_n \right) = \{ c_1v_1 + c_2v_2 +\cdots + c_nv_n | c_i \in R  \}  $$ The space of all of the combination of vectors $$v_1, v_2, ...,v_n$$
+$$span \left( v_1, v_2, \cdots, v_n \right) = \{ c_1v_1 + c_2v_2 +\cdots + c_nv_n \| c_i \in R  \}  $$ The space of all of the combination of vectors $$v_1, v_2, ...,v_n$$
 
 ## Subspace 
 
