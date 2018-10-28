@@ -117,9 +117,9 @@ if V is subspace of $$R^N$$
 2. if  $$ \vec x $$ in V, any scaler c, then the scalar product $$ c\vec x $$ is in V (closure under scaler multiplication)
 3. if  $$ \vec a $$ in V and $$ \vec b $$ in V , then $$ \vec a + \vec b $$ also in V (closure under addition)
 
-![](/img⁩/post⁩/Linear_Algebra/pic1.png)
+![](/img⁩/post⁩/Linear-Algebra/pic1.png)
 
-![](https://raw.githubusercontent.com/beckswu/beckswu.github.io/master/img/post/Linear_Algebra/pic1.png)
+![](https://raw.githubusercontent.com/beckswu/beckswu.github.io/master/img/post/Linear-Algebra/pic1.png)
 
 
 ## Null Space and Column Space
@@ -149,7 +149,7 @@ $$N\left( A \right) =\left( \vec 0 \right) $$ if and only if column vectors of A
 Column space is valid subspace 满足: <br/>
 1. $$ \vec 0 $$ in subspace
 2. if $$ \vec b, \vec c \in C\left(A\right) $$, then $$  \vec b + \vec c = \left( b_1 +  c_1  \right) \vec v_1 + \left( b_2 +  c_2  \right) \vec v_2 + \cdots + \left( b_n +  c_n  \right) \vec v_n  \in  C\left(A\right) $$
-3. if $$ \vec v \in C\left(A\right) $$, $$ A \left(c \vec v \right) = c \left( A\vec v \right) \in NC\left(A\right)$$
+3. if $$ \vec v \in C\left(A\right) $$, $$ A \left(c \vec v \right) = c \left( A\vec v \right) \in C\left(A\right)$$
 
 __Rank__: Dimension of Column space = number of <span style="color: red">pivot variables </span> in reduced echelon form in Matrix A (the number of linear independent column vector)
 
@@ -253,6 +253,12 @@ properties:
    $$ \| C \vec x \|^2 = C\vec x \cdot C \vec x = \left( C\vec x \right)^T C \vec x = \vec x^T C^T C \vec x =\vec x^T \vec x =  \| C \vec x \|   $$ 
 
    $$cos\theta =  \frac{ C\vec w \cdot C \vec v }{ \| C\vec v \| \| C\vec v \| } =  \frac{ \left(C\vec w \right)^T C \vec v }{ \| \vec v \| \| \vec v \| } =  \frac{ \vec w^T C^T C \vec v }{ \| \vec v \| \| \vec v \| }  = \frac{ \vec w^T \vec v }{ \| \vec v \| \| \vec v \| } $$
+
+#### Gram-Schmidt process
+
+__Gram-Schmidt process__, is a procedure which takes a nonorthogonal set of linearly independent functions to constructs an orthogonal basis
+
+![](\img\post\Linear-Algebra\pic2.png)
 
 ```python
 import numpy as np
