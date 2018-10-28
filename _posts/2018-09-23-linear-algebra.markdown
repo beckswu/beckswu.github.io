@@ -105,7 +105,7 @@ a set of vectors is __linearly dependent__ if one of the vectors in the st can b
 
 n vectors in $$R^N$$ are __linearly independent__ if and only if the <span style="background-color: #FFFF00">determinant </span>of the matrix formed by the vectors as its column is non-zero. ($$det\left(A \right)\neq 0 $$)
 
-$$span \left( v_1, v_2, \cdots, v_n \right) = \{ c_1v_1 + c_2v_2 +\cdots + c_nv_n \| c_i \in R  \}  $$ The space of all of the combination of vectors $$v_1, v_2, ...,v_n$$
+$$span \left( v_1, v_2, \cdots, v_n \right) = \{ c_1v_1 + c_2v_2 +\cdots + c_nv_n | c_i \in R  \}  $$ The space of all of the combination of vectors $$v_1, v_2, ...,v_n$$
 
 ## Subspace 
 
@@ -125,11 +125,11 @@ if V is subspace of $$R^N$$
 
 the __kernel(nullspace)__ of a linear map L : V → W between two vector spaces V and W, is the set of all elements v of V for which L(v) = 0, where 0 denotes the zero vector in W: <br/>
 $$ ker\left(L\right) = \{ v \in V | L\left( v \right) \} $$ <br/>
-or in $$R^N:  N = \{ \vec x \in R^n \| A \vec x =  \vec 0  \} $$  
+or in $$R^N:  N = \{ \vec x \in R^n | A \vec x =  \vec 0  \} $$  
 
 Null space is valid subspace 满足: <br/>
 1. $$ \vec 0 $$ in subspace
-2. if $$ \vec v_1, \vec v_1 \in N $$, then  $$ A \left( \vec v_1 +  \vec v_2 \right) = A\vec v_1 + A\vec v_2 = \vec 0 \ in N $$
+2. if $$ \vec v_1, \vec v_1 \in N $$, then  $$ A \left( \vec v_1 +  \vec v_2 \right) = A\vec v_1 + A\vec v_2 = \vec 0 \in N $$
 3. if $$ \vec v \in N $$, $$ A \left(c \vec v \right) = c \left( A\vec v \right) \in N $$
 
 #### column space
