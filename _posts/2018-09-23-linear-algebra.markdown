@@ -34,9 +34,10 @@ two vector $$  \vec  x $$ and $$  \vec y $$ are orthorgonal: &nbsp;&nbsp;&nbsp; 
 
 cross product: <br/>
  $$  \vec a =  \begin{bmatrix} a_1 \\ a_2  \\ a_3 \\ \end{bmatrix}, \vec b =  \begin{bmatrix} b_1 \\ b_2  \\ b_3 \\ \end{bmatrix}, \vec a \times \vec b  = \begin{bmatrix} a_2b_3 - a_3b_2 \\ a_3b_1 - a_1b_3 \\ a_1b_2 - a_2b_1 \\ \end{bmatrix} $$<br/>
+Cross product 还可以算平行四边形的面积
 
-<span style="background-color: #FFFF00">Dot product tells: product of lengths of vectors move together at same direction with b.</span> When $$\vec a $$ ∙ $$\vec b $$ = 0, perpendicular, $$\vec a $$ onto $$\vec b $$ is zero
-<span style="background-color: #FFFF00">Cross product tells: product of lengths of vectors move perpendicular direction with b.</span> When $$\vec a $$ ∙$$\vec b = || \vec a || || \vec b || $$\vec a $$, perpendicular, 获得最大值, 当 a 和 b colinear, $$\vec a \times \vec b $$ = 0 no perpendicular vector
+<span style="background-color: #FFFF00">Dot product tells: product of lengths of vectors move together at same direction with b.</span> When $$\vec a $$ ∙ $$\vec b $$ = 0, perpendicular, $$\vec a $$ onto $$\vec b $$ is zero <br/>
+<span style="background-color: #FFFF00">Cross product tells: product of lengths of vectors move perpendicular direction with b.</span> When $$\vec a \times \vec b = || \vec a || || \vec b || $$, perpendicular, 获得最大值, 当 $$\vec a $$ 和 $$ \vec b $$ colinear, $$\vec a \times \vec b $$ = 0 no perpendicular vector
 
 
 注: <span style="color: red">difference between perpendicular and orthogonal</span>:  $$  \vec  x \cdot \vec y  = \vec 0 $$   only means orthogonal, zero vector is orthogonal to everything but zero vector not perpendicular to everything; perpendicular is orthogonal, 但是othogonal 不一定是perpendicular, 因为 $$  \vec  x \cdot \vec 0  = 0 $$ 不是perpendicular
