@@ -161,10 +161,29 @@ $$ nullity\left( A \right) + rank\left(  A \right) = dim\left( V \right) $$
 
 __Onto (surjective)__: every elements in co-domain y ∈ Y, there exist at least one x ∈ X such that f(x) = y. 每一个Y知至少都有一个X与之相对应, 一个X对应多个 或 有个X 灭有对应Y 无所谓
 
-__One-to-one (injective)__: for every value that map to there at most at most one x map to it. 每个一个y只有一个x map, 每个x map to unqiue y: f(x)=y
+following statement are quivalent: <br/>
+1. T is onto
+2. T(x) = b has at least one solution for b in $$R^m$$
+3. A has a pivot in every row
+4. The columns of A span $$R^m$$
+
+__One-to-one (injective)__: for every y that map to, there at most at most one x map to it. 每个一个y只有一个x map, 每个x map to unqiue y: f(x)=y, 有的Y没有x对应上 无所谓, 可以有y 没有x map to
+
+following statement are quivalent: <br/>
+1. T is one-to-one
+2. T(x) = b has at most one solution for b in $$R^m$$
+3. The columns of A are linearly independent (因为每一个y最后只有一个x)
+4. A has pivot in every column
+5. Ax = 0 has only the trival solution
 
 $$f: x -> y $$ is invertible if and only if f is onto and one-to-one <br/>
 Invertible means For every y ∈ Y f(x) = y has a unique solution, that means one-to-one, 如果有y ∈ Y 但是没 有相应的 x 对应，就不是 invertible 了,所以 invertible means onto
+
+| T is one-to-one | T is onto |
+|------|------|
+| T(X) =b has at most one solution for every b | T(x) = b has least one solution for every b | 
+| The columns of A are linearly independent |  The columns of A span $$R^m$$ | 
+| A has a pivot in every column | A has a pivot in every row | 
 
 
 
