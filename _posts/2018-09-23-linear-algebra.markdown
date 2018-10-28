@@ -96,6 +96,7 @@ A square matrix is __not invertible__ is called __singular__ or **degenerate**. 
  $$ \left( cA \right)^T = cA^T  $$ for scalar c <br/>
  $$ det\left( A^{T} \right) =  det\left( A \right)  $$  <br/>
  $$ a \cdot b = a^Tb   $$ for column vectors a and b  <br/>
+ $$ Rank \left(A\right) = Rank \left(A^T\right) $$ <br/>
 
 if $$  A^T = A $$, then A is called __symmetric matrix__
 
@@ -152,6 +153,14 @@ __Rank__: Dimension of Column space = number of <span style="color: red">pivot v
 
 __Rank Nullity Theorem__<br/>
 $$ nullity\left( A \right) + rank\left(  A \right) = dim\left( V \right) $$
+
+
+## Linear Transformation:
+
+ __linear transformation__ (linear mapping, linear map) is a mapping V → W between two modules (including vector spaces) that preserves the operations of addition and scalar multiplication. <br/>
+ $$ T: R^n -> R^n if only if \vec a , \vec b \in R^n 1. T\left(\vec a + \vec b \right) = T\left(\vec a \right) + T\left( \vec b \right) 2. T\left(c\vec a) = cT\left(\vec a \right) $$
+
+
 
 ```python
 import numpy as np
