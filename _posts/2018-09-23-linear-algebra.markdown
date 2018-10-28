@@ -162,7 +162,7 @@ $$ nullity\left( A \right) + rank\left(  A \right) = dim\left( V \right) $$
 #### Onto
 __Onto (surjective)__: every elements in co-domain y ∈ Y, there exist at least one x ∈ X such that f(x) = y. 每一个Y都至少都有一个X与之相对应, 一个X对应多个Y 或 有个X 没有对应Y 无所谓
 
-following statements are quivalent: <br/>
+following statements are quivalent (A is m by n matrix): <br/>
 1. T is onto
 2. T(x) = b has at least one solution for every b in $$R^m$$
 3. A has a pivot in every row
@@ -172,7 +172,7 @@ following statements are quivalent: <br/>
 
 __One-to-one (injective)__: for every y that map to, there at most at most one x map to it. 每个一个y只有一个x map, 每个x map to unqiue y: f(x)=y, 有的Y没有x对应上 无所谓, 可以有y 没有x map to
 
-following statements are quivalent: <br/>
+following statements are quivalent (A is m by n matrix): <br/>
 1. T is one-to-one
 2. T(x) = b has at most one solution for b in $$R^m$$
 3. The columns of A are linearly independent (因为每一个y最后只有一个x)
