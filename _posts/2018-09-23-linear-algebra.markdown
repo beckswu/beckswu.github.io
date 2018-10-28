@@ -245,7 +245,7 @@ properties:
 6. If orthonormal basis 组成的matrix A,  then $$Proj_v \vec x = A \left( A^T A \right)^{-1} A \vec x = A A^T \vec x $$
 7. If orthonormal basis 组成的matrix A, then when do transformation, it will preserve length and angle for transformation <br/>
    prove: <br/>
-   $$ \| C \vec x \|^2 = C\vec x \cdot C \vec x = \left( C\vec x \right)^T C \vec x = \vec x^T C^T \cdot C \vec x =\vec x^T \vec x =  \| C \vec x \|   $$
+   $$ \| C \vec x \|^2 = C\vec x \cdot C \vec x = \left( C\vec x \right)^T C \vec x = \vec x^T C^T C \vec x =\vec x^T \vec x =  \| C \vec x \|   $$ <br/>
    $$cos\theta =  \frac{ C\vec w \cdot C \vec v }{ \| C\vec v \| \| C\vec v \| } =  \frac{ \left(C\vec w \right)^T C \vec v }{ \| \vec v \| \| \vec v \| } =  \frac{ \vec w^T C^T C \vec v }{ \| \vec v \| \| \vec v \| }  = \frac{ \vec w^T \vec v }{ \| \vec v \| \| \vec v \| } $$
 
 ```python
