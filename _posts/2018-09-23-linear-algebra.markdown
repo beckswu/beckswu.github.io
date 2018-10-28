@@ -164,9 +164,9 @@ __Onto (surjective)__: every elements in co-domain y ∈ Y, there exist at least
 
 following statements are quivalent (A is m by n matrix): <br/>
 1. T is onto
-2. T(x) = b has at least one solution for every b in $$R^m$$
-3. A has a pivot in every row
-4. The columns of A span $$R^m$$
+2. T(x) = b has at least one solution for every b in $$R^m$$ 
+3. The columns of A span $$R^m$$ (否则不能span $$R^m$$)
+4. A has a pivot in every row
 
 #### One-to-One
 
