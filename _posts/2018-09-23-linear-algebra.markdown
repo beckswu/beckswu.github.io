@@ -197,8 +197,8 @@ $$ T: R^n -> R^n $$  if and only if  $$\vec a , \vec b \in R^n 1. T\left( \vec a
 
 #### matrix product properties
 
-__Associative__ :  (AB)C = A(BC). 
-__Distributive__:  A(B+C) = AB + BC,  (B+C)A = BA + CA
+__Associative__ :  (AB)C = A(BC).   <br/>
+__Distributive__:  A(B+C) = AB + BC,  (B+C)A = BA + CA <br/>
 __Not Communicative__: $$AB \neq BA $$
 
 
