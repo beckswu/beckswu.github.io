@@ -158,7 +158,8 @@ $$ nullity\left( A \right) + rank\left(  A \right) = dim\left( V \right) $$
 ## Linear Transformation:
 
  __linear transformation__ (linear mapping, linear map) is a mapping V → W between two modules (including vector spaces) that preserves the operations of addition and scalar multiplication. <br/>
- $$ T: R^n -> R^n if only if \vec a , \vec b \in R^n 1. T\left(\vec a + \vec b \right) = T\left(\vec a \right) + T\left( \vec b \right) 2. T\left(c\vec a) = cT\left(\vec a \right) $$
+$$ T: R^n -> R^n $$  if and only if  $$\vec a , \vec b \in R^n 1. T\left( \vec a + \vec b \right) = T\left( \vec a \right) + T\left( \vec b \right) 2. T\left(c\vec a\right)  = cT\left(\vec a \right) $$
+
 
 
 
