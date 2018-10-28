@@ -44,7 +44,7 @@ Cross product 还可以算平行四边形的面积
 
 求basis的coordinate的时，若basis vector orthogonal to each other, 可以用scaler projection, 看$$  \vec x$$到$$  \vec v_i$$的projection $$ \frac{ \vec x \cdot \vec v  }{ \|\vec v\|^2 } $$ 即是coordinate
 
-#### basis
+## Basis
 
 Basis is a set of n vectors that 
 - are not linear combinations of each other (linear independent): <br/>
@@ -65,7 +65,6 @@ A square matrix is __not invertible__ is called __singular__ or **degenerate**. 
 
 <span style="background-color: #FFFF00">Invertibility  <=> unique solution to $$ A \vec x = \vec 0$$ </span>
 
-#### properties
  $$ \left( A^{-1} \right)^{-1} = A  $$ <br/>
  $$ \left( kA \right)^{-1} = k^{-1} A^{-1}  $$ for nonzero scalar K <br/>
  $$ \left( A^T \right)^{-1} =  \left( A^{-1} \right)^T  $$  <br/>
