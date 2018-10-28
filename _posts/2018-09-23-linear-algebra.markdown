@@ -238,7 +238,7 @@ An orthonormal set must be  <span style="color: red">linearly independent</span>
 properties: 
 1. The column vectors are linearly independent.
 2. if $$ \vec x = c_1 \vec v_1 +  c_2 \vec v_2 + \cdots +  c_k \vec v_k$$, then $$\vec v_i \cdot \vec x = c_1 \vec v_1 \cdot \vec v_i +  c_2 \vec v_2 \cdot \vec v_i + \cdots +  c_k \vec v_k \cdot \vec v_i = c_i \vec v_i \cdot \vec v_i = c_i $$
-3. $$ \left[ \vec x \right]_B = \begin{bmatrix} c_1 \\ c_2 \\ \vdots \\ c_k \end{bmatrix} =  \begin{bmatrix} \vec v_1 \vec x \\ \vec v_2 \vec x  \\ \vdots \\ \vec v_k \vec x  \end{bmatrix}
+3. $$ \left[ \vec x \right]_B = \begin{bmatrix} c_1 \\ c_2 \\ \vdots \\ c_k \end{bmatrix} =  \begin{bmatrix} \vec v_1 \vec x \\ \vec v_2 \vec x  \\ \vdots \\ \vec v_k \vec x  \end{bmatrix} $$
 4. If orthonormal basis 组成matrix A， 则 $$ A^T A = I_k $$ the identity matrix <br/>
     prove: $$ A^T A = \begin{bmatrix} -- \vec v_1^T -- \\  --\vec v_2^T-- \\ --\vdots-- \\ --\vec v_k^T-- \end{bmatrix}  \begin{bmatrix} \mid &\mid &\cdots &\mid \\  \vec v_1^T & \vec v_2^T & \cdots  &\vec v_1^T \\ \mid &\mid &\cdots &\mid \end{bmatrix} =  \begin{bmatrix} 1 & 0 &\cdots & 0 \\  0 & 1 & \cdots & 0  \\ \vdots &  \vdots & \ddots & \vdots \\ 0 & 0 & \cdots & 1 \end{bmatrix}  $$
 5. B is n by n matrix whose columns form an orthonormal set, then $$B^{-1} = B^T $$ (因为是 n by n, 所以是invertible)
