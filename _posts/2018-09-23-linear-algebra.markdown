@@ -203,7 +203,7 @@ __Not Communicative__: $$AB \neq BA $$
 
 vector projection $$\vec x \cdot \vec v $$因为是scaler 可以放后面
 
- $$  \vec proj_{L} \left(\vec x\right) =  c \vec v =  \frac{ \vec x \cdot \vec v  }{ \vec v \cdot \vec v } \vec v =  \frac{ \vec v  \left(\vec v \cdot \vec x \right)}{ \vec v \cdot \vec v }  =  \frac{ \vec v  \vec v^T \vec x }{ \vec v \cdot \vec v } = \frac{ \vec v  \vec v^T }{ \vec v \cdot \vec v }  \vec x $$
+ $$  \vec proj_{L} \left(\vec x\right) =  c \vec v =  \frac{ \vec x \cdot \vec v  }{ \vec v \cdot \vec v } \vec v =  \frac{ \vec v  \left(\vec v \cdot \vec x \right)}{ \vec v \cdot \vec v }  =  \frac{ \vec v \space \vec v^T \vec x }{ \vec v \cdot \vec v } = \frac{ \vec v \space \vec v^T }{ \vec v \cdot \vec v }  \vec x $$
 
 if A is matrix consists of basis of V, then :<br/>
 $$Proj_v \vec x = A \left( A^T A \right)^{-1} A^T \vec x $$
