@@ -27,7 +27,7 @@ Cosine: &nbsp;&nbsp;&nbsp; $$  \vec a \cdot \vec b  =  ||a|| ||b|| cos\theta  $$
 Sine: &nbsp;&nbsp;&nbsp; $$  \vec a \times \vec b  =  ||a|| ||b|| sin\theta  $$<br/>
 Cauchy Schwarz Inequality: &nbsp;&nbsp;&nbsp; $$  \| \vec a \cdot \vec b \|  <=  ||a||||b||  $$<br/>
 scaler projection: &nbsp;&nbsp;&nbsp; $$  \vec proj_{L} \left(\vec x\right) =   \frac{ \vec x \cdot \vec v  }{ ||\vec v|| } $$<br/>
-vector projection: &nbsp;&nbsp;&nbsp; $$  \vec proj_{L} \left(\vec x\right) =  c \vec v =  \frac{ \vec x \cdot \vec v  }{ \vec v \cdot \vec v } \vec v $$<br/>
+vector projection: &nbsp;&nbsp;&nbsp; $$  \vec proj_{L} \left(\vec x\right) =  c \vec v =  \frac{ \vec x \cdot \vec v  }{ \vec v \cdot \vec v } \vec v =  \frac{ \vec v \vec v^T  }{ \vec v \cdot \vec v } \vec x =  $$<br/>
 two vector $$  \vec  x $$ and $$  \vec y $$ are orthorgonal: &nbsp;&nbsp;&nbsp; $$  \vec  x \cdot \vec y  = 0 $$   <br/>
 (Optional) : $$  \vec a \times \left( \vec b \times \vec c \right)  =  \vec b \left(\vec a \cdot \vec c \right) - \vec c \left(\vec a \cdot \vec b \right)  $$
 
@@ -200,6 +200,10 @@ __Distributive__:  A(B+C) = AB + BC,  (B+C)A = BA + CA <br/>
 __Not Communicative__: $$AB \neq BA $$
 
 ## Projection on plane
+
+vector projection $$\vec x \cdot \vec v $$因为是scaler 可以放后面
+
+ $$  \vec proj_{L} \left(\vec x\right) =  c \vec v =  \frac{ \vec x \cdot \vec v  }{ \vec v \cdot \vec v } \vec v =  \frac{ \vec v  \left(\vec v \cdot \vec x \right)}{ \vec v \cdot \vec v }  =  \frac{ \vec v  \vec v^T \vec x }{ \vec v \cdot \vec v } = \frac{ \vec v  \vec v^T }{ \vec v \cdot \vec v }  \vec x $$
 
 if A is matrix consists of basis of V, then :<br/>
 $$Proj_v \vec x = A \left( A^T A \right)^{-1} A^T \vec x $$
