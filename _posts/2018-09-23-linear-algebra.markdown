@@ -346,7 +346,7 @@ vals
 
 注： not include Basis Transformation, least square, function composition, determinant
 
-[file](https://docs.google.com/viewer?url=http://nbviewer.jupyter.org/github/beckswu/beckswu.github.io/blob/master/document/Data-Structure-and-Algorithms.pdf "file")
+[Detailed PDF](https://docs.google.com/viewer?url=http://nbviewer.jupyter.org/github/beckswu/beckswu.github.io/blob/master/document/linear%20algebra.pdf "file")
 
 [linear Algebra](https://docs.google.com/viewer?url=http://nbviewer.jupyter.org/github/beckswu/beckswu.github.io/blob/master/document/document/linear%20algebra.pdf "file")
 
@@ -358,6 +358,3 @@ vals
 </object>
 
 
-
-
-<embed src="" width="500" height="375">
