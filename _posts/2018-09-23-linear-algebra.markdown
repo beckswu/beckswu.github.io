@@ -108,7 +108,7 @@ a set of vectors is __linearly dependent__ if one of the vectors in the st can b
 
 n vectors in $$R^N$$ are __linearly independent__ if and only if the <span style="background-color: #FFFF00">determinant </span>of the matrix formed by the vectors as its column is non-zero. ($$det\left(A \right)\neq 0 $$ or $$A\left(\vec x \right) = \vec 0$$ only has trivial solution)
 
-$$span \left( v_1, v_2, \cdots, v_n \right) = \{ c_1v_1 + c_2v_2 +\cdots + c_nv_n \| c_i \in R  \}  $$ The space of all of the combination of vectors $$v_1, v_2, ...,v_n$$
+$$span \left( v_1, v_2, \cdots, v_n \right) = \{ c_1v_1 + c_2v_2 +\cdots + c_nv_n \mid c_i \in R  \}  $$ The space of all of the combination of vectors $$v_1, v_2, ...,v_n$$
 
 ## Subspace 
 
