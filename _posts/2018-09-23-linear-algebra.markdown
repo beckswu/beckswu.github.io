@@ -60,7 +60,7 @@ Basis is a set of n vectors that
 
 $$ \left[ \begin{array}{ccc \| ccc}  1 & 0 &1 &1 & 0 &0  \\ 0 & 2 & 1 &0 & 1 &0  \\ 1&1&1 &0 & 0 &1 \end{array} \right]  =>  \left[ \begin{array}{ccc\|ccc}  1 & 0 &0 & -1 & -1 &2   \\  0 & 1 &0 & -1 & 0 & 1  \\ 0 & 0 &1 & 2&1&0  \end{array} \right] $$
 
-A square matrix is __not invertible__ is called __singular__ or **degenerate**. A square matrix is singular if and only if its __determinant__ is 0. <span style="background-color: #FFFF00">Non-square matrices</span> do not have inverse.
+A square matrix is __not invertible__ is called __singular__ or **degenerate**. A square matrix is singular if and only if its __determinant__ is 0. <span style="background-color: #FFFF00">Non-square matrices</span> do not have inverse(因为it will always be the case that either the rows or columns (whichever is larger in number) are linearly dependent for non-square matrix).
 
 <span style="background-color: #FFFF00">Invertibility  <=> unique solution to $$ A \vec x = \vec 0$$ </span>
 
