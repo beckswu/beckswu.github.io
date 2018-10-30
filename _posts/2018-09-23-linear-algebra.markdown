@@ -414,6 +414,14 @@ we have constraint eigenvector length = 1, then we add Lagrange multiplier
 $$ V = \frac{1}{n} \sum_{i=1}^{n} \left( \sum_{j=1}^d x_{ij} e_j \right)^2 - \lambda\left( \sum_{k=1}^d e_j^2  -1 \right)$$
 
 $$ \frac{\partial V}{\partial e_a} = \frac{2}{n} \sum_{i=1}^{n} \left( \sum_{j=1}^d x_{ij} e_j \right) x_{ia} - 2\lambda e_a = 0$$
+
+$$ 2 \sum_{i=1}^{d} e_j \left( \frac{1}{n}  \sum_{j=1}^n x_{ia} x_{ij}  \right)  = 2\lambda e_a $$
+
+$$  \sum_{i=1}^{d} e_j  cov\(left a,j \right)  = \lambda e_a $$
+
+把第 a 行的 covariance matrix 和 ea dot product，得到 eigenvector 的 a 个行
+
+$$\begin{Bmatrix} \sum_{i=1}^{d}  cov\(left 1,j \right) e_j = \lambda e_1 \\ \sum_{i=1}^{d}  cov\(left 2,j \right) e_j = \lambda e_2 \\ vdots \\ \sum_{i=1}^{d}  cov\(left d,j \right) e_j = \lambda e_d  \end{Bmatrix}  =>  \bbox[yellow]{\sum e = \lambda e}$$
  
 [Detailed PDF](https://docs.google.com/viewer?url=http://nbviewer.jupyter.org/github/beckswu/beckswu.github.io/blob/master/document/linear%20algebra.pdf "file")
 
