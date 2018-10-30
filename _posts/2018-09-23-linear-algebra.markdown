@@ -399,8 +399,11 @@ Project on m dimensions with m eigenvectors (unit length) $$e_1, e_2, \cdots, e_
 - center the instance(subtract the mean): $$x - u$$
 - project to each dimension using dot project $$(x-u)^T e_j$$ for j = 1... m ($$scaler = \frac{ \vec x \cdot \vec v  }{ \|\vec v\| } = \vec x \cdot \vec v$$ given $$\|\vec v\| = 1$$):  
 
-$$ \begin{bmatrix} x'_1 \\ x'_2 \\ \vdots \\ x'_m  \end{bmatrix} = \begin{bmatrix} \left(x - \vec u \right)^T \vec e_1 \\ \left(x - \vec u \right)^T \vec e_2 \\ \vdots \\ \left(x - \vec u \right)^T \vec e_m \end{bmatrix} = \begin{bmatrix} \left(x_1 - u_1 \right) e_{1,1} + \left(x_2 - u_2 \right) e_{1,2} + \cdots + \left(x_1 - u_1 \right) e_{1,d}  \\ \left(x_1 - u_1 \right) e_{2,1} + \left(x_2 - u_2 \right) e_{2,2} + \cdots + \left(x_1 - u_1 \right) e_{2,d} \\ \vdots \\ \left(x_1 - u_1 \right) e_m,1} + \left(x_2 - u_2 \right) e_{m,2} + \cdots + \left(x_1 - u_1 \right) e_{m,d} \end{bmatrix}   $$
+$$ \begin{bmatrix} x'_1 \\ x'_2 \\ \vdots \\ x'_m  \end{bmatrix} = $$
 
+$$\begin{bmatrix} \left(x - \vec u \right)^T \vec e_1 \\ \left(x - \vec u \right)^T \vec e_2 \\ \vdots \\ \left(x - \vec u \right)^T \vec e_m \end{bmatrix} = $$
+
+$$  \begin{bmatrix} \left(x_1 - u_1 \right) e_{1,1} + \left(x_2 - u_2 \right) e_{1,2} + \cdots + \left(x_1 - u_1 \right) e_{1,d}  \\ \left(x_1 - u_1 \right) e_{2,1} + \left(x_2 - u_2 \right) e_{2,2} + \cdots + \left(x_1 - u_1 \right) e_{2,d} \\ \vdots \\ \left(x_1 - u_1 \right) e_m,1} + \left(x_2 - u_2 \right) e_{m,2} + \cdots + \left(x_1 - u_1 \right) e_{m,d} \end{bmatrix}   $$
  
 [Detailed PDF](https://docs.google.com/viewer?url=http://nbviewer.jupyter.org/github/beckswu/beckswu.github.io/blob/master/document/linear%20algebra.pdf "file")
 
