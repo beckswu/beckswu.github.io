@@ -385,6 +385,21 @@ Why greatestt variability: <span style="background-color: #FFFF00">to preserve r
 如果 project 后距离变 (<span style="color: red">relative distance</span> between points)短了 (比如projection 到绿色的e)，会破坏原来结构， 两个红点距离变短跟original space. 而我们数据结构的假设是: nearby things should predict the same result. 就像 ML， 两 个点很接近，predict 结果很 可能一样
 
 
+#### Principal Components = eigenvectors
+
+- Center the data at zero. $$X_i = X_i - u$$. subtract mean from each attribute <span style="color: red">origin will be at the center of dataset </span>
+- Compute Covaraince matrix $$\sum$$. Covariance 是 indicator wheter 两个变量一起change, or change together in opposite direction, $$cov\left(x_1, x_2 \right) = \frac{1}{n} \sum_{i=0}^{i=n} x_{i1} * x_{i2}$$
+- if we use covariance matrix times a vector (can be any vector) in the plane several time, 最后covariance matrix times vector 不会改变方向，只会让vector 变得longer and longer (turns towards direction of variance), 最后不改变方向的vector is the dimension should be picked as greatest variance. 
+- want vectors e which aren't turned. $$\sum e = \lambda e$$, e is the eigenvectors of $$\sum$$, $$\lambda $$ is corresponding eigenvalues. <span style="background-color: #FFFF00">principle components - eigenvectors with largest eigenvalues </span>
+
+__Projecting to new dimensions__
+  
+Project on m dimensions with m eigenvectors (unit length) $$e_1, e_2, \cdots, e_m$$ with m biggest eigenvalues. Have original coordinates $$x = \{x_1, x_2 , \cdots, x_d \}$$, want the new coordinates $$x'= \{x'_1, x'_2,\cdots, x'_n \}$$
+- center the instance(subtract the mean): $$x - u$$
+- project to each dimension using dot project $$(x-u)^T e_j$$ for j = 1... m ($$scaler = \frac{ \vec x \cdot \vec v  }{ ||\vec v|| } = \vec x \cdot \vec v$$ given $$\|\vec v\| = 1$$):  
+
+
+ 
 [Detailed PDF](https://docs.google.com/viewer?url=http://nbviewer.jupyter.org/github/beckswu/beckswu.github.io/blob/master/document/linear%20algebra.pdf "file")
 
 [linear Algebra](https://docs.google.com/viewer?url=http://nbviewer.jupyter.org/github/beckswu/beckswu.github.io/blob/master/document/document/linear%20algebra.pdf "file")
