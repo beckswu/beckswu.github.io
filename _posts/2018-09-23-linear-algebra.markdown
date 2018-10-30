@@ -346,6 +346,45 @@ vals
 
 注： not include Basis Transformation, least square, function composition, determinant
 
+## PCA 
+
+####  Assumption
+
+Why PCA? 
+1. Some variables can be explained by one variable.  e.g X1. # of skidding accidents X2. # snow plow expenditures 3. # patients with heat stoke. 上面几个变量都可以用温度表示. All variables depends on a single quantity which does not observe directly
+2. Curse of Dimensionality: Data in our dataset have lots of dimension: (machine learning) : 真实的 algorithm 也许用不了这么多，就浪费了 memory
+3. As dimensionality grows, fewer observations per region
+
+__Assumption__ about dimensions: 
+1. Independence: count along each dimension separately. meaning when counting the frequency of $$x_1$$, ignore $$x_2$$
+2. smoothness: propagate class counts to neighboring regions 红的附近是红色的， 蓝色附近是蓝色
+3. symmetry: invariance to order of dimensions. The order of variables doesn't matter, $$x_1$$ 与 $$x_2$$ 可以对调
+
+Dimensionality reduction 降维 Goal: represent instances with fewer variables
+- try to preserve as much structure in the data as possible 
+- discriminative: only structure that affects class separability
+
+__Feature selection__: pick a subset of the original dimensions $$x_1, x_2, \cdots, x_n$$ <br/>
+__Feature extraction__: construct a new set of dimensions (e.g. linear combination of original attributes)
+
+#### Principal Components Analysis: 
+
+Define a set of principal compenents:
+- 1st: direction of the greatest variability(variance) in the data (in which way the data spread out the most), 可以是any line in the space, 不一定是 X, Y
+- 2nd: perpendicular to 1st, greatest variability of what's left 
+-  ... and so on until d (original dimensionality)
+
+FIrst m << d components become m new dimensions. Change coodinates of every data point to hese dimensions
+
+![](\img\post\Linear-Algebra\pic3.png)
+
+Why greatestt variability: <span style="background-color: #FFFF00">to preserve relative distances</span>
+
+![](\img\post\Linear-Algebra\pic4.png)
+
+如果 project 后距离变 (<span style="color: red">relative distance</span> between points)短了 (比如projection 到绿色的e)，会破坏原来结构， 两个红点距离变短跟original space. 而我们数据结构的假设是: nearby things should predict the same result. 就像 ML， 两 个点很接近，predict 结果很 可能一样
+
+
 [Detailed PDF](https://docs.google.com/viewer?url=http://nbviewer.jupyter.org/github/beckswu/beckswu.github.io/blob/master/document/linear%20algebra.pdf "file")
 
 [linear Algebra](https://docs.google.com/viewer?url=http://nbviewer.jupyter.org/github/beckswu/beckswu.github.io/blob/master/document/document/linear%20algebra.pdf "file")
