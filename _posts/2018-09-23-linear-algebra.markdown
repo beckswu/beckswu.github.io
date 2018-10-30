@@ -401,7 +401,7 @@ Project on m dimensions with m eigenvectors (unit length) $$e_1, e_2, \cdots, e_
 
 $$ \begin{bmatrix} x'_1 \\ x'_2 \\ \vdots \\ x'_m  \end{bmatrix} = \begin{bmatrix} \left(x - \vec u \right)^T \vec e_1 \\ \left(x - \vec u \right)^T \vec e_2 \\ \vdots \\ \left(x - \vec u \right)^T \vec e_m \end{bmatrix} = \begin{bmatrix} \left( x_1 - u_1 \right) e_{1,1} + \left( x_2 - u_2 \right) e_{1,2} + \cdots + \left( x_1 - u_1 \right) e_{1,d}  \\ \left( x_1 - u_1 \right) e_{2,1} + \left( x_2 - u_2 \right) e_{2,2} + \cdots + \left( x_1 - u_1 \right) e_{2,d} \\ \vdots \\ \left( x_1 - u_1 \right) e_{m,1} + \left( x_2 - u_2 \right) e_{m,2} + \cdots + \left(x_1 - u_1 \right) e_{m,d} \end{bmatrix}   $$
 
-Prove: eigenvector = greatest variance: 
+__Prove: eigenvector = greatest variance__: 
 
 - eigenvector has unit length (length = 1)
 - Select dimension e which maximizes the variance
@@ -413,7 +413,7 @@ we have constraint eigenvector length = 1, then we add Lagrange multiplier
 
 $$ V = \frac{1}{n} \sum_{i=1}^{n} \left( \sum_{j=1}^d x_{ij} e_j \right)^2 - \lambda\left( \sum_{k=1}^d e_j^2  -1 \right)$$
 
-$ \frac{\partial V}{\partial e_a} = \frac{2}{n} \sum_{i=1}^{n} \left( \sum_{j=1}^d x_{ij} e_j \right)x_{ia} - 2\lambda e_a = 0$$
+$$ \frac{\partial V}{\partial e_a} = \frac{2}{n} \sum_{i=1}^{n} \left( \sum_{j=1}^d x_{ij} e_j \right) x_{ia} - 2\lambda e_a = 0$$
  
 [Detailed PDF](https://docs.google.com/viewer?url=http://nbviewer.jupyter.org/github/beckswu/beckswu.github.io/blob/master/document/linear%20algebra.pdf "file")
 
