@@ -401,6 +401,10 @@ Project on m dimensions with m eigenvectors (unit length) $$e_1, e_2, \cdots, e_
 
 $$ \begin{bmatrix} x'_1 \\ x'_2 \\ \vdots \\ x'_m  \end{bmatrix} = \begin{bmatrix} \left(x - \vec u \right)^T \vec e_1 \\ \left(x - \vec u \right)^T \vec e_2 \\ \vdots \\ \left(x - \vec u \right)^T \vec e_m \end{bmatrix} = \begin{bmatrix} \left( x_1 - u_1 \right) e_{1,1} + \left( x_2 - u_2 \right) e_{1,2} + \cdots + \left( x_d - u_d \right) e_{1,d}  \\ \left( x_1 - u_1 \right) e_{2,1} + \left( x_2 - u_2 \right) e_{2,2} + \cdots + \left( x_d - u_d \right) e_{2,d} \\ \vdots \\ \left( x_1 - u_1 \right) e_{m,1} + \left( x_2 - u_2 \right) e_{m,2} + \cdots + \left(x_d - u_d \right) e_{m,d} \end{bmatrix}   $$
 
+__Prove: projection mean is zero__: 
+
+$$ \begin{align}  u & = \frac{1}{n} \sum_{i=1}^{n} \left( \sum_{j=1}^d x_{ij} e_j \right) \\ & =  \sum_{j=1}^d \left( \frac{1}{n} \sum_{i=1}^{n} x_{ij} \right) e_j \\ & = \sum_{j=1}^d 0 * e_j  = 0 \end{align} $$
+
 __Prove: eigenvector = greatest variance__: 
 
 - eigenvector has unit length (length = 1)
@@ -423,6 +427,11 @@ $$  \sum_{i=1}^{d} e_j  cov\left( a,j \right)  = \lambda e_a $$
 
 $$\begin{Bmatrix} \sum_{i=1}^{d}  cov\left( 1,j \right) e_j = \lambda e_1 \\ \sum_{i=1}^{d}  cov\left( 2,j \right) e_j = \lambda e_2 \\ \vdots \\ \sum_{i=1}^{d}  cov\left( d,j \right) e_j = \lambda e_d  \end{Bmatrix}  =>  \bbox[yellow]{\sum e = \lambda e}$$
  
+ 
+__Prove: eigenvalue = variance along eigenvector__: 
+
+
+
 [Detailed PDF](https://docs.google.com/viewer?url=http://nbviewer.jupyter.org/github/beckswu/beckswu.github.io/blob/master/document/linear%20algebra.pdf "file")
 
 [linear Algebra](https://docs.google.com/viewer?url=http://nbviewer.jupyter.org/github/beckswu/beckswu.github.io/blob/master/document/document/linear%20algebra.pdf "file")
