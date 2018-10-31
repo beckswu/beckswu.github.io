@@ -452,17 +452,17 @@ __How many dimensions__:
 
 #### PCA Practical Issue 
 
-1. Covariance extremly sensitive to large value
+- <span style="background-color: #FFFF00">Covariance extremly sensitive to large value</span>
    -  multiply some dimension by 1000 (把其中一维的数据都乘以1000), it will affect covariance matrix  e.g 如果人的身高用 micrometers 计算，每个数很大很大，height will become a principal component
    -  <span style="background-color: #FFFF00">solution</span>: normalize each dimension to zero mean and unit variance x' = (x-mean)/st.dev
-2.	PCA assumes underlying subspace is linear
+-	<span style="background-color: #FFFF00">PCA assumes underlying subspace is linear</span>
    -  1 dimension: straight line 
    -  2 dimension: a flat sheet
    -  PCA cannot find manifolds, can only find a single directions, 比如下图，不能发现nonlinear space
 
 ![](\img\post\Linear-Algebra\pic7.png)
 
-3. Cannot see the class of classification and only see the dimension. It can be hurt very badly because it doesn't see the class label when decomposition just see the coordinates
+-  <span style="background-color: #FFFF00">Cannot see the class of classification and only see the dimension</span>. It can be hurt very badly because it doesn't see the class label when decomposition just see the coordinates
 
 ![](\img\post\Linear-Algebra\pic8.png)
 
