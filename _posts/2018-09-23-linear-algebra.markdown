@@ -430,6 +430,7 @@ $$\begin{Bmatrix} \sum_{i=1}^{d}  cov\left( 1,j \right) e_j = \lambda e_1 \\ \su
  
 __Prove: eigenvalue = variance along eigenvector__: 
 
+$$ \begin{align}  V = \frac{1}{n} \sum_{i=1}^{n} \left( \sum_{j=1}^d x_{ij} e_j - u \right)^2 & = \frac{1}{n} \sum_{i=1}^{n} \left( \sum_{j=1}^d x_{ij} e_j \right)^2 \\ & = \frac{1}{n} \sum_{i=1}^{n} \left( \sum_{j=1}^d x_{ij} e_j \right) \left( \sum_{a=1}^d x_{ia} e_a \right) \\ & = \sum_{a=1}^d  \sum_{j=1}^d \left(  \frac{1}{n}  \sum_{i=1}^{n} x_{ia} x_{ij} \right) e_j e_a  \\ & = \sum_{a=1}^d  \left( \sum_{j=1}^d  cov \left( a, j \right) e_j \right) e_a   \\ & =  \sum_{a=1}^d  \left( \lambda e_a \right) e_a  \\ & = \lambda \|e \|^2  \end{align} $$
 
 
 [Detailed PDF](https://docs.google.com/viewer?url=http://nbviewer.jupyter.org/github/beckswu/beckswu.github.io/blob/master/document/linear%20algebra.pdf "file")
