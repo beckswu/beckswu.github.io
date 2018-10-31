@@ -406,7 +406,10 @@ $$ \begin{bmatrix} x'_1 \\ x'_2 \\ \vdots \\ x'_m  \end{bmatrix} = \begin{bmatri
 
 __Prove: projection mean is zero__: 
 
+project 到一个eigenvector上的mean
+
 $$ \begin{align}  u & = \frac{1}{n} \sum_{i=1}^{n} \left( \sum_{j=1}^d x_{ij} e_j \right) \\ & =  \sum_{j=1}^d \left( \frac{1}{n} \sum_{i=1}^{n} x_{ij} \right) e_j \\ & = \sum_{j=1}^d 0 * e_j  = 0 \end{align} $$
+
 
 __Prove: eigenvector = greatest variance__: 
 
