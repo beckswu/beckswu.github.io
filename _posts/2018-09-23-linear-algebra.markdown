@@ -497,14 +497,14 @@ __Cons__:
 
 
 
-[Detailed PDF](https://docs.google.com/viewer?url=http://nbviewer.jupyter.org/github/beckswu/beckswu.github.io/blob/master/document/linear%20algebra.pdf "file")
+[Detailed LA PDF](https://docs.google.com/viewer?url=http://nbviewer.jupyter.org/github/beckswu/beckswu.github.io/blob/master/document/linear%20algebra.pdf "file")
 
 [linear Algebra](https://docs.google.com/viewer?url=http://nbviewer.jupyter.org/github/beckswu/beckswu.github.io/blob/master/document/document/linear%20algebra.pdf "file")
 
 
-<object data="https://docs.google.com/viewer?url=http://nbviewer.jupyter.org/github/beckswu/beckswu.github.io/blob/master/img/CSharp.pdf" type="application/pdf" width="700px" height="700px">
-    <embed src="https://docs.google.com/viewer?url=http://nbviewer.jupyter.org/github/beckswu/beckswu.github.io/blob/master/img/CSharp.pdf">
-        <p>This browser does not support PDFs. Please download the PDF to view it: <a href="https://docs.google.com/viewer?url=http://nbviewer.jupyter.org/github/beckswu/beckswu.github.io/blob/master/img/CSharp.pdf">Download PDF</a>.</p>
+<object data="https://docs.google.com/viewer?url=http://nbviewer.jupyter.org/github/beckswu/beckswu.github.io/blob/master/document/linear%20algebra.pdf" type="application/pdf" width="700px" height="700px">
+    <embed src="https://docs.google.com/viewer?url=http://nbviewer.jupyter.org/github/beckswu/beckswu.github.io/blob/master/document/linear%20algebra.pdf">
+        <p>This browser does not support PDFs. Please download the PDF to view it: <a href="https://docs.google.com/viewer?url=http://nbviewer.jupyter.org/github/beckswu/beckswu.github.io/blob/master/document/linear%20algebra.pdf">Download PDF</a>.</p>
     </embed>
 </object>
 
