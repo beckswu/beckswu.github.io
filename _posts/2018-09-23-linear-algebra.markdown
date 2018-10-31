@@ -396,7 +396,7 @@ Step:
 
 __Projecting to new dimensions__
   
-Project on m dimensions with m eigenvectors (unit length) $$e_1, e_2, \cdots, e_m$$ with m biggest eigenvalues. Have original coordinates $$x = \{x_1, x_2 , \cdots, x_d \}$$, want the new coordinates $$x'= \{x'_1, x'_2,\cdots, x'_n \}$$
+Project on m dimensions with m eigenvectors (unit length) $$e_1, e_2, \cdots, e_n$$ with n biggest eigenvalues. Have original coordinates $$x = \{x_1, x_2 , \cdots, x_d \}$$, want the new coordinates $$x'= \{x'_1, x'_2,\cdots, x'_n \}$$
 - center the instance(subtract the mean): $$x - u$$
 - project to each dimension using dot project $$(x-u)^T e_j$$ for j = 1... n ($$scaler = \frac{ \vec x \cdot \vec v  }{ \|\vec v\| } = \vec x \cdot \vec v$$ given $$\|\vec v\| = 1$$):  
 
