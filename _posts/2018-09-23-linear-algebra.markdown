@@ -396,13 +396,13 @@ Step:
 
 __Projecting to new dimensions__
   
-Project on m dimensions with m eigenvectors (unit length) $$e_1, e_2, \cdots, e_m$$ with m biggest eigenvalues. Have original coordinates $$x = \{x_1, x_2 , \cdots, x_d \}$$, want the new coordinates $$x'= \{x'_1, x'_2,\cdots, x'_m \}$$
+Project on m dimensions with m eigenvectors (unit length) $$e_1, e_2, \cdots, e_m$$ with m biggest eigenvalues. Have original coordinates $$x = \{x_1, x_2 , \cdots, x_d \}$$, want the new coordinates $$x'= \{x'_1, x'_2,\cdots, x'_n \}$$
 - center the instance(subtract the mean): $$x - u$$
-- project to each dimension using dot project $$(x-u)^T e_j$$ for j = 1... m ($$scaler = \frac{ \vec x \cdot \vec v  }{ \|\vec v\| } = \vec x \cdot \vec v$$ given $$\|\vec v\| = 1$$):  
+- project to each dimension using dot project $$(x-u)^T e_j$$ for j = 1... n ($$scaler = \frac{ \vec x \cdot \vec v  }{ \|\vec v\| } = \vec x \cdot \vec v$$ given $$\|\vec v\| = 1$$):  
 
-$$ \begin{bmatrix} x'_1 \\ x'_2 \\ \vdots \\ x'_m  \end{bmatrix} = \begin{bmatrix} \left(x - \vec u \right)^T \vec e_1 \\ \left(x - \vec u \right)^T \vec e_2 \\ \vdots \\ \left(x - \vec u \right)^T \vec e_m \end{bmatrix} = \begin{bmatrix} \left( x_1 - u_1 \right) e_{1,1} + \left( x_2 - u_2 \right) e_{1,2} + \cdots + \left( x_d - u_d \right) e_{1,d}  \\ \left( x_1 - u_1 \right) e_{2,1} + \left( x_2 - u_2 \right) e_{2,2} + \cdots + \left( x_d - u_d \right) e_{2,d} \\ \vdots \\ \left( x_1 - u_1 \right) e_{m,1} + \left( x_2 - u_2 \right) e_{m,2} + \cdots + \left(x_d - u_d \right) e_{m,d} \end{bmatrix}   $$
+$$ \begin{bmatrix} x'_1 \\ x'_2 \\ \vdots \\ x'_n  \end{bmatrix} = \begin{bmatrix} \left(x - \vec u \right)^T \vec e_1 \\ \left(x - \vec u \right)^T \vec e_2 \\ \vdots \\ \left(x - \vec u \right)^T \vec e_m \end{bmatrix} = \begin{bmatrix} \left( x_1 - u_1 \right) e_{1,1} + \left( x_2 - u_2 \right) e_{1,2} + \cdots + \left( x_d - u_d \right) e_{1,d}  \\ \left( x_1 - u_1 \right) e_{2,1} + \left( x_2 - u_2 \right) e_{2,2} + \cdots + \left( x_d - u_d \right) e_{2,d} \\ \vdots \\ \left( x_1 - u_1 \right) e_{n,1} + \left( x_2 - u_2 \right) e_{n,2} + \cdots + \left(x_d - u_d \right) e_{n,d} \end{bmatrix}   $$
 
-把d维projection到m维上, $$x'_i$$ 是对应第i个 eigenvector 的coordiantes, 是number, $$e_{i,j}$$ 是第i个eigenvector 第j维，是number. 所以需要m个eigenvalues 和 m个eigenvectors, 第i个eigenvector是 $$\{e_{i,1}, e_{i,2}, \cdots, e_{i,d}  \}$$
+把d维projection到n维上, $$x'_i$$ 是对应第i个 eigenvector 的coordiantes, 是number, $$e_{i,j}$$ 是第i个eigenvector 第j维，是number. 所以需要n个eigenvalues 和 n个eigenvectors, 第i个eigenvector是 $$\{e_{i,1}, e_{i,2}, \cdots, e_{i,d}  \}$$
 
 __Prove: projection mean is zero__: 
 
