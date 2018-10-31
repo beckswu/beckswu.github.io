@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      "Linear Algebra - Summary "
+title:      "Linear Algebra + PCA - Summary "
 subtitle:   "Linear Algebra 线性代数 总结"
 date:       2018-09-23 20:00:00
 author:     "Becks"
@@ -430,7 +430,7 @@ $$\begin{Bmatrix} \sum_{i=1}^{d}  cov\left( 1,j \right) e_j = \lambda e_1 \\ \su
  
 __Prove: eigenvalue = variance along eigenvector__: variane along the projections along eigenvector is eigenvalues
 
-$$ \begin{align}  V = \frac{1}{n} \sum_{i=1}^{n} \left( \sum_{j=1}^d x_{ij} e_j - u \right)^2 & = \frac{1}{n} \sum_{i=1}^{n} \left( \sum_{j=1}^d x_{ij} e_j \right)^2 \\ & = \frac{1}{n} \sum_{i=1}^{n} \left( \sum_{j=1}^d x_{ij} e_j \right) \left( \sum_{a=1}^d x_{ia} e_a \right) \\ & = \sum_{a=1}^d  \sum_{j=1}^d \left(  \frac{1}{n}  \sum_{i=1}^{n} x_{ia} x_{ij} \right) e_j e_a  \\ & = \sum_{a=1}^d  \left( \sum_{j=1}^d  cov \left( a, j \right) e_j \right) e_a   \\ & =  \sum_{a=1}^d  \left( \lambda e_a \right) e_a  \\ & = \lambda \|e \|^2  \end{align} = \lambda $$
+$$ \begin{align}  V = \frac{1}{n} \sum_{i=1}^{n} \left( \sum_{j=1}^d x_{ij} e_j - u \right)^2 & = \frac{1}{n} \sum_{i=1}^{n} \left( \sum_{j=1}^d x_{ij} e_j \right)^2 \\ & = \frac{1}{n} \sum_{i=1}^{n} \left( \sum_{j=1}^d x_{ij} e_j \right) \left( \sum_{a=1}^d x_{ia} e_a \right) \\ & = \sum_{a=1}^d  \sum_{j=1}^d \left(  \frac{1}{n}  \sum_{i=1}^{n} x_{ia} x_{ij} \right) e_j e_a  \\ & = \sum_{a=1}^d  \left( \sum_{j=1}^d  cov \left( a, j \right) e_j \right) e_a   \\ & =  \sum_{a=1}^d  \left( \lambda e_a \right) e_a  \\ & = \lambda \|e \|^2 = \lambda \end{align}  $$
 
 __How many dimensions__:
 
@@ -449,6 +449,51 @@ __How many dimensions__:
 
 
 ![](\img\post\Linear-Algebra\pic6.png)
+
+#### PCA Practical Issue 
+
+1. Covariance extremly sensitive to large value
+   -  multiply some dimension by 1000 (把其中一维的数据都乘以1000), it will affect covariance matrix  e.g 如果人的身高用 micrometers 计算，每个数很大很大，height will become a principal component
+   -  <span style="background-color: #FFFF00">solution</span>: normalize each dimension to zero mean and unit variance x' = (x-mean)/st.dev
+2.	PCA assumes underlying subspace is linear
+   -  1 dimension: straight line 
+   -  2 dimension: a flat sheet
+   -  PCA cannot find manifolds, can only find a single directions, 比如下图，不能发现nonlinear space
+
+![](\img\post\Linear-Algebra\pic7.png)
+
+3.  Cannot see the class of classification and only see the dimension. It can be hurt very badly because it doesn't see the class label when decomposition just see the coordinates
+
+![](\img\post\Linear-Algebra\pic8.png)
+
+比如蓝色dimension是PCA给的，但really diseaster, cannot separate them, 因为无法分层，但实际红色dimension更好，但因为PCA，maximize variance，不会选择红色
+
+改进: LDA (linear discriminat analysis)  但LDA not guaranteed to be better for classification.
+
+LDA(linear discriminant analysis): when projected on new direction,  <span style="color: red">LDA maximize the mean difference of class normalized by their variance whereas PCA looks for the dimension of greatest variance</span>. Greater separation between classes
+
+LDA assume:
+
+1. data 是 gaussian 分布，
+2. assume have simple boundary between data points,
+
+![](\img\post\Linear-Algebra\pic9.png)
+
+![](\img\post\Linear-Algebra\pic10.png)
+
+#### PCA PROS and CONS
+
+__Pros__:
+
+1.	dramatic reduction in size of data: faster processing, smaller storage
+2.	reflects our intuitions about the data
+
+__Cons__:
+1.	too expensive for many applications (e.g. bid stream data such as twitter, web)
+2.	disastrous for tasks with fine-grained classes 
+3.	the assuptions behind the methods(linearity of supspace)  
+
+
 
 [Detailed PDF](https://docs.google.com/viewer?url=http://nbviewer.jupyter.org/github/beckswu/beckswu.github.io/blob/master/document/linear%20algebra.pdf "file")
 
