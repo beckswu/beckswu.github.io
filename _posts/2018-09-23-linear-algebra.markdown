@@ -428,9 +428,9 @@ $$  \sum_{i=1}^{d} e_j  cov\left( a,j \right)  = \lambda e_a $$
 $$\begin{Bmatrix} \sum_{i=1}^{d}  cov\left( 1,j \right) e_j = \lambda e_1 \\ \sum_{i=1}^{d}  cov\left( 2,j \right) e_j = \lambda e_2 \\ \vdots \\ \sum_{i=1}^{d}  cov\left( d,j \right) e_j = \lambda e_d  \end{Bmatrix}  =>  \bbox[yellow]{\sum e = \lambda e}$$
  
  
-__Prove: eigenvalue = variance along eigenvector__: 
+__Prove: eigenvalue = variance along eigenvector__: variane along the projections along eigenvector is eigenvalues
 
-$$ \begin{align}  V = \frac{1}{n} \sum_{i=1}^{n} \left( \sum_{j=1}^d x_{ij} e_j - u \right)^2 & = \frac{1}{n} \sum_{i=1}^{n} \left( \sum_{j=1}^d x_{ij} e_j \right)^2 \\ & = \frac{1}{n} \sum_{i=1}^{n} \left( \sum_{j=1}^d x_{ij} e_j \right) \left( \sum_{a=1}^d x_{ia} e_a \right) \\ & = \sum_{a=1}^d  \sum_{j=1}^d \left(  \frac{1}{n}  \sum_{i=1}^{n} x_{ia} x_{ij} \right) e_j e_a  \\ & = \sum_{a=1}^d  \left( \sum_{j=1}^d  cov \left( a, j \right) e_j \right) e_a   \\ & =  \sum_{a=1}^d  \left( \lambda e_a \right) e_a  \\ & = \lambda \|e \|^2  \end{align} $$
+$$ \begin{align}  V = \frac{1}{n} \sum_{i=1}^{n} \left( \sum_{j=1}^d x_{ij} e_j - u \right)^2 & = \frac{1}{n} \sum_{i=1}^{n} \left( \sum_{j=1}^d x_{ij} e_j \right)^2 \\ & = \frac{1}{n} \sum_{i=1}^{n} \left( \sum_{j=1}^d x_{ij} e_j \right) \left( \sum_{a=1}^d x_{ia} e_a \right) \\ & = \sum_{a=1}^d  \sum_{j=1}^d \left(  \frac{1}{n}  \sum_{i=1}^{n} x_{ia} x_{ij} \right) e_j e_a  \\ & = \sum_{a=1}^d  \left( \sum_{j=1}^d  cov \left( a, j \right) e_j \right) e_a   \\ & =  \sum_{a=1}^d  \left( \lambda e_a \right) e_a  \\ & = \lambda \|e \|^2  \end{align} = \lambda $$
 
 
 [Detailed PDF](https://docs.google.com/viewer?url=http://nbviewer.jupyter.org/github/beckswu/beckswu.github.io/blob/master/document/linear%20algebra.pdf "file")
