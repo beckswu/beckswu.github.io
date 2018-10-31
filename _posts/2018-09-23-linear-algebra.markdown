@@ -432,6 +432,23 @@ __Prove: eigenvalue = variance along eigenvector__: variane along the projection
 
 $$ \begin{align}  V = \frac{1}{n} \sum_{i=1}^{n} \left( \sum_{j=1}^d x_{ij} e_j - u \right)^2 & = \frac{1}{n} \sum_{i=1}^{n} \left( \sum_{j=1}^d x_{ij} e_j \right)^2 \\ & = \frac{1}{n} \sum_{i=1}^{n} \left( \sum_{j=1}^d x_{ij} e_j \right) \left( \sum_{a=1}^d x_{ia} e_a \right) \\ & = \sum_{a=1}^d  \sum_{j=1}^d \left(  \frac{1}{n}  \sum_{i=1}^{n} x_{ia} x_{ij} \right) e_j e_a  \\ & = \sum_{a=1}^d  \left( \sum_{j=1}^d  cov \left( a, j \right) e_j \right) e_a   \\ & =  \sum_{a=1}^d  \left( \lambda e_a \right) e_a  \\ & = \lambda \|e \|^2  \end{align} = \lambda $$
 
+__How many dimensions__:
+
+1. 方法一: 
+   - Pick $$e_i$$ that explain the msot variance 
+   - sort eigenvectors s.t. $$\lambda _1 \ge \lambda _2 \cdots \lambda _d$$
+   - pick first m eigenvectors which explain 90% or 95% of total variance (前m个eigenvectors 解释了90% 或 95%的)
+
+2. 方法二：
+   -  sort eigenvectors s.t. $$\lambda _1 \ge \lambda _2 \cdots \lambda _d$$
+   -  plot eigenvalues as decreasing order 
+   -  use a scree plot (pick the stopping point)
+
+
+![](\img\post\Linear-Algebra\pic5.png)
+
+
+![](\img\post\Linear-Algebra\pic6.png)
 
 [Detailed PDF](https://docs.google.com/viewer?url=http://nbviewer.jupyter.org/github/beckswu/beckswu.github.io/blob/master/document/linear%20algebra.pdf "file")
 
