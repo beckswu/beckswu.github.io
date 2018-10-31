@@ -492,8 +492,8 @@ __Pros__:
 
 __Cons__:
 1.	too expensive for many applications (e.g. bid stream data such as twitter, web)
-2.	disastrous for tasks with fine-grained classes 
-3.	the assuptions behind the methods(linearity of supspace)  
+2.	<span style="color: red">disastrous for tasks with fine-grained classes</span> 
+3.	the assuptions behind the methods(<span style="background-color: #FFFF00">linearity of supspace</span>)  
 
 
 
