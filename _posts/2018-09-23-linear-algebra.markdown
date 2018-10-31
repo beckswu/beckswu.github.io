@@ -427,9 +427,9 @@ $$ V = \frac{1}{n} \sum_{i=1}^{n} \left( \sum_{j=1}^d x_{ij} e_j \right)^2 - \la
 
 $$ \frac{\partial V}{\partial e_a} = \frac{2}{n} \sum_{i=1}^{n} \left( \sum_{j=1}^d x_{ij} e_j \right) x_{ia} - 2\lambda e_a = 0$$
 
-$$ 2 \sum_{i=1}^{d} e_j \left( \frac{1}{n}  \sum_{j=1}^n x_{ia} x_{ij}  \right)  = 2\lambda e_a $$
+$$ 2 \sum_{j=1}^{d} e_j \left( \frac{1}{n}  \sum_{j=1}^n x_{ia} x_{ij}  \right)  = 2\lambda e_a $$
 
-$$  \sum_{i=1}^{d} e_j  cov\left( a,j \right)  = \lambda e_a $$
+$$  \sum_{j=1}^{d} e_j  cov\left( a,j \right)  = \lambda e_a $$
 
 把第 a 行的 covariance matrix 和 ea dot product，得到 eigenvector 的 a 个行, covarince matrix是
 
