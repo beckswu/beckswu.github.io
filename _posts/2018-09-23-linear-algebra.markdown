@@ -462,7 +462,7 @@ __How many dimensions__:
 
 ![](\img\post\Linear-Algebra\pic7.png)
 
-3.  Cannot see the class of classification and only see the dimension. It can be hurt very badly because it doesn't see the class label when decomposition just see the coordinates
+3. Cannot see the class of classification and only see the dimension. It can be hurt very badly because it doesn't see the class label when decomposition just see the coordinates
 
 ![](\img\post\Linear-Algebra\pic8.png)
 
@@ -478,6 +478,8 @@ LDA assume:
 2. assume have simple boundary between data points,
 
 ![](\img\post\Linear-Algebra\pic9.png)
+
+Example where PCA gives a better projection: 
 
 ![](\img\post\Linear-Algebra\pic10.png)
 
