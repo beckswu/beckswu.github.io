@@ -266,11 +266,15 @@ properties:
 
 #### Orthogonal Matrix
 
-A nonsingular matrix Q is called an <span style="background-color: #FFFF00">__orthogonal matrix__ if  $$Q^{-1} = Q^T$$</span>. Q is orthogonal if and only if the columns of Q form an orthonormal set of vectors in $$R^n$$
+A nonsingular matrix Q is called an <span style="background-color: #FFFF00">__orthogonal matrix__ if  $$Q^{-1} = Q^T$$</span>. Q is orthogonal matrix if and only if the columns of Q form an orthonormal set of vectors in $$R^n$$. (a square real matrix with orthonormal columns is called orthogonal)
 
 Wiki: An __orthogonal matrix__ is a square matrix whose columns and rows are orthogonal unit vectors i.e. $$Q^TQ = QQ^T = I$$
 
-The rows of an orthogonal matrix are an orthonormal basis. That is, each row has length one, and are mutually perpendicular. Similarly, the columns are also an orthonormal basis.  <span style="color: red">In fact, given any orthonormal basis, the matrix whose rows are that basis is an orthogonal matrix.</span> (given orthonormal basis当row也是orthonormal basis时候 就是orthogonal matrix) It is automatically the case that the columns are another orthonormal basis.
+The rows of an orthogonal matrix are an orthonormal basis. That is, each row has length one, and are mutually perpendicular. Similarly, the columns are also an orthonormal basis.
+
+prove orthonormal columns form orthogonal matrix:<br/>
+
+orthonormal columns is left invertible. $$Q^T Q = I => Q^{-1} = Q $$, because $$Q\space Q^{-1} = I => Q^Q^T = I $$, columns columns 组成的matrix row 也是orthonormal
 
 properties: 
 1. The column vectors and row vectors forms orthonormal basis
