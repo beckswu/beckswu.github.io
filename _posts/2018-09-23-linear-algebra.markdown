@@ -255,12 +255,14 @@ properties:
     prove: $$ A^T A = \begin{bmatrix} -- \vec v_1^T -- \\  --\vec v_2^T-- \\ --\vdots-- \\ --\vec v_k^T-- \end{bmatrix}  \begin{bmatrix} \mid &\mid &\cdots &\mid \\  \vec v_1 & \vec v_2 & \cdots  &\vec v_k \\ \mid &\mid &\cdots &\mid \end{bmatrix} =  \begin{bmatrix} 1 & 0 &\cdots & 0 \\  0 & 1 & \cdots & 0  \\ \vdots &  \vdots & \ddots & \vdots \\ 0 & 0 & \cdots & 1 \end{bmatrix}  $$
 5. A is n by n matrix whose columns form an orthonormal set, then $$A^{-1} = A^T $$ (因为是 n by n, 所以是invertible)
 6. If orthonormal basis 组成的matrix A,  then $$Proj_v \vec x = A \left( A^T A \right)^{-1} A \vec x = A A^T \vec x $$
-7. If orthonormal basis 组成的matrix A, then when do transformation, it will preserve length and angle for transformation. prove: 
+7. If orthonormal basis 组成的matrix A, then when do transformation, it will preserve length and angle for transformation. It aslo preserve inner product prove: 
 
 
    $$ \| C \vec x \|^2 = C\vec x \cdot C \vec x = \left( C\vec x \right)^T C \vec x = \vec x^T C^T C \vec x =\vec x^T \vec x =  \| C \vec x \|   $$ 
 
    $$cos\theta =  \frac{ C\vec w \cdot C \vec v }{ \| C\vec v \| \| C\vec v \| } =  \frac{ \left(C\vec w \right)^T C \vec v }{ \| \vec v \| \| \vec v \| } =  \frac{ \vec w^T C^T C \vec v }{ \| \vec v \| \| \vec v \| }  = \frac{ \vec w^T \vec v }{ \| \vec v \| \| \vec v \| } $$
+
+  $$ \left( A x \right)^T \left(A y \right) = x^T A^T A y = x^T y  $$ 
 
 #### Orthogonal Matrix
 
