@@ -294,7 +294,7 @@ If A is invertible, then the factorization is unique if we require the diagonal 
 
 $$AR^{-1} = Q $$ where a is square matrix and Q is the orthogonal matrix(columns, rows are orthonormal) from Gram-schmidt process
 
-$$AR^{-1} = Q,  A = QR = > Q^{-1} A = Q^{-1} Q R  => Q^{-1} A = R , => R = Q^TA$$
+$$ A = QR = > Q^{-1} A = Q^{-1} Q R  => Q^T A = R $$
 
 ## Eigenvector & Eigenvalue
 
