@@ -73,7 +73,7 @@ A square matrix is __not invertible__ is called __singular__ or **degenerate**. 
 
  inverse of diagonal matrix 是每个diagonal 数的倒数
 
- $$ A = begin{bmatrix} 2 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & -1 \end{bmatrix},  A^{-1} = begin{bmatrix} 0.5 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & -1 \end{bmatrix} $$
+ $$ A = \begin{bmatrix} 2 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & -1 \end{bmatrix},  A^{-1} = \begin{bmatrix} 0.5 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & -1 \end{bmatrix} $$
 
  if A be a square n by n matrix is invertible, following must be __all true of all false__
  - A is inveritble, A has an inverse, is nonsingular, or is nondegenerate
