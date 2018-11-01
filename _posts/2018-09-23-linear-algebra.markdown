@@ -239,6 +239,8 @@ $$N\left(A^T \right)  = \left(  C\left( A \right) \right)^{\bot},  \left( N\left
 
 $$Dim\left( V \right) + Dim\left( V^{\bot} \right) = nums \space of \space columns $$
 
+A nonsingular matrix Q is called an <span style="background-color: #FFFF00">__orthogonal matrix__ if  $$Q^{-1} = Q^T$$</span> Q is orthogonal if and only if the columns of Q form an orthonormal set of vectors in $$R^n$$
+
 #### Orthonormal Basis
 
 A subset $$\{ \vec v_1, \vec v_2, \cdots, \vec v_k \}$$ of a vector space V, with inner product <,>, is called __orthonormal__ if $$<\vec v_i, \vec v_j> = 0 \space when \space i \neq j $$. That is, the vector are mutually orthogonal. Moverover, each length is one  $$<\vec v_i, \vec v_i> = 1. $$
