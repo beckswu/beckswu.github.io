@@ -255,7 +255,7 @@ properties:
     prove: $$ A^T A = \begin{bmatrix} -- \vec v_1^T -- \\  --\vec v_2^T-- \\ --\vdots-- \\ --\vec v_k^T-- \end{bmatrix}  \begin{bmatrix} \mid &\mid &\cdots &\mid \\  \vec v_1 & \vec v_2 & \cdots  &\vec v_k \\ \mid &\mid &\cdots &\mid \end{bmatrix} =  \begin{bmatrix} 1 & 0 &\cdots & 0 \\  0 & 1 & \cdots & 0  \\ \vdots &  \vdots & \ddots & \vdots \\ 0 & 0 & \cdots & 1 \end{bmatrix}  $$
 5. __Left Invertible__: A is n by n matrix whose columns form an orthonormal set, then $$A^{-1} = A^T $$ (因为是 n by n, 所以是invertible)
 6. If orthonormal basis 组成的matrix A,  then $$Proj_v \vec x = A \left( A^T A \right)^{-1} A \vec x = A A^T \vec x $$
-7. If orthonormal basis 组成的matrix A, then when do transformation, it will preserve length and angle for transformation. It aslo preserve inner product prove: 
+7. If orthonormal basis 组成的matrix A, then when do transformation, it will preserve length and angle for transformation. It aslo preserve inner product. prove: 
 
 
    $$ \| C \vec x \|^2 = C\vec x \cdot C \vec x = \left( C\vec x \right)^T C \vec x = \vec x^T C^T C \vec x =\vec x^T \vec x =  \| C \vec x \|   $$ 
@@ -268,19 +268,16 @@ properties:
 
 A nonsingular matrix Q is called an <span style="background-color: #FFFF00">__orthogonal matrix__ if  $$Q^{-1} = Q^T$$</span>. Q is orthogonal matrix if and only if the columns of Q form an orthonormal set of vectors in $$R^n$$. (a square real matrix with orthonormal columns is called orthogonal) 
 
-<span style="background-color: #FFFF00"> 只要column vectors (dimension n) 是orthonormal 就可以组成orthogonal matrix (n by n), 并且row vectors 同样是orthonormal </span>
+<span style="background-color: #FFFF00"> 只要column vectors (dimension n) 是orthonormal(each length = 1 and mutually perpendicular),就可以组成orthogonal matrix (n by n), 并且row vectors 同样是orthonormal </span>
 
 Wiki: An __orthogonal matrix__ is a square matrix whose columns and rows are orthogonal unit vectors i.e. $$Q^TQ = QQ^T = I$$
 
-The rows of an orthogonal matrix are an orthonormal basis. That is, each row has length one, and are mutually perpendicular. Similarly, the columns are also an orthonormal basis.
-
 prove orthonormal columns form orthogonal matrix:<br/>
-
 orthonormal columns is left invertible. $$Q^T Q = I => Q^{-1} = Q $$, because $$Q \space Q^{-1} = I => Q \space Q^T = I $$, columns columns 组成的matrix row 也是orthonormal => matrix is orthogonal 
 
 properties: 
 1. The column vectors and row vectors forms orthonormal basis
-2. Transpose = inverse: $$Q^T = Q^{-1}$$
+2. transpose = inverse: $$Q^T = Q^{-1}$$
 3. The determinant of any orthogonal matrix is either +1 or -1
 
 #### Gram-Schmidt process
