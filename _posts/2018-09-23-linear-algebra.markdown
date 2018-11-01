@@ -239,10 +239,6 @@ $$N\left(A^T \right)  = \left(  C\left( A \right) \right)^{\bot},  \left( N\left
 
 $$Dim\left( V \right) + Dim\left( V^{\bot} \right) = nums \space of \space columns $$
 
-A nonsingular matrix Q is called an <span style="background-color: #FFFF00">__orthogonal matrix__ if  $$Q^{-1} = Q^T$$</span>. Q is orthogonal if and only if the columns of Q form an orthonormal set of vectors in $$R^n$$
-
-Wiki: An __orthogonal matrix__ is a square matrix whose columns and rows are orthogonal unit vectors i.e. $$Q^TQ = QQ^T = I$$
-
 #### Orthonormal Basis
 
 A subset $$\{ \vec v_1, \vec v_2, \cdots, \vec v_k \}$$ of a vector space V, with inner product <,>, is called __orthonormal__ if $$<\vec v_i, \vec v_j> = 0 \space when \space i \neq j $$. That is, the vector are mutually orthogonal. Moverover, each length is one  $$<\vec v_i, \vec v_i> = 1. $$
@@ -265,6 +261,16 @@ properties:
    $$ \| C \vec x \|^2 = C\vec x \cdot C \vec x = \left( C\vec x \right)^T C \vec x = \vec x^T C^T C \vec x =\vec x^T \vec x =  \| C \vec x \|   $$ 
 
    $$cos\theta =  \frac{ C\vec w \cdot C \vec v }{ \| C\vec v \| \| C\vec v \| } =  \frac{ \left(C\vec w \right)^T C \vec v }{ \| \vec v \| \| \vec v \| } =  \frac{ \vec w^T C^T C \vec v }{ \| \vec v \| \| \vec v \| }  = \frac{ \vec w^T \vec v }{ \| \vec v \| \| \vec v \| } $$
+
+#### Orthogonal Matrix
+
+A nonsingular matrix Q is called an <span style="background-color: #FFFF00">__orthogonal matrix__ if  $$Q^{-1} = Q^T$$</span>. Q is orthogonal if and only if the columns of Q form an orthonormal set of vectors in $$R^n$$
+
+Wiki: An __orthogonal matrix__ is a square matrix whose columns and rows are orthogonal unit vectors i.e. $$Q^TQ = QQ^T = I$$
+
+The rows of an orthogonal matrix are an orthonormal basis. That is, each row has length one, and are mutually perpendicular. Similarly, the columns are also an orthonormal basis.  <span style="color: red">In fact, given any orthonormal basis, the matrix whose rows are that basis is an orthogonal matrix.</span> (given orthonormal basis当row也是orthonormal basis时候 就是orthogonal matrix) It is automatically the case that the columns are another orthonormal basis.
+
+
 
 #### Gram-Schmidt process
 
