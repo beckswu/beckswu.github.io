@@ -292,7 +292,7 @@ Any  square matrix A may be decomposed as A = QR where Q is an __orthogonal matr
 
 If A is invertible, then the factorization is unique if we require the diagonal elements of R to be positive.
 
-$$AR^{-1} = Q $$ where a is square matrix and Q is the orthogonal matrix(columns, rows are orthonormal) from Gram-schmidt process, $$R^{-1}$$ 是upper triangular matrix 表示row operation 得到Q的值 (example in PDF)
+$$AR^{-1} = Q $$ where a is square matrix and Q is the orthogonal matrix(columns, rows are orthonormal) from Gram-schmidt process, $$R^{-1}$$ 是upper triangular matrix 表示row operation 得到orthogonal matrix (example in PDF)
  
 $$ A = QR = > Q^{-1} A = Q^{-1} Q R  => Q^T A = R $$
 
