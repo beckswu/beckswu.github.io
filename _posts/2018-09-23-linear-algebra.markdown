@@ -133,7 +133,7 @@ __Dimension__: the number (cardinality) of a basis of V
 #### null space
 
 the __kernel(nullspace)__ of a linear map L : V → W between two vector spaces V and W, is the set of all elements v of V for which L(v) = 0, where 0 denotes the zero vector in W: <br/>
-$$ ker\left(L\right) = \{ v \in V | L\left( v \right) \} $$ <br/>
+$$ ker\left(L\right) = \{ v \in V | L\left( v \right) = \vec 0 \} $$ <br/>
 or in $$R^N:  N = \{ \vec x \in R^n | A \vec x =  \vec 0  \} $$  
 
 Null space is valid subspace 满足: <br/>
