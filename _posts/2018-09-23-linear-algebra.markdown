@@ -270,6 +270,11 @@ __Gram-Schmidt process__, is a procedure which takes a nonorthogonal set of line
 
 ![](\img\post\Linear-Algebra\pic2.png)
 
+#### QR Decomposition
+
+Any  square matrix A may be decomposed as A = QR where Q is an orthogonal matrix (its columns are orthogonal unit vectors $$O^T Q = QQ^T = I $$ ) and R is an upper triangular matrix (right triangular matrix).If A is invertible, then the factorization is unique if we require the diagonal elements of R to be positive.
+
+
 ## Eigenvector & Eigenvalue
 
 If T is a linear transformation from a vector space V over a field F into itself(V) and $$\vec v$$ is a not a zero vector, then  $$\vec v$$ is an __eigenvector__ of T if  $$T\left(\vec v\right)$$  is a scalar multile of v. It can be written: 
