@@ -274,11 +274,11 @@ The rows of an orthogonal matrix are an orthonormal basis. That is, each row has
 
 prove orthonormal columns form orthogonal matrix:<br/>
 
-orthonormal columns is left invertible. $$Q^T Q = I => Q^{-1} = Q $$, because $$Q\space Q^{-1} = I => Q^Q^T = I $$, columns columns 组成的matrix row 也是orthonormal
+orthonormal columns is left invertible. $$Q^T Q = I => Q^{-1} = Q $$, because $$Q \space Q^{-1} = I => Q \space Q^T = I $$, columns columns 组成的matrix row 也是orthonormal
 
 properties: 
 1. The column vectors and row vectors forms orthonormal basis
-2. $$Q^T = Q^{-1}$$
+2. Transpose = inverse: $$Q^T = Q^{-1}$$
 3. The determinant of any orthogonal matrix is either +1 or -1
 
 #### Gram-Schmidt process
