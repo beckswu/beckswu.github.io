@@ -67,6 +67,7 @@ A square matrix is __not invertible__ is called __singular__ or **degenerate**. 
 
  $$ \left( A^{-1} \right)^{-1} = A  $$ <br/>
  $$ \left( kA \right)^{-1} = k^{-1} A^{-1}  $$ for nonzero scalar K <br/>
+ $$ \left( AB \right)^{-1} =  B^{-1}A^{-1}  $$  <br/>
  $$ \left( A^T \right)^{-1} =  \left( A^{-1} \right)^T  $$  <br/>
  $$ det\left( A^{-1} \right) =  det\left( A \right)^{-1}  $$  <br/>
 
