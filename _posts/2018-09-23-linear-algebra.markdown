@@ -272,7 +272,10 @@ Wiki: An __orthogonal matrix__ is a square matrix whose columns and rows are ort
 
 The rows of an orthogonal matrix are an orthonormal basis. That is, each row has length one, and are mutually perpendicular. Similarly, the columns are also an orthonormal basis.  <span style="color: red">In fact, given any orthonormal basis, the matrix whose rows are that basis is an orthogonal matrix.</span> (given orthonormal basis当row也是orthonormal basis时候 就是orthogonal matrix) It is automatically the case that the columns are another orthonormal basis.
 
-
+properties: 
+1. The column vectors and row vectors forms orthonormal basis
+2. $$Q^T = Q^{-1}$$
+3. The determinant of any orthogonal matrix is either +1 or -1
 
 #### Gram-Schmidt process
 
