@@ -241,7 +241,7 @@ $$Dim\left( V \right) + Dim\left( V^{\bot} \right) = nums \space of \space colum
 
 A nonsingular matrix Q is called an <span style="background-color: #FFFF00">__orthogonal matrix__ if  $$Q^{-1} = Q^T$$</span>. Q is orthogonal if and only if the columns of Q form an orthonormal set of vectors in $$R^n$$
 
-Wiki: An __orthogonal matrix__ is a square matrix whose columns and rows are orthogonal unit vectors $$Q^TQ = QQ^T = I$$
+Wiki: An __orthogonal matrix__ is a square matrix whose columns and rows are orthogonal unit vectors i.e. $$Q^TQ = QQ^T = I$$
 
 #### Orthonormal Basis
 
