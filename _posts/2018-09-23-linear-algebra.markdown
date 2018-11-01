@@ -266,7 +266,9 @@ properties:
 
 #### Orthogonal Matrix
 
-A nonsingular matrix Q is called an <span style="background-color: #FFFF00">__orthogonal matrix__ if  $$Q^{-1} = Q^T$$</span>. Q is orthogonal matrix if and only if the columns of Q form an orthonormal set of vectors in $$R^n$$. (a square real matrix with orthonormal columns is called orthogonal)
+A nonsingular matrix Q is called an <span style="background-color: #FFFF00">__orthogonal matrix__ if  $$Q^{-1} = Q^T$$</span>. Q is orthogonal matrix if and only if the columns of Q form an orthonormal set of vectors in $$R^n$$. (a square real matrix with orthonormal columns is called orthogonal) 
+
+<span style="background-color: #FFFF00"> 只要column vectors (dimension n) 是orthonormal 就可以组成orthogonal matrix (n by n), 并且row vectors 同样是orthonormal </span>
 
 Wiki: An __orthogonal matrix__ is a square matrix whose columns and rows are orthogonal unit vectors i.e. $$Q^TQ = QQ^T = I$$
 
@@ -274,7 +276,7 @@ The rows of an orthogonal matrix are an orthonormal basis. That is, each row has
 
 prove orthonormal columns form orthogonal matrix:<br/>
 
-orthonormal columns is left invertible. $$Q^T Q = I => Q^{-1} = Q $$, because $$Q \space Q^{-1} = I => Q \space Q^T = I $$, columns columns 组成的matrix row 也是orthonormal
+orthonormal columns is left invertible. $$Q^T Q = I => Q^{-1} = Q $$, because $$Q \space Q^{-1} = I => Q \space Q^T = I $$, columns columns 组成的matrix row 也是orthonormal => matrix is orthogonal 
 
 properties: 
 1. The column vectors and row vectors forms orthonormal basis
