@@ -314,7 +314,7 @@ $$ \left( A - \lambda  I_n  \right) \vec v = \vec 0 $$
 
 - Eigenvalue can be 0. Then $$A \vec v = \lambda \vec 0$$ means that $$\vec v$$ is in nullspace
 - If A is Indetity matrix, then eigenvalue is 1, $$A \vec v = \vec v$$
-- If $$A \vec v = = \lambda \vec v $$ then $$A^2 \vec v = = \lambda^2 \vec v $$  and $$A^{-1} \vec v = = \lambda^{-1} \vec v $$ for the same $$\vec v$$
+- If $$A \vec v = \lambda \vec v $$ then $$A^2 \vec v = \lambda^2 \vec v $$  and $$A^{-1} \vec v = \lambda^{-1} \vec v $$ for the same $$\vec v$$
 
 ```python
 import numpy as np
