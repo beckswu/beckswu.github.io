@@ -312,6 +312,7 @@ $$ \left( A - \lambda  I_n  \right) \vec v = \vec 0 $$
 
 因为 $$\vec v $$ is non-zero vector, $$ \left( A - \lambda  I_n  \right) $$ 必须是linear dependent matrix, 否则只有trivial soluion {0}, so $$ det\left( A - \lambda  I_n  \right) = 0 $$ 
 
+Eigenvalue can be 0. Then $$A \vec x = \lambda \vec 0$$ means that $$\vecx$$ is in nullspace
 
 ```python
 import numpy as np
