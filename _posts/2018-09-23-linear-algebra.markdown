@@ -316,6 +316,12 @@ $$ \left( A - \lambda  I_n  \right) \vec v = \vec 0 $$
 - If A is Indetity matrix, then eigenvalue is 1, $$A \vec v = \vec v$$
 - If $$A \vec v = \lambda \vec v $$ then $$A^2 \vec v = \lambda^2 \vec v $$  and $$A^{-1} \vec v = \lambda^{-1} \vec v $$ for the same $$\vec v$$
 - <span style="color: red">If A is singular, then 0 is an eigenvalue</span>.  Prove: A is singular => det(A) = 0  =>  $$det\left(A- \lambda I \right) = 0$$ => det(A - 0I) = 0;  因为A若不是singluar, 需要$$A - \lambda I$$让它变成singular, 若已经是singular, 无须减去$$\lambda$$
+- Row operation (Elimination) don't preserve eigenvalue (比如第二行 += 第一行). 
+- <span style="color: red">Triangular matrix has Eigenvalue on its diagonal </span>
+- The product of eigenvalues = determinant
+- The sum of eigenvalues = the sum of n diagonal entries
+
+$$\lambda_{1} + \lambda_{2} + \cdots + \lambda_{n} = a_{11} + a_{22} + \cdots + a_{nn} $$
 
 ```python
 import numpy as np
