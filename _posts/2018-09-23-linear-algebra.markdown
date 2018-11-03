@@ -126,7 +126,7 @@ if V is subspace of $$R^N$$
 ![](\img\post\Linear-Algebra\pic1.PNG)
 
 
-## Null Space and Column Space
+## Null/Column Space
 
 __Dimension__: the number (cardinality) of a basis of V
 
