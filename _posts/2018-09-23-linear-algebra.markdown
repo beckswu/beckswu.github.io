@@ -319,7 +319,7 @@ $$ \left( A - \lambda  I_n  \right) \vec v = \vec 0 $$
 - Row operation (Elimination) don't preserve eigenvalue (比如第二行 += 第一行). 
 - <span style="color: red">Triangular matrix has Eigenvalue on its diagonal </span> (因为triangular的determinant = diagonal 数的乘积)
 - <span style="background-color: #FFFF00">The product of eigenvalues = determinant </span>
-- <span style="background-color: #FFFF00"> The sum of eigenvalues = the sum of n diagonal entries </span>
+- <span style="background-color: #FFFF00"> The sum of eigenvalues = the sum of n diagonal entries </span>. The sum of the entries along the main diagonal is called the __trace__ of A
 
 $$\lambda_{1} + \lambda_{2} + \cdots + \lambda_{n} = a_{11} + a_{22} + \cdots + a_{nn} $$
 
