@@ -309,6 +309,7 @@ $$ \left( A - \lambda  I_n  \right) \vec v = \vec 0 $$
 因为 $$\vec v $$ is non-zero vector, $$ \left( A - \lambda  I_n  \right) $$ 必须是linear dependent matrix, 否则只有trivial soluion {0}, so $$ det\left( A - \lambda  I_n  \right) = 0 $$ 
 
 - Eigenvalue can be 0. Then $$A \vec v = \lambda \vec 0$$ means that $$\vec v$$ is in nullspace
+- we can multiply eigenvectors by any nonzero constants. $$A\left(c \vec v \right) = \lambda\left(c \vec v \right)$$ is still true
 - If A is Indetity matrix, then eigenvalue is 1, $$A \vec v = \vec v$$
 - If $$A \vec v = \lambda \vec v $$ then $$A^2 \vec v = \lambda^2 \vec v $$  and $$A^{-1} \vec v = \lambda^{-1} \vec v $$ for the same $$\vec v$$
 - <span style="color: red">If A is singular, then 0 is an eigenvalue</span>.  Prove: A is singular => det(A) = 0  =>  $$det\left(A- \lambda I \right) = 0 => det\left(A - 0I \right) = 0 $$;  因为A若不是singluar, 需要$$A - \lambda I$$让它变成singular, 若已经是singular, 无须减去$$\lambda$$
@@ -343,12 +344,24 @@ $$X^{-1}AX = \Lambda = \begin{bmatrix} \lambda_1 & & \\ & \ddots & \\ & &\lambda
 
 $$AX= X \Lambda $$,  我们知道$$X \Lambda = \left[ \lambda_1 \vec v_1 , \lambda_2 \vec v_2 , \cdots, \lambda_n \vec v_n  \right]$$ 得到是每个eigenvector 乘以相应的eigenvalue 组成的matrix, 
 
+Remark: 
+1. The eigenvectors in X come in the same order as the eigenvalues in $$\Lambda$$. 
+2. Some matrices have too few eigenvectors. Those matrices cannot be diagonalized. Here are two examples. $$A = \begin{bmatrix} 1 & -1 \\ 1 & -1 \end{bmatrix}, B = \begin{bmatrix} 0 & -1 \\ 0 & 0 \end{bmatrix}$$. The eigenvectors are 0 and 0.
+
+No connection between invertibility and diagonalizability:
+- *Invertibility* is concerned with *eigenvalues* ($$\lambda =  0 \space or \space \lambda \neq 0$$)
+- Diagonalizability is convered with the eigenvectors (too few or enough for X)
+
 properties: 
 - $$A^2$$has the same eigenvectors in X and squared eigenvalues in $$\Lambda^2$$, $$A^2 = X \Lambda X^{-1} \space X \Lambda X^{-1} = X \Lambda^2 X^{-1} $$
 - Power of A: $$A^k = X \Lambda X^{-1} \space X \Lambda X^{-1} \cdots X \Lambda X^{-1}  = X \Lambda^k X^{-1} $$
 - Matrix X has inverse, beacuse coumns were assumed to be linearly independent. <span style="color: red">Without n independent eigenvectors, we can't diagonalize</span>
-- <span style="background-color: #FFFF00">$$A$$ and $$\Lambda A$$ have the same eigenvalues $$\lambda_1, \lambda_2, \cdots, \lambda_n$$</span>, The eigenvectors are different.
-    - Suppose the eigenvalues $$\lambda_1, \cdots, \lambda_2$$
+- <span style="background-color: #FFFF00">$$A$$ and $$\Lambda$$ have the same eigenvalues $$\lambda_1, \lambda_2, \cdots, \lambda_n$$</span>, The eigenvectors are different.
+    - Suppose the eigenvalues $$\lambda_1, \cdots, \lambda_n$$ are all <span style="color: red">differeent</span>. Then it is automatic that the eigenvectors $$x_1,\cdots, \x_n$$ are <span style="color: red">independent</span>. <span style="color: red">The eigenvector matrix X will be invertile</span>. <span style="background-color: #FFFF00">*Any matrix that has no repeated eigenvalues can be diagonalized, An n by n matrix that has n different eigenvalues must be diagonalizable*</span>.
+- if all $$\mid \lambda \mid < 1$$, then $$A^k $$ -> zero matrix
+
+
+
 
 ```python
 import numpy as np
