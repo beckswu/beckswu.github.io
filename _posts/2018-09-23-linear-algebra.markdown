@@ -331,10 +331,10 @@ $$when \space \lambda = 0, \space det\left(A\right) = \lambda_1 \lambda_2 \cdots
 #### Diagonalization
 
 why Diagonal matrix useful?
-- Determiant = diagonal的乘积
+- Determiant = diagonal所有数的乘积
 - eigenvalues 就是每个diagonal上(对角线上)的数
 - eigenvalue 是unit vector
-- power of matrix 就是diagonal上数的数power 
+- power of matrix 就是diagonal上数的数=power 
   
 $$A = \begin{bmatrix} 3&0 \\ 0&7 \end{bmatrix}, det\left( A\right) = 3*7 = 21, eigenvalues = 3,7, A^k = \begin{bmatrix} 3^k &0 \\ 0&7^k \end{bmatrix}$$
 
@@ -342,32 +342,31 @@ __Diagonalization__: Suppose the n by n matrix A has n linearly independent eige
  
 $$X^{-1}AX = \Lambda = \begin{bmatrix} \lambda_1 & & \\ & \ddots & \\ & &\lambda_n \end{bmatrix}, \space A = X \Lambda X^{-1} $$
 
-$$AX= X \Lambda $$,  我们知道$$X \Lambda = \left[ \lambda_1 \vec v_1 , \lambda_2 \vec v_2 , \cdots, \lambda_n \vec v_n  \right]$$ 得到是每个eigenvector 乘以相应的eigenvalue 组成的matrix, 
+$$AX= X \Lambda $$,  我们知道$$X \Lambda = \left[ \lambda_1 \vec v_1 , \lambda_2 \vec v_2 , \cdots, \lambda_n \vec v_n  \right] = AX $$ 得到是每个eigenvector 乘以相应的eigenvalue 组成的matrix, 
 
 Remark: 
 1. The eigenvectors in X come in the same order as the eigenvalues in $$\Lambda$$. 
 2. Some matrices have too few eigenvectors. Those matrices cannot be diagonalized. Here are two examples. $$A = \begin{bmatrix} 1 & -1 \\ 1 & -1 \end{bmatrix}, B = \begin{bmatrix} 0 & -1 \\ 0 & 0 \end{bmatrix}$$. The eigenvectors are 0 and 0.
 
 No connection between invertibility and diagonalizability:
-- *Invertibility* is concerned with *eigenvalues* ($$\lambda =  0 \space or \space \lambda \neq 0$$)
-- Diagonalizability is convered with the eigenvectors (too few or enough for X)
+- <span style="color: red">*Invertibility*</span> is concerned with <span style="color: red">*eigenvalues*</span> ($$\lambda =  0 \space or \space \lambda \neq 0$$)
+- <span style="color: red">*Diagonalizability*</span> is convered with the <span style="color: red">*eigenvectors* </span>(too few or enough for X)
 
 properties: 
 - $$A^2$$has the same eigenvectors in X and squared eigenvalues in $$\Lambda^2$$, $$A^2 = X \Lambda X^{-1} \space X \Lambda X^{-1} = X \Lambda^2 X^{-1} $$
 - Power of A: $$A^k = X \Lambda X^{-1} \space X \Lambda X^{-1} \cdots X \Lambda X^{-1}  = X \Lambda^k X^{-1} $$
 - Matrix X has inverse, beacuse coumns were assumed to be linearly independent. <span style="color: red">Without n independent eigenvectors, we can't diagonalize</span>
 - <span style="background-color: #FFFF00">$$A$$ and $$\Lambda$$ have the same eigenvalues $$\lambda_1, \lambda_2, \cdots, \lambda_n$$</span>, The eigenvectors are different.
-    - Suppose the eigenvalues $$\lambda_1, \cdots, \lambda_n$$ are all <span style="color: red">differeent</span>. Then it is automatic that the eigenvectors $$x_1,\cdots, \x_n$$ are <span style="color: red">independent</span>. <span style="color: red">The eigenvector matrix X will be invertile</span>. <span style="background-color: #FFFF00">*Any matrix that has no repeated eigenvalues can be diagonalized, An n by n matrix that has n different eigenvalues must be diagonalizable*</span>.
+    - Suppose the eigenvalues $$\lambda_1, \cdots, \lambda_n$$ are all <span style="color: red">differeent</span>. Then it is automatic that the eigenvectors $$x_1,\cdots, x_n$$ are <span style="color: red">independent</span>. <span style="color: red">The eigenvector matrix X will be invertile</span>. <span style="background-color: #FFFF00">*Any matrix that has no repeated eigenvalues can be diagonalized, An n by n matrix that has n different eigenvalues must be diagonalizable*</span>.
+    - All the matrices $$A = B^{-1}CB $$ are *similar*. <span style="background-color: #FFFF00">They all share the eigenvalues of C</span>
 - if all $$\mid \lambda \mid < 1$$, then $$A^k $$ -> zero matrix
 
-Let A and C be n by n matrices. We say that A is __similar__ to C if there is an invertible n by n matrix b such that $$A = B^{-1}CB $$, <span style="color: red">C may not be diagonal</span>
+Let A and C be n by n matrices. We say that A is __similar__ to C if there is an invertible n by n matrix B such that $$A = B^{-1}CB $$, <span style="color: red">C may not be diagonal</span>
 
-properteis:
-- All the matrices $$A = B^{-1}CB $$ are *similar*. <span style="background-color: #FFFF00">They all share the eigenvalues of C</span>
 
-prove if A and C are similar, they share the same eigenvalues: suppose $$Cx =\lambdax$$, then $$A = BCB^-1$$ has the eigenvalue $$\lambda $$ with the new eigenvector Bx: 
+prove if A and C are similar, they share the same eigenvalues: suppose $$Cx =\lambda x$$, then $$A = BCB^-1$$ has the eigenvalue $$\lambda $$ with the new eigenvector Bx: 
 
-$$A\left( Bx\right) =\left( BCB^-1 \right) \left( Bx\right) = BCx = B\lambdax = \lambda \left( Bx\right) $$
+$$A\left( Bx\right) =\left( BCB^-1 \right) \left( Bx\right) = BCx = B\lambda x = \lambda \left( Bx\right) $$
 
 Application: Fibonacci number, $$u_{k+1} = Au_{k}, where A = \begin{bmatrix} 1 & 1 \\ 0 & 1 \end{bmatrix} $$, then $$u_k = A^k u_0 = X \Lambda^k X^{-1} =  X \Lambda^k X^{-1}u_0  =  X \Lambda^k c$$
 
