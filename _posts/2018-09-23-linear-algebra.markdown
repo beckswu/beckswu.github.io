@@ -366,7 +366,7 @@ Let A and C be n by n matrices. We say that A is __similar__ to C if there is an
 
 prove if A and C are similar, they share the same eigenvalues: suppose $$Cx =\lambda x$$, then $$A = BCB^-1$$ has the eigenvalue $$\lambda $$ with the new eigenvector Bx: 
 
-$$A\left( Bx\right) =\left( BCB^-1 \right) \left( Bx\right) = BCx = B\lambda x = \lambda \left( Bx\right) $$
+$$A\left( Bx\right) =\left( BCB^{-1} \right) \left( Bx\right) = BCx = B\lambda x = \lambda \left( Bx\right) $$
 
 Application: Fibonacci number, $$u_{k+1} = Au_{k}, where A = \begin{bmatrix} 1 & 1 \\ 0 & 1 \end{bmatrix} $$, then $$u_k = A^k u_0 = X \Lambda^k X^{-1} =  X \Lambda^k X^{-1}u_0  =  X \Lambda^k c$$
 
