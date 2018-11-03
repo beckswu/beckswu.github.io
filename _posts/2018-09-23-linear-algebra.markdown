@@ -360,8 +360,18 @@ properties:
     - Suppose the eigenvalues $$\lambda_1, \cdots, \lambda_n$$ are all <span style="color: red">differeent</span>. Then it is automatic that the eigenvectors $$x_1,\cdots, \x_n$$ are <span style="color: red">independent</span>. <span style="color: red">The eigenvector matrix X will be invertile</span>. <span style="background-color: #FFFF00">*Any matrix that has no repeated eigenvalues can be diagonalized, An n by n matrix that has n different eigenvalues must be diagonalizable*</span>.
 - if all $$\mid \lambda \mid < 1$$, then $$A^k $$ -> zero matrix
 
+Let A and C be n by n matrices. We say that A is __similar__ to C if there is an invertible n by n matrix b such that $$A = B^{-1}CB $$, <span style="color: red">C may not be diagonal</span>
 
+properteis:
+- All the matrices $$A = B^{-1}CB $$ are *similar*. <span style="background-color: #FFFF00">They all share the eigenvalues of C</span>
 
+prove if A and C are similar, they share the same eigenvalues: suppose $$Cx =\lambdax$$, then $$A = BCB^-1$$ has the eigenvalue $$\lambda $$ with the new eigenvector Bx: 
+
+$$A\left( Bx\right) =\left( BCB^-1 \right) \left( Bx\right) = BCx = B\lambdax = \lambda \left( Bx\right) $$
+
+Application: Fibonacci number, $$u_{k+1} = Au_{k}, where A = \begin{bmatrix} 1 & 1 \\ 0 & 1 \end{bmatrix} $$, then $$u_k = A^k u_0 = X \Lambda^k X^{-1} =  X \Lambda^k X^{-1}u_0  =  X \Lambda^k c$$
+
+$$u_k = c_1 \left(\lambda_1\right)^k x_1 + \cdots + c_n \left(\lambda_n\right)^k x_n \space provided \space u_0 = c_1x+1 + \cdots + c_nx_n$$
 
 ```python
 import numpy as np
