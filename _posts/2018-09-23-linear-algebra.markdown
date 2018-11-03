@@ -130,8 +130,6 @@ if V is subspace of $$R^N$$
 
 __Dimension__: the number (cardinality) of a basis of V
 
-#### null space
-
 the __kernel(nullspace)__ of a linear map L : V → W between two vector spaces V and W, is the set of all elements v of V for which L(v) = 0, where 0 denotes the zero vector in W: <br/>
 $$ ker\left(L\right) = \{ v \in V | L\left( v \right) = \vec 0 \} $$ <br/>
 or in $$R^N:  N = \{ \vec x \in R^n | A \vec x =  \vec 0  \} $$  
@@ -143,8 +141,6 @@ Null space is valid subspace 满足: <br/>
 
 __Nullity__: Dimension of Null space = number of free variables <span style="color: red">free variables (non-pivot) </span> in reduced echelon form in Matrix A
 $$N\left( A \right) =\left( \vec 0 \right) $$ if and only if column vectors of A are linearly independent (only apply when A is n by n matrix)
-
-#### column space
 
  The __column space (also called the range or image)__ of a matrix A is the span (set of all possible linear combinations) of its column vectors. The column space of a matrix is the __image__ or __range__ of the corresponding matrix transformation.
 
