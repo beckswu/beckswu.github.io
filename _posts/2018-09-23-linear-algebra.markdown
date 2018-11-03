@@ -348,7 +348,7 @@ Remark:
 1. The eigenvectors in X come in the same order as the eigenvalues in $$\Lambda$$. 
 2. Some matrices have too few eigenvectors. Those matrices cannot be diagonalized. Here are two examples. $$A = \begin{bmatrix} 1 & -1 \\ 1 & -1 \end{bmatrix}, B = \begin{bmatrix} 0 & -1 \\ 0 & 0 \end{bmatrix}$$. The eigenvectors are 0 and 0.
 
-No connection between invertibility and diagonalizability:
+<span style="background-color: #FFFF00">No connection between invertibility and diagonalizability:</span>
 - <span style="color: red">*Invertibility*</span> is concerned with <span style="color: red">*eigenvalues*</span> ($$\lambda =  0 \space or \space \lambda \neq 0$$)
 - <span style="color: red">*Diagonalizability*</span> is convered with the <span style="color: red">*eigenvectors* </span>(too few or enough for X)
 
