@@ -370,7 +370,7 @@ $$A\left( Bx\right) =\left( BCB^-1 \right) \left( Bx\right) = BCx = B\lambda x =
 
 Application: Fibonacci number, $$u_{k+1} = Au_{k}, where A = \begin{bmatrix} 1 & 1 \\ 0 & 1 \end{bmatrix} $$, then $$u_k = A^k u_0 = X \Lambda^k X^{-1} =  X \Lambda^k X^{-1}u_0  =  X \Lambda^k c$$
 
-$$u_k = c_1 \left(\lambda_1\right)^k x_1 + \cdots + c_n \left(\lambda_n\right)^k x_n \space provided \space u_0 = c_1x+1 + \cdots + c_nx_n$$
+$$u_k = c_1 \left(\lambda_1\right)^k x_1 + \cdots + c_n \left(\lambda_n\right)^k x_n \space \space provided  \space \space u_0 = c_1x+1 + \cdots + c_nx_n$$
 
 ```python
 import numpy as np
