@@ -341,7 +341,7 @@ __Diagonalization__: Suppose the n by n matrix A has n linearly independent eige
  
 $$X^{-1}AX = \Lambda = \begin{bmatrix} \lambda_1 & & \\ & \ddots & \\ & &\lambda_n \end{bmatrix}, \space A = X \Lambda X^{-1} $$
 
-$$AX= X \Lambda $$,  我们知道$$X \Lambda = \left[ \lambda1 \vec v_1 , \lambda2 \vec v_2 , \cdots, \lambdan \vec v_n  \right]$$ 得到是每个eigenvector 乘以相应的eigenvalue 组成的matrix, 
+$$AX= X \Lambda $$,  我们知道$$X \Lambda = \left[ \lambda_1 \vec v_1 , \lambda_2 \vec v_2 , \cdots, \lambda_n \vec v_n  \right]$$ 得到是每个eigenvector 乘以相应的eigenvalue 组成的matrix, 
 
 properties: 
 - $$A^2$$has the same eigenvectors in X and squared eigenvalues in $$\Lambda^2$$, $$A^2 = X \Lambda X^{-1} \space X \Lambda X^{-1} = X \Lambda^2 X^{-1} $$
