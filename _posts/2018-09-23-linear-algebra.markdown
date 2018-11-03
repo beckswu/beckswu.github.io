@@ -317,11 +317,19 @@ $$ \left( A - \lambda  I_n  \right) \vec v = \vec 0 $$
 - If $$A \vec v = \lambda \vec v $$ then $$A^2 \vec v = \lambda^2 \vec v $$  and $$A^{-1} \vec v = \lambda^{-1} \vec v $$ for the same $$\vec v$$
 - <span style="color: red">If A is singular, then 0 is an eigenvalue</span>.  Prove: A is singular => det(A) = 0  =>  $$det\left(A- \lambda I \right) = 0 => det\left(A - 0I \right) = 0 $$;  因为A若不是singluar, 需要$$A - \lambda I$$让它变成singular, 若已经是singular, 无须减去$$\lambda$$
 - Row operation (Elimination) don't preserve eigenvalue (比如第二行 += 第一行). 
-- <span style="color: red">Triangular matrix has Eigenvalue on its diagonal </span>
+- <span style="color: red">Triangular matrix has Eigenvalue on its diagonal </span> (因为triangular的determinant = diagonal 数的乘积)
 - <span style="background-color: #FFFF00">The product of eigenvalues = determinant </span>
 - <span style="background-color: #FFFF00"> The sum of eigenvalues = the sum of n diagonal entries </span>
 
 $$\lambda_{1} + \lambda_{2} + \cdots + \lambda_{n} = a_{11} + a_{22} + \cdots + a_{nn} $$
+
+prove The product of eigenvalues = determinant: 
+
+suppose $$\lambda_1 , \lambda_2,  \cdots , \lambda_n$$ are the eigenvalues of A, Then $$ \lambda s $$$ are aslo the roots of the characteristic polynomial
+
+$$\begin{align} det\left(A - \lambda  I \right) &= \left(-1\right)^n \left( \lambda - \lambda_1 \right)\left(\lambda - \lambda_2 \right) \cdots \left( \lambda - \lambda_n \right) \\ &= \left(\lambda_1 - \lambda \right)\left(\lambda_2 - \lambda \right) \cdots \left(\lambda_n - \lambda \right)   \end{align}$$
+
+$$when \space \lambda = 0, \space det\left(A) = \lambda_1 \lambda_2 \cdots  \lambda_n $$
 
 ```python
 import numpy as np
