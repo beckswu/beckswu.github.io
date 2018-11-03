@@ -316,7 +316,7 @@ $$ \left( A - \lambda  I_n  \right) \vec v = \vec 0 $$
 - If A is Indetity matrix, then eigenvalue is 1, $$A \vec v = \vec v$$
 - If $$A \vec v = \lambda \vec v $$ then $$A^2 \vec v = \lambda^2 \vec v $$  and $$A^{-1} \vec v = \lambda^{-1} \vec v $$ for the same $$\vec v$$
 - <span style="color: red">If A is singular, then 0 is an eigenvalue</span>.  Prove: A is singular => det(A) = 0  =>  $$det\left(A- \lambda I \right) = 0 => det\left(A - 0I \right) = 0 $$;  因为A若不是singluar, 需要$$A - \lambda I$$让它变成singular, 若已经是singular, 无须减去$$\lambda$$
-- Row operation (Elimination) don't preserve eigenvalue (比如第二行 += 第一行). 
+- Row operation (Elimination) don't always preserve eigenvalue (比如第二行 += 第一行). 
 - <span style="color: red">Triangular matrix has Eigenvalue on its diagonal </span> (因为triangular的determinant = diagonal 数的乘积)
 - <span style="background-color: #FFFF00">The product of eigenvalues = determinant </span>
 - <span style="background-color: #FFFF00"> The sum of eigenvalues = the sum of n diagonal entries </span>. The sum of the entries along the main diagonal is called the __trace__ of A
@@ -330,6 +330,23 @@ suppose $$\lambda_1 , \lambda_2,  \cdots , \lambda_n$$ are the eigenvalues of A,
 $$\begin{align} det\left(A - \lambda  I \right) &= \left(-1\right)^n \left( \lambda - \lambda_1 \right)\left(\lambda - \lambda_2 \right) \cdots \left( \lambda - \lambda_n \right) \\ &= \left(\lambda_1 - \lambda \right)\left(\lambda_2 - \lambda \right) \cdots \left(\lambda_n - \lambda \right)   \end{align}$$
 
 $$when \space \lambda = 0, \space det\left(A\right) = \lambda_1 \lambda_2 \cdots  \lambda_n $$
+
+#### Diagonalization
+
+why Diagonal matrix useful?
+- Determiant = diagonal的乘积
+- eigenvalues 就是每个diagonal上(对角线上)的数
+- eigenvalue 是unit vector
+- power of matrix 就是diagonal上数的数power 
+  
+$$A = \begin{bmatrix} 3&0 \\ 0&7 \end{bmatrix}, det\left( A\right) = 3*7 = 21, eigenvalues = 3,7, A^k = \begin{bmatrix} 3^k &0 \\ 0&7^k \end{bmatrix}$$
+
+__Diagonalization__: Suppose the n by n matrix A has n linearly independent eigenvectors $$x_1, \cdots, x_n$$. Put them into the columns of an __eigenvector matrix X__. Then $$X^{-1}AX$$ is the __eigenvalue matrix__ $$\Lambda$$ (capital lambda)
+ 
+$$X^{-1}AX = \Lambda = \begin{bmatrix} \lambda_1 & & \\ & \vdots & \\ & &\lambda_n \end{bmatrix}, \space, $$A = X \Lambda X^{-1} $$$$ 
+
+$$AX= X \Lambda $$,  $$X \Lambda $$ 得到是每个eigenvector 乘以相应的eigenvalue 组成的matrix, 
+
 
 ```python
 import numpy as np
