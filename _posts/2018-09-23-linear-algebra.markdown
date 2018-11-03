@@ -329,7 +329,7 @@ suppose $$\lambda_1 , \lambda_2,  \cdots , \lambda_n$$ are the eigenvalues of A,
 
 $$\begin{align} det\left(A - \lambda  I \right) &= \left(-1\right)^n \left( \lambda - \lambda_1 \right)\left(\lambda - \lambda_2 \right) \cdots \left( \lambda - \lambda_n \right) \\ &= \left(\lambda_1 - \lambda \right)\left(\lambda_2 - \lambda \right) \cdots \left(\lambda_n - \lambda \right)   \end{align}$$
 
-$$when \space \lambda = 0, \space det\left(A) = \lambda_1 \lambda_2 \cdots  \lambda_n $$
+$$when \space \lambda = 0, \space det\left(A\right) = \lambda_1 \lambda_2 \cdots  \lambda_n $$
 
 ```python
 import numpy as np
