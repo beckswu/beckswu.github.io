@@ -428,7 +428,7 @@ $$x^T S x = x^T A^T A x = \left(A x \right)^T A x = Ax \cdot Ax = \| Ax \|^2 $$.
 4. $$x^T S x$$ is positive except at $$x = 0$$. This is the **energy-based** definition
 5. S equals $$A^TA$$ for a matrix A with independent columns
 
-E.g. Test symmetricmatrices S for positive definiteness:
+E.g. Test symmetric matrices S for positive definiteness:
 
 $$\begin{bmatrix} 2 & -1 & 0 \\ -1 & 2 & -1 \\ 0 & -1 & 2 \end{bmatrix}$$
 
