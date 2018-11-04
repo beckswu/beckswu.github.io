@@ -374,13 +374,12 @@ $$u_k = c_1 \left(\lambda_1\right)^k x_1 + \cdots + c_n \left(\lambda_n\right)^k
 
 #### Symmetric Matrices
 
-1. Every real symmetric S can be diagonalized : $$S = Q \Lambda Q^{-1} = Q \Lambda Q^T $$ with $$Q^{-1} = Q^T$$
+1. All real symmetric S can <span style="color: red">always</span> be diagonalized : $$S = Q \Lambda Q^{-1} = Q \Lambda Q^T $$ with $$Q^{-1} = Q^T$$, there are always enough eigenvectors to diagonalize $$S = S^T$$, even with repeated eigenvalues.
 2. A symmetric matrix S has n <span style="color: red">**real eigenvalues**</span> $$\lambda_i $$ and n <span style="color: red">orthonormal eigenvectors</span> $$q_1, \cdots, q_n$$
 3. row space is perpendicular to column space. As we know, null space should be perpendicular to row space, 因为symmetric, column space = row space,  $$A = A^T$$, so $$N\left( A \right)^{{\bot}} \space = C\left(A^T\right) = C\left(A \right) $$
 4. Every smmetric matrix has $$S = Q \Lambda Q^T = \lambda_1 q_1 q_1^T + \cdots + \lambda_n q_n q_n^T  $$
 5. For symmetric matrices the pivots and the eigenvalues have the same sign. (有几个正的pivot 就有几个正的eigenvalue) *For symetric matrices the pivots and the eigenvalues have the same signs*
-6. All symmetric matrices are diagonalizable, there are always enough eigenvectors to diagonalize $$S = S^T$$, even with repeated eigenvalues.
-7. Every square matrix can be "triangularized" by $$A = Q T Q^{-1}$$, if A = S, then $$T = \Lambda$$
+6. Every square matrix can be "triangularized" by $$A = Q T Q^{-1}$$, if A = S, then $$T = \Lambda$$
 
 prove(1): S is a symmetric matrix so we have $$S = S^T$$, aslo we know Eigenvalue matrix is symmetric $$\Lambda = \Lambda^T$$
 
