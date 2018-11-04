@@ -410,18 +410,18 @@ $$Symmetric \space diagonalization \space \space \space \space \space \bbox[yell
 
 #### Positive Definite Matrices
 
-1. For symmetric matrix :  all eigenvalues > 0 <=> all pivots > 0  <=> all upper left determinants > 0 (所有eigenvalue 大于0， pivot都大于0，determinant 大于0)
+1. For symmetric matrix :  all eigenvalues > 0 &nbsp; <=> &nbsp; all pivots > 0 &nbsp;  <=> &nbsp; all upper left determinants > 0 (所有eigenvalue 大于0， pivot都大于0，determinant 大于0)
 2. If S and T are symmetric positive definite, so is T+S. 
 3. For square matrix $$S = A^T A $$ is square and symmetric. <span style="color: red">If the columns of A are independent then S = $$A^TA$$ is positive definite</span>
 
 
 Prove (2):<br/>
-$$x^T \left( S + T \right) x = x^T s x + x^T T x $$ if those two terms are positive (for $$x \neq 0 $$) so $$S+T$$ is aslo positive definite.
+$$x^T \left( S + T \right) x = x^T S x + x^T T x $$ if those two terms are positive (for $$x \neq 0 $$) so $$S+T$$ is aslo positive definite.
 
 Prove (3): <br/>
 $$x^T S x = x^T A^T A x = \left(A x \right)^T A x = Ax \cdot Ax = \| Ax \|^2 $$. That vector $$A x \neq 0 $$ when $$x \neq 0 $$ (this is meaning of independent columns). Then $$x^T S x $$ is the positive number $$\| Ax \|^2$$ and matrix S is positive definite
 
-<span style="background-color: #FFFF00">验证matrix是positive definite</span>, when a symmetrix matrix S has one of these five properties, it has them all (任何一个正确，就可以说是positive definite)
+<span style="background-color: #FFFF00">__验证matrix是positive definite__</span>, when a symmetrix matrix S has one of these five properties, it has them all (任何一个正确，就可以说是positive definite)
 1. All **n pivots** of S are positive
 2. All **n upper left determinants** are positive (THe upper left determinants 是 左上角 1 by 1, 2 by 2, ... n by n matrix determinants)
 3. All **n eigenvalues** of S are positive
@@ -450,9 +450,9 @@ $$x^T S x = 2x_1^2 - 2x_1x_2 + 2x_2^2 - 2x_2x_3 + 2x_3^2 \space \space \space Re
 
 $$\|A_1 x \|^2 = x_1^2 + \left(x_2 - x_1 \right)^2 + \left(x_3 -x_2 \right)^2 + x_3^2  \space \space \space, Using \space differences \space in \space A_1$$ 
 
-$$ \|A_2 x \|^2 = 2 \left(x_1 - \frac{1}{2} x_2\right)^2 + \frac{3}{2} \left(x_2 - \frac{2}{3} x_3\right)^2 + \frac{4}{3} x_3^2 \space \space \space Using S = LDL^T  $$
+$$ \|A_2 x \|^2 = 2 \left(x_1 - \frac{1}{2} x_2\right)^2 + \frac{3}{2} \left(x_2 - \frac{2}{3} x_3\right)^2 + \frac{4}{3} x_3^2 \space \space \space Using \space S = LDL^T  $$
 
-$$  \|A_3 x \|^2 =\lambda_1\left(q_1^T x \right)^2 + \lambda_2\left(q_2^T x \right)^2 + \lambda_3\left(q_3^T x \right)^2 $$
+$$  \|A_3 x \|^2 =\lambda_1\left(q_1^T x \right)^2 + \lambda_2\left(q_2^T x \right)^2 + \lambda_3\left(q_3^T x \right)^2 \space \space \space Using S \space = Q\Lambda Q^T $$
 
 
 **Positive semidefinite matrices** have all $$\lambda \geq 0$$ and all $$x^T S x \geq 0$$. The upper left determinants are non-negative. $$S = A^TA$$ may have dependent columns in A. e.g.$$\begin{bmatrix} 1 & 2 \\ 2&4 \end{bmatrix} = \begin{bmatrix} 1 & 0 \\ 2&0 \end{bmatrix} \begin{bmatrix} 1 & 2 \\ 0&0 \end{bmatrix} $$
