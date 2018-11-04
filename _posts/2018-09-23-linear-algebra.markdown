@@ -374,7 +374,7 @@ $$u_k = c_1 \left(\lambda_1\right)^k x_1 + \cdots + c_n \left(\lambda_n\right)^k
 
 #### Symmetric Matrices
 
-1. All real symmetric S can <span style="color: red">always</span> be diagonalized : $$S = Q \Lambda Q^{-1} = Q \Lambda Q^T $$ with $$Q^{-1} = Q^T$$, there are always enough eigenvectors to diagonalize $$S = S^T$$, even with repeated eigenvalues.
+1. Every real symmetric S can <span style="color: red">always</span> be diagonalized : $$S = Q \Lambda Q^{-1} = Q \Lambda Q^T $$ with $$Q^{-1} = Q^T$$, there are always enough eigenvectors to diagonalize $$S = S^T$$, even with repeated eigenvalues.
 2. A symmetric matrix S has n <span style="color: red">**real eigenvalues**</span> $$\lambda_i $$ and n <span style="color: red">orthonormal eigenvectors</span> $$q_1, \cdots, q_n$$
 3. row space is perpendicular to column space. As we know, null space should be perpendicular to row space, 因为symmetric, column space = row space,  $$A = A^T$$, so $$N\left( A \right)^{{\bot}} \space = C\left(A^T\right) = C\left(A \right) $$
 4. Every smmetric matrix has $$S = Q \Lambda Q^T = \lambda_1 q_1 q_1^T + \cdots + \lambda_n q_n q_n^T  $$
@@ -387,9 +387,9 @@ $$S = Q\Lambda Q^{-1} \space  and  \space   S^T =  \left(Q\Lambda Q^{-1}\right)^
 
 根据orthogonal matrix 定义: Q is orthogonal matrix if $$Q^{-1} = Q^T$$, <span style="color: red">Eigenvector matrix Q becomes an orthogonal matrix Q</span>
 
-prove (2) Eigenvectors of a real symmetric matrix (when they correspond to different $$\lambda$$'s) are always perpendicular: Suppose $$Sx = \lambda_1x \$$ and $$Sy = \lambda_2 y \$$, we assume $$\lambda _1 \neq \lambda_2$$, we can use the fact $$S^T = S$$
+prove (2) Eigenvectors of a real symmetric matrix (when they correspond to different $$\lambda$$'s) are always perpendicular: Suppose $$Sx = \lambda_1x \$$ and $$Sy = \lambda_2 y \$$, we assume $$\lambda _1 \neq \lambda_2$$, we can use the fact $$S^T = S$$, Use dot product with two perpendicular vector is zero.
 
-$$ \left( \lambda_1 x \right)^T y = \left(Sx \right)^T y = x^T S^T y = x^T S y = x^T \lambda_2 y$$
+$$ \left( \lambda_1 x \right)^T y = x^T \lambda_1 y  = \left(Sx \right)^T y = x^T S^T y = x^T S y = x^T \lambda_2 y$$
 
 The left side is $$x^T \lambda_1 y$$ = right side $$x^T \lambda_2 y$$, 因为$$\lambda_1 \neq \lambda_2$$ => so $$x^T y = 0$$
 
