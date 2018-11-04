@@ -378,8 +378,8 @@ $$u_k = c_1 \left(\lambda_1\right)^k x_1 + \cdots + c_n \left(\lambda_n\right)^k
 2. A symmetric matrix S has n <span style="color: red">**real eigenvalues**</span> $$\lambda_i $$ and n <span style="color: red">orthonormal eigenvectors</span> $$q_1, \cdots, q_n$$
 3.  <span style="color: red">row space is perpendicular to column space</span>. As we know before, null space should be perpendicular to row space, 因为symmetric, column space = row space,  $$A = A^T$$, so $$N\left( A \right)^{\bot} \space = C\left(A^T\right) = C\left(A \right) $$
 4. Every smmetric matrix has $$S = Q \Lambda Q^T = \lambda_1 q_1 q_1^T + \cdots + \lambda_n q_n q_n^T  $$
-5. For symmetric matrices the pivots and the eigenvalues have the same sign. (有几个正的pivot 就有几个正的eigenvalue) *For symetric matrices the pivots and the eigenvalues have the same signs*
-6. Every square matrix can be "triangularized" by $$A = Q T Q^{-1}$$, if A = S, then $$T = \Lambda$$
+5. For symmetric matrices the pivots and the eigenvalues have the same sign (有几个正的pivot 就有几个正的eigenvalue). *For symmetric matrices the pivots and the eigenvalues have the same signs*
+6. Every square matrix can be "triangularized" by $$A = Q T Q^{-1}$$, if $$A = S$$, then $$T = \Lambda$$
 
 prove(1): S is a symmetric matrix so we have $$S = S^T$$, aslo we know Eigenvalue matrix is symmetric $$\Lambda = \Lambda^T$$
 
@@ -396,13 +396,13 @@ The left side is $$x^T \lambda_1 y$$ = right side $$x^T \lambda_2 y$$, 因为$$\
 prove(4): <br/>
 e.g. 2 by 2 symmetric matrix, we have $$S = \lambda_1 q_1 q_1^T + \lambda_2 q_2 q_2^T$$
 
-$$S = Q \Lambda  Q^T = \left[q_1 q_2 \right] \begin{bmatrix} \lambda_1 & \\ & \lambda_2 \end{bmatrix}  \begin{bmatrix} q_1^T \\ q_2^T \end{bmatrix}$$
+$$S = Q \Lambda  Q^T = \left[q_1, \space q_2 \right] \begin{bmatrix} \lambda_1 & \\ & \lambda_2 \end{bmatrix}  \begin{bmatrix} q_1^T \\ q_2^T \end{bmatrix}$$
 
 So if S is symmetric ( q's are orthonormal)  prove properties (4):
 
 $$Sq_i =\left( Q \Lambda Q^T \right) q_i = \left( \lambda_1 q_1 q_1^T + \cdots + \lambda_n q_n q_n^T \right) q_i = \lambda_i q_i$$
 
-(5):  Symmetric matrix: $$\begin{bmatrix} 1 & 3 \\ 3 & 1 \end{bmatrix}$$ has pivots 1 and -8 and eigenvalues 4 and -2
+(5):  Symmetric matrix: $$\begin{bmatrix} 1 & 3 \\ 3 & 1 \end{bmatrix}$$ has pivots 1 and -8 and eigenvalues 4 and -2, 一个positive pivot 和 一个positive eigenvalue, 一个negative pivot 和 一个negative eigenvalue
 
 (**Spectral Theorem**): Every symmetric matrix has the factorization $$S = Q \Lambda Q^T$$ with real eigenvalues in $$\Lambda $$ and orthonormal eigenvectors in the columns of Q: 
 
