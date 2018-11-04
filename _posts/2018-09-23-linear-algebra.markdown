@@ -382,11 +382,11 @@ $$u_k = c_1 \left(\lambda_1\right)^k x_1 + \cdots + c_n \left(\lambda_n\right)^k
 6. All symmetric matrices are diagonalizable, there are always enough eigenvectors to diagonalize $$S = S^T$$, even with repeated eigenvalues.
 7. Every square matrix can be "triangularized" by $$A = Q T Q^{-1}$$, if A = S, then $$T = \Lambda$$
 
-prove(1): S is a symmetric matrix so we have $$S = S^T$$
+prove(1): S is a symmetric matrix so we have $$S = S^T$$, aslo we know Eigenvalue matrix is symmetric $$\Lambda = \Lambda^T$$
 
-$$S = QAQ^{-1} \space  and  \space   S^T =  \left(QAQ^{-1}\right)^T = \left( Q^{-1}\right)^T A^T Q^T \space = QAQ^{-1}  => Q^{-1} = Q^T $$
+$$S = Q\Lambda Q^{-1} \space  and  \space   S^T =  \left(Q\Lambda Q^{-1}\right)^T = \left( Q^{-1}\right)^T \Lambda^T Q^T \space = Q\Lambda Q^{-1}  => Q^{-1} = Q^T $$
 
-根据orthogonal matrix 定义: Q is orthogonal matrix if $$Q^{-1} = Q^T$$, Eigenvector matrix Q becomes an orthogonal matrix Q
+根据orthogonal matrix 定义: Q is orthogonal matrix if $$Q^{-1} = Q^T$$, <span style="color: red">Eigenvector matrix Q becomes an orthogonal matrix Q</span>
 
 prove (2) Eigenvectors of a real symmetric matrix (when they correspond to different $$\lambda$$'s) are always perpendicular: Suppose $$Sx = \lambda_1x \$$ and $$Sy = \lambda_2 y \$$, we assume $$\lambda _1 \neq \lambda_2$$, we can use the fact $$S^T = S$$
 
@@ -409,6 +409,7 @@ $$Sq_i =\left( Q \Lambda Q^T \right) q_i = \left( \lambda_1 q_1 q_1^T + \cdots +
 
 $$Symmetric \space diagonalization \space \space \space \space \space \bbox[yellow]{ S = Q \Lambda Q^{-1} = Q \Lambda Q^T \space \space Q^{-1} = Q^T } $$
 
+<br/><br/>
 ```python
 import numpy as np
 #calculate inverse
