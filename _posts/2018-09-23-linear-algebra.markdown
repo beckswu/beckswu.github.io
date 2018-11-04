@@ -372,6 +372,22 @@ Application: Fibonacci number, $$u_{k+1} = Au_{k}, where A = \begin{bmatrix} 1 &
 
 $$u_k = c_1 \left(\lambda_1\right)^k x_1 + \cdots + c_n \left(\lambda_n\right)^k x_n \space \space provided  \space \space u_0 = c_1x+1 + \cdots + c_nx_n$$
 
+#### Symmetric Matrices
+
+- Every real symmetric S can be diagonalized : $$S = Q \Lambda Q^{-1} = Q \Lambda Q^T $$ with $$Q^{-1} = Q^T$$
+- A symmetric matrix S has n <span style="color: red">**real eigenvalues**</span> $$\lambda_i $$ and n <span style="color: red">orthonormal eigenvectors</span> $$q_1, \cdots, q_n$$
+- row space is perpendicular to column space. As we know, null space should perpendicular to row space, 因为symmetric $$A = A^T$$, so $$N\left( A \right)^{{\bot}} = C\left(A^T\right) = C\left(A \right) $$
+
+prove: S is a symmetric matrix so $$S = S^T$$
+
+$$S = QAQ^{-1} \space  and  \space   Q^T =  \left(QAQ^{-1}\right)^T = \left( Q^{-1}\right)^T A^T Q^T \space => Q^{-1} = Q^T $$
+
+根据orthogonal matrix 定义: Q is orthogonal matrix if $$Q^{-1} = Q^T$$, Eigenvector matrix Q becomes an orthogonal matrix Q
+
+(**Spectral Theorem**): Every symmetric matrix has the factorization $$S = Q \Lambda Q^T$$ with real eigenvalues in $$\Lambda $$ and orthonormal eigenvectors in the columns of Q: 
+
+$$Symmetric \space diagonalization \space \space \space \space \space \bbox[yellow]{ S = Q \Lambda Q^{-1} = Q \Lambda Q^T \space \space Q^{-1} = Q^T } $$
+
 ```python
 import numpy as np
 #calculate inverse
