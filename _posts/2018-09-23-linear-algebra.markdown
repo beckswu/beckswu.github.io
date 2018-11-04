@@ -374,15 +374,36 @@ $$u_k = c_1 \left(\lambda_1\right)^k x_1 + \cdots + c_n \left(\lambda_n\right)^k
 
 #### Symmetric Matrices
 
-- Every real symmetric S can be diagonalized : $$S = Q \Lambda Q^{-1} = Q \Lambda Q^T $$ with $$Q^{-1} = Q^T$$
-- A symmetric matrix S has n <span style="color: red">**real eigenvalues**</span> $$\lambda_i $$ and n <span style="color: red">orthonormal eigenvectors</span> $$q_1, \cdots, q_n$$
-- row space is perpendicular to column space. As we know, null space should perpendicular to row space, 因为symmetric $$A = A^T$$, so $$N\left( A \right)^{{\bot}} = C\left(A^T\right) = C\left(A \right) $$
+1. Every real symmetric S can be diagonalized : $$S = Q \Lambda Q^{-1} = Q \Lambda Q^T $$ with $$Q^{-1} = Q^T$$
+2. A symmetric matrix S has n <span style="color: red">**real eigenvalues**</span> $$\lambda_i $$ and n <span style="color: red">orthonormal eigenvectors</span> $$q_1, \cdots, q_n$$
+3. row space is perpendicular to column space. As we know, null space should be perpendicular to row space, 因为symmetric, column space = row space,  $$A = A^T$$, so $$N\left( A \right)^{{\bot}} \space = C\left(A^T\right) = C\left(A \right) $$
+4. Every smmetric matrix has $$S = Q \Lambda Q^T = \lambda_1 q_1 q_1^T + \cdots + \lambda_n q_n q_n^T  $$
+5. For symmetric matrices the pivots and the eigenvalues have the same sign. (有几个正的pivot 就有几个正的eigenvalue) *For symetric matrices the pivots and the eigenvalues have the same signs*
+6. All symmetric matrices are diagonalizable, there are always enough eigenvectors to diagonalize $$S = S^T$$, even with repeated eigenvalues.
+7. Every square matrix can be "triangularized" by $$A = Q T Q^{-1}$$, if A = S, then $$T = \Lambda$$
 
-prove: S is a symmetric matrix so $$S = S^T$$
+prove(1): S is a symmetric matrix so we have $$S = S^T$$
 
-$$S = QAQ^{-1} \space  and  \space   Q^T =  \left(QAQ^{-1}\right)^T = \left( Q^{-1}\right)^T A^T Q^T \space => Q^{-1} = Q^T $$
+$$S = QAQ^{-1} \space  and  \space   S^T =  \left(QAQ^{-1}\right)^T = \left( Q^{-1}\right)^T A^T Q^T \space = QAQ^{-1}  => Q^{-1} = Q^T $$
 
 根据orthogonal matrix 定义: Q is orthogonal matrix if $$Q^{-1} = Q^T$$, Eigenvector matrix Q becomes an orthogonal matrix Q
+
+prove (2) Eigenvectors of a real symmetric matrix (when they correspond to different $$\lambda$$'s) are always perpendicular: Suppose $$Sx = \lambda_1x \$$ and $$Sy = \lambda_2 y \$$, we assume $$\lambda _1 \neq \lambda_2$$, we can use the fact $$S^T = S$$
+
+$$ \left( \lambda_1 x \right)^T y = \left(Sx \right)^T y = x^T S^T y = x^T S y = x^T \lambda_2 y$$
+
+The left side is $$x^T \lambda_1 y$$ = right side $$x^T \lambda_2 y$$, 因为$$\lambda_1 \neq \lambda_2$$ => so $$x^T y = 0$$
+
+prove(4): <br/>
+e.g. 2 by 2 symmetric matrix, we have $$S = \lambda_1 q_1 q_1^T + \lambda_2 q_2 q_2^T$$
+
+$$S = Q \Lambda  Q^T = \left[q_1 q_2 \]righ \begin{bmatrix} \lambda_1 & \\ & \lambda_2 \end {bmatrix}  \begin{bmatrix} q_1^T \\ q_2^T \end {bmatrix}$$
+
+So if S is symmetric ( q's are orthonormal)  prove properties (4):
+
+$$Sq_i =\left( Q \Lambda Q^T \right) q_i = left(\lambda_1 q_1 q_1^T + \cdots + \lambda_n q_n q_n^T \right) q_i = \lambda_i q_i$$
+
+(5):  Symmetric matrix: $$\begin{bmatrix} 1 & 3 \\ 3 & 1 \end{bmatrix}$$ has pivots 1 and -8 and eigenvalues 4 and -2
 
 (**Spectral Theorem**): Every symmetric matrix has the factorization $$S = Q \Lambda Q^T$$ with real eigenvalues in $$\Lambda $$ and orthonormal eigenvectors in the columns of Q: 
 
