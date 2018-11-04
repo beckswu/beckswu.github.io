@@ -397,11 +397,11 @@ The left side is $$x^T \lambda_1 y$$ = right side $$x^T \lambda_2 y$$, 因为$$\
 prove(4): <br/>
 e.g. 2 by 2 symmetric matrix, we have $$S = \lambda_1 q_1 q_1^T + \lambda_2 q_2 q_2^T$$
 
-$$S = Q \Lambda  Q^T = \left[q_1 q_2 \]righ \begin{bmatrix} \lambda_1 & \\ & \lambda_2 \end {bmatrix}  \begin{bmatrix} q_1^T \\ q_2^T \end {bmatrix}$$
+$$S = Q \Lambda  Q^T = \left[q_1 q_2 \right] \begin{bmatrix} \lambda_1 & \\ & \lambda_2 \end{bmatrix}  \begin{bmatrix} q_1^T \\ q_2^T \end{bmatrix}$$
 
 So if S is symmetric ( q's are orthonormal)  prove properties (4):
 
-$$Sq_i =\left( Q \Lambda Q^T \right) q_i = left(\lambda_1 q_1 q_1^T + \cdots + \lambda_n q_n q_n^T \right) q_i = \lambda_i q_i$$
+$$Sq_i =\left( Q \Lambda Q^T \right) q_i = \left( \lambda_1 q_1 q_1^T + \cdots + \lambda_n q_n q_n^T \right) q_i = \lambda_i q_i$$
 
 (5):  Symmetric matrix: $$\begin{bmatrix} 1 & 3 \\ 3 & 1 \end{bmatrix}$$ has pivots 1 and -8 and eigenvalues 4 and -2
 
