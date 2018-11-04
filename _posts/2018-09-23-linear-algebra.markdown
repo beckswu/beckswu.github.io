@@ -408,6 +408,56 @@ $$Sq_i =\left( Q \Lambda Q^T \right) q_i = \left( \lambda_1 q_1 q_1^T + \cdots +
 
 $$Symmetric \space diagonalization \space \space \space \space \space \bbox[yellow]{ S = Q \Lambda Q^{-1} = Q \Lambda Q^T \space \space Q^{-1} = Q^T } $$
 
+#### Positive Definite Matrices
+
+1. For symmetric matrix :  all eigenvalues > 0 <=> all pivots > 0  <=> all upper left determinants > 0 (所有eigenvalue 大于0， pivot都大于0，determinant 大于0)
+2. If S and T are symmetric positive definite, so is T+S. 
+3. For square matrix $$S = A^T A $$ is square and symmetric. <span style="color: red">If the columns of A are independent then S = $$A^TA$$ is positive definit</span>
+
+
+Prove (2):<br/>
+$$x^T \left( S + T \right) x = x^T s x + x^T T x $$ if those two terms are positive (for $$x \neq 0 $$) so $$S+T$$ is aslo positive definite.
+
+Prove (3): <br/>
+$$x^T S x = x^T A^T A x = \left(A x \right)^T A x = Ax \cdot Ax = \| Ax \|^2 $$. The vector $$A x \neq 0 $$ when $$x \neq 0 $$ (this is meaning of independent columns). Then $$x^T S x $$ is the positive number $$\| Ax \|^2$$ and matrix S is positive definite
+
+when a symmetrix matrix S has one of these five properties, it has them all (任何一个正确，就可以说是positive definite)
+1. All **n pivots** of S are positive
+2. All **n upper left determinants** are positive (THe upper left determinants 是 1 by 1, 2 by 2, ... n by n matrix determinants)
+3. All **n eigenvalues** of S are positive
+4. $$x^T S x$$ is positive except at $$x = 0$$. This is the **energy-based** definition
+5. S equals $$A^TA$$ for a matrix A with independent columns
+
+E.g. Test symmetricmatrices S for positive definiteness:
+
+$$\begin{bmatrix} 2 & -1 & 0 \\ -1 & 2 & -1 \\ 0 & -1 & 2 \end{bmatrix}$$
+
+The pivots of S are 2 and $$\frac{2}{3}$$ and $$\frac{4}{3}$$ all positive. Its upper left determintes are 2, 3, 4 are all positive. The eigenvalues of S are $$ 2- \sqrt{2} $$ and $$2 + \sqrt{2}$$ all positive. That completes tests 1, 2, 3. Any one test is decisive!<br/> 
+We also have $$A_1, A_2, A_3$$ suggest for $$S = A^TA$$
+
+$$S = A_1^T A_1  \space \space \begin{bmatrix} 2 & -1 & 0 \\ -1 & 2 & -1 \\ 0 & -1 & 2 \end{bmatrix} = \begin{bmatrix} 1 & -1 & 0 & 0 \\ 0 & 1 & -1 & 0 \\ 0 & 0 & 1 & -1 \end{bmatrix} \begin{bmatrix} 1 & 0 & 0 \\ -1 & 1 & 0 \\ 0 & -1 & 1 \\ 0 & 0 & -1 \end{bmatrix} $$ 
+
+The three columsn of $$A_1$$ are independent, Therefore S is positive definite. <br/>
+$$A_2$$ comes from $$S = LDL^T$$(the symmetric version of S = LU). Elimination gives the pivots $$2, \frac{3}{2}, \frac{4}{3}$$ in D and the multipliers $$-\frac{1}{2}, 0 , -\frac{2}{3}$$ in L. Just put $$A_2 = L \sqrt{D}$$, $$A_2$$ are also called Cholesky factor of S
+
+$$L D L^T = \begin{bmatrix} 1 &  &  \\ -\frac{1}{2} & 1 &  \\ 0 & -\frac{2}{3} & 1 \end{bmatrix}  \begin{bmatrix} 2 &  &  \\  & \frac{3}{2} &  \\  &  & \frac{4}{3} \end{bmatrix} \begin{bmatrix} 1 & -\frac{1}{2} & 0 \\  & 1 & -\frac{2}{3} \\  &  & 1 \end{bmatrix} =  \left(L \sqrt{D} \right) \left(L \sqrt{D} \right)^T = A_2^T A_2 $$
+
+Eigenvalues give the symmetric choice $$A_3 = Q \sqrt{\Lambda} Q^T $$. This is also successful with $$A_3^T A_3 = Q \Lambda Q^T = S$$. All tests whow that matrix S is positive definite
+
+To see that the enery $x^TSx$$ is positive, we can write it as sum of square. 
+
+$$x^T S x = 2x_1^2 - 2x_1x_2 + 2x_2^2 - 2x_2x_3 + 2x_3^2 \space \space \space Rewrite \space with \space squares$$
+
+$\|A_1 x \|^2 = x_1^2 + \left(x_2 - x_1 \right)^2 + \left(x_3 -x_2 \right)^2 + x_3^2  \space \space \space, Using \space differences \space in \space A_1$$ 
+
+$$ \|A_2 x \|^2 = 2 \left(x_1 - \frac{1}{2} x_2\right)^2 + \frac{3}{2} \left(x_2 - \frac{2}{3} x_3\right)^2 + \frac{4}{3} x_3^2 \space \space \space Using S = LDL^T  $$
+
+$$  \|A_3 x \|^2 =\lambda_1\left(q_1^T x)^2 + \lambda_2\left(q_2^T x)^2 + \lambda_3\left(q_3^T x)^2 $$
+
+
+
+
+
 <br/><br/>
 ```python
 import numpy as np
