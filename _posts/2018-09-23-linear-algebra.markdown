@@ -409,10 +409,11 @@ $$Sq_i =\left( Q \Lambda Q^T \right) q_i = \left( \lambda_1 q_1 q_1^T + \cdots +
 $$Symmetric \space diagonalization \space \space \space \space \space \bbox[yellow]{ S = Q \Lambda Q^{-1} = Q \Lambda Q^T \space \space Q^{-1} = Q^T } $$
 
 #### Positive Definite Matrices
-
-1. For symmetric matrix :  <span style="color: red">all eigenvalues > 0 &nbsp; <=> &nbsp; all pivots > 0 &nbsp;  <=> &nbsp; all upper left determinants > 0 (所有eigenvalue 大于0， pivot都大于0，determinant 大于0)</span>
+1. The matrix S is  <span style="color: red">**positive definite**</span> if the energy test is $$x^TSx > 0$$ for all vectors $$x \neq 0$$
 2. If S and T are symmetric positive definite, so is T+S. 
 3. For square matrix $$S = A^T A $$ is square and symmetric. <span style="color: red">If the columns of A are independent then S = $$A^TA$$ is positive definite</span>
+4. For symmetric matrix :  <span style="color: red">all eigenvalues > 0 &nbsp; <=> &nbsp; all pivots > 0 &nbsp;  <=> &nbsp; all upper left determinants > 0 (所有eigenvalue 大于0， pivot都大于0，determinant 大于0)</span>
+5. Positive semidefinite S allows $$\lambda = 0$$, pivot = 0, determinant = 0, and energy $$x^T S x = 0$$
 
 
 Prove (2):<br/>
