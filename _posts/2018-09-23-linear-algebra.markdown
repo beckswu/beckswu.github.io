@@ -444,7 +444,7 @@ $$L D L^T = \begin{bmatrix} 1 &  &  \\ -\frac{1}{2} & 1 &  \\ 0 & -\frac{2}{3} &
 
 Eigenvalues give the symmetric choice $$A_3 = Q \sqrt{\Lambda} Q^T $$. This is also successful with $$A_3^T A_3 = Q \Lambda Q^T = S$$. All tests show that matrix S is positive definite
 
-To see that the enery $x^TSx$$ is positive, we can write it as sum of square. 
+To see that the enery $$x^TSx$$ is positive, we can write it as sum of square. 
 
 $$x^T S x = 2x_1^2 - 2x_1x_2 + 2x_2^2 - 2x_2x_3 + 2x_3^2 \space \space \space Rewrite \space with \space squares$$
 
