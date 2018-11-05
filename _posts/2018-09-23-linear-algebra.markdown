@@ -205,9 +205,11 @@ __Not Communicative__: $$AB \neq BA $$
 
 1. A is n by n nonsingular matrix. A = LU where L and U are triangular matrices. 
 2. <span style="color: red">U is a upper triangular matrix with the pivots on its diagonal</span> . Gaussian Elmination is from A to U.
-3. <span style="color: red">L is lower triangular matrix. The entries of L are exactly the multiplier $$l_{ij}$$ - which multiplied the pivot row j when it was subtracted from row i</span> （Gaussian elimination 第i行 -= $$l_{ij}$$第j行, 从reduced form to A, 第i行 += $$l_{ij}$$第j行). 
+3. <span style="color: red">L is lower triangular matrix. The entries of L are exactly the multiplier $$l_{ij}$$ - 表示 Gaussian elimination 第i行 -= $$l_{ij}$$第j行, 从reduced form to A, 第i行 += $$l_{ij}$$第j行. 
 4. Every inverse matrix $$E^{-1}$$ is lower triangular. $$E_{ij}$$ 表示 j 行 += $$E_{ij}$$i 行 to make ij entry as zero *The lower triangular product of inverse is L*. <span style="color: red"> Every $$E^{-1}$$ has 1 down its diagonal </span>
 5. If U diagonal is 1, then we can write $$A = LU \space \space or \space \space A = LDU$$  <span style="color: red"> where D is diagonal matrix contains pivot and U has 1 on the diagonal </span>
+6. Solve $$Ax = LUx = b $$ can be solve by two step: $$Lc = b$$ (foward) then solve $$Ux = c$$ (backword)
+   - before we augment to $$\left[A b \right]$$, but most computer codes keep two sides seprate. The memory of elimination is held in L and U, to process b whenever we want to.
 
 e.g. $$A = \begin{bmatrix} 2 & 1 \\ 6 & 8 \end{bmatrix}$$
 
@@ -221,7 +223,7 @@ $$Row \space 3 \space of \space A = \left(Row \space 3 \space of \space U \right
 
 $$ Row \space 1 \space of \space U = Row \space 1 \space of \space A $$
 
-Gaussian Elimination 每一步从A 到 U 是乘以 matrix $$E_{ij}$$ to produce zero in (i,j) position, 3 by 3 matrix  $$\left(E_{32} E_{31} E_{21} \right) A = U $$ becomes $$A = \left(E_{21}^{-1} E_{31}^{-1} E_{32}^{-1} \right) U $$ 
+Gaussian Elimination 每一步从A 到 U 是乘以 matrix $$E_{ij}$$ to produce zero in (i,j) position, 3 by 3 matrix  $$\left(E_{32} E_{31} E_{21} \right) A = U $$ and $$A = \left(E_{21}^{-1} E_{31}^{-1} E_{32}^{-1} \right) U $$ 
 
 show (3) e.g. Elimination subtracts $$\frac{1}{2}$$ times row 1 from row 2. The last step substract $$\frac{2}{3}$$ times row 2 from 3. The (3,1) multiplier is zero because the (3,1) Entry in A is zero. No operation needed
 
