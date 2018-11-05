@@ -390,7 +390,7 @@ properties:
 - Power of A: $$A^k = X \Lambda X^{-1} \space X \Lambda X^{-1} \cdots X \Lambda X^{-1}  = X \Lambda^k X^{-1} $$
 - Matrix X has inverse, beacuse coumns were assumed to be linearly independent. <span style="color: red">Without n independent eigenvectors, we can't diagonalize</span>
 - <span style="background-color: #FFFF00">$$A$$ and $$\Lambda$$ have the same eigenvalues $$\lambda_1, \lambda_2, \cdots, \lambda_n$$</span>, The eigenvectors are different.
-    - Suppose the eigenvalues $$\lambda_1, \cdots, \lambda_n$$ are all <span style="color: red">differeent</span>. Then it is automatic that the eigenvectors $$x_1,\cdots, x_n$$ are <span style="color: red">independent</span>. <span style="color: red">The eigenvector matrix X will be invertile</span>. <span style="background-color: #FFFF00">*Any matrix that has no repeated eigenvalues can be diagonalized, An n by n matrix that has n different eigenvalues must be diagonalizable*</span>.
+    - Suppose the eigenvalues $$\lambda_1, \cdots, \lambda_n$$ are all <span style="color: red">different</span>. Then it is automatic that the eigenvectors $$x_1,\cdots, x_n$$ are <span style="color: red">independent</span>. <span style="color: red">The eigenvector matrix X will be invertile</span>. <span style="background-color: #FFFF00">*Any matrix that has no repeated eigenvalues can be diagonalized, An n by n matrix that has n different eigenvalues must be diagonalizable*</span>.
     - All the matrices $$A = B^{-1}CB $$ are *similar*. <span style="background-color: #FFFF00">They all share the eigenvalues of C</span>
 - if all $$\mid \lambda \mid < 1$$, then $$A^k $$ -> zero matrix
 
