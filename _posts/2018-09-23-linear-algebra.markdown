@@ -371,7 +371,7 @@ why Diagonal matrix useful?
   
 $$A = \begin{bmatrix} 3&0 \\ 0&7 \end{bmatrix}, det\left( A\right) = 3*7 = 21, eigenvalues = 3,7, A^k = \begin{bmatrix} 3^k &0 \\ 0&7^k \end{bmatrix}$$
 
-__Diagonalization__: Suppose the n by n matrix A has n linearly independent eigenvectors $$x_1, \cdots, x_n$$. Put them into the columns of an __eigenvector matrix X__. Then $$X^{-1}AX$$ is the __eigenvalue matrix__ $$\Lambda$$ (capital lambda)
+__Diagonalization__: Suppose the n by n matrix A has __n linearly independent eigenvectors__ $$x_1, \cdots, x_n$$. Put them into the columns of an __eigenvector matrix X__. Then $$X^{-1}AX$$ is the __eigenvalue matrix__ $$\Lambda$$ (capital lambda)
  
 $$X^{-1}AX = \Lambda = \begin{bmatrix} \lambda_1 & & \\ & \ddots & \\ & &\lambda_n \end{bmatrix}, \space A = X \Lambda X^{-1} $$
 
