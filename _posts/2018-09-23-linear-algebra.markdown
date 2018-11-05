@@ -215,9 +215,11 @@ $$Forward \space from \space A \space to \space U  \space \space E_{21}A = \begi
 
 $$Back \space from \space U \space to \space A  \space \space E_{21}^{-1} A = \begin{bmatrix} 1 & 0 \\ 3 & 1 \end{bmatrix} \begin{bmatrix} 2 & 1 \\ 0 & 5 \end{bmatrix} = \begin{bmatrix} 2 & 1 \\ 6 & 8 \end{bmatrix}  = A$$
 
-$$Row \space 3 \space of \space U = \left(Row \space 3 \space of \space A \right) - l_{31}\left(Row \space 1 \space of \space U \right) - l_{32} \left(Row \space 2 \space of \space U \right) \space \space \left(Row \space 1 \space of \space U \right) = \left(Row \space 1 \space of \space A \right)$$
+$$Row \space 3 \space of \space U = \left(Row \space 3 \space of \space A \right) - l_{31}\left(Row \space 1 \space of \space U \right) - l_{32} \left(Row \space 2 \space of \space U \right) $$
 
 $$Row \space 3 \space of \space A = \left(Row \space 3 \space of \space U \right) + l_{31}\left(Row \space 1 \space of \space U \right) - l_{32} \left(Row \space 2 \space of \space U \right)$$
+
+$$ Row \space 1 \space of \space U = Row \space 1 \space of \space A $$
 
 Gaussian Elimination 每一步从A 到 U 是乘以 matrix $$E_{ij}$$ to produce zero in (i,j) position, 3 by 3 matrix  $$\left(E_{32} E_{31} E_{21} \right) A = U $$ becomes $$A = \left(E_{21}^{-1} E_{31}^{-1} E_{32}^{-1} \right) U $$ 
 
