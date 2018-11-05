@@ -215,7 +215,7 @@ $$Forward \space from \space A \space to \space U  \space \space E_{21}A = \begi
 
 $$Back \space from \space U \space to \space A  \space \space E_{21}^{-1} A = \begin{bmatrix} 1 & 0 \\ 3 & 1 \end{bmatrix} \begin{bmatrix} 2 & 1 \\ 0 & 5 \end{bmatrix} = \begin{bmatrix} 2 & 1 \\ 6 & 8 \end{bmatrix}  = A$$
 
-$$Row \space 3 \space of \space U = \left(Row \space 3 \space of \space A \right) - l_{31}\left(Row \space 1 \space of \space U \right) - l_{32} \left(Row \space 2 \space of \space U \right) \space \space left(Row \space 1 \space of \space U \right) = \left(Row \space 1 \space of \space A \right)$$
+$$Row \space 3 \space of \space U = \left(Row \space 3 \space of \space A \right) - l_{31}\left(Row \space 1 \space of \space U \right) - l_{32} \left(Row \space 2 \space of \space U \right) \space \space \left(Row \space 1 \space of \space U \right) = \left(Row \space 1 \space of \space A \right)$$
 
 $$Row \space 3 \space of \space A = \left(Row \space 3 \space of \space U \right) + l_{31}\left(Row \space 1 \space of \space U \right) - l_{32} \left(Row \space 2 \space of \space U \right)$$
 
