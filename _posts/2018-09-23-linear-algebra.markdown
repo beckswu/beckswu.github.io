@@ -397,7 +397,7 @@ properties:
 Let A and C be n by n matrices. We say that A is __similar__ to C if there is an invertible n by n matrix B such that $$A = B^{-1}CB $$, <span style="color: red">C may not be diagonal</span>
 
 
-prove if A and C are similar, they share the same eigenvalues: suppose $$Cx =\lambda x$$, then $$A = BCB^-1$$ has the eigenvalue $$\lambda $$ with the new eigenvector Bx: 
+prove if A and C are similar, they share the same eigenvalues: suppose $$Cx =\lambda x$$, then $$A = BCB^{-1}$$ has the eigenvalue $$\lambda $$ with the new eigenvector Bx: 
 
 $$A\left( Bx\right) =\left( BCB^{-1} \right) \left( Bx\right) = BCx = B\lambda x = \lambda \left( Bx\right) $$
 
