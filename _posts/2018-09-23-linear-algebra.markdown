@@ -519,11 +519,11 @@ For any Matrix A, can always found two orthogonal matrix(orthornomal) U and T an
 
 We first choose two orthonormal vectors $$\vec v_1, \vec v_2$$, 通过A的linear transformation, 变成another two orthogonal vectors $$A \vec v_1, A \vec v_2$$, then we choose another two orthonormal vectors $$\vec u_1, \vec u_2$$ (unit length) on the direction of $$A \vec v_1, A \vec v_2$$, then we have $$A \vec v_1 = \sigma_1 \vec u_1; \space A \vec v_2 = \sigma_2 \vec u_2 $$
 
-$$In \space left \space graph, \space  x = \frac{\left(\vec v_1 \cdot \vec x \right)}{\|\vec v_1 \|^2} \vec v_1 + \frac{\left(\vec v_2 \cdot \vec x \right)}{\|\vec v_2 \|^2}\vec v_2 =  \left(\vec v_1 \cdot \vec x \right) \vec v_1 + \left(\vec v_2 \cdot \vec x \right) \vec v_2  $$
+$$In \space left \space graph, \space  x = \frac{\left( v_1 \cdot  x \right)}{\| v_1 \|^2}  v_1 + \frac{\left( v_2 \cdot  x \right)}{\| v_2 \|^2} v_2 =  \left(\vec v_1 \cdot  x \right)  v_1 + \left( v_2 \cdot x \right)  v_2  $$
 
-$$Then \space multiply \space A \space A x =  \left( \vec v_1 \cdot \vec x \right) A \vec v_1 + \left(\vec v_2 \cdot \vec x \right) A \vec v_2  $$
+$$Then \space multiply \space A \space A x =  \left( v_1 \cdot x \right) A  v_1 + \left( v_2 \cdot  x \right) A  v_2  $$
 
-$$ A x =  \left(\vec v_1 \cdot \vec x \right) \sigma_1 \vec u_1 + \left(\vec v_2 \cdot \vec x \right) \sigma_2 \vec u_2  $$
+$$ A x =  \left( v_1 \cdot x \right) \sigma_1  u_1 + \left( v_2 \cdot x \right) \sigma_2  u_2  $$
 
 $$ A x =  u_1 \sigma_1 v_1^T x + u_2 \sigma_2 v_2^T x $$
 
