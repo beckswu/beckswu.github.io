@@ -513,7 +513,7 @@ For any Matrix A, can always found two orthogonal matrix(orthornomal) U and T an
 
 几何意义: 
 
-以 2 by 2 matrix 为例, SVD 可以在 2 x 2 matrix上的几何意思是主要讲两个orthonormal vectors 通过矩阵分解 变成成另一个 二维空间下orthornormal vectors
+以 2 by 2 matrix 为例, SVD 可以在 2 x 2 matrix上的几何意思是主要将两个orthonormal vectors 通过矩阵分解 变成成另一个 二维空间下两个orthornormal vectors
 
 ![](\img\post\Linear-Algebra\pic11.png)
 
