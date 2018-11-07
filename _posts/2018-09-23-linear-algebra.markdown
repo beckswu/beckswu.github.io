@@ -447,13 +447,17 @@ $$Symmetric \space diagonalization \space \space \space \space \space \bbox[yell
 3. For square matrix $$S = A^T A $$ is square and symmetric. <span style="color: red">If the columns of A are independent then S = $$A^TA$$ is positive definite</span>
 4. For symmetric matrix :  <span style="color: red">all eigenvalues > 0 &nbsp; <=> &nbsp; all pivots > 0 &nbsp;  <=> &nbsp; all upper left determinants > 0 (所有eigenvalue 大于0， pivot都大于0，determinant 大于0)</span>
 5. Positive semidefinite S allows $$\lambda = 0$$, pivot = 0, determinant = 0, and energy $$x^T S x = 0$$
-
+6. $$A^TA$$ at least Positive semi-definite for any matrix
 
 Prove (2):<br/>
 $$x^T \left( S + T \right) x = x^T S x + x^T T x $$ if those two terms are positive (for $$x \neq 0 $$) so $$S+T$$ is aslo positive definite.
 
 Prove (3): <br/>
 $$x^T S x = x^T A^T A x = \left(A x \right)^T A x = Ax \cdot Ax = \| Ax \|^2 $$. That vector $$A x \neq 0 $$ when $$x \neq 0 $$ (this is meaning of independent columns). Then $$x^T S x $$ is the positive number $$\| Ax \|^2$$ and matrix S is positive definite
+
+Prove (6): 利用SVD ($$U,V是orthonormal basis组成的matrix$$)<br/>
+$$A^TA = \left(U \Sigma V^T \right)^T U \Sigma V^T = V \Sigma U^T U \Sigma V^T = V \Sigma^2 V^T$$
+
 
 <span style="background-color: #FFFF00">__验证matrix是positive definite__</span>, when a symmetrix matrix S has one of these five properties, it has them all (任何一个正确，就可以说是positive definite)
 1. All **n pivots** of S are positive
@@ -491,11 +495,19 @@ $$  \|A_3 x \|^2 =\lambda_1\left(q_1^T x \right)^2 + \lambda_2\left(q_2^T x \rig
 
 **Positive semidefinite matrices** have all $$\lambda \geq 0$$ and all $$x^T S x \geq 0$$. The upper left determinants are non-negative. $$S = A^TA$$ may have dependent columns in A. e.g.$$\begin{bmatrix} 1 & 2 \\ 2&4 \end{bmatrix} = \begin{bmatrix} 1 & 0 \\ 2&0 \end{bmatrix} \begin{bmatrix} 1 & 2 \\ 0&0 \end{bmatrix} $$
 
+
+
 ## Singular Value Decomposition
 
 problem with Diagonalization ($$A = X\Lambda X^{-1}$$): 1. eigenvector matrix is not orthogonal. 2. Eigenvector matrix are usually not orthogonal. 3. There are not always enough eigenvectors 4. $$Ax = \lambda x$$ requires A to be a square matrix
 
 $$A = U\Sigma V^T$$
+
+Goal: Orthogonal basis in row space (unit vector v) $$R^n$$ to Orthogonal basis in column space (unit vector u)  $$R^m$$
+
+$$ A v_1 = \sigma_1 u_1,  A v_2 = \sigma_1 u_1$$
+
+利用$$A^TA$$ is symmetric matrix的性质
 
 
 <br/><br/>
