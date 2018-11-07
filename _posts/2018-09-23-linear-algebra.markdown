@@ -507,13 +507,13 @@ problem with Diagonalization ($$A = X\Lambda X^{-1}$$):
 3. There are not always enough eigenvectors 
 4. $$Ax = \lambda x$$ requires A to be a square matrix
 
-$$A = U\Sigma V^T $$
+$$A = U\Sigma V^T = u_1\sigma_1 v_1^T + \cdots + u_r\sigma_r v_r^T$$
 
 For any Matrix A, can always found two orthogonal matrix(orthornomal) U (m by m matrix) and V(n by n matrix) and diagonal matrix $$\Sigma$$ (m by n matrix) where U's is called **left singular vectors** (unit eigenvectors of $$AA^T$$) and V's are called **right singular vectors**(unit eigenvectors of $$A^TA$$), The $$\sigma$$'s are called **singular values** (square roots of the equal eigenvalues of $$AA^T$$ and $$A^TA$$)
 
 #### Geometric meaning  
 
-For every linear map $$A: R^n -> R^m$$ one can find <span style="color: red">orthonormal bases of $$R^n$$</span> (the columns $$V_1, \cdots,V_n$$ yield an orthonormal basis) and <span style="color: red">$$R^m$$</span> ($$U_1, \cdots, U_m$$ yeild an orthonormal basis) such that A maps the  i-th basis vector of $$R^n$$ to a *non-negative* muliple of the i-th basis vector of $$R^m$$, and left-over basis vectors to zero. The map A is <span style="color: red">a diagonal matrix with non-negative real diagonal entries</span>, where $$\sigma_i$$ is the i-th diagonal entry of $$\Sigma$$, and $$\bbox[yellow]{A\left( V_i\right) = 0 \space for \space i > min\left(m, n\right)}$$ 
+For every linear map $$A: R^n -> R^m$$ one can find <span style="color: red">orthonormal bases of $$R^n$$</span> (the columns $$V_1, \cdots,V_n$$ yield an orthonormal basis) and <span style="color: red">$$R^m$$</span> ($$U_1, \cdots, U_m$$ yeild an orthonormal basis) such that A maps the  i-th basis vector of $$R^n$$ to a *non-negative* muliple of the i-th basis vector of $$R^m$$, and left-over basis vectors to zero(rank = r, 只有r个diagonal 是正的real number 剩下diagonal 和其余的都是0). The map A is <span style="color: red">a diagonal matrix with non-negative real diagonal entries</span>, where $$\sigma_i$$ is the i-th diagonal entry of $$\Sigma$$, and $$\bbox[yellow]{A\left( V_i\right) = 0 \space for \space i > min\left(m, n\right)}$$ 
 
 $$The \space linear \space transformation: \space \space \space A: R^n -> R^m$$
 
@@ -542,6 +542,30 @@ $$ A v_1 = \sigma_1 u_1,  A v_2 = \sigma_1 u_1$$
 
 利用$$A^TA$$ is symmetric matrix的性质
 
+#### SVD
+
+U will be m by m matrix, where rank(U) = r $$u_1, \cdots, u_r$$ is an orthonormal basis for **column space** and $$u_{r+1}, \cdots, u_m$$ is an orthonormal basis for the **left null space** $$N\left(A^T\right)$$. V will be n by n matrix where rank(V) = r $$v_1, \cdots, v_r$$ is an orthonormal basis for **row space** and $$v_{r+1}, \cdots, v_r$$ is an orthonormal basis for the  **null space** $$N\left(A\right)$$
+
+**Reduced SVD**: $$AV_r = U_r \Sigma_r$$, A is m by n, $$V_r$ is n by r, $$U_r$$ is m by r and $$\Sigma_r$$ is r by r 
+
+$$A\left[v_1, \cdots, v_r \right] = \left[u_1, \cdots, u_r \right] \begin{bmatrix} \sigma_1 & 0 & \cdots & 0 \\  0 & \sigma_2 & \cdots & 0 \\ \vdots & \vdots & \ddots & \vdots \\ 0 & 0 & \cdots & \sigma_r  \end{bmatrix}$$, 
+
+**Full SVD**: $$\Sigma$$ is m by n, 跟reduced SVD $$\Sigma$$(r by r)一样 with m - r extra zero rows and n - r new zero columns
+
+
+$$A\left[v_1, \cdots, v_r, \cdots, v_n \right] = \left[u_1, \cdots, u_r, \cdots, u_n \right] \begin{bmatrix} \sigma_1 &  &  &  \\   & ddots &  &  \\  &  & \sigma_r & \\  &  &  &   \end{bmatrix}$$, 
+
+The <span style="color: red">v's will be orthonormal eigenvectors of $$A^TA$$</span>, V is eigenvector matrix V for symmetric positive (semi) definite matrix $$A^TA$$, $$\Sigma^T \ Sigma $$ must be eigenvalue matrix of $$A^TA$$: <span style="color: red">Each $$\sigma^2$$ is $$\lambda$$!</span>
+
+$$A^A = \left(U \Sigma V^T \right)^T\left(U \Sigma V^T \right) = V \Sigma^T U^T U \Sigma V^T = V \Sigma^T \ Sigma V^T$$
+
+Example 1: When is $$A = U \Sigma V^T$$ (singular values) the same as $$X \Lambda X^{-1}$$ (eigenvalues)?
+
+A needs orthonormal eigenvectors to allow $$X = U = V$$. A aslo needs eigenvalues $$\lambda  \geq 0 $$ if $$\Lambda = \Sigma$$ (SVD $$\Sigma$$ 需要非负数). So A must be a positive semidefinite (or definite) symmetric matrix. Only then $$A = X \Lambda X^{-1}$$ which is also $$Q \Lambda Q^T$$ coincide with $$A = U \Sigma V^T$$
+
+Example 2: If $$A = xy^T$$ (rank = 1) with unit vectors x and y, what is the SVD of A?
+
+The reduced SVD is exactly $$xy^T$$, with rank r = 1. It has $$u_1 = x $$ and $$v_1 = y $$ and $$\sigma_1 =1$$. Full the full SVD, complete $$u_1 = x$$ to an orthonormal bassis of u's and complete $$v_1 = y$$ to an orthonormal basis of v's. No new $$\sigma$$'s, only $$\sigma_1 = 1$$
 
 <br/><br/>
 ```python
