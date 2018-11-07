@@ -350,6 +350,7 @@ $$ \left( A - \lambda  I_n  \right) \vec v = \vec 0 $$
 - <span style="color: red">Triangular matrix has Eigenvalue on its diagonal </span> (因为triangular的determinant = diagonal 数的乘积)
 - <span style="background-color: #FFFF00">The product of eigenvalues = determinant </span>
 - <span style="background-color: #FFFF00"> The sum of eigenvalues = the sum of n diagonal entries </span>. The sum of the entries along the main diagonal is called the __trace__ of A
+- $$A^TA $$ and  $$AA^T$$ are both symmetric matrix, <span style="color: red">both share the same eigenvalues</span>
 
 $$\lambda_{1} + \lambda_{2} + \cdots + \lambda_{n} = a_{11} + a_{22} + \cdots + a_{nn} $$
 
@@ -447,7 +448,7 @@ $$Symmetric \space diagonalization \space \space \space \space \space \bbox[yell
 3. For square matrix $$S = A^T A $$ is square and symmetric. <span style="color: red">If the columns of A are independent then S = $$A^TA$$ is positive definite</span>
 4. For symmetric matrix :  <span style="color: red">all eigenvalues > 0 &nbsp; <=> &nbsp; all pivots > 0 &nbsp;  <=> &nbsp; all upper left determinants > 0 (所有eigenvalue 大于0， pivot都大于0，determinant 大于0)</span>
 5. Positive semidefinite S allows $$\lambda = 0$$, pivot = 0, determinant = 0, and energy $$x^T S x = 0$$
-6. $$A^TA$$ at least Positive semi-definite for any matrix
+6. $$A^TA, \space and \space AA^T$$ are both at least Positive semi-definite for any matrix
 
 Prove (2):<br/>
 $$x^T \left( S + T \right) x = x^T S x + x^T T x $$ if those two terms are positive (for $$x \neq 0 $$) so $$S+T$$ is aslo positive definite.
@@ -456,7 +457,8 @@ Prove (3): <br/>
 $$x^T S x = x^T A^T A x = \left(A x \right)^T A x = Ax \cdot Ax = \| Ax \|^2 $$. That vector $$A x \neq 0 $$ when $$x \neq 0 $$ (this is meaning of independent columns). Then $$x^T S x $$ is the positive number $$\| Ax \|^2$$ and matrix S is positive definite
 
 Prove (6): 利用SVD ($$U,V$$是orthonormal basis组成的matrix, $$\Sigma$$ 是diagonal matrix)<br/>
-$$A^TA = \left(U \Sigma V^T \right)^T U \Sigma V^T = V \Sigma U^T U \Sigma V^T = V \Sigma^2 V^T$$
+$$A^TA = \left(U \Sigma V^T \right)^T U \Sigma V^T = V \Sigma U^T U \Sigma V^T = V \Sigma^2 V^T$$<br/>
+$$ \Sigma^2$$ will be eigenvalue of $$A^TA$$
 
 
 <span style="background-color: #FFFF00">__验证matrix是positive definite__</span>, when a symmetrix matrix S has one of these five properties, it has them all (任何一个正确，就可以说是positive definite)
@@ -501,7 +503,28 @@ $$  \|A_3 x \|^2 =\lambda_1\left(q_1^T x \right)^2 + \lambda_2\left(q_2^T x \rig
 
 problem with Diagonalization ($$A = X\Lambda X^{-1}$$): 1. eigenvector matrix is not orthogonal. 2. Eigenvector matrix are usually not orthogonal. 3. There are not always enough eigenvectors 4. $$Ax = \lambda x$$ requires A to be a square matrix
 
-$$A = U\Sigma V^T$$
+$$A = U\Sigma V^T $$
+
+For any Matrix A, can always found two orthogonal matrix(orthornomal) U and T and diagonal matrix $$\Sigma$$ where U's is called **left singular vectors** (unit eigenvectors of $$AA^T$$) and V's are called **right singular vectors**(unit eigenvectors of $$A^TA$$), The $$\sigma$$'s are called **singular values** (square roots of the equal eigenvalues of $$AA^T$$ and $$A^TA$$)
+
+几何意义: 
+
+以 2 by 2 matrix 为例, SVD 可以在 2 x 2 matrix上的几何意思是主要讲两个orthonormal vectors 通过矩阵分解 变成成另一个 二维空间下orthornormal vectors
+
+(\img\post\Linear-Algebra\pic11.png)
+
+We first choose two orthonormal vectors $$\vec v_1, \vec v_2$$, 通过A的linear transformation, 变成another two orthogonal vectors $$A \vec v_1, A \vec v_2$$, then we choose another two orthonormal vectors $$\vec u_1, \vec u_2$$ (unit length) on the direction of $$A \vec v_1, A \vec v_2$$, then we have $$A \vec v_1 = \sigma_1 \vec u_1; \space A \vec v_2 = \sigma_2 \vec u_2 $$
+
+$$In \space left \space graph, \space  x = \frac{\left(\vec v_1 \dot \vec x \right)}{\|\vec v_1 \|^2}\vec v_1 + \frac{\left(\vec v_2 \dot \vec x \right)}{\|\vec v_2 \|^2}\vec v_2 =  \left(\vec v_1 \dot \vec x \right) \vec v_1 + \left(\vec v_2 \dot \vec x \right) \vec v_2  $$
+
+$$Then \space multiply \space A \space A x =  \left(\vec v_1 \dot \vec x \right) A \vec v_1 + \left(\vec v_2 \dot \vec x \right) A \vec v_2  $$
+
+$$ A x =  \left(\vec v_1 \dot \vec x \right) \sigma_1 \vec u_1 + \left(\vec v_2 \dot \vec x \right) \sigma_2 \vec u_2  $$
+
+$$ A x =  u_1 \sigma_1 v_1^T x + u_2 \sigma_2 v_2^T x $$
+
+$$ get \space rid \space of \space X: \space \space A =  u_1 \sigma_1 v_1^T + u_2 \sigma_2 v_2^T $$
+
 
 Goal: Orthogonal basis in row space (unit vector v) $$R^n$$ to Orthogonal basis in column space (unit vector u)  $$R^m$$
 
