@@ -491,6 +491,12 @@ $$  \|A_3 x \|^2 =\lambda_1\left(q_1^T x \right)^2 + \lambda_2\left(q_2^T x \rig
 
 **Positive semidefinite matrices** have all $$\lambda \geq 0$$ and all $$x^T S x \geq 0$$. The upper left determinants are non-negative. $$S = A^TA$$ may have dependent columns in A. e.g.$$\begin{bmatrix} 1 & 2 \\ 2&4 \end{bmatrix} = \begin{bmatrix} 1 & 0 \\ 2&0 \end{bmatrix} \begin{bmatrix} 1 & 2 \\ 0&0 \end{bmatrix} $$
 
+## Singular Value Decomposition
+
+problem with Diagonalization ($$A = X\Lambda X^{-1}$$): 1. eigenvector matrix is not orthogonal. 2. Eigenvector matrix are usually not orthogonal. 3. There are not always enough eigenvectors 4. $$Ax = \lambda x$$ requires A to be a square matrix
+
+$$A = U\Sigma V^T$$
+
 
 <br/><br/>
 ```python
