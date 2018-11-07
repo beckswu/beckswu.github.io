@@ -501,7 +501,11 @@ $$  \|A_3 x \|^2 =\lambda_1\left(q_1^T x \right)^2 + \lambda_2\left(q_2^T x \rig
 
 ## Singular Value Decomposition
 
-problem with Diagonalization ($$A = X\Lambda X^{-1}$$): 1. eigenvector matrix is not orthogonal. 2. Eigenvector matrix are usually not orthogonal. 3. There are not always enough eigenvectors 4. $$Ax = \lambda x$$ requires A to be a square matrix
+problem with Diagonalization ($$A = X\Lambda X^{-1}$$): 
+1. eigenvector matrix is not orthogonal. 
+2. Eigenvector matrix are usually not orthogonal. 
+3. There are not always enough eigenvectors 
+4. $$Ax = \lambda x$$ requires A to be a square matrix
 
 $$A = U\Sigma V^T $$
 
@@ -511,15 +515,15 @@ For any Matrix A, can always found two orthogonal matrix(orthornomal) U and T an
 
 以 2 by 2 matrix 为例, SVD 可以在 2 x 2 matrix上的几何意思是主要讲两个orthonormal vectors 通过矩阵分解 变成成另一个 二维空间下orthornormal vectors
 
-(\img\post\Linear-Algebra\pic11.png)
+![](\img\post\Linear-Algebra\pic11.png)
 
 We first choose two orthonormal vectors $$\vec v_1, \vec v_2$$, 通过A的linear transformation, 变成another two orthogonal vectors $$A \vec v_1, A \vec v_2$$, then we choose another two orthonormal vectors $$\vec u_1, \vec u_2$$ (unit length) on the direction of $$A \vec v_1, A \vec v_2$$, then we have $$A \vec v_1 = \sigma_1 \vec u_1; \space A \vec v_2 = \sigma_2 \vec u_2 $$
 
-$$In \space left \space graph, \space  x = \frac{\left(\vec v_1 \dot \vec x \right)}{\|\vec v_1 \|^2}\vec v_1 + \frac{\left(\vec v_2 \dot \vec x \right)}{\|\vec v_2 \|^2}\vec v_2 =  \left(\vec v_1 \dot \vec x \right) \vec v_1 + \left(\vec v_2 \dot \vec x \right) \vec v_2  $$
+$$In \space left \space graph, \space  x = \frac{\left(\vec v_1 \cdot \vec x \right)}{\|\vec v_1 \|^2} \vec v_1 + \frac{\left(\vec v_2 \cdot \vec x \right)}{\|\vec v_2 \|^2}\vec v_2 =  \left(\vec v_1 \cdot \vec x \right) \vec v_1 + \left(\vec v_2 \cdot \vec x \right) \vec v_2  $$
 
-$$Then \space multiply \space A \space A x =  \left(\vec v_1 \dot \vec x \right) A \vec v_1 + \left(\vec v_2 \dot \vec x \right) A \vec v_2  $$
+$$Then \space multiply \space A \space A x =  \left( \vec v_1 \cdot \vec x \right) A \vec v_1 + \left(\vec v_2 \cdot \vec x \right) A \vec v_2  $$
 
-$$ A x =  \left(\vec v_1 \dot \vec x \right) \sigma_1 \vec u_1 + \left(\vec v_2 \dot \vec x \right) \sigma_2 \vec u_2  $$
+$$ A x =  \left(\vec v_1 \cdot \vec x \right) \sigma_1 \vec u_1 + \left(\vec v_2 \cdot \vec x \right) \sigma_2 \vec u_2  $$
 
 $$ A x =  u_1 \sigma_1 v_1^T x + u_2 \sigma_2 v_2^T x $$
 
