@@ -455,7 +455,7 @@ $$x^T \left( S + T \right) x = x^T S x + x^T T x $$ if those two terms are posit
 Prove (3): <br/>
 $$x^T S x = x^T A^T A x = \left(A x \right)^T A x = Ax \cdot Ax = \| Ax \|^2 $$. That vector $$A x \neq 0 $$ when $$x \neq 0 $$ (this is meaning of independent columns). Then $$x^T S x $$ is the positive number $$\| Ax \|^2$$ and matrix S is positive definite
 
-Prove (6): 利用SVD ($$U,V是orthonormal basis组成的matrix$$)<br/>
+Prove (6): 利用SVD ($$U,V$$是orthonormal basis组成的matrix, $$\Sigma$$ 是diagonal matrix)<br/>
 $$A^TA = \left(U \Sigma V^T \right)^T U \Sigma V^T = V \Sigma U^T U \Sigma V^T = V \Sigma^2 V^T$$
 
 
