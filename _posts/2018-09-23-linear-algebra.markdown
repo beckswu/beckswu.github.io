@@ -513,27 +513,27 @@ For any Matrix A, can always found two orthogonal matrix(orthornomal) U (m by m 
 
 #### Geometric meaning  
 
-For every linear map $$T: R^n -> R^m$$ one can find <span style="color: red">orthonormal bases of $$R^n$$</span> (the columns $$V_1, \cdots,V_n$$ yield an orthonormal basis) and <span style="color: red">$$R^m$$</span> ($$U_1, \cdots, U_m$$ yeild an orthonormal basis) such that T maps the  i-th basis vector of $$R^n$$ to a *non-negative* muliple of the i-th basis vector of $$R^m$$, and left-over basis vectors to zero. The map T is <span style="color: red">a diagonal matrix with non-negative real diagonal entries</span>, where $$\sigma_i$$ is the i-th diagonal entry of $$\Sigma$$, and $$\bbox[yellow]{T\left( V_i\right) = 0 \space for \space i > min\left(m, n\right)}$$ 
+For every linear map $$A: R^n -> R^m$$ one can find <span style="color: red">orthonormal bases of $$R^n$$</span> (the columns $$V_1, \cdots,V_n$$ yield an orthonormal basis) and <span style="color: red">$$R^m$$</span> ($$U_1, \cdots, U_m$$ yeild an orthonormal basis) such that A maps the  i-th basis vector of $$R^n$$ to a *non-negative* muliple of the i-th basis vector of $$R^m$$, and left-over basis vectors to zero. The map A is <span style="color: red">a diagonal matrix with non-negative real diagonal entries</span>, where $$\sigma_i$$ is the i-th diagonal entry of $$\Sigma$$, and $$\bbox[yellow]{A\left( V_i\right) = 0 \space for \space i > min\left(m, n\right)}$$ 
 
-$$The \space linear \space transformation: \space \space \space T: R^n -> R^m$$
+$$The \space linear \space transformation: \space \space \space A: R^n -> R^m$$
 
-$$T V_i = \sigma_i U_i, \space \space \space i = i, \cdots, min \left(m, n \right) $$
+$$A V_i = \sigma_i U_i, \space \space \space i = i, \cdots, min \left(m, n \right) $$
 
 以 2 by 2 matrix 为例, SVD 可以在 2 x 2 matrix上的几何意思是主要将两个orthonormal vectors 通过矩阵分解 变成成另一个 二维空间下两个orthornormal vectors
 
 ![](\img\post\Linear-Algebra\pic11.png)
 
-We first choose two orthonormal vectors $$\vec v_1, \vec v_2$$, 通过T的linear transformation, 变成another two orthogonal vectors $$T \vec v_1, T \vec v_2$$, then we choose another two orthonormal vectors $$\vec u_1, \vec u_2$$ (unit length) on the direction of $$T \vec v_1, T \vec v_2$$, then we have $$T \vec v_1 = \sigma_1 \vec u_1; \space T \vec v_2 = \sigma_2 \vec u_2 $$
+We first choose two orthonormal vectors $$\vec v_1, \vec v_2$$, 通过T的linear transformation, 变成another two orthogonal vectors $$A \vec v_1, A \vec v_2$$, then we choose another two orthonormal vectors $$\vec u_1, \vec u_2$$ (unit length) on the direction of $$A \vec v_1, A \vec v_2$$, then we have $$A \vec v_1 = \sigma_1 \vec u_1; \space A \vec v_2 = \sigma_2 \vec u_2 $$
 
 $$In \space left \space graph, \space  \space \space  x = \frac{\left( v_1 \cdot  x \right)}{\| v_1 \|^2}  v_1 + \frac{\left( v_2 \cdot  x \right)}{\| v_2 \|^2} v_2 =  \left( v_1 \cdot  x \right)  v_1 + \left( v_2 \cdot x \right)  v_2  $$
 
-$$Then \space multiply \space T, \space \space  \space T x =  \left( v_1 \cdot x \right) T  v_1 + \left( v_2 \cdot  x \right) T  v_2  $$
+$$Then \space multiply \space A, \space \space  \space A x =  \left( v_1 \cdot x \right) A  v_1 + \left( v_2 \cdot  x \right) A  v_2  $$
 
-$$ T x =  \left( v_1 \cdot x \right) \sigma_1  u_1 + \left( v_2 \cdot x \right) \sigma_2  u_2  $$
+$$ A x =  \left( v_1 \cdot x \right) \sigma_1  u_1 + \left( v_2 \cdot x \right) \sigma_2  u_2  $$
 
-$$ T x =  u_1 \sigma_1 v_1^T x + u_2 \sigma_2 v_2^T x $$
+$$ A x =  u_1 \sigma_1 v_1^T x + u_2 \sigma_2 v_2^T x $$
 
-$$ get \space rid \space of \space X: \space \space  \space T =  u_1 \sigma_1 v_1^T + u_2 \sigma_2 v_2^T $$
+$$ get \space rid \space of \space X: \space \space  \space A =  u_1 \sigma_1 v_1^A + u_2 \sigma_2 v_2^A $$
 
 
 Goal: Orthogonal basis in row space (unit vector v) $$R^n$$ to Orthogonal basis in column space (unit vector u)  $$R^m$$
