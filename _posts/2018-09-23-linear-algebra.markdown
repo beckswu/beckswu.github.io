@@ -509,9 +509,15 @@ problem with Diagonalization ($$A = X\Lambda X^{-1}$$):
 
 $$A = U\Sigma V^T $$
 
-For any Matrix A, can always found two orthogonal matrix(orthornomal) U and T and diagonal matrix $$\Sigma$$ where U's is called **left singular vectors** (unit eigenvectors of $$AA^T$$) and V's are called **right singular vectors**(unit eigenvectors of $$A^TA$$), The $$\sigma$$'s are called **singular values** (square roots of the equal eigenvalues of $$AA^T$$ and $$A^TA$$)
+For any Matrix A, can always found two orthogonal matrix(orthornomal) U (m by m matrix) and V(n by n matrix) and diagonal matrix $$\Sigma$$ (m by n matrix) where U's is called **left singular vectors** (unit eigenvectors of $$AA^T$$) and V's are called **right singular vectors**(unit eigenvectors of $$A^TA$$), The $$\sigma$$'s are called **singular values** (square roots of the equal eigenvalues of $$AA^T$$ and $$A^TA$$)
 
-几何意义: 
+#### Geometric meaning  
+
+For every linear map $$T: R^n -> R^m$$ one can find orthonormal bases of $$R^n$$ (the columns $$V_1, \cdots,V_n$$ yield an orthonormal basis) and $$R^m$$ ($$U_1, \cdots, U_m$$ yeild an orthonormal basis) such that T maps the  i-th basis vector of $$R^n$$ to a *non-negative* muliple of the i0th basis vector of $$R^m$$, and sends the left-over bassis vectors to zero.. The map T is a diagonal matrix with non-negative real diagonal entries, where $$\sigma_i$$ is the i-th diagonal entry of $$\Sigma$$, and $$\bbox[yellow]{T\left( V_i\right) = 0 \space for i > min\left(m, n\right)}$$ 
+
+$$The \space linear \space transformation: \space \space \space T: R^n -> R^m$$
+
+$$T V_i = \sigma_i U_i, \space \space \space i = i, \cdots, min \left(m, n \right) $$
 
 以 2 by 2 matrix 为例, SVD 可以在 2 x 2 matrix上的几何意思是主要将两个orthonormal vectors 通过矩阵分解 变成成另一个 二维空间下两个orthornormal vectors
 
