@@ -556,7 +556,7 @@ $$A\left[v_1, \cdots, v_r \right] = \left[u_1, \cdots, u_r \right] \begin{bmatri
 **Full SVD**: $$\Sigma$$ is m by n, 跟reduced SVD $$\Sigma$$(r by r)一样 with m - r extra zero rows and n - r new zero columns
 
 
-$$A\left[v_1, \cdots, v_r, \cdots, v_n \right] = \left[u_1, \cdots, u_r, \cdots, u_n \right] \begin{bmatrix} \sigma_1 &  &  &  \\   & \ddots &  &  \\  &  & \sigma_r & \\  &  &  &   \end{bmatrix}$$ 
+$$A\left[v_1, \cdots, v_r, \cdots, v_n \right] = \left[u_1, \cdots, u_r, \cdots, u_n \right] \begin{bmatrix} \sigma_1 &  &  &   & \\   & \ddots &  &  &  \\  &  & \sigma_r & \\  &  &  &  \ddots & \\ &  &  &  & 0   \end{bmatrix}$$ 
 
 The <span style="color: red">v's will be orthonormal eigenvectors of $$A^TA$$</span>, V is eigenvector matrix V for symmetric positive (semi) definite matrix $$A^TA$$, $$\Sigma^T \Sigma $$ must be eigenvalue matrix of $$A^TA$$: <span style="color: red">Each $$\sigma^2$$ is $$\lambda$$!</span>
 
