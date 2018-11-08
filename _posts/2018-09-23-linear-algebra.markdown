@@ -544,20 +544,30 @@ $$ A v_1 = \sigma_1 u_1,  A v_2 = \sigma_1 u_1$$
 
 #### SVD
 
-U will be m by m matrix, where rank(U) = r $$u_1, \cdots, u_r$$ is an orthonormal basis for **column space** and $$u_{r+1}, \cdots, u_m$$ is an orthonormal basis for the **left null space** $$N\left(A^T\right)$$. V will be n by n matrix where rank(V) = r $$v_1, \cdots, v_r$$ is an orthonormal basis for **row space** and $$v_{r+1}, \cdots, v_r$$ is an orthonormal basis for the  **null space** $$N\left(A\right)$$
+U will be m by m matrix, where rank(U) = r $$u_1, \cdots, u_r$$ is an orthonormal basis for **column space** and $$u_{r+1}, \cdots, u_m$$ is an orthonormal basis for the **left null space** $$N\left(A^T\right)$$(用left null space原因是: 与column space orthogonal, $$\Sigma$$ 与left null space对于的数都是0,不会transformation). V will be n by n matrix where rank(V) = r $$v_1, \cdots, v_r$$ is an orthonormal basis for **row space** and $$v_{r+1}, \cdots, v_r$$ is an orthonormal basis for the  **null space** $$N\left(A\right)$$
 
 **Reduced SVD**: $$AV_r = U_r \Sigma_r$$, A is m by n, $$V_r$ is n by r, $$U_r$$ is m by r and $$\Sigma_r$$ is r by r 
 
-$$A\left[v_1, \cdots, v_r \right] = \left[u_1, \cdots, u_r \right] \begin{bmatrix} \sigma_1 & 0 & \cdots & 0 \\  0 & \sigma_2 & \cdots & 0 \\ \vdots & \vdots & \ddots & \vdots \\ 0 & 0 & \cdots & \sigma_r  \end{bmatrix}$$, 
+$$A\left[v_1, \cdots, v_r \right] = \left[u_1, \cdots, u_r \right] \begin{bmatrix} \sigma_1 & 0 & \cdots & 0 \\  0 & \sigma_2 & \cdots & 0 \\ \vdots & \vdots & \ddots & \vdots \\ 0 & 0 & \cdots & \sigma_r  \end{bmatrix}$$
 
 **Full SVD**: $$\Sigma$$ is m by n, 跟reduced SVD $$\Sigma$$(r by r)一样 with m - r extra zero rows and n - r new zero columns
 
 
-$$A\left[v_1, \cdots, v_r, \cdots, v_n \right] = \left[u_1, \cdots, u_r, \cdots, u_n \right] \begin{bmatrix} \sigma_1 &  &  &  \\   & ddots &  &  \\  &  & \sigma_r & \\  &  &  &   \end{bmatrix}$$, 
+$$A\left[v_1, \cdots, v_r, \cdots, v_n \right] = \left[u_1, \cdots, u_r, \cdots, u_n \right] \begin{bmatrix} \sigma_1 &  &  &  \\   & \ddots &  &  \\  &  & \sigma_r & \\  &  &  &   \end{bmatrix}$$ 
 
 The <span style="color: red">v's will be orthonormal eigenvectors of $$A^TA$$</span>, V is eigenvector matrix V for symmetric positive (semi) definite matrix $$A^TA$$, $$\Sigma^T \ Sigma $$ must be eigenvalue matrix of $$A^TA$$: <span style="color: red">Each $$\sigma^2$$ is $$\lambda$$!</span>
 
-$$A^A = \left(U \Sigma V^T \right)^T\left(U \Sigma V^T \right) = V \Sigma^T U^T U \Sigma V^T = V \Sigma^T \ Sigma V^T$$
+$$A^TA = \left(U \Sigma V^T \right)^T\left(U \Sigma V^T \right) = V \Sigma^T U^T U \Sigma V^T = V \Sigma^T \Sigma V^T$$
+
+$$AA^T =\left(U \Sigma V^T \right) \left(U \Sigma V^T \right)^T =  U \Sigma V^T V \Sigma^T U^T = U \Sigma \Sigma^T U$$
+
+**Singular Value Stability vs Eigenvalue Instability**
+
+$$A = \begin{bmatrix} 0 & 1 & 0 & 0 \\ 0 & 0 & 2 & 0 \\ 0 & 0 &0 & 3 \\ 0 & 0 & 0 & 0 $$, Eigenvalue = 0, 0, 0, 0, singular value = 3, 2, 1
+
+$$A = \begin{bmatrix} 0 & 1 & 0 & 0 \\ 0 & 0 & 2 & 0 \\ 0 & 0 &0 & 3 \\ \frac{1}{60000} & 0 & 0 & 0 $$, Eigenvalue =  $$\frac{1}{10},  \frac{i}{10}, \frac{-1}{10}, \frac{-i}{10} $$, singular value = $$ 3, 2, 1, \frac{1}{60000} $$
+
+
 
 Example 1: When is $$A = U \Sigma V^T$$ (singular values) the same as $$X \Lambda X^{-1}$$ (eigenvalues)?
 
@@ -566,6 +576,19 @@ A needs orthonormal eigenvectors to allow $$X = U = V$$. A aslo needs eigenvalue
 Example 2: If $$A = xy^T$$ (rank = 1) with unit vectors x and y, what is the SVD of A?
 
 The reduced SVD is exactly $$xy^T$$, with rank r = 1. It has $$u_1 = x $$ and $$v_1 = y $$ and $$\sigma_1 =1$$. Full the full SVD, complete $$u_1 = x$$ to an orthonormal bassis of u's and complete $$v_1 = y$$ to an orthonormal basis of v's. No new $$\sigma$$'s, only $$\sigma_1 = 1$$
+
+Example 3: Find the matrices $$U, \Sigma, V $$ for $$A = \begin{bmatrix}3 & 0 \\ 4 & 5 \end{bmatrix}$$, The rank r = 2
+
+$$A^TA = \begin{bmatrix} 25 & 20 \\ 20 & 25 \end{bmatrix} \space \space \space \space \space AA^T = \begin{bmatrix} 9 & 12 \\ 12 & 41 \end{bmatrix}$$
+
+Those have the same trace 50. The eigenvalues are $$\sigma_1^2 = 45, \sigma_2^2 = 5$$. The eigenvectors of $$A^TA$$ are $$\begin{bmatrix} 1  \\ 1 \end{bmatrix}, \begin{bmatrix} -1  \\ 1 \end{bmatrix} $$ **Right singular vectors** are $$v_1 = \frac{1}{\sqrt{2}} \begin{bmatrix} 1 \\ 1 \end{bmatrix}, \space v_2 = \frac{1}{\sqrt{2}} \begin{bmatrix} -1 \\ 1 \end{bmatrix}$$. 两种方法求 **left singular vectors** 1. 求eigenvector of $$AA^T$$ 2. 用$$u_i = \frac{Av_i}{\sigma_i}$$
+
+$$Av_1 = \frac{3}{\sqrt{2}} \begin{bmatrix} 1 \\ 3 \end{bmatrix} = sqrt{45} \frac{1}{\sqrt{10}} \begin{bmatrix} 1 \\ 3 \end{bmatrix} = \sigma_1 u_1 $$
+
+$$Av_2 = \frac{1}{\sqrt{2}} \begin{bmatrix} -3 \\ 1 \end{bmatrix} = sqrt{5} \frac{1}{\sqrt{10}} \begin{bmatrix} -3 \\ 1 \end{bmatrix} = \sigma_1 u_1 $$
+
+$$U = \frac{1}{\sqrt{10}} \begin{bmatrix} 1 & -3 \\ 3 & -1 \end{bmatrix} \space \space \Sigma = \begin{bmatrix} \sqrt{45} & \\  & \sqrt{5} \end{bmatrix} \space \space V = \frac{1}{\sqrt{2}} \begin{bmatrix} 1 & -1 \\ 1 & 1 \end{bmatrix}  $$
+
 
 <br/><br/>
 ```python
