@@ -553,12 +553,12 @@ V will be n by n matrix where rank(V) = r
 
 $$A\left[v_1, \cdots, v_r \right] = \left[u_1, \cdots, u_r \right] \begin{bmatrix} \sigma_1 & 0 & \cdots & 0 \\  0 & \sigma_2 & \cdots & 0 \\ \vdots & \vdots & \ddots & \vdots \\ 0 & 0 & \cdots & \sigma_r  \end{bmatrix}$$
 
-**Full SVD**:<span style="background-color: #FFFF00">A is m by n, U is M by M  $$\Sigma$$ is M by N, V is N by N </span>, 跟reduced SVD $$\Sigma$$(r by r)一样 with m - r extra zero rows and n - r new zero columns
+**Full SVD**:<span style="background-color: #FFFF00">A is m by n, U is m by m  $$\Sigma$$ is m by n, V is n by n </span>, 跟reduced SVD $$\Sigma$$(r by r)一样 with m - r extra zero rows and n - r new zero columns
 
 
 $$A\left[v_1, \cdots, v_r, \cdots, v_n \right] = \left[u_1, \cdots, u_r, \cdots, u_m \right] \begin{bmatrix} \sigma_1 &  &  &   & \\   & \ddots &  &  &  \\  &  & \sigma_r & \\  &  &  &  \ddots & \\ &  &  &  & 0   \end{bmatrix}$$ 
 
-The <span style="color: red">v's will be orthonormal eigenvectors of $$A^TA$$</span>, V is eigenvector matrix V for symmetric positive (semi) definite matrix $$A^TA$$, $$\Sigma^T \Sigma $$ must be eigenvalue matrix of $$A^TA$$: <span style="color: red">Each $$\sigma^2$$ is $$\lambda$$!</span>
+The <span style="color: red">v's will be orthonormal eigenvectors of $$A^TA$$</span>, V is eigenvector matrix for symmetric positive (semi) definite matrix $$A^TA$$ ($$V \Sigma^T \Sigma V^T \geq 0 $$), $$\Sigma^T \Sigma $$ must be eigenvalue matrix of $$A^TA$$: <span style="color: red">Each $$\sigma^2$$ is $$\lambda$$!</span>
 
 $$A^TA = \left(U \Sigma V^T \right)^T\left(U \Sigma V^T \right) = V \Sigma^T U^T U \Sigma V^T = V \Sigma^T \Sigma V^T$$
 
