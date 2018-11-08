@@ -549,7 +549,7 @@ V will be n by n matrix where rank(V) = r
 - $$\left[v_1, \cdots, v_r\right]$$ is an orthonormal basis for **row space** 
 - $$\left[v_{r+1}, \cdots, v_r\right]$$ is an orthonormal basis for the  **null space** $$N\left(A\right)$$
 
-**Reduced SVD**: $$AV_r = U_r \Sigma_r$$, A is m by n, $$V_r$ is n by r, $$U_r$$ is m by r and $$\Sigma_r$$ is r by r 
+**Reduced SVD**: $$AV_r = U_r \Sigma_r$$, A is m by n, $$V_r$$ is n by r, $$U_r$$ is m by r and $$\Sigma_r$$ is r by r 
 
 $$A\left[v_1, \cdots, v_r \right] = \left[u_1, \cdots, u_r \right] \begin{bmatrix} \sigma_1 & 0 & \cdots & 0 \\  0 & \sigma_2 & \cdots & 0 \\ \vdots & \vdots & \ddots & \vdots \\ 0 & 0 & \cdots & \sigma_r  \end{bmatrix}$$
 
