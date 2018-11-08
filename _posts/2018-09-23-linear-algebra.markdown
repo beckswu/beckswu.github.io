@@ -302,7 +302,7 @@ A nonsingular matrix Q is called an <span style="background-color: #FFFF00">__or
 Wiki: An __orthogonal matrix__ is a square matrix whose columns and rows are orthogonal unit vectors i.e. $$Q^TQ = QQ^T = I$$
 
 prove orthonormal columns form orthogonal matrix:<br/>
-orthonormal columns is left invertible. $$Q^T Q = I => Q^{-1} = Q $$, because $$Q \space Q^{-1} = I => Q \space Q^T = I $$, columns columns 组成的matrix row 也是orthonormal => matrix is orthogonal 
+orthonormal columns is left invertible. $$Q^T Q = I => Q^{-1} = Q $$, because $$Q \space Q^{-1} = I => Q \space Q^T = I $$, columns 组成的matrix row 也是orthonormal => matrix is orthogonal 
 
 properties: 
 1. The column vectors and row vectors forms orthonormal basis
