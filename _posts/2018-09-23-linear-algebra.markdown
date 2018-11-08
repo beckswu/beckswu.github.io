@@ -543,8 +543,7 @@ $$ A v_1 = \sigma_1 u_1,  A v_2 = \sigma_1 u_1$$
 
 U will be m by m matrix, where rank(U) = r <br/> 
 - $$\left[u_1, \cdots, u_r \right]$$ is an orthonormal basis for **column space** 
--  $$\left[u_{r+1}, \cdots, u_m$$\right] is an orthonormal basis for the **left null space** $$N\left(A^T\right)$$(用left null space原因是: 与column space orthogonal, $$\Sigma$$ 与left null space对于的数都是0,不会transformation). 
-
+-  $$\left[u_{r+1}, \cdots, u_m$$\right] $$ is an orthonormal basis for the **left null space** $$N\left(A^T\right)$$(用left null space原因是: 与column space orthogonal, $$\Sigma$$ 与left null space对于的数都是0,不会transformation).  <br/>
 V will be n by n matrix where rank(V) = r
 - $$\left[v_1, \cdots, v_r\right]$$ is an orthonormal basis for **row space** 
 - $$\left[v_{r+1}, \cdots, v_r\right]$$ is an orthonormal basis for the  **null space** $$N\left(A\right)$$
