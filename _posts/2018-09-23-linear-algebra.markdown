@@ -410,7 +410,7 @@ $$u_k = c_1 \left(\lambda_1\right)^k x_1 + \cdots + c_n \left(\lambda_n\right)^k
 
 1. Every real symmetric S can <span style="color: red">always</span> be diagonalized : $$S = Q \Lambda Q^{-1} = Q \Lambda Q^T $$ with $$Q^{-1} = Q^T$$, there are always enough eigenvectors to diagonalize $$S = S^T$$, even with repeated eigenvalues.
 2. A symmetric matrix S has n <span style="color: red">**real eigenvalues**</span> $$\lambda_i $$ and n <span style="color: red">orthonormal eigenvectors</span> $$q_1, \cdots, q_n$$
-3.  <span style="color: red">row space is perpendicular to column space</span>. As we know before, null space should be perpendicular to row space, 因为symmetric, column space = row space,  $$A = A^T$$, so $$N\left( A \right)^{\bot} \space = C\left(A^T\right) = C\left(A \right) $$
+3.  <span style="color: red">Null space is perpendicular to column space, row space is the same as column space</span>. As we know before, null space should be perpendicular to row space, 因为symmetric, column space = row space,  $$A = A^T$$, so $$N\left( A \right)^{\bot} \space = C\left(A^T\right) = C\left(A \right) $$
 4. Every smmetric matrix has $$S = Q \Lambda Q^T = \lambda_1 q_1 q_1^T + \cdots + \lambda_n q_n q_n^T  $$
 5. For symmetric matrices the pivots and the eigenvalues have the same sign (有几个正的pivot 就有几个正的eigenvalue). *For symmetric matrices the pivots and the eigenvalues have the same signs*
 6. Every square matrix can be "triangularized" by $$A = Q T Q^{-1}$$, if $$A = S$$, then $$T = \Lambda$$
