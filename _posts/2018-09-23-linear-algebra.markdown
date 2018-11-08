@@ -449,6 +449,7 @@ $$Symmetric \space diagonalization \space \space \space \space \space \bbox[yell
 4. For symmetric matrix :  <span style="color: red">all eigenvalues > 0 &nbsp; <=> &nbsp; all pivots > 0 &nbsp;  <=> &nbsp; all upper left determinants > 0 (所有eigenvalue 大于0， pivot都大于0，determinant 大于0)</span>
 5. Positive semidefinite S allows $$\lambda = 0$$, pivot = 0, determinant = 0, and energy $$x^T S x = 0$$
 6. $$A^TA, \space and \space AA^T$$ are both at least Positive semi-definite for any matrix
+7. Inverse matrix of positive-definite symmetric matrix is positive-definite.
 
 Prove (2):<br/>
 $$x^T \left( S + T \right) x = x^T S x + x^T T x $$ if those two terms are positive (for $$x \neq 0 $$) so $$S+T$$ is aslo positive definite.
@@ -497,7 +498,22 @@ $$  \|A_3 x \|^2 =\lambda_1\left(q_1^T x \right)^2 + \lambda_2\left(q_2^T x \rig
 
 **Positive semidefinite matrices** have all $$\lambda \geq 0$$ and all $$x^T S x \geq 0$$. The upper left determinants are non-negative. $$S = A^TA$$ may have dependent columns in A. e.g.$$\begin{bmatrix} 1 & 2 \\ 2&4 \end{bmatrix} = \begin{bmatrix} 1 & 0 \\ 2&0 \end{bmatrix} \begin{bmatrix} 1 & 2 \\ 0&0 \end{bmatrix} $$
 
+(a). **Prove**: the eigenvalues of a real symmetric positive-definite matrix A are all positive.Note: positive definite matrix meaning任何的x, $$x^TAx > 0$$, 所以x 也可以是eigenvector
 
+$$Ax = \lambda x, \space multiply \space x^T \space, \space x^T A x = \lambda x^T x = \lambda|x|^{x} > 0$$
+
+(b). **Prove**: if eigenvalues of a real symmetric matrix A are all positive, then A is positive-definite. Note: real symmetric matrix can be diagonalizable.  $$A = Q\LambdaQ^T$$
+
+
+$$x^TAx = x^T Q \Lambda Q^Tx, \space put y = Q^T \space => \space x^TAx = y^TD y $$
+
+$$y = \begin{bmatrix} y_1 \\ y_2 \\ \vdots \\ y_n \end{bmatrix}, \space \space x^TAx = y^T D y = \left[y_1, y_2, \cdots, y_n  \right] \begin{bmatrix} \lambda_1 & 0 & 0 & 0 \\ 0 & \lambda_2 & 0 & 0 \\ \vdots & \cdots & \ddots& \vdots \\ 0 & 0 & \cdots & \lambda_n   \end{bmatrix} \begin{bmatrix} y_1 \\ y_2 \\ \vdots \\ y_n \end{bmatrix}$$
+
+$$x^TAx = y^T D y = \lambda_1 y_1^2 + \lambda_2 y_2^2 + \cdots +\lambda_n y_1^n > 0 \space for \space x \neq 0$$
+
+(C). **Prove**: A is positive definite symmetric n by n matrix then $$A^{-1}$$ is positive definite symmetric matrix
+
+A is invertible, because A is positive definite matrix, eigenvalue all bigger than zero, then $$A^{-1}$$ is symmetric, $$I = I^T = \left(A^{-1} A\right)^T = A^T \left( A^{-1}\right)^T = A \left(A^{-1}\right)$$, so we have $$A^{-1} = \left( A^{-1}\right)^T$$/ Then all eigenvalues of $$A^{-1}$$ are of the form $$1/\lambda$$, where $$\lambda $$ is eigenvalue of A. Since A (positive definite) $$\lambda \geq 0$$, then all eigenvalues of $$A^{-1} \geq 0$$
 
 ## Singular Value Decomposition
 
