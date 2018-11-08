@@ -502,14 +502,13 @@ $$  \|A_3 x \|^2 =\lambda_1\left(q_1^T x \right)^2 + \lambda_2\left(q_2^T x \rig
 ## Singular Value Decomposition
 
 problem with Diagonalization ($$A = X\Lambda X^{-1}$$): 
-1. eigenvector matrix is not orthogonal. 
-2. Eigenvector matrix are usually not orthogonal. 
-3. There are not always enough eigenvectors 
-4. $$Ax = \lambda x$$ requires A to be a square matrix
+1. Eigenvector matrix are usually not orthogonal. 
+2. There are not always enough eigenvectors 
+3. $$Ax = \lambda x$$ requires A to be a square matrix
 
 $$A = U\Sigma V^T = u_1\sigma_1 v_1^T + \cdots + u_r\sigma_r v_r^T$$
 
-For any Matrix A, can always found two orthogonal matrix(orthornomal) U (m by m matrix) and V(n by n matrix) and diagonal matrix $$\Sigma$$ (m by n matrix) where U's is called **left singular vectors** (unit eigenvectors of $$AA^T$$) and V's are called **right singular vectors**(unit eigenvectors of $$A^TA$$), The $$\sigma$$'s are called **singular values** (square roots of the equal eigenvalues of $$AA^T$$ and $$A^TA$$)
+For any Matrix A, can **always** found two orthogonal matrix(orthornomal) U (m by m matrix) and V(n by n matrix) and diagonal matrix $$\Sigma$$ (m by n matrix) where U's is called **left singular vectors** (unit eigenvectors of $$AA^T$$) and V's are called **right singular vectors**(unit eigenvectors of $$A^TA$$), The $$\sigma$$'s are called **singular values** (square roots of the equal eigenvalues of $$AA^T$$ and $$A^TA$$)
 
 #### Geometric meaning  
 
@@ -517,7 +516,7 @@ For every linear map $$A: R^n -> R^m$$ one can find <span style="color: red">ort
 
 $$The \space linear \space transformation: \space \space \space A: R^n -> R^m$$
 
-$$A V_i = \sigma_i U_i, \space \space \space i = i, \cdots, min \left(m, n \right) $$
+$$A v_i = \sigma_i u_i, \space \space \space i = 1, \cdots, min \left(m, n \right) $$
 
 以 2 by 2 matrix 为例, SVD 可以在 2 x 2 matrix上的几何意思是主要将两个orthonormal vectors 通过矩阵分解 变成成另一个 二维空间下两个orthornormal vectors
 
@@ -533,18 +532,22 @@ $$ A x =  \left( v_1 \cdot x \right) \sigma_1  u_1 + \left( v_2 \cdot x \right) 
 
 $$ A x =  u_1 \sigma_1 v_1^T x + u_2 \sigma_2 v_2^T x $$
 
-$$ get \space rid \space of \space X: \space \space  \space A =  u_1 \sigma_1 v_1^A + u_2 \sigma_2 v_2^A $$
+$$ get \space rid \space of \space X: \space \space  \space A =  u_1 \sigma_1 v_1^T + u_2 \sigma_2 v_2^T $$
 
 
 Goal: Orthogonal basis in row space (unit vector v) $$R^n$$ to Orthogonal basis in column space (unit vector u)  $$R^m$$
 
 $$ A v_1 = \sigma_1 u_1,  A v_2 = \sigma_1 u_1$$
 
-利用$$A^TA$$ is symmetric matrix的性质
-
 #### SVD
 
-U will be m by m matrix, where rank(U) = r $$u_1, \cdots, u_r$$ is an orthonormal basis for **column space** and $$u_{r+1}, \cdots, u_m$$ is an orthonormal basis for the **left null space** $$N\left(A^T\right)$$(用left null space原因是: 与column space orthogonal, $$\Sigma$$ 与left null space对于的数都是0,不会transformation). V will be n by n matrix where rank(V) = r $$v_1, \cdots, v_r$$ is an orthonormal basis for **row space** and $$v_{r+1}, \cdots, v_r$$ is an orthonormal basis for the  **null space** $$N\left(A\right)$$
+U will be m by m matrix, where rank(U) = r <br/> 
+- $$\left[u_1, \cdots, u_r \right]$$ is an orthonormal basis for **column space** 
+-  $$\left[u_{r+1}, \cdots, u_m$$\right] is an orthonormal basis for the **left null space** $$N\left(A^T\right)$$(用left null space原因是: 与column space orthogonal, $$\Sigma$$ 与left null space对于的数都是0,不会transformation). 
+
+V will be n by n matrix where rank(V) = r
+- $$\left[v_1, \cdots, v_r\right]$$ is an orthonormal basis for **row space** 
+- $$\left[v_{r+1}, \cdots, v_r\right]$$ is an orthonormal basis for the  **null space** $$N\left(A\right)$$
 
 **Reduced SVD**: $$AV_r = U_r \Sigma_r$$, A is m by n, $$V_r$ is n by r, $$U_r$$ is m by r and $$\Sigma_r$$ is r by r 
 
