@@ -555,7 +555,7 @@ $$A\left[v_1, \cdots, v_r \right] = \left[u_1, \cdots, u_r \right] \begin{bmatri
 
 $$A\left[v_1, \cdots, v_r, \cdots, v_n \right] = \left[u_1, \cdots, u_r, \cdots, u_n \right] \begin{bmatrix} \sigma_1 &  &  &  \\   & \ddots &  &  \\  &  & \sigma_r & \\  &  &  &   \end{bmatrix}$$ 
 
-The <span style="color: red">v's will be orthonormal eigenvectors of $$A^TA$$</span>, V is eigenvector matrix V for symmetric positive (semi) definite matrix $$A^TA$$, $$\Sigma^T \ Sigma $$ must be eigenvalue matrix of $$A^TA$$: <span style="color: red">Each $$\sigma^2$$ is $$\lambda$$!</span>
+The <span style="color: red">v's will be orthonormal eigenvectors of $$A^TA$$</span>, V is eigenvector matrix V for symmetric positive (semi) definite matrix $$A^TA$$, $$\Sigma^T \Sigma $$ must be eigenvalue matrix of $$A^TA$$: <span style="color: red">Each $$\sigma^2$$ is $$\lambda$$!</span>
 
 $$A^TA = \left(U \Sigma V^T \right)^T\left(U \Sigma V^T \right) = V \Sigma^T U^T U \Sigma V^T = V \Sigma^T \Sigma V^T$$
 
@@ -563,9 +563,9 @@ $$AA^T =\left(U \Sigma V^T \right) \left(U \Sigma V^T \right)^T =  U \Sigma V^T 
 
 **Singular Value Stability vs Eigenvalue Instability**
 
-$$A = \begin{bmatrix} 0 & 1 & 0 & 0 \\ 0 & 0 & 2 & 0 \\ 0 & 0 &0 & 3 \\ 0 & 0 & 0 & 0 $$, Eigenvalue = 0, 0, 0, 0, singular value = 3, 2, 1
+$$A = \begin{bmatrix} 0 & 1 & 0 & 0 \\ 0 & 0 & 2 & 0 \\ 0 & 0 &0 & 3 \\ 0 & 0 & 0 & 0 \end{bmatrix}  $$, Eigenvalue = 0, 0, 0, 0, singular value = 3, 2, 1
 
-$$A = \begin{bmatrix} 0 & 1 & 0 & 0 \\ 0 & 0 & 2 & 0 \\ 0 & 0 &0 & 3 \\ \frac{1}{60000} & 0 & 0 & 0 $$, Eigenvalue =  $$\frac{1}{10},  \frac{i}{10}, \frac{-1}{10}, \frac{-i}{10} $$, singular value = $$ 3, 2, 1, \frac{1}{60000} $$
+$$A = \begin{bmatrix} 0 & 1 & 0 & 0 \\ 0 & 0 & 2 & 0 \\ 0 & 0 &0 & 3 \\ \frac{1}{60000} & 0 & 0 & 0 \end{bmatrix}  $$, Eigenvalue =  $$\frac{1}{10},  \frac{i}{10}, \frac{-1}{10}, \frac{-i}{10} $$, singular value = $$ 3, 2, 1, \frac{1}{60000} $$
 
 
 
