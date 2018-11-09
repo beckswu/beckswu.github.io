@@ -378,7 +378,9 @@ $$X^{-1}AX = \Lambda = \begin{bmatrix} \lambda_1 & & \\ & \ddots & \\ & &\lambda
 
 $$AX= X \Lambda $$,  我们知道$$X \Lambda = \left[ \lambda_1 \vec v_1 , \lambda_2 \vec v_2 , \cdots, \lambda_n \vec v_n  \right] = AX $$ 得到是每个eigenvector 乘以相应的eigenvalue 组成的matrix, 
 
-<span style="color: red">注:</span> 即使eigenvalues 不够 n个, matrix may or may not diagonalized. 比如indentity matrix 的eigenvalues 都是1, 但是eigenvectors matrix 也可以是identity matrix (1 on diagonal), 也是n 个independent eigenvectors
+<span style="color: red">注:</span> 当有n个不同eigenvalues, matrix 一定diagonalizable, 因为n个distinct eigenvalues implies n linearly independent eigenvectors
+
+<span style="color: red">注:</span> 即使eigenvalues 不够 n个, matrix may or may not diagonalized. 比如indentity matrix 的eigenvalues 都是1, 但是eigenvectors matrix 也可以是identity matrix (1 on diagonal), 也是n 个independent eigenvectors. 但是比如matrix = $$\begin{bmatrix} 2 & 1 \\ 0 & 2 \end{bmatrix}$$ not diagonalized, eigenvalues = 2, eigenvectors = $$\begin{bmatrix} 1 \\ 0 \end{bmatrix}$$ only 1 eigenvector
 
 **prove eigenvectors from different eigenvalues are linearly independent**: suppose $$v_1,v_2$$ are eigenvector correspond to distinct eigenvalues $$\lambda_1$$ and $$\lambda_2$$, to show linearly independent, $$a_1v_1 + a_2v_2 = 0$$, we need to show $$a_1 = a_2 = 0$$
 
