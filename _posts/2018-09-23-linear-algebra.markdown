@@ -366,9 +366,9 @@ $$when \space \lambda = 0, \space det\left(A\right) = \lambda_1 \lambda_2 \cdots
 
 why Diagonal matrix useful?
 - <span style="color: red">Determiant = diagonal所有数的乘积 </span>
-- <span style="color: red">eigenvalues 就是每个diagonal上(对角线上)的数 </span>
-- eigenvalue 是unit vector
-- <span style="color: red">power of matrix 就是diagonal上数的数=power </span>
+- <span style="color: red">Eigenvalues 就是每个diagonal上(对角线上)的数 </span>
+- Eigenvalue 是unit vector
+- <span style="color: red">Power of matrix 就是diagonal上数的数=power </span>
   
 $$A = \begin{bmatrix} 3&0 \\ 0&7 \end{bmatrix}, det\left( A\right) = 3*7 = 21, eigenvalues = 3,7, A^k = \begin{bmatrix} 3^k &0 \\ 0&7^k \end{bmatrix}$$
 
