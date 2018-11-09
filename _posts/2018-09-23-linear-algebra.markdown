@@ -420,7 +420,7 @@ prove if A and C are similar, they share the same eigenvalues: suppose $$Cx =\la
 
 $$A\left( Bx\right) =\left( BCB^{-1} \right) \left( Bx\right) = BCx = B\lambda x = \lambda \left( Bx\right) $$
 
-*Application*: Fibonacci number, $$u_{k+1} = Au_{k}, where \space A = \begin{bmatrix} 1 & 1 \\ 1 & 0 \end{bmatrix} $$, then $$u_k = A^k u_0  =  X \Lambda^k X^{-1}u_0  =  X \Lambda^k c, u_0 = \begin{bmatrix} 1  \\  0 \end{bmatrix} $$, $$u_0 = c X$$, $$u_0$$可以表示为linear combination of eigenvector, Eigenvalue is $$\frac{1}{2}\left(1+\sqrt{5} \right) $$ and $$ \frac{1}{2}\left(1-\sqrt{5} \right)$$, so Fibonacci 数字增加速率是$$\frac{1}{2} \left(1+\sqrt{5} \right)$$
+*Application*: Fibonacci number, $$u_{k+1} = Au_{k}, where \space A = \begin{bmatrix} 1 & 1 \\ 1 & 0 \end{bmatrix} $$, then $$u_k = A^k u_0  =  X \Lambda^k X^{-1}u_0  =  X \Lambda^k c$$, $$ u_0 = \begin{bmatrix} 1  \\  0 \end{bmatrix} $$, $$u_0 = c X$$, $$u_0$$可以表示为linear combination of eigenvector, Eigenvalue is $$\frac{1}{2}\left(1+\sqrt{5} \right) $$ and $$ \frac{1}{2}\left(1-\sqrt{5} \right)$$, so Fibonacci 数字增加速率是$$\frac{1}{2} \left(1+\sqrt{5} \right)$$
 
 $$u_{k+1} \approx u_k, F_{100} \approx c_1 \left(\frac{1 + \sqrt{5}}{2} \right)^{100}, \space \space \space given \space \left(\frac{1 - \sqrt{5}}{2} \right)^{100} \approx 0 $$
 
