@@ -327,6 +327,8 @@ $$ A = QR = > Q^{-1} A = Q^{-1} Q R  => Q^T A = R $$
 
 ## Eigenvector & Eigenvalue
 
+<span style="color: red">注:</span> eigenvalues & eigenvectors only apply to square matrix. For non-square matrices we use singular values
+
 If T is a linear transformation from a vector space V over a field F into itself(V) and $$\vec v$$ is a not a zero vector, then  $$\vec v$$ is an __eigenvector__ of T if  $$T\left(\vec v\right)$$  is a scalar multile of v. It can be written: 
 
 $$ T\left(\vec v \right) = \lambda \vec v $$
