@@ -372,11 +372,13 @@ why Diagonal matrix useful?
   
 $$A = \begin{bmatrix} 3&0 \\ 0&7 \end{bmatrix}, det\left( A\right) = 3*7 = 21, eigenvalues = 3,7, A^k = \begin{bmatrix} 3^k &0 \\ 0&7^k \end{bmatrix}$$
 
-__Diagonalization__: Suppose the n by n matrix A has __n linearly independent eigenvectors__ $$x_1, \cdots, x_n$$ (有n个不一样的eigenvalues). Put them into the columns of an __eigenvector matrix X__. Then $$X^{-1}AX$$ is the __eigenvalue matrix__ $$\Lambda$$ (capital lambda)
+__Diagonalization__: Suppose the n by n matrix A has __n linearly independent eigenvectors__ $$x_1, \cdots, x_n$$. Put them into the columns of an __eigenvector matrix X__. Then $$X^{-1}AX$$ is the __eigenvalue matrix__ $$\Lambda$$ (capital lambda)
  
 $$X^{-1}AX = \Lambda = \begin{bmatrix} \lambda_1 & & \\ & \ddots & \\ & &\lambda_n \end{bmatrix}, \space A = X \Lambda X^{-1} $$
 
 $$AX= X \Lambda $$,  我们知道$$X \Lambda = \left[ \lambda_1 \vec v_1 , \lambda_2 \vec v_2 , \cdots, \lambda_n \vec v_n  \right] = AX $$ 得到是每个eigenvector 乘以相应的eigenvalue 组成的matrix, 
+
+<span style="color: red">注:</span> 即使eigenvalues 不够 n, matrix may or may not diagonalized. 比如indentity matrix 的eigenvalues 都是1, 但是eigenvectors matrix 可以是identity matrix (1 on diagonal), 也是n 个independent eigenvectors
 
 **prove eigenvectors from different eigenvalues are linearly independent**: suppose $$v_1,v_2$$ are eigenvector correspond to distinct eigenvalues $$\lambda_1$$ and $$\lambda_2$$, to show linearly independent, $$a_1v_1 + a_2v_2 = 0$$, we need to show $$a_1 = a_2 = 0$$
 
