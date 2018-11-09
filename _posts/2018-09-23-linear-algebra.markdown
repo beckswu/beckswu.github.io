@@ -378,7 +378,7 @@ $$X^{-1}AX = \Lambda = \begin{bmatrix} \lambda_1 & & \\ & \ddots & \\ & &\lambda
 
 $$AX= X \Lambda $$,  我们知道$$X \Lambda = \left[ \lambda_1 \vec v_1 , \lambda_2 \vec v_2 , \cdots, \lambda_n \vec v_n  \right] = AX $$ 得到是每个eigenvector 乘以相应的eigenvalue 组成的matrix, 
 
-<span style="color: red">注:</span> 当有n个不同eigenvalues, matrix 一定diagonalizable, 因为n个distinct eigenvalues implies n linearly independent eigenvectors
+<span style="color: red">注:</span> 当有n个不同eigenvalues, matrix 一定diagonalizable, 因为n个distinct eigenvalues implies n linearly independent eigenvectors. <span style="background-color: #FFFF00">*Any matrix that has no repeated eigenvalues can be diagonalized, An n by n matrix that has n different eigenvalues must be diagonalizable*</span>.
 
 <span style="color: red">注:</span> 即使eigenvalues 不够 n个, matrix may or may not diagonalized. 比如indentity matrix 的eigenvalues 都是1, 但是eigenvectors matrix 也可以是identity matrix (1 on diagonal), 也是n 个independent eigenvectors. 但是比如matrix = $$\begin{bmatrix} 2 & 1 \\ 0 & 2 \end{bmatrix}$$ not diagonalized, eigenvalues = 2, eigenvectors = $$\begin{bmatrix} 1 \\ 0 \end{bmatrix}$$ only 1 eigenvector
 
@@ -409,7 +409,7 @@ properties:
 - Power of A: $$A^k = X \Lambda X^{-1} \space X \Lambda X^{-1} \cdots X \Lambda X^{-1}  = X \Lambda^k X^{-1} $$
 - Matrix X has inverse, beacuse coumns were assumed to be linearly independent. <span style="color: red">Without n independent eigenvectors, we can't diagonalize</span>
 - <span style="background-color: #FFFF00">$$A$$ and $$\Lambda$$ have the same eigenvalues $$\lambda_1, \lambda_2, \cdots, \lambda_n$$</span>, The eigenvectors are different.
-    - Suppose the eigenvalues $$\lambda_1, \cdots, \lambda_n$$ are all <span style="color: red">different</span>. Then it is automatic that the eigenvectors $$x_1,\cdots, x_n$$ are <span style="color: red">independent</span>. <span style="color: red">The eigenvector matrix X will be invertile</span>. <span style="background-color: #FFFF00">*Any matrix that has no repeated eigenvalues can be diagonalized, An n by n matrix that has n different eigenvalues must be diagonalizable*</span>.
+    - Suppose the eigenvalues $$\lambda_1, \cdots, \lambda_n$$ are all <span style="color: red">different</span>. Then it is automatic that the eigenvectors $$x_1,\cdots, x_n$$ are <span style="color: red">independent</span>. <span style="color: red">The eigenvector matrix X will be invertile</span>. 
     - All the matrices $$A = B^{-1}CB $$ are *similar*. <span style="background-color: #FFFF00">They all share the eigenvalues of C</span>
 - if all $$\mid \lambda \mid < 1$$, then $$A^k $$ -> zero matrix
 
@@ -420,9 +420,11 @@ prove if A and C are similar, they share the same eigenvalues: suppose $$Cx =\la
 
 $$A\left( Bx\right) =\left( BCB^{-1} \right) \left( Bx\right) = BCx = B\lambda x = \lambda \left( Bx\right) $$
 
-Application: Fibonacci number, $$u_{k+1} = Au_{k}, where A = \begin{bmatrix} 1 & 1 \\ 0 & 1 \end{bmatrix} $$, then $$u_k = A^k u_0 = X \Lambda^k X^{-1} =  X \Lambda^k X^{-1}u_0  =  X \Lambda^k c$$
+Application: Fibonacci number, $$u_{k+1} = Au_{k}, where \space A = \begin{bmatrix} 1 & 1 \\ 1 & 0 \end{bmatrix} $$, then $$u_k = A^k u_0  =  X \Lambda^k X^{-1}u_0  =  X \Lambda^k c, u_0 = \begin{bmatrix} 1  \\  0 \end{bmatrix} $$, $$u_0 = c X$$ u_$$0是linear combination from eigenvector, Eigenvalue is $$\frac{1}{2}\left(1+\sqrt{5} \right), \frac{1}{2}\left(1-\sqrt{5} \right)$$, so Fibonacci 数字增加速率是$$\frac{1}{2}\left(1+\sqrt{5}
 
-$$u_k = c_1 \left(\lambda_1\right)^k x_1 + \cdots + c_n \left(\lambda_n\right)^k x_n \space \space provided  \space \space u_0 = c_1x+1 + \cdots + c_nx_n$$
+$$u_{k+1} \approx u_k, F_100 \approx c_1 \left(\frac{1 + \sqrt{5}}{2} \right)^100, \space \space \left(\frac{1 - \sqrt{5}}{2} \right)^100 \approx 0 $$
+
+$$u_k = A^100 u_0 =  c_1 \left(\lambda_1\right)^k x_1 + \cdots + c_n \left(\lambda_n\right)^k x_n \space \space provided  \space \space u_0 = c_1x+1 + \cdots + c_nx_n$$
 
 #### Symmetric Matrices
 
