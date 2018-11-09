@@ -529,7 +529,7 @@ $$Ax = \lambda x, \space multiply \space x^T \space, \space x^T A x = \lambda x^
 (b). **Prove**: if eigenvalues of a real symmetric matrix A are all positive, then A is positive-definite. Note: real symmetric matrix can be diagonalizable.  $$A = Q\Lambda Q^T$$
 
 
-$$x^TAx = x^T Q \Lambda Q^Tx, \space put y = Q^T \space => \space x^TAx = y^TD y $$
+$$x^TAx = x^T Q \Lambda Q^Tx, \space put \space y = Q^T \space => \space x^TAx = y^TD y $$
 
 $$y = \begin{bmatrix} y_1 \\ y_2 \\ \vdots \\ y_n \end{bmatrix}, \space \space x^TAx = y^T D y = \left[y_1, y_2, \cdots, y_n  \right] \begin{bmatrix} \lambda_1 & 0 & 0 & 0 \\ 0 & \lambda_2 & 0 & 0 \\ \vdots & \cdots & \ddots& \vdots \\ 0 & 0 & \cdots & \lambda_n   \end{bmatrix} \begin{bmatrix} y_1 \\ y_2 \\ \vdots \\ y_n \end{bmatrix}$$
 
