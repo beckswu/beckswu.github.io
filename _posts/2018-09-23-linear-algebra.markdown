@@ -372,11 +372,25 @@ why Diagonal matrix useful?
   
 $$A = \begin{bmatrix} 3&0 \\ 0&7 \end{bmatrix}, det\left( A\right) = 3*7 = 21, eigenvalues = 3,7, A^k = \begin{bmatrix} 3^k &0 \\ 0&7^k \end{bmatrix}$$
 
-__Diagonalization__: Suppose the n by n matrix A has __n linearly independent eigenvectors__ $$x_1, \cdots, x_n$$. Put them into the columns of an __eigenvector matrix X__. Then $$X^{-1}AX$$ is the __eigenvalue matrix__ $$\Lambda$$ (capital lambda)
+__Diagonalization__: Suppose the n by n matrix A has __n linearly independent eigenvectors__ $$x_1, \cdots, x_n$$ (有n个不一样的eigenvalues). Put them into the columns of an __eigenvector matrix X__. Then $$X^{-1}AX$$ is the __eigenvalue matrix__ $$\Lambda$$ (capital lambda)
  
 $$X^{-1}AX = \Lambda = \begin{bmatrix} \lambda_1 & & \\ & \ddots & \\ & &\lambda_n \end{bmatrix}, \space A = X \Lambda X^{-1} $$
 
 $$AX= X \Lambda $$,  我们知道$$X \Lambda = \left[ \lambda_1 \vec v_1 , \lambda_2 \vec v_2 , \cdots, \lambda_n \vec v_n  \right] = AX $$ 得到是每个eigenvector 乘以相应的eigenvalue 组成的matrix, 
+
+**prove eigenvectors from different eigenvalues are linearly independent**: suppose $$v_1,v_2$$ are eigenvector correspond to distinct eigenvalues $$\lambda_1$$ and $$\lambda_2$$, to show linearly independent, $$a_1v_1 + a_2v_2 = 0$$, we need to show $$a_1 = a_2 = 0$$
+
+$$T\left(0 \right) =  T\left(a_1v_1 + a_2v_2  \right) = a_1\lambda_1 v_1 + a_2\lambda_2 v_2 \tag{1}\label{eq1}$$
+
+Now instead multiply the original equation by $$\lambda_1$$ 
+
+$$\lambda_1 \left(a_1v_1 + a_2v_2 \right) = a_1 \lambda_1 v_1  + a_2 \lambda_1 v_2  = 0 \tag{2}\label{eq2}$$
+
+Use (1) - (2)
+
+$$ 0  = a_2 \left(\lambda_2 - \lambda_1 \right)v_2 $$
+
+Since $$\lambda_2 - \lambda_1 \neq 0$$ and $$v_2 \neq 0$$, then $$a_2 = 0$$. Then $$a_1v_1 + a_2v_2 = 0 = a_1v_1 = 0$$, Since $$v_1 \neq 0$$, then $$a_1 = 0$$. So $$v_1$$ and $$v_2$$ are linearly independent
 
 Remark: 
 1. The eigenvectors in X come in the same order as the eigenvalues in $$\Lambda$$. 
