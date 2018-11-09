@@ -435,6 +435,10 @@ $$S = Q\Lambda Q^{-1} \space  and  \space   S^T =  \left(Q\Lambda Q^{-1}\right)^
 
 根据orthogonal matrix 定义: Q is orthogonal matrix if $$Q^{-1} = Q^T$$, <span style="color: red">Eigenvector matrix Q becomes an orthogonal matrix Q</span>
 
+对于repeated eigenvalues, 比如10 by 10 indentity matrix, eigenvalues 都是1，但是eigenvector可以是orthonormal vector 比如 1 在diagonal上
+
+$$\begin{bmatrix} 1 & 0 & \cdots & 0 \\ 0 & 1 & \cdots & 0 \\ \vdots & \vdots & \ddots & \vdots \\ 0 & 0 & \cdots & 1   \end{bmatrix}$$
+
 prove (2) Eigenvectors of a real symmetric matrix (when they correspond to different $$\lambda$$'s) are always perpendicular: Suppose $$Sx = \lambda_1x \$$ and $$Sy = \lambda_2 y \$$, we assume $$\lambda _1 \neq \lambda_2$$, we can use the fact $$S^T = S$$, Use dot product with two perpendicular vector is zero.
 
 $$ \left( \lambda_1 x \right)^T y = x^T \lambda_1 y  = \left(Sx \right)^T y = x^T S^T y = x^T S y = x^T \lambda_2 y$$
