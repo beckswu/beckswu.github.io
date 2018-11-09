@@ -502,7 +502,7 @@ $$  \|A_3 x \|^2 =\lambda_1\left(q_1^T x \right)^2 + \lambda_2\left(q_2^T x \rig
 
 $$Ax = \lambda x, \space multiply \space x^T \space, \space x^T A x = \lambda x^T x = \lambda|x|^{x} > 0$$
 
-(b). **Prove**: if eigenvalues of a real symmetric matrix A are all positive, then A is positive-definite. Note: real symmetric matrix can be diagonalizable.  $$A = Q\LambdaQ^T$$
+(b). **Prove**: if eigenvalues of a real symmetric matrix A are all positive, then A is positive-definite. Note: real symmetric matrix can be diagonalizable.  $$A = Q\Lambda Q^T$$
 
 
 $$x^TAx = x^T Q \Lambda Q^Tx, \space put y = Q^T \space => \space x^TAx = y^TD y $$
