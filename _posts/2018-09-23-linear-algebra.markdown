@@ -404,7 +404,7 @@ Remark:
 
 <span style="background-color: #FFFF00">No connection between invertibility and diagonalizability:</span>
 - <span style="color: red">*Invertibility*</span> is concerned with <span style="color: red">*eigenvalues*</span> ($$\lambda =  0 \space or \space \lambda \neq 0$$)
-- <span style="color: red">*Diagonalizability*</span> is convered with the <span style="color: red">*eigenvectors* </span>(too few or enough for X)
+- <span style="color: red">*Diagonalizability*</span> is convered with the <span style="color: red">*eigenvectors* </span>(too few or enough for X, n 个eigenvectors, 即使不是n个eigenvalues, 可能也会有n个eigenvectors)
 
 properties: 
 - $$A^2$$has the same eigenvectors in X and squared eigenvalues in $$\Lambda^2$$, $$A^2 = X \Lambda X^{-1} \space X \Lambda X^{-1} = X \Lambda^2 X^{-1} $$
