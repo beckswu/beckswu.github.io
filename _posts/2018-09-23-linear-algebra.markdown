@@ -652,7 +652,7 @@ Complex Vectors
 4. When $$Ax = \lambda x$$ and A is real, taking conjugates, then $$\overline {Ax} = \overline {\lambda x} \space => \space A \bar{x} = \bar{\lambda} \bar{x}  $$
 5. $$z + \bar{z} $$, $$z \bar{z}$$ are always **real**. $$z = a + bi$$, $$z + \bar{z} = 2a $$, $$z \bar{z} = a^2 + b^2$$ 
 6. In polar system real part is x axis and imaginary part is y axis and $$a^2 + b^2 = r^2$$, $$z = a + b i $$  is aslo  $$z = rcos\theta + irsin\theta$$ which equal to $$re^{i\theta}$$, and $$\bar{z} = re^{-i\theta}$$ (*Euler's Formula*)
-7. The nth power of $$z = r \left(r cos\theta + i sin \theta \right)$$ is $$z^n = r^n \left(cos \left(n n \theta \right) + i sin \left(n \theta \right) \right)$$. Minor proof $$\left(cos \theta + i sin \theta\right) \times \left(cos \theta + i sin \theta\right) = cos^2 \theta + i^2 sin^2 \theta + 2 i sin \theta + cos \theta = \left(cos^2 \theta - sin^2 \theta \right) + 2 i sin \theta + cos \theta = cos 2 \theta + sin 2\theta$$
+7. The nth power of $$z = r \left(r cos\theta + i sin \theta \right)$$ is $$z^n = r^n \left(cos \left( n \theta \right) + i sin \left(n \theta \right) \right)$$. Minor proof $$\left(cos \theta + i sin \theta\right) \times \left(cos \theta + i sin \theta\right) = cos^2 \theta + i^2 sin^2 \theta + 2 i sin \theta + cos \theta $$$$= \left(cos^2 \theta - sin^2 \theta \right) + 2 i sin \theta + cos \theta = cos 2 \theta + sin 2\theta$$
 
 <br/><br/>
 ```python
