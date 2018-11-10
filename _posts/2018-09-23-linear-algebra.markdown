@@ -256,6 +256,8 @@ $$  \vec y = \left(A^T A \right)^{-1}  A^T \vec x $$
 
 $$  Proj_v \vec x  = A \left(A^T A \right)^{-1}  A^T \vec x   $$
 
+ <span style="color: red">注:</span> If A is square matrix with independent columns, $$  Proj_v = Indentiy \space matrix $$ 
+
 
 ## Orthogonal
 
@@ -297,12 +299,17 @@ properties:
 
 A nonsingular matrix Q is called an <span style="background-color: #FFFF00">__orthogonal matrix__ if  $$Q^{-1} = Q^T$$</span>. Q is orthogonal matrix if and only if the columns of Q form an orthonormal set of vectors in $$R^n$$. (a square real matrix with orthonormal columns is called orthogonal) 
 
+ <span style="color: red"> 注</span>: Orthogonal matrix 必须是square，否则non-square matrix 没有inverse
+
 <span style="background-color: #FFFF00"> 只要column vectors (dimension n) 是orthonormal(each length = 1 and mutually perpendicular),就可以组成orthogonal matrix (n by n), 并且row vectors 同样是orthonormal </span>
 
 Wiki: An __orthogonal matrix__ is a square matrix whose columns and rows are orthogonal unit vectors i.e. $$Q^TQ = QQ^T = I$$
 
-prove orthonormal columns form orthogonal matrix:<br/>
-orthonormal columns is left invertible. $$Q^T Q = I => Q^{-1} = Q $$, because $$Q \space Q^{-1} = I => Q \space Q^T = I $$, columns 组成的matrix row 也是orthonormal => matrix is orthogonal 
+prove orthonormal columns form orthogonal matrix:
+
+方法一: orthonormal columns is left invertible. $$Q^T Q = I => Q^{-1} = Q $$, because $$Q \space Q^{-1} = I => Q \space Q^T = I $$, columns 组成的matrix row 也是orthonormal => matrix is orthogonal 
+
+方法二: Since $$Q^TQ = I$$, then Projection matrix is $$Q \left(Q^T Q \right)^{-1} Q^T = Q Q^T$$, 我们知道Square matrix (n by n) with n independent columns, Projection matrix is indentity matrix, so we have $$ Q Q^T = I$$.
 
 properties: 
 1. The column vectors and row vectors forms orthonormal basis
@@ -433,7 +440,7 @@ $$u_k = A^{100} u_0 =  c_1 \left(\lambda_1\right)^k x_1 + \cdots + c_n \left(\la
 1. Every real symmetric S can <span style="color: red">always</span> be diagonalized : $$S = Q \Lambda Q^{-1} = Q \Lambda Q^T $$ with $$Q^{-1} = Q^T$$, there are always enough eigenvectors to diagonalize $$S = S^T$$, even with repeated eigenvalues.
 2. A symmetric matrix S has n <span style="color: red">**real eigenvalues**</span> $$\lambda_i $$ and n <span style="color: red">orthonormal eigenvectors</span> $$q_1, \cdots, q_n$$ ($$Q^{-1} = Q^T$$)
 3.  <span style="color: red">Null space is perpendicular to column space, row space is the same as column space</span>. As we know before, null space should be perpendicular to row space, 因为symmetric, column space = row space,  $$A = A^T$$, so $$N\left( A \right)^{\bot} \space = C\left(A^T\right) = C\left(A \right) $$
-4. Every smmetric matrix has $$S = Q \Lambda Q^T = \lambda_1 q_1 q_1^T + \cdots + \lambda_n q_n q_n^T  $$
+4. Every smmetric matrix has $$S = Q \Lambda Q^T = \lambda_1 q_1 q_1^T + \cdots + \lambda_n q_n q_n^T  $$, a combination of perpendicular projection matrix($$\lambda$$ 是combination的系数), $$q_1 q_1^T$$ is projection matrix $$q_1^T q_1 = I$$, $$q_1 \left(q_1^T q_1 \right)^{-1} q_1^T = q_1 q_1^T$$
 5. For symmetric matrices the pivots and the eigenvalues have the same sign (有几个正的pivot 就有几个正的eigenvalue). *For symmetric matrices the pivots and the eigenvalues have the same signs*
 6. Every square matrix can be "triangularized" by $$A = Q T Q^{-1}$$, if $$A = S$$, then $$T = \Lambda$$
 
@@ -468,7 +475,7 @@ $$Sq_i =\left( Q \Lambda Q^T \right) q_i = \left( \lambda_1 q_1 q_1^T + \cdots +
 
 $$Symmetric \space diagonalization \space \space \space \space \space \bbox[yellow]{ S = Q \Lambda Q^{-1} = Q \Lambda Q^T \space \space Q^{-1} = Q^T } $$
 
-#### Positive Definite Matrices
+#### Positive Definite Symmetric Matrices
 1. The matrix S is  <span style="color: red">**positive definite**</span> if the energy test is $$x^TSx > 0$$ for all vectors $$x \neq 0$$
 2. If S and T are symmetric positive definite, so is T+S. 
 3. For square matrix $$S = A^T A $$ is square and symmetric. <span style="color: red">If the columns of A are independent then S = $$A^TA$$ is positive definite</span>
