@@ -441,7 +441,7 @@ $$u_k = A^{100} u_0 =  c_1 \left(\lambda_1\right)^k x_1 + \cdots + c_n \left(\la
 2. A symmetric matrix S has n <span style="color: red">**real eigenvalues**</span> $$\lambda_i $$ and n <span style="color: red">orthonormal eigenvectors</span> $$q_1, \cdots, q_n$$ ($$Q^{-1} = Q^T$$)
 3.  <span style="color: red">Null space is perpendicular to column space, row space is the same as column space</span>. As we know before, null space should be perpendicular to row space, 因为symmetric, column space = row space,  $$A = A^T$$, so $$N\left( A \right)^{\bot} \space = C\left(A^T\right) = C\left(A \right) $$
 4. Every smmetric matrix has $$S = Q \Lambda Q^T = \lambda_1 q_1 q_1^T + \cdots + \lambda_n q_n q_n^T  $$, a combination of perpendicular projection matrix($$\lambda$$ 是combination的系数), $$q_1 q_1^T$$ is projection matrix $$q_1^T q_1 = I$$, $$q_1 \left(q_1^T q_1 \right)^{-1} q_1^T = q_1 q_1^T$$
-5. For symmetric matrices the pivots and the eigenvalues have the same sign (有几个正的pivot 就有几个正的eigenvalue). *For symmetric matrices the pivots and the eigenvalues have the same signs*
+5. For symmetric matrices the pivots and the eigenvalues have the same sign (有几个正的pivot 就有几个正的eigenvalue).
 6. Every square matrix can be "triangularized" by $$A = Q T Q^{-1}$$, if $$A = S$$, then $$T = \Lambda$$
 
 prove(1): S is a symmetric matrix so we have $$S = S^T$$, aslo we know Eigenvalue matrix is symmetric $$\Lambda = \Lambda^T$$
@@ -641,6 +641,18 @@ $$Av_2 = \frac{1}{\sqrt{2}} \begin{bmatrix} -3 \\ 1 \end{bmatrix} = \sqrt{5} \fr
 
 $$U = \frac{1}{\sqrt{10}} \begin{bmatrix} 1 & -3 \\ 3 & -1 \end{bmatrix} \space \space \Sigma = \begin{bmatrix} \sqrt{45} & \\  & \sqrt{5} \end{bmatrix} \space \space V = \frac{1}{\sqrt{2}} \begin{bmatrix} 1 & -1 \\ 1 & 1 \end{bmatrix}  $$
 
+
+## Complex Vectors and Matrices
+
+Complex Vectors
+
+1. *The complex conjugate ($$z = a + bi$$) of*  is $$\bar z = a - bi$$
+2. $$\bar{z_1} + \bar{z_2} = \bar{z_1 + z_2}$$
+3. $$\bar{z_1} \times \bar{z_2} = \bar{z_1z_2} $$, prove $$z_1 \times z_2 = \left(a+ bi \right)\left(c + di \right) = \left(ac - bd\right) + \left(ad + cd\right)i$$, $$\bar{z_1} \times \bar{z_2} = \left(a - bi \right)\left(c - di \right) =  \left(ac - bd\right) - \left(ad + cd\right)i $$
+4. When $$Ax = \lambdax$$ and A is real, taking conjugates, then $$\bar{Ax} = \bar{\lambda x} \space => \space A \bar{x} = \bar{\lambda} \bar{x}  $$
+5. $$z = a + bi$$, $$z + \bar{z} = 2a $$, $$z \bar{z} = a^2 + b^2$$ are always **real**, $\left(3 + 2i\right) + \left(3 - 2i\right) = 6 $$, and $$\left(3 + 2i\right) *\left(3 - 2i\right) = 9 + 4 = 13 $$
+6. In polar system real part is x and imaginary part is y and $$a^2 + b^2 = r^2$$, $$z = a + b i $$  is aslo  $$z = rcos\theta + irsin\theta$$ which equal to $$re^{i\theta}$$, and $$\bar{z} = re^{-i\theta}$$ (*Euler's Formula*)
+7. The nth power of $$z = r \left(r cos\theta + i sin \theta \right)$$ is $$z^n = r^n \left(cosn \theta + i sin n \theta \right)$$
 
 <br/><br/>
 ```python
