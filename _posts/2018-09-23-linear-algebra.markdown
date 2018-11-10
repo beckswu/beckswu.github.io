@@ -647,12 +647,12 @@ $$U = \frac{1}{\sqrt{10}} \begin{bmatrix} 1 & -3 \\ 3 & -1 \end{bmatrix} \space 
 Complex Vectors
 
 1. *The complex conjugate ($$z = a + bi$$) of*  is $$\bar z = a - bi$$
-2. $$\bar{z_1} + \bar{z_2} = \bar{z_1 + z_2}$$
-3. $$\bar{z_1} \times \bar{z_2} = \bar{z_1z_2} $$, prove $$z_1 \times z_2 = \left(a+ bi \right)\left(c + di \right) = \left(ac - bd\right) + \left(ad + cd\right)i$$, $$\bar{z_1} \times \bar{z_2} = \left(a - bi \right)\left(c - di \right) =  \left(ac - bd\right) - \left(ad + cd\right)i $$
-4. When $$Ax = \lambda x$$ and A is real, taking conjugates, then $$\bar{Ax} = \bar{\lambda x} \space => \space A \bar{x} = \bar{\lambda} \bar{x}  $$
-5. $$z = a + bi$$, $$z + \bar{z} = 2a $$, $$z \bar{z} = a^2 + b^2$$ are always **real**, $$ \left(3 + 2i\right) + \left(3 - 2i\right) = 6 $$, and $$\left(3 + 2i\right) *\left(3 - 2i\right) = 9 + 4 = 13 $$
-6. In polar system real part is x and imaginary part is y and $$a^2 + b^2 = r^2$$, $$z = a + b i $$  is aslo  $$z = rcos\theta + irsin\theta$$ which equal to $$re^{i\theta}$$, and $$\bar{z} = re^{-i\theta}$$ (*Euler's Formula*)
-7. The nth power of $$z = r \left(r cos\theta + i sin \theta \right)$$ is $$z^n = r^n \left(cosn \theta + i sin n \theta \right)$$. Minor proof $$\left(cos \theta + i sin \theta\right) \times \left(cos \theta + i sin \theta\right) = cos^2 \theta + i^2 sin^2 \theta + 2 i sin \theta + cos \theta = \left(cos^2 \theta - sin^2 \theta \right) + 2 i sin \theta + cos \theta = cos 2 \theta + sin 2\theta$$
+2. The sum of two conjugate of vector = the conjugate of two vectors: $$\bar{z_1} + \bar{z_2} = \overline {z_1 + z_2}$$
+3. $$\bar{z_1} \times \bar{z_2} = \overline {z_1z_2} $$, prove $$z_1 \times z_2 = \left(a+ bi \right)\left(c + di \right) = \left(ac - bd\right) + \left(ad + cd\right)i$$, $$\bar{z_1} \times \bar{z_2} = \left(a - bi \right)\left(c - di \right) =  \left(ac - bd\right) - \left(ad + cd\right)i $$
+4. When $$Ax = \lambda x$$ and A is real, taking conjugates, then $$\overline {Ax} = \overline {\lambda x} \space => \space A \bar{x} = \bar{\lambda} \bar{x}  $$
+5. $$z + \bar{z} $$, $$z \bar{z}$$ are always **real**. $$z = a + bi$$, $$z + \bar{z} = 2a $$, $$z \bar{z} = a^2 + b^2$$ 
+6. In polar system real part is x axis and imaginary part is y axis and $$a^2 + b^2 = r^2$$, $$z = a + b i $$  is aslo  $$z = rcos\theta + irsin\theta$$ which equal to $$re^{i\theta}$$, and $$\bar{z} = re^{-i\theta}$$ (*Euler's Formula*)
+7. The nth power of $$z = r \left(r cos\theta + i sin \theta \right)$$ is $$z^n = r^n \left(cos \left(n n \theta \right) + i sin \left(n \theta \right) \right)$$. Minor proof $$\left(cos \theta + i sin \theta\right) \times \left(cos \theta + i sin \theta\right) = cos^2 \theta + i^2 sin^2 \theta + 2 i sin \theta + cos \theta = \left(cos^2 \theta - sin^2 \theta \right) + 2 i sin \theta + cos \theta = cos 2 \theta + sin 2\theta$$
 
 <br/><br/>
 ```python
