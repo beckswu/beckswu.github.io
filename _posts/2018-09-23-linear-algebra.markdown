@@ -668,7 +668,7 @@ $$A^H \space is \space A  \space Hermitian  \space  \space If  \space A = \begin
 
 **Properties:**
 
-1. The inner product of real or complex vectors u and v is $$u^H v$$
+1. The inner product of real or complex vectors u and v is $$$$\bbox[yellow]{\mathbf{u^H v}}$$
 2. The conjugate transpose of AB is $$\bbox[yellow]{\mathbf{\left(AB \right)^H = B^H A^H}}$$ (A, B are matrices)
 3. The inner product of $$Au$$ with v equals the inner product of u with $$A^Hv$$, $$\bbox[yellow]{\mathbf{ \left(Au \right)^H v = u^H\left(A^H u \right)  }}$$ 
 
@@ -676,7 +676,7 @@ $$u^H v = \left [ \bar u_1 \cdots \bar u_n \right] \begin{bmatrix} v_1 \\ \vdots
 
 <span style="color: red">注:</span> For inner product $$u^Hv$$ is different from $$v^Hu$$. The order of the vectors is now important. *实际上 $$u^Hv$$ is complex conjugate of $$v^Hu$$*
 
-<span style="color: red">注:</span> **A zero inner product still means that vectors are orthogonal** 比如 The inner product of $$u = \begin{bmatrix} 1 \\ i \end{bmatrix} $$ with $$v = \begin{bmatrix} i \\ 1 \end{bmatrix} $$ is $$\left 1 - i\right] \begin{bmatrix} i \\ 1 \end{bmatrix} = 0$$
+<span style="color: red">注:</span> **A zero inner product still means that vectors are orthogonal** 比如 The inner product of $$u = \begin{bmatrix} 1 \\ i \end{bmatrix} $$ with $$v = \begin{bmatrix} i \\ 1 \end{bmatrix} $$ is $$\left[ 1 - i\right] \begin{bmatrix} i \\ 1 \end{bmatrix} = 0$$
 
 prove(3): The conjugate of $$Au $$ is $$\overline{AU}$$. Transposing $$\overline{AU}$$ gives $$\bar u^T \bar A^T$$, which is $$u^HA^H$$
 
