@@ -644,7 +644,7 @@ $$U = \frac{1}{\sqrt{10}} \begin{bmatrix} 1 & -3 \\ 3 & -1 \end{bmatrix} \space 
 
 ## Complex Vectors and Matrices
 
-**Complex Vectors**
+**Complex Vectors:**
 
 1. *The complex conjugate ($$z = a + bi$$) of*  is $$\bar z = a - bi$$
 2. The sum of two conjugate of vector = the conjugate of two vectors: $$\bbox[yellow]{\mathbf{\bar{z_1} + \bar{z_2} = \overline {z_1 + z_2}}}$$
@@ -654,7 +654,7 @@ $$U = \frac{1}{\sqrt{10}} \begin{bmatrix} 1 & -3 \\ 3 & -1 \end{bmatrix} \space 
 6. In polar system real part is x axis and imaginary part is y axis and $$a^2 + b^2 = r^2$$, $$z = a + b i $$  is aslo  $$z = rcos\theta + irsin\theta$$ which equal to $$re^{i\theta}$$, and $$\bar{z} = re^{-i\theta}$$ (*Euler's Formula*)
 7. The nth power of $$z = r \left(r cos\theta + i sin \theta \right)$$ is $$z^n = r^n \left(cos \left( n \theta \right) + i sin \left(n \theta \right) \right)$$. Minor proof $$\left(cos \theta + i sin \theta\right) \times \left(cos \theta + i sin \theta\right) = cos^2 \theta + i^2 sin^2 \theta + 2 i sin \theta + cos \theta $$$$= \left(cos^2 \theta - sin^2 \theta \right) + 2 i sin \theta + cos \theta = cos 2 \theta + sin 2\theta$$
 
-**Complex Matrices**
+
 
 **Hermitian (Conjugate transpose)** $$z  = \left[a_1 + ib_i, \cdots, a_n + ib_n \right]$$. *When transpose a complex vector z or matrix A, take the complex conjugate too*.
 
@@ -665,6 +665,23 @@ Reason to take conjugate when transpose: The length squared of a real vector is 
 $$Length \space square \space \left[ \bar z_1 \cdots \bar z_n \right] \begin{bmatrix} z_1 \\ \vdots \\ z_n  \end{bmatrix} = \mid z_1^2 \mid^2 + \cdots+ \mid z_n^2 \mid^2.  \space  => \space \bar z^T z = z^H z = \|z \|^2  $$
 
 $$A^H \space is \space A  \space Hermitian  \space  \space If  \space A = \begin{bmatrix} 1 & i \\ 0 & 1 + i \end{bmatrix} \space then \space A^H =   \begin{bmatrix} 1 & 0 \\ -i & 1 - i \end{bmatrix}$$
+
+**Properties:**
+
+1. The inner product of real or complex vectors u and v is $$u^H v$$
+2. The conjugate transpose of AB is $$\bbox[yellow]{\mathbf{\left(AB \right)^H = B^H A^H}}$$ (A, B are matrices)
+3. The inner product of $$Au$$ with v equals the inner product of u with $$A^Hv$$, $$\bbox[yellow]{\mathbf{ \left(Au \right)^H v = u^H\left(A^H u \right)  }}$$ 
+
+$$u^H v = \left [ \bar u_1 \cdots \bar u_n \right] \begin{bmatrix} v_1 \\ \vdots \\ v_n \end{bmatrix} = \bar u_1 v_1 + \cdots + \bar u_n v_n $$
+
+<span style="color: red">注:</span> For inner product $$u^Hv$$ is different from $$v^Hu$$. The order of the vectors is now important. *实际上 $$u^Hv$$ is complex conjugate of $$v^Hu$$*
+
+<span style="color: red">注:</span> **A zero inner product still means that vectors are orthogonal** 比如 The inner product of $$u = \begin{bmatrix} 1 \\ i \end{bmatrix} $$ with $$v = \begin{bmatrix} i \\ 1 \end{bmatrix} $$ is $$\left 1 - i\right] \begin{bmatrix} i \\ 1 \end{bmatrix} = 0$$
+
+prove(3): The conjugate of $$Au $$ is $$\overline{AU}$$. Transposing $$\overline{AU}$$ gives $$\bar u^T \bar A^T$$, which is $$u^HA^H$$
+
+$$\left(Au \right)^H v = u^H A^H v = u^H\left(A^H u \right)$$
+
 
 <br/><br/>
 ```python
