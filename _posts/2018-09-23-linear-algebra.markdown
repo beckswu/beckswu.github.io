@@ -660,7 +660,7 @@ Complex Matrices
 
 $$ {\bar z}^T  = \left[ \bar z_1, \cdots, \bar z_n \right] = \left[a_1 - ib_1, \cdots, a_n - ib_n \right]$$
 
-Reason to take conjugate when transpose. 
+Reason to take conjugate when transpose: The length squared of a real vector is $$x_1^2 + \cdots + x_n^2$$. The length squared of a complext vector is not $$z_1^2 + \cdots + z_n^2 $$. with wrong definition, the length of (1,i) would be $$1^2 + i^2 = 0$$. A nonzero vector would have length. Instead of $$\left( a + bi \right)^2$$, we want $$a^2 + b^2$$ which is $$\left( a + bi \right) \times \left( a - bi \right)$$
 
 <br/><br/>
 ```python
