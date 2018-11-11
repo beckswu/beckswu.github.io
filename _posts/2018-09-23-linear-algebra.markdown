@@ -722,6 +722,20 @@ The left sides are equal so $$\lambda y^H z = \beta y^H z $$, since $$\lambda \n
 
 <span style="color: red">注:</span>  When S is real and symmetric, X is Q - an orthogonal matrix. <span style="color: red">If S is complex and Hermitian. Its eigenvectors are complex and orthonormal. </span> **The eigenvector matrix is like Q, but complex**: $$\mathbf{Q^HQ = I}$$. We assign Q a new name "unitary""
 
+
+#### Unitary Matrices
+
+A **unitary matrix** Q is a (complex) square matrix that has orthonormal columns
+
+1. Every matrix Q with orthonormal columns has $$Q^H Q = I$$. If Q is **square**, it is a unitary matrix. Then $$\mathbf{Q^H = Q^{-1}}$$
+2. The **eigenvalues** of unitary (and orthogonal) matrices Q all have $$\mid \lambda \mid = 1$$. If Q is unitary then $$\| Qz \| = \| z \|$$.
+   
+*proof 2*:   
+
+$$\( Qz\right)^H Qz = z^H \lambda \lambda z = \lambda^2 z^H z$$
+
+$$\( Qz\right)^H Qz = z^H Q^H Q z = z^H z \text{ leads to } \lambda^2 = 1, \lambda = \pm 1 $$
+
 <br/><br/>
 ```python
 import numpy as np
