@@ -44,6 +44,8 @@ $$\mathbf{\text{Cost function: }}\mathscr{L} \left(\hat y, y \right) =  \frac{1}
 
 **Cost function measures** how well parameter w and b doing **on the training set** (cost function是对于entire training set )
 
+![](\img\post\Deep-Learning\pic2.png)
+
 Loss (error) function 不用 $$L\left(\hat y, y \right) = \frac{1}{2}\left( \hat y - y\right)^2$$ (<span style="color: red">Optimization is not a convex function having many local optimum</span>, so Grandient Descent may not find global optimum)
 
 
