@@ -64,9 +64,9 @@ $$\frac{\partial J \left(w, b \right)}{\partial w} = \frac{ J\left( w + 0.0001, 
 
 *mathematic proof of gradient*
 
-$$z = W^T x + b,  \hat y = a = \sigma\left(z\right) = \frac{1}{1 + e^{-z}}$$
+$$\text{As we know: }z = W^T x + b,  \hat y = a = \sigma\left(z\right) = \frac{1}{1 + e^{-z}}$$
 
-$$\mathscr{L} \left(a, y \right) = - ylog\left( a \right) + \left( 1- y \right) log\left( 1 - a \right) $$
+$$\text{As we know: } \mathscr{L} \left(a, y \right) = - ylog\left( a \right) + \left( 1- y \right) log\left( 1 - a \right) $$
 
 $$\frac{\partial \mathscr{L} \left(a, y \right)}{\partial a} = -\frac{y}{a} + \frac{1-y}{1-a}   $$
 
