@@ -682,7 +682,7 @@ prove(3): The conjugate of $$Au $$ is $$\overline{AU}$$. Transposing $$\overline
 
 $$\left(Au \right)^H v = u^H A^H v = u^H\left(A^H u \right)$$
 
-**Hermitian Matrices: $$S = S^H$$**
+#### Hermitian Matrices: $$S = S^H$$
 
 **Hermitian matrices**: $$S = S^H$$. The condition on the entries is $$s_{ij} = \overline{s_{ji}}$$. E.g. $$\begin{bmatrix} 2 & 3 - 3i \\ 3 + 3i & 5 \end{bmatrix}$$ Every real symmetric matrix is Hermitian,because taking its conjugate has no effect. 
 
