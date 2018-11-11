@@ -13,7 +13,7 @@ tags:
     - 总结
 ---
 
-> note from youtube khan Academy / Introduction to Linear Algebra \[Gilbert Strang\]
+> note from youtube khan Academy + Introduction to Linear Algebra \[Gilbert Strang\]  + MIT Open Courses
 
 <script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"> </script>
 
@@ -732,9 +732,9 @@ A **unitary matrix** Q is a (complex) square matrix that has orthonormal columns
    
 *proof 2*:   
 
-$$\( Qz\right)^H Qz = z^H \lambda \lambda z = \lambda^2 z^H z$$
+$$\left( Qz\right)^H Qz = z^H \lambda \lambda z = \lambda^2 z^H z$$
 
-$$\( Qz\right)^H Qz = z^H Q^H Q z = z^H z \text{ leads to } \lambda^2 = 1, \lambda = \pm 1 $$
+$$\left( Qz\right)^H Qz = z^H Q^H Q z = z^H z \text{ leads to } \lambda^2 = 1, \lambda = \pm 1 $$
 
 <br/><br/>
 ```python
