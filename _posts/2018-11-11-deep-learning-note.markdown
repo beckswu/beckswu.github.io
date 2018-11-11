@@ -50,14 +50,15 @@ Loss (error) function 不用 $$L\left(\hat y, y \right) = \frac{1}{2}\left( \hat
 #### Gradient Descent
 
 Repeat { <br/>
-$$W := w - \alphda \frac{ \partial J\left(w, b)}{\partial w}, \text{ \alpha learning rate} $$
-$$b := b- \alphda \frac{ \partial J\left(w, b)}{\partial b}$$
+$$W := w - \alphda \frac{ \partial J\left(w, b\right)}{\partial w}, \text{ \alpha learning rate} $$
+$$b := b- \alphda \frac{ \partial J\left(w, b\right)}{\partial b}$$
+
 }
 
 Gradient Descent $$W := w - \alphda \frac{ \partial J\left(w, b)}{\partial w}$$, $$\alpha$$ <span style="color: red">前面是减号的原因</span>
 
 ![](\img\post\Deep-Learning\pic1.PNG)
 
-$$\frac{\partial J \left(w, b \right)}{\partial w} = \frac{ J\left( w + 0.0001, b) - J\left(w,b \right)}{\left( w + 0.0001\right) - w}$$
+$$\frac{\partial J \left(w, b \right)}{\partial w} = \frac{ J\left( w + 0.0001, b\right) - J\left(w,b \right)}{\left( w + 0.0001\right) - w}$$
 
 如过J(w,b)的值随着w的增加而增加(increasing, slope为正), 找global minimum 就是要w的基础上减小(与slope相反), 如过增加的幅度（slope) 越大,代表离global minimum 的点越远，就要减得越大.同样如果J(w,b)的值随着w的增加而减小(decreasing, slope为负), 找global minimum 就是要w的基础上增加
