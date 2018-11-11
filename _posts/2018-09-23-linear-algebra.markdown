@@ -670,7 +670,7 @@ $$U = \frac{1}{\sqrt{10}} \begin{bmatrix} 1 & -3 \\ 3 & -1 \end{bmatrix} \space 
 
 $$ z^H = {\bar z}^T  = \left[ \bar z_1, \cdots, \bar z_n \right] = \left[a_1 - ib_1, \cdots, a_n - ib_n \right]$$
 
-Reason to take conjugate when transpose: The length squared of a real vector is $$x_1^2 + \cdots + x_n^2$$. The length squared of a complex vector is not $$z_1^2 + \cdots + z_n^2 $$. with wrong definition, the length of (1,i) would be $$1^2 + i^2 = 0$$. A nonzero vector would have zero length. Instead of $$\left( a + bi \right)^2$$, we want $$a^2 + b^2$$ which is $$\left( a + bi \right) \times \left( a - bi \right)$$
+Reason to take conjugate when transpose: The length squared of a real vector is $$x_1^2 + \cdots + x_n^2$$. The length squared of a complex vector is not $$z_1^2 + \cdots + z_n^2 $$. with wrong definition, the length of (1,i) would be $$\begin{bmatrix} 1 & i \end{bmatrix} \begin{bmatrix} 1 \\ i \end{bmatrix}  =  1^2 + i^2 = 0$$. A nonzero vector would have zero length. Instead of $$\left( a + bi \right)^2$$, we want $$a^2 + b^2$$ which is $$\left( a + bi \right) \times \left( a - bi \right)$$
 
 $$Length \space square \space \left[ \bar z_1 \cdots \bar z_n \right] \begin{bmatrix} z_1 \\ \vdots \\ z_n  \end{bmatrix} = \mid z_1^2 \mid^2 + \cdots+ \mid z_n^2 \mid^2.  \space  => \space \bar z^T z = z^H z = \|z \|^2  $$
 
@@ -728,7 +728,7 @@ The left sides are equal so $$\lambda y^H z = \beta y^H z $$, since $$\lambda \n
 A **unitary matrix** Q is a (complex) square matrix that has orthonormal columns
 
 1. Every matrix Q with orthonormal columns has $$Q^H Q = I$$. If Q is **square**, it is a unitary matrix. Then $$\mathbf{Q^H = Q^{-1}}$$
-2. The **eigenvalues** of unitary (and orthogonal) matrices Q all have $$\mid \lambda \mid = 1$$. If Q is unitary then $$\| Qz \| = \| z \|$$.
+2. The **eigenvalues** of unitary (and orthogonal) matrices Q all have $$\mid \lambda \mid = 1$$. If Q is unitary then $$\mathbf{\| Qz \| = \| z \|}$$.
    
 *proof 2*:   
 
