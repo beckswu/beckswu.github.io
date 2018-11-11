@@ -316,6 +316,16 @@ properties:
 2. transpose = inverse: $$Q^T = Q^{-1}$$
 3. The determinant of any orthogonal matrix is either +1 or -1
 
+*proof 3* 利用orthogonal matrix $$A^T A = I$$性质
+
+$$\left(Ax \right)^T Ax = \lambda x^T \lambda x = \lambda^2 x^Tx$$
+
+$$\left(Ax \right)^T Ax = x^T A^T A x = x^T x$$
+
+so $$ \lambda^2 x^Tx = x^T x$$, $$\mid \lambda \mid = 1$$. Then $$\lambda = -1 \space or \space 1$$
+
+
+
 #### Gram-Schmidt process
 
 __Gram-Schmidt process__, is a procedure which takes a nonorthogonal set of linearly independent functions to constructs an orthogonal basis
