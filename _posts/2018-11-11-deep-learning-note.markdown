@@ -35,9 +35,9 @@ tags:
 
 #### Cost Function
 
-$$\text{Loss function: }\mathscr{L} \left(\hat y, y \right) = - ylog\left( \hat y \right) + \left( 1- y \right) log\left( 1 - \hat y \right) $$
+$$\mathbf{\text{Loss function: }\mathscr{L} \left(\hat y, y \right) = \bbox[yellow]{ - ylog\left( \hat y \right) + \left( 1- y \right) log\left( 1 - \hat y \right)} }$$
 
-$$\text{Cost function: }\mathscr{L} \left(\hat y, y \right) =  \frac{1}{m} \sum_{i=1}^m \mathscr{L} \left(\hat y^{\left(i\right)}, y^{\left(i\right)} \right) = \frac{1}{m} \sum_{i=1}^m  \ y^{\left(i\right)} log\left( \hat y^{\left(i\right)}  \right) + \left( 1- y^{\left(i\right)} \right) log\left( 1 - \hat y^{\left(i\right)} \right) $$
+$$\mathbf{\text{Cost function: }}\mathscr{L} \left(\hat y, y \right) =  \frac{1}{m} \sum_{i=1}^m \mathscr{L} \left(\hat y^{\left(i\right)}, y^{\left(i\right)} \right) = \frac{1}{m} \sum_{i=1}^m  \ y^{\left(i\right)} log\left( \hat y^{\left(i\right)}  \right) + \left( 1- y^{\left(i\right)} \right) log\left( 1 - \hat y^{\left(i\right)} \right) $$
 
 
 **Loss function** measures how well your algorithm output $$\hat y^{\left(i \right)} $$ on each of the training examples or compares to the ground true label $$ y^{\left(i \right)}$$ on each of the training examples (loss function是对于一个 training example )
@@ -62,7 +62,7 @@ $$\frac{\partial J \left(w, b \right)}{\partial w} = \frac{ J\left( w + 0.0001, 
 
 若J(w,b)的值随着w的增加而增加(increasing, slope为正), 找global minimum 就是要w的基础上减小(与slope相反),同理如果J(w,b)的值随着w的增加而减小(decreasing, slope为负), 找global minimum 就是要w的基础上增加
 
-*mathematic proof of gradient*
+*mathematic proof of gradient*: Using Chain Rule
 
 $$\text{As we know: }z = W^T x + b,  \hat y = a = \sigma\left(z\right) = \frac{1}{1 + e^{-z}}$$
 
