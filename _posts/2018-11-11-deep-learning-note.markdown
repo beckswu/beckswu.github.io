@@ -39,4 +39,4 @@ $$\mathscr{L} \left(\hat y, y \right) = - ylog\left( \hat y \right) + \left( 1- 
 
 Loss function measures how good $$\hat y $$ when true label is y
 
-Loss (error) function 不用 $$L\left(\haty, y) = \frac{1}{2}\left(\hat y - y\right)^2$$ (Optimization is not a convex function having many local optimum, so Grandient Descent may not find global optimum)
+Loss (error) function 不用 $$L\left(\haty, y \right) = \frac{1}{2}\left( \hat y - y\right)^2$$ (Optimization is not a convex function having many local optimum, so Grandient Descent may not find global optimum)
