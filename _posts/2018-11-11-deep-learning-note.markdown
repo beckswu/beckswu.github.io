@@ -60,4 +60,20 @@ Gradient Descent $$W := w - \alpha \frac{ \partial J\left(w, b \right)}{\partial
 
 $$\frac{\partial J \left(w, b \right)}{\partial w} = \frac{ J\left( w + 0.0001, b\right) - J\left(w,b \right)}{\left( w + 0.0001\right) - w}$$
 
-如过J(w,b)的值随着w的增加而增加(increasing, slope为正), 找global minimum 就是要w的基础上减小(与slope相反), 如过增加的幅度（slope) 越大,代表离global minimum 的点越远，就要减得越大.同样如果J(w,b)的值随着w的增加而减小(decreasing, slope为负), 找global minimum 就是要w的基础上增加
+若J(w,b)的值随着w的增加而增加(increasing, slope为正), 找global minimum 就是要w的基础上减小(与slope相反),同理如果J(w,b)的值随着w的增加而减小(decreasing, slope为负), 找global minimum 就是要w的基础上增加
+
+$$z = W^T x + b,  \hat y = a = \sigma\left(z\right) = \frac{1}{1 + e^{-z}}$$
+
+$$\mathscr{L} \left(a, y \right) = - ylog\left( a \right) + \left( 1- y \right) log\left( 1 - a \right) $$
+
+$$\frac{\partial \mathscr{L} \left(a, y \right)}{\partial a} = -\frac{y}{a} + \frac{1-y}{1-a}   $$
+
+$$\frac{\partial a }{\partial z} = \frac{1}{1+e^{-z}} \frac{-e^{-z}}{1+e^{-z}} = a * \left( 1-a \right)$$
+
+$$dz = \frac{\mathscr{L} \left(a, y \right)}{\partial a} * \frac{a}{z} = -y*\left(1-a \right) + a\left(1- y \right) = a - y $$
+
+$$dw_1 = \frac{\mathscr{L} \left(a, y \right)}{dz} \frac{\partial z}{\partial w1} = x_1 dz = x_1 \left(a - y \right) $$
+
+$$dw_1 = \frac{\mathscr{L} \left(a, y \right)}{dz} \frac{\partial z}{\partial w2} = x_2 dz = x_2 \left(a - y \right) $$
+
+$$db = \frac{\mathscr{L} \left(a, y \right)}{dz} \frac{\partial z}{\partial b} = dz = a - y$$
