@@ -686,8 +686,8 @@ $$\left(Au \right)^H v = u^H A^H v = u^H\left(A^H u \right)$$
 
 **Hermitian matrices**: $$S = S^H$$. The condition on the entries is $$s_{ij} = \overline{s_{ji}}$$. E.g. $$\begin{bmatrix} 2 & 3 - 3i \\ 3 + 3i & 5 \end{bmatrix}$$ Every real symmetric matrix is Hermitian,because taking its conjugate has no effect. 
 
-1. If $$S = S^H$$ and z is any real or complex column vector, then $$z^H S z$$ is real
-2. Every eigenvalue of a Hermitian matrix is real
+1. If $$S = S^H$$ and z is any real or complex column vector, then <span style="background-color: #FFFF00">$$z^H S z$$ is real</span>
+2. <span style="color: red">Every eigenvalue of a Hermitian matrix is real</span>
 3. <span style="color: red">The eigenvectors of a Hermitian matrix are orthogonal</span> (when they correspond to different eigenvalues). If $$Sz = \lambda z$$ and $$Sy = \beta y$$, then $$y^Hz = 0 $$
 
 
@@ -695,7 +695,7 @@ $$\left(Au \right)^H v = u^H A^H v = u^H\left(A^H u \right)$$
 
 $$\left(z^H S z \right)^H = z^H s^H \left(z^H \right)^H = z^H S z$$ 
 
-E.g. Here is that enery $$z^HSz$$: The terms $$2\mid z_1 \mid^2 $$ and   $$5\mid z_2 \mid^2 $$ from diagonal are both real, And off-diagonal terms are conjugates of each other - so their sum is real(The imaginary parts cancel when we add)
+E.g. Here is that enery $$z^HSz$$: The terms $$2\mid z_1 \mid^2 $$ and   $$5\mid z_2 \mid^2 $$ from diagonal are both real, And off-diagonal terms are conjugates of each other - so their sum is real (The imaginary parts cancel when we add)
 
 
 $$\left[\bar z_1 \bar z_2 \right] \begin{bmatrix} 2 & 3 - i \\ 3 + 3i & 5 \end{bmatrix} \begin{bmatrix} z_1 \\ z_2  \end{bmatrix} = \underbrace{2 \bar z_1 z_1 + 5 \bar z_2 z_2}_{\text{diagonal}} + \underbrace{\left(3 - 3i \right)  \bar z_1 z_2 +  \left(3 + 3i \right)  z_1  \bar  z_2}_{\text{off-diagonal}} $$
@@ -704,9 +704,9 @@ $$\left[\bar z_1 \bar z_2 \right] \begin{bmatrix} 2 & 3 - i \\ 3 + 3i & 5 \end{b
 
 *proof (3):* multiply $$Sz = \lambda z$$ by $$y^H$$, take conjugate transpose of  $$Sy = \beta y$$ then multiply $$z$$
 
-$$Sz y^H = \lambda z y^H \space \space \Rightarrow  \space \space y^H S z = \lambda y^H z $$
+$$y^H Sz = y^H  \lambda z \space \space \Rightarrow  \space \space y^H S z = \lambda y^H z $$
 
-$$\left( S y \right)^H z = \left(\beta y)^H z \space \space \Rightarrow  \space \space y^H S^H z = \beta y^H z $$
+$$\left( S y \right)^H z = \left(\beta y \right)^H z \space \space \Rightarrow  \space \space y^H S^H z = \beta y^H z $$
 
 The left sides are equal so $$\lambda y^H z = \beta y^H z $$, since $$\lambda \neq \beta$$, then $$y^Hz$$ must be zero
 
