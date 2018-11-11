@@ -50,14 +50,14 @@ Loss (error) function 不用 $$L\left(\hat y, y \right) = \frac{1}{2}\left( \hat
 #### Gradient Descent
 
 Repeat { <br/>
-$$W := w - \alphda \frac{ \partial J\left(w, b\right)}{\partial w}, \text{ \alpha learning rate} $$
-$$b := b- \alphda \frac{ \partial J\left(w, b\right)}{\partial b}$$
+$$W := w - \alpha \frac{ \partial J\left(w, b\right)}{\partial w}, \text{ \alpha learning rate} $$
+$$b := b- \alpha \frac{ \partial J\left(w, b\right)}{\partial b}$$
 
 }
 
-Gradient Descent $$W := w - \alphda \frac{ \partial J\left(w, b)}{\partial w}$$, $$\alpha$$ <span style="color: red">前面是减号的原因</span>
+Gradient Descent $$W := w - \alpha \frac{ \partial J\left(w, b)}{\partial w}$$, $$\alpha$$ <span style="color: red">前面是减号的原因</span>
 
-![](\img\post\Deep-Learning\pic1.PNG)
+![](\img\post\Deep-Learning\pic1.png)
 
 $$\frac{\partial J \left(w, b \right)}{\partial w} = \frac{ J\left( w + 0.0001, b\right) - J\left(w,b \right)}{\left( w + 0.0001\right) - w}$$
 
