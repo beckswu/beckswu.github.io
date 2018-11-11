@@ -44,7 +44,7 @@ Loss function measures how well your algorithm output $$\hat y^{\left(i \right)}
 
 Cost function measures how well a and b doing on the training set
 
-Loss (error) function 不用 $$L\left(\haty, y \right) = \frac{1}{2}\left( \hat y - y\right)^2$$ (Optimization is not a convex function having many local optimum, so Grandient Descent may not find global optimum)
+Loss (error) function 不用 $$L\left(\hat y, y \right) = \frac{1}{2}\left( \hat y - y\right)^2$$ (Optimization is not a convex function having many local optimum, so Grandient Descent may not find global optimum)
 
 
 #### Gradient Descent
