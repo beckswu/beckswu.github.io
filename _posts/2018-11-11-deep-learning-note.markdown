@@ -107,10 +107,11 @@ $$w_1 = w_1 - \alpha dw_1; \space w_2 = w_2 - \alpha dw_w; \space b = b - \alpha
 
 ------------
 n: # attributes, m: #training examples;  W: n by 1 matrix; X : n by m matrix (every columns is one training example); b: 1 by m matrix (with the same number)<br/>
-$$Z = W^T X + b = np.dot\left(w.T, x\right) + b$$<br/>
-$$A = \sigma\left( Z \right)$$<br/>
-$$dZ = A - Y $$<br/>
-$$dW = \frac{1}{m} X dZ^T$$ <br/>
-$$db =  \frac{1}{m} \sum_{i=1}^m dz^{\left( i\right)} = \frac{1}{m} np.sum\left(dZ \right)$$<br/>
+$$Z = W^T X + b = np.dot\left(w.T, x\right) + b$$, Z is 1 by m matrix<br/>
+$$A = \sigma\left( Z \right)$$ , A is 1 by m matrix<br/>
+$$dZ = A - Y $$, dZ is 1 by m matrix<br/>
+$$dW = \frac{1}{m} X dZ^T$$ dW is n by 1 matrix<br/>
+$$db =  \frac{1}{m} \sum_{i=1}^m dz^{\left( i\right)} = \frac{1}{m} np.sum\left(dZ \right)$$, db is a number<br/>
 $$w := w - \alpha dw; \space  b:= b - \alpha db$$ <br/>
+
 ------------
