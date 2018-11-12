@@ -85,10 +85,19 @@ $$\mathbf{db = \frac{\mathscr{L} \left(a, y \right)}{\partial z} \frac{\partial 
 
 #### Logistic Regresion
 
-$$i = 0, dw_1 = 0, dw_2 = 0, db = 0$$<br/>
+
+------------
+$$i = 0, dw_1 = 0, dw_2 = 0, db = 0, Jt = 0$$<br/>
 For i from 1 to m:<br/>
 $$\space \space \space \space \space z^{\left( i \right)} = W^T x^{\left( i \right)} + b $$ <br/>
 $$\space \space \space \space \space a^{\left( i \right)} = \sigma \left(z^{\left( i \right)} \right)$$<br/>
-$$\space \space \space \space \space Jt^{\left( i \right)} = -y^{\left( i \right)} log a^{\left( i \right)} + \left(1 - y^{ \left( i \right)} \right) log  \left(1 - a^{ \left( i\right)} \right)$$<br/>
+$$\space \space \space \space \space Jt = -y^{\left( i \right)} log a^{\left( i \right)} + \left(1 - y^{ \left( i \right)} \right) log  \left(1 - a^{ \left( i\right)} \right)$$<br/>
+$$\space \space \space \space \space dz^{\left( i \right)} = a^{\left( i \right)} - y^{\left(i \right)}$$<br/>
+$$\space \space \space \space \space  dw_1 += x_1^{\left(i\right)} dz^{\left( i \right)}$$<br/>
+$$\space \space \space \space \space  dw_2 += x_2^{\left(i\right)} dz^{\left( i \right)}$$<br/>
+$$\space \space \space \space \space  db +=  dz^{\left( i \right)}$$<br/>
+End Loop<br/>
+$$Jt /= m; dw_1 /= m; dw_2 /= m; db /= m$$<br/>
+$$w_1 = w_1 - \alphda dw_1; w_2 = w_2 - \alphda dw_w; b = b - \alphda db;$$
 
-End Loop
+------------
