@@ -85,7 +85,7 @@ $$\mathbf{db = \frac{\mathscr{L} \left(a, y \right)}{\partial z} \frac{\partial 
 
 #### Logistic Regresion
 
-
+**Logistic Regression with Gradient Descent on m Examples**
 ------------
 $$i = 0, dw_1 = 0, dw_2 = 0, db = 0, Jt = 0$$<br/>
 For i from 1 to m:<br/>
@@ -97,7 +97,18 @@ $$\space \space \space \space \space  dw_1 += x_1^{\left(i\right)} dz^{\left( i 
 $$\space \space \space \space \space  dw_2 += x_2^{\left(i\right)} dz^{\left( i \right)}$$<br/>
 $$\space \space \space \space \space  db +=  dz^{\left( i \right)}$$<br/>
 End Loop<br/>
-$$Jt /= m; dw_1 /= m; dw_2 /= m; db /= m$$<br/>
-$$w_1 = w_1 - \alphda dw_1; w_2 = w_2 - \alphda dw_w; b = b - \alphda db;$$
+$$Jt /= m; \space dw_1 /= m; \space dw_2 /= m; \space db /= m$$<br/>
+$$w_1 = w_1 - \alpha dw_1; \space w_2 = w_2 - \alpha dw_w; \space b = b - \alpha db;$$
 
+------------
+
+**Vectorizing Logistic Regression with Gradient Descent on m Examples**
+------------
+n: # attributes, m: #training examples;  W: n by 1 matrix; X : n by m matrix (every columns is one training example); b: 1 by m matrix (with the same number)<br/>
+$$Z = W^T X + b = np.dot\left(w.T, x\right) + b$$<br/>
+$$A = \sigma\left( Z \right)$$<br/>
+$$dZ = A - Y $$<br/>
+$$dW = \frac{1}{m} X dZ^T$$ <br/>
+$$db =  \frac{1}{m} \sum_{i=1}{m} dz^{\left( i\right)} = \frac{1}{m} np.sum\left(dZ \right)$$<br/>
+$$w := w - \alpha dw; \space  b:= b - \alpha db$$ <br/>
 ------------
