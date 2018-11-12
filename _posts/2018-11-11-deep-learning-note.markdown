@@ -84,3 +84,9 @@ $$\mathbf{db = \frac{\mathscr{L} \left(a, y \right)}{\partial z} \frac{\partial 
 
 
 #### Logistic Regresion
+
+$$i = 0, dw_1 = 0, dw_2 = 0, db = 0$$<br/>
+For i from 1 to m:
+$$\space \space \space \space \space z^{\left( i \right)} = W^T x^{\left( i \right)} + b $$ <br/>
+$$\space \space \space \space \space a^{\left( i \right)} = \sigma \left(z^{\left( i \right)} \right)$$<br/>
+End Loop
