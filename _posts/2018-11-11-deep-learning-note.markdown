@@ -37,7 +37,7 @@ tags:
 
 $$\mathbf{\text{Loss function: }\mathscr{L} \left(\hat y, y \right) = \bbox[yellow]{ - ylog\left( \hat y \right) + \left( 1- y \right) log\left( 1 - \hat y \right)} }$$
 
-$$\mathbf{\text{Cost function: }}\mathscr{L} \left(\hat y, y \right) =  \frac{1}{m} \sum_{i=1}^m \mathscr{L} \left(\hat y^{\left(i\right)}, y^{\left(i\right)} \right) = \frac{1}{m} \sum_{i=1}^m  \ y^{\left(i\right)} log\left( \hat y^{\left(i\right)}  \right) + \left( 1- y^{\left(i\right)} \right) log\left( 1 - \hat y^{\left(i\right)} \right) $$
+$$\mathbf{\text{Cost function: }} J \left(w, b\right) =  \frac{1}{m} \sum_{i=1}^m \mathscr{L} \left(\hat y^{\left(i\right)}, y^{\left(i\right)} \right) = \frac{1}{m} \sum_{i=1}^m  \ y^{\left(i\right)} log\left( \hat y^{\left(i\right)}  \right) + \left( 1- y^{\left(i\right)} \right) log\left( 1 - \hat y^{\left(i\right)} \right) $$
 
 
 **Loss function** measures how well your algorithm output $$\hat y^{\left(i \right)} $$ on each of the training examples or compares to the ground true label $$ y^{\left(i \right)}$$ on each of the training examples (loss function是对于一个 training example )
@@ -52,8 +52,8 @@ Loss (error) function 不用 $$L\left(\hat y, y \right) = \frac{1}{2}\left( \hat
 #### Gradient Descent
 
 Repeat { <br/>
-$$W := w - \alpha \frac{ \partial J\left(w, b\right)}{\partial w}, \alpha \text{ learning rate} $$<br/>
-$$b := b- \alpha \frac{ \partial J\left(w, b\right)}{\partial b}$$<br/>
+$$W := w - \alpha \frac{ \partial J\left(w, b\right)}{\partial w} =  w - \frac{1}{m} \frac{\partial \sum_{i=1}{m}\mathscr{L} \left(\hat y, y \right)}{\partial w} , \alpha \text{ learning rate} $$<br/>
+$$b := b- \alpha \frac{ \partial J\left(w, b\right)}{\partial b} $$<br/>
 }
 
 Gradient Descent $$W := w - \alpha \frac{ \partial J\left(w, b \right)}{\partial w}$$, $$\alpha$$ <span style="color: red">前面是减号的原因</span>
@@ -76,8 +76,11 @@ $$\frac{\partial a }{\partial z} = \frac{1}{1+e^{-z}} \frac{-e^{-z}}{1+e^{-z}} =
 
 $$dz = \frac{\mathscr{L} \left(a, y \right)}{\partial a} * \frac{\partial a}{\partial z} = -y*\left(1-a \right) + a\left(1- y \right) = a - y $$
 
-$$\mathbf{dw_1 = \frac{\mathscr{L} \left(a, y \right)}{dz} \frac{\partial z}{\partial w1} = x_1 dz = x_1 \left(a - y \right)}$$
+$$\mathbf{dw_1 = \frac{\mathscr{L} \left(a, y \right)}{\partial z} \frac{\partial z}{\partial w1} = x_1 dz = x_1 \left(a - y \right)}$$
 
-$$\mathbf{dw_1 = \frac{\mathscr{L} \left(a, y \right)}{dz} \frac{\partial z}{\partial w2} = x_2 dz = x_2 \left(a - y \right)}$$
+$$\mathbf{dw_2 = \frac{\mathscr{L} \left(a, y \right)}{\partial z} \frac{\partial z}{\partial w2} = x_2 dz = x_2 \left(a - y \right)}$$
 
-$$\mathbf{db = \frac{\mathscr{L} \left(a, y \right)}{dz} \frac{\partial z}{\partial b} = dz = a - y}$$
+$$\mathbf{db = \frac{\mathscr{L} \left(a, y \right)}{\partial z} \frac{\partial z}{\partial b} = dz = a - y}$$
+
+
+#### Logistic Regresion
