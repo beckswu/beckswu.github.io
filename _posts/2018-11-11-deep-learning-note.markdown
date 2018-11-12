@@ -86,6 +86,7 @@ $$\mathbf{db = \frac{\mathscr{L} \left(a, y \right)}{\partial z} \frac{\partial 
 #### Logistic Regresion
 
 **Logistic Regression with Gradient Descent on m Examples**
+
 ------------
 $$i = 0, dw_1 = 0, dw_2 = 0, db = 0, Jt = 0$$<br/>
 For i from 1 to m:<br/>
@@ -103,12 +104,13 @@ $$w_1 = w_1 - \alpha dw_1; \space w_2 = w_2 - \alpha dw_w; \space b = b - \alpha
 ------------
 
 **Vectorizing Logistic Regression with Gradient Descent on m Examples**
+
 ------------
 n: # attributes, m: #training examples;  W: n by 1 matrix; X : n by m matrix (every columns is one training example); b: 1 by m matrix (with the same number)<br/>
 $$Z = W^T X + b = np.dot\left(w.T, x\right) + b$$<br/>
 $$A = \sigma\left( Z \right)$$<br/>
 $$dZ = A - Y $$<br/>
 $$dW = \frac{1}{m} X dZ^T$$ <br/>
-$$db =  \frac{1}{m} \sum_{i=1}{m} dz^{\left( i\right)} = \frac{1}{m} np.sum\left(dZ \right)$$<br/>
+$$db =  \frac{1}{m} \sum_{i=1}^m dz^{\left( i\right)} = \frac{1}{m} np.sum\left(dZ \right)$$<br/>
 $$w := w - \alpha dw; \space  b:= b - \alpha db$$ <br/>
 ------------
