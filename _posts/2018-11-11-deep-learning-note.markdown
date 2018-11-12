@@ -52,8 +52,8 @@ Loss (error) function 不用 $$L\left(\hat y, y \right) = \frac{1}{2}\left( \hat
 #### Gradient Descent
 
 Repeat { <br/>
-$$W := w - \alpha \frac{ \partial J\left(w, b\right)}{\partial w} =  w - \frac{1}{m} \frac{\partial \sum_{i=1}{m}\mathscr{L} \left(\hat y, y \right)}{\partial w} , \alpha \text{ learning rate} $$<br/>
-$$b := b- \alpha \frac{ \partial J\left(w, b\right)}{\partial b} $$<br/>
+$$W := w - \alpha \frac{ \partial J\left(w, b\right)}{\partial w} =  w - \frac{1}{m} \frac{\partial \sum_{i=1}^m \mathscr{L} \left(\hat y, y \right)}{\partial w} , \alpha \text{ learning rate} $$<br/>
+$$b := b- \alpha \frac{ \partial J\left(w, b\right)}{\partial b} =  b - \frac{1}{m} \frac{\partial \sum_{i=1}^m \mathscr{L} \left(\hat y, y \right)}{\partial b} $$<br/>
 }
 
 Gradient Descent $$W := w - \alpha \frac{ \partial J\left(w, b \right)}{\partial w}$$, $$\alpha$$ <span style="color: red">前面是减号的原因</span>
