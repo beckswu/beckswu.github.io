@@ -35,9 +35,9 @@ tags:
 
 #### Cost Function
 
-$$\mathbf{\text{Loss function: }\mathscr{L} \left(\hat y, y \right) = \bbox[yellow]{ - ylog\left( \hat y \right) + \left( 1- y \right) log\left( 1 - \hat y \right)} }$$
+$$\mathbf{\text{Loss function: }\mathscr{L} \left(\hat y, y \right) = \bbox[yellow]{ - ylog\left( \hat y \right) - \left( 1- y \right) log\left( 1 - \hat y \right)} }$$
 
-$$\mathbf{\text{Cost function: }} J \left(w, b\right) =  \frac{1}{m} \sum_{i=1}^m \mathscr{L} \left(\hat y^{\left(i\right)}, y^{\left(i\right)} \right) = \frac{1}{m} \sum_{i=1}^m  \ y^{\left(i\right)} log\left( \hat y^{\left(i\right)}  \right) + \left( 1- y^{\left(i\right)} \right) log\left( 1 - \hat y^{\left(i\right)} \right) $$
+$$\mathbf{\text{Cost function: }} J \left(w, b\right) =  -\frac{1}{m} \sum_{i=1}^m \mathscr{L} \left(\hat y^{\left(i\right)}, y^{\left(i\right)} \right) = \frac{1}{m} \sum_{i=1}^m  \ y^{\left(i\right)} log\left( \hat y^{\left(i\right)}  \right) + \left( 1- y^{\left(i\right)} \right) log\left( 1 - \hat y^{\left(i\right)} \right) $$
 
 
 **Loss function** measures how well your algorithm output $$\hat y^{\left(i \right)} $$ on each of the training examples or compares to the ground true label $$ y^{\left(i \right)}$$ on each of the training examples (loss function是对于一个 training example )
@@ -72,7 +72,7 @@ $$\text{As we know: } \mathscr{L} \left(a, y \right) = - ylog\left( a \right) + 
 
 $$\frac{\partial \mathscr{L} \left(a, y \right)}{\partial a} = -\frac{y}{a} + \frac{1-y}{1-a}   $$
 
-$$\frac{\partial a }{\partial z} = \frac{1}{1+e^{-z}} \frac{-e^{-z}}{1+e^{-z}} = a * \left( 1-a \right)$$
+$$\frac{\partial a }{\partial z} = \frac{1}{1+e^{-z}} \frac{e^{-z}}{1+e^{-z}} = a * \left( 1-a \right)$$
 
 $$dz = \frac{\mathscr{L} \left(a, y \right)}{\partial a} * \frac{\partial a}{\partial z} = -y*\left(1-a \right) + a\left(1- y \right) = a - y $$
 
@@ -92,7 +92,7 @@ $$i = 0, dw_1 = 0, dw_2 = 0, db = 0, Jt = 0$$<br/>
 For i from 1 to m:<br/>
 $$\space \space \space \space \space z^{\left( i \right)} = W^T x^{\left( i \right)} + b $$ <br/>
 $$\space \space \space \space \space a^{\left( i \right)} = \sigma \left(z^{\left( i \right)} \right)$$<br/>
-$$\space \space \space \space \space Jt += -y^{\left( i \right)} log a^{\left( i \right)} + \left(1 - y^{ \left( i \right)} \right) log  \left(1 - a^{ \left( i\right)} \right)$$<br/>
+$$\space \space \space \space \space Jt += -y^{\left( i \right)} log a^{\left( i \right)} - \left(1 - y^{ \left( i \right)} \right) log  \left(1 - a^{ \left( i\right)} \right)$$<br/>
 $$\space \space \space \space \space dz^{\left( i \right)} = a^{\left( i \right)} - y^{\left(i \right)}$$<br/>
 $$\space \space \space \space \space  dw_1 += x_1^{\left(i\right)} dz^{\left( i \right)}$$<br/>
 $$\space \space \space \space \space  dw_2 += x_2^{\left(i\right)} dz^{\left( i \right)}$$<br/>
