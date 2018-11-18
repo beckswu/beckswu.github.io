@@ -38,6 +38,9 @@ tags:
 **Layer** 分为Input layer, hidden layer(not observed), 和 output layer <br/>
 **Activation** 每一层的input, $$a^{\left[0 \right]} = X$$, $$a_2^{\left[1 \right]} $$, 第一层的第二个input <br/>
 当数neural network 时候不算input layer， 所以当 $$y = a^{\left[2 \right]}$$, 一个input layer, 一个hidden layer, 一个output layer时候，被称为2 layer NN
+用$$\[\i \right]$$ 表示第i层, 用$$\left( i \right)$$ 表示第i个
+
+![](\img\post\Deep-Learning\pic3.png)
 
 
 #### Cost Function
@@ -113,7 +116,7 @@ $$w_1 = w_1 - \alpha dw_1; \space w_2 = w_2 - \alpha dw_w; \space b = b - \alpha
 **Vectorizing Logistic Regression with Gradient Descent on m Examples**
 
 ------------
-n: # attributes, m: #training examples;  W: n by 1 matrix; X : n by m matrix (every columns is one training example); b: 1 by m matrix (with the same number)<br/>
+n: # attributes, m: #training examples;  W: n by 1 matrix; X : n by m matrix (every columns is one training example, every row is each attributes); b: 1 by m matrix (with the same number)<br/>
 $$Z = W^T X + b = np.dot\left(w.T, x\right) + b$$, Z is 1 by m matrix<br/>
 $$A = \sigma\left( Z \right)$$ , A is 1 by m matrix<br/>
 $$dZ = A - Y $$, dZ is 1 by m matrix<br/>
@@ -134,5 +137,5 @@ $$\text{take the log of (1):  } y log \hat y + \left( 1- y \right) log \left(1 -
 
 Loss function 加上负号 因为想要make probability large, we want to minimize loss function, minimize loss function corresponding to maximize the log of the probability
 
-同理: 我们想最大化probability: $$\prod_{i=1}^m p\left( y^{\left(i \right)} \mid x^{\left(i \right)} \right)$$ 也等于最小化 $$- \frac{1}{m} \sum_{i=1}^m log\left( y^{\left(i \right)} \mid x^{\left(i \right) \right)$$
+同理: 我们想最大化probability: $$\prod_{i=1}^m p\left( y^{\left(i \right)} \mid x^{\left(i \right)} \right)$$ 也等于最小化 $$- \frac{1}{m} \sum_{i=1}^m log\left( y^{\left(i \right)} \mid x^{\left(i \right)} \right)$$
 
