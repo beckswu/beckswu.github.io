@@ -115,3 +115,17 @@ $$db =  \frac{1}{m} \sum_{i=1}^m dz^{\left( i\right)} = \frac{1}{m} np.sum\left(
 $$w := w - \alpha dw; \space  b:= b - \alpha db$$ <br/>
 
 ------------
+
+*Logistic Regression Cost Function 演变*
+
+$$P\left( y \mid x \right) = \hat y ^y \left( 1 - \hat y \right) ^{1-y} \tag{1}\label{eq1}$$
+
+当 y = 1 时候, $$P\left(y \mid x \right) = \hat y$$ <br/>
+当 y = 0 时候, $$P\left(y \mid x \right) = 1 - \hat y$$
+
+$$\text{take the log of (1):  } y log \hat y + \left( 1- y \right) log \left(1 - \hat y \right)$$
+
+Loss function 加上负号 因为想要make probability large, we want to minimize loss function, minimize loss function corresponding to maximize the log of the probability
+
+同理: 我们想最大化probability: $$\prod_{i=1}^m p\left( y^{\left(i \right)} \mid x^{\left(i \right)} \right)$$ 也等于最小化 $$- \frac{1}{m} \sum_{i=1}^m log\left9 y^{\left(i \right)} \mid x^{\left(i \right) \right)$$
+
