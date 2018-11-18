@@ -33,6 +33,13 @@ tags:
 
 ## Standard Neural Network
 
+#### Notation
+
+**Layer** 分为Input layer, hidden layer(not observed), 和 output layer <br/>
+**Activation** 每一层的input, $$a^{\left[0 \right]} = X$$, $$a_2^{\left[1 \right]} $$, 第一层的第二个input <br/>
+当数neural network 时候不算input layer， 所以当 $$y = a^{\left[2 \right]}$$, 一个input layer, 一个hidden layer, 一个output layer时候，被称为2 layer NN
+
+
 #### Cost Function
 
 $$\mathbf{\text{Loss function: }\mathscr{L} \left(\hat y, y \right) = \bbox[yellow]{ - ylog\left( \hat y \right) - \left( 1- y \right) log\left( 1 - \hat y \right)} }$$
@@ -116,7 +123,7 @@ $$w := w - \alpha dw; \space  b:= b - \alpha db$$ <br/>
 
 ------------
 
-*Logistic Regression Cost Function 演变*
+<span style="color: red">*Logistic Regression Cost Function 演变*</span>
 
 $$P\left( y \mid x \right) = \hat y ^y \left( 1 - \hat y \right) ^{1-y} \tag{1}\label{eq1}$$
 
@@ -127,5 +134,5 @@ $$\text{take the log of (1):  } y log \hat y + \left( 1- y \right) log \left(1 -
 
 Loss function 加上负号 因为想要make probability large, we want to minimize loss function, minimize loss function corresponding to maximize the log of the probability
 
-同理: 我们想最大化probability: $$\prod_{i=1}^m p\left( y^{\left(i \right)} \mid x^{\left(i \right)} \right)$$ 也等于最小化 $$- \frac{1}{m} \sum_{i=1}^m log\left9 y^{\left(i \right)} \mid x^{\left(i \right) \right)$$
+同理: 我们想最大化probability: $$\prod_{i=1}^m p\left( y^{\left(i \right)} \mid x^{\left(i \right)} \right)$$ 也等于最小化 $$- \frac{1}{m} \sum_{i=1}^m log\left( y^{\left(i \right)} \mid x^{\left(i \right) \right)$$
 
