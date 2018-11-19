@@ -55,7 +55,7 @@ $$z = w^Tx + b = \left[ w_1, w_2, \cdots, w_n  \right] \begin{bmatrix} \mid & \m
 $$\mathbf{W^{\left[ i \right]}}$$ 表示 从第i-1 层到第i层的paramter <br/>
 X ($$a^{\left[ 0 \right]}$$) 是 n by m 维, <br/>
 A ($$a^{\left[ 0 \right]}$$) 是 #$$a_i$$ by m 维, <br/>
-W 是 # $$a_{i}$$ by #$$a_{i-1}$$ 维, 表示从第i-1 层 到 第i层的参数。 # $$a_{i}$$是下一层layer的neuron(node) 数, # $$a_{i-1}$$是上一层neuron(node) 数， W的j行代表从 $$A_{i-1 }$$ 到 $$a_{i}$$ 第j 个 nodes 所有参数   <br/>
+W 是 # $$a_{i}$$ by #$$a_{i-1}$$ 维, 表示从第i-1 层 到 第i层的参数。 # $$a_{i}$$是下一层layer的neuron(node) 数, # $$a_{i-1}$$是上一层neuron(node) 数， W的j行代表从 $$a_{i-1 }$$ 到 $$a_{i}$$ 第j 个 nodes 所有参数   <br/>
 b 是 # $$a_{i}$$ by 1 维 <br/>
 
 $$z^{\left[ i \right]} = W^{\left[ i \right]}a^{\left[ i-1 \right]} + b^{\left[ i \right]} = \begin{bmatrix} ---W_1^{\left[ i \right]T}--- \\ ---W_2^{\left[ i \right]T}--- \\ \vdots \\ ---W_n^{\left[ i \right]T}--- \end{bmatrix}  \begin{bmatrix} \mid & \mid & \cdots & \mid \\ a_1^{\left[ i-1 \right]} & a_2^{\left[ i-1 \right]} & \cdots & a_m^{\left[ i-1 \right]} \\ \mid & \mid & \cdots & \mid \end{bmatrix} + \begin{bmatrix} b_1 \\ b_2 \\ \vdots \\ b_n \end{bmatrix}  $$
@@ -165,7 +165,6 @@ Loss function 加上负号 因为想要make probability large, we want to minimi
 **Forward Prop on m Examples**
 
 ------------
-X is n by 1, n 是attributes, W 是 # $$a_{i}$$ by #$$a_{i-1}$$ 的 matrix,# $$a_{i}$$是下一层layer的neuron 数, # $$a_{i-1}$$是上一层neuron 数， W的i行 代表下一个layer第i个neuron的数
 
 for i = 1 to m: <br/>
  $$ \space \space \space \space \space   z^{\left[ 1 \right] \left( i \right)} = W^{\left[ 1 \right]} x^{\left( i \right)} + b^{\left[ 1 \right]} $$<br/>
@@ -175,7 +174,7 @@ $$ \space \space \space \space \space   a^{\left[ 2 \right] \left( i \right)} = 
 
 ------------
 
-$$z^{\left[ 1 \right]T} = w^{\left[ 1 \right]T}x + b^{\left[ 1 \right]T}$$
+$$z^{\left[ 1 \right]} = w^{\left[ 1 \right]}x + b^{\left[ 1 \right]}$$
 
 $$z^{\left[ 1 \right]T}  = \begin{bmatrix} ---W_1^{\left[ 1 \right]T}--- \\ ---W_2^{\left[ 1 \right]T}--- \\ ---W_3^{\left[ 1 \right]T}--- \\ ---W_4^{\left[ 1 \right]T}--- \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \\ x_3 \end{bmatrix} + \begin{bmatrix} b_1^{\left[ 1 \right]} \\ b_2^{\left[ 1 \right]} \\ b_3^{\left[ 1 \right]} \\ b_4^{\left[ 1 \right]} \end{bmatrix}   $$ 
 
@@ -185,12 +184,12 @@ $$z^{\left[ 1 \right]T}  = \begin{bmatrix} ---W_1^{\left[ 1 \right]T}--- \\ ---W
 ------------
 
 $$Z^{\left[ 1 \right]} = W^{\left[ 1 \right]} X + b^{\left[ 1 \right]} $$<br/>
-$$A^{\left[ 1 \right]} = \sigma\left(Z^{\left[ 1 \right]}\right)$$
-$$Z^{\left[ 2 \right]} = W^{\left[ 2 \right]} X + b^{\left[ 2 \right]} $$<br/>
+$$A^{\left[ 1 \right]} = \sigma\left(Z^{\left[ 1 \right]}\right)$$ <br/>
+$$Z^{\left[ 2 \right]} = W^{\left[ 2 \right]} A^{\left[ 1 \right]}  + b^{\left[ 2 \right]} $$<br/>
 $$A^{\left[ 2 \right]} = \sigma\left(Z^{\left[ 2 \right]}\right)$$
 
 ------------
 
-$$z^{\left[ 1 \right]T} = w^{\left[ 1 \right]T}x + b^{\left[ 1 \right]T}$$
+$$z^{\left[ 1 \right]} = w^{\left[ 1 \right]}x + b^{\left[ 1 \right]}$$
 
-$$z^{\left[ 1 \right]T}  = \begin{bmatrix} ---W_1^{\left[ 1 \right]T}--- \\ ---W_2^{\left[ 1 \right]T}--- \\ ---W_3^{\left[ 1 \right]T}--- \\ ---W_4^{\left[ 1 \right]T}--- \end{bmatrix} \begin{bmatrix} \mid & \mid & \cdots \mid \\ a_1^{\left[ i-1 \right]T} & x_2^{\left[ i-1 \right]T} & \cdots \x_m^{\left[ i-1 \right]T} \\ \mid & \mid & \cdots \mid \end{bmatrix} + \begin{bmatrix} b_1^{\left[ 1 \right]} \\ b_2^{\left[ 1 \right]} \\ b_3^{\left[ 1 \right]} \\ b_4^{\left[ 1 \right]} \end{bmatrix}   $$ 
+$$z^{\left[ 1 \right]}  = \begin{bmatrix} ---W_1^{\left[ 1 \right]T}--- \\ ---W_2^{\left[ 1 \right]T}--- \\ ---W_3^{\left[ 1 \right]T}--- \\ ---W_4^{\left[ 1 \right]T}--- \end{bmatrix} \begin{bmatrix} \mid & \mid & \cdots & \mid \\ a_1^{\left[ i-1 \right]T} & x_2^{\left[ i-1 \right]T} & \cdots & x_m^{\left[ i-1 \right]T} \\ \mid & \mid & \cdots & \mid \end{bmatrix} + \begin{bmatrix} b_1^{\left[ 1 \right]} \\ b_2^{\left[ 1 \right]} \\ b_3^{\left[ 1 \right]} \\ b_4^{\left[ 1 \right]} \end{bmatrix}   $$ 
