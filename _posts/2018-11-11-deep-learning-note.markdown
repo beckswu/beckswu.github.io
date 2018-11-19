@@ -37,7 +37,7 @@ tags:
 
 **Layer** 分为Input layer, hidden layer(not observed), 和 output layer <br/>
 **Activation** 每一层的input也是上一层的output, $$a^{\left[0 \right]} = X$$, $$a_2^{\left[1 \right]} $$, 第一层的第二个input, 也是第0层的第二个output <br/>
-用$$\mathbf{\[\i \right]}$$ 表示第i层, 用$$\mathbf{\left( i \right)}$$ 表示第i个training example <br/>
+用$$\mathbf{\left[\i \right]}$$ 表示第i层, 用$$\mathbf{\left( i \right)}$$ 表示第i个training example <br/>
 $$\mathbf{W^{\left[ i \right]}}$$ 表示 从第i-1 层到第i层的paramter <br/>
 z 是 x 的linear transformation $$z = wx + b$$
 a 是activation output, $$a = \sigma\left(z \right)$$
@@ -151,10 +151,10 @@ Loss function 加上负号 因为想要make probability large, we want to minimi
 X is n by 1, n 是attributes, W 是 # $$a_{i}$$ by #$$a_{i-1}$$ 的 matrix,# $$a_{i}$$是下一层layer的neuron 数, # $$a_{i-1}$$是上一层neuron 数， W的i行 代表下一个layer第i个neuron的数
 
 for i = 1 to m: <br/>
- \space \space \space \space \space   z^{\left[ 1 \right] \left( i \right)} = W^{\left[ 1 \right]} x^{\left( i \right)} + b^{\left[ 1 \right]} <br/>
- \space \space \space \space \space   a^{\left[ 1 \right] \left( i \right)} = \sigma \left(z^{\left[ 1 \right]} x^{\left( i \right)} \right)<br/>
- \space \space \space \space \space   z^{\left[ 2 \right] \left( i \right)} = W^{\left[ 2 \right]} x^{\left( i \right)} + b^{\left[ 2 \right]}<br/>
- \space \space \space \space \space   a^{\left[ 2 \right] \left( i \right)} = \sigma \left(z^{\left[ 2 \right]} x^{\left( i \right)} \right)<br/>
+ $$ \space \space \space \space \space   z^{\left[ 1 \right] \left( i \right)} = W^{\left[ 1 \right]} x^{\left( i \right)} + b^{\left[ 1 \right]} $$<br/>
+ $$\space \space \space \space \space   a^{\left[ 1 \right] \left( i \right)} = \sigma \left(z^{\left[ 1 \right]} x^{\left( i \right)} \right) $$<br/>
+$$ \space \space \space \space \space   z^{\left[ 2 \right] \left( i \right)} = W^{\left[ 2 \right]} x^{\left( i \right)} + b^{\left[ 2 \right]} $$<br/>
+$$ \space \space \space \space \space   a^{\left[ 2 \right] \left( i \right)} = \sigma \left(z^{\left[ 2 \right]} x^{\left( i \right)} \right) $$<br/>
 
 ------------
 
