@@ -160,4 +160,4 @@ $$ \space \space \space \space \space   a^{\left[ 2 \right] \left( i \right)} = 
 
 $$z^{\left[ 1 \right]T} = w^{\left[ 1 \right]T}x + b^{\left[ 1 \right]T}$$
 
-$$z^{\left[ 1 \right]T}  = \begin{bmatrix} ---W_1^{\left[ 1 \right]T}--- \\ ---W_2^{\left[ 1 \right]T}--- \\ ---W_3^{\left[ 1 \right]T}--- \\ ---W_4^{\left[ 1 \right]T}--- \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \\ x_3 \end{bmatrix} + \begin{bmatrix} b_1^{\left[ 1 \right]T} \\ b_2^{\left[ 1 \right]T} \\ b_3^{\left[ 1 \right]T} \\ b_4^{\left[ 1 \right]T} \end{bmatrix}   $$ 
+$$z^{\left[ 1 \right]T}  = \begin{bmatrix} ---W_1^{\left[ 1 \right]T}--- \\ ---W_2^{\left[ 1 \right]T}--- \\ ---W_3^{\left[ 1 \right]T}--- \\ ---W_4^{\left[ 1 \right]T}--- \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \\ x_3 \end{bmatrix} + \begin{bmatrix} b_1^{\left[ 1 \right]} \\ b_2^{\left[ 1 \right]} \\ b_3^{\left[ 1 \right]} \\ b_4^{\left[ 1 \right]} \end{bmatrix}   $$ 
