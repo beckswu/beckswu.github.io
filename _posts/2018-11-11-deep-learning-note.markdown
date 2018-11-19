@@ -61,9 +61,6 @@ b 是 # $$a_{i}$$ by 1 维 <br/>
 $$z^{\left[ i \right]} = W^{\left[ i \right]}a^{\left[ i-1 \right]} + b^{\left[ i \right]} = \begin{bmatrix} ---W_1^{\left[ i \right]T}--- \\ ---W_2^{\left[ i \right]T}--- \\ \vdots \\ ---W_n^{\left[ i \right]T}--- \end{bmatrix}  \begin{bmatrix} \mid & \mid & \cdots & \mid \\ a_1^{\left[ i-1 \right]} & a_2^{\left[ i-1 \right]} & \cdots & a_m^{\left[ i-1 \right]} \\ \mid & \mid & \cdots & \mid \end{bmatrix} + \begin{bmatrix} b_1 \\ b_2 \\ \vdots \\ b_n \end{bmatrix}  $$
 
 
-z 是 x 的linear transformation $$z = wx + b$$
-a 是activation output, $$a = \sigma\left(z \right)$$
-
 ![](\img\post\Deep-Learning\pic3.png)
 
 
