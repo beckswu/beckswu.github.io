@@ -26,7 +26,7 @@ Associative over scaler multiplication: &nbsp;&nbsp;&nbsp; $$ \left( c \vec v \r
 Dot product self is the length square: &nbsp;&nbsp;&nbsp; $$ \vec v \cdot \vec v  =  ||v||^2 = v_1^2 + v_2^2 + ... + v_n^2  $$<br/>
 Cosine: &nbsp;&nbsp;&nbsp; $$  \vec a \cdot \vec b  =  ||a|| ||b|| cos\theta  $$<br/>
 Sine: &nbsp;&nbsp;&nbsp; $$  \vec a \times \vec b  =  ||a|| ||b|| sin\theta  $$<br/>
-Cauchy Schwarz Inequality: &nbsp;&nbsp;&nbsp; $$  \| \vec a \cdot \vec b \|  <=  ||a||||b||  $$<br/>
+Cauchy Schwarz Inequality: &nbsp;&nbsp;&nbsp; $$  \mid \vec a \cdot \vec b \mid  <=  ||a||||b||  $$<br/>
 scaler projection: &nbsp;&nbsp;&nbsp; $$  \vec proj_{L} \left(\vec x\right) =   \frac{ \vec x \cdot \vec v  }{ ||\vec v|| } $$<br/>
 vector projection: &nbsp;&nbsp;&nbsp; $$  \vec proj_{L} \left(\vec x\right) =  c \vec v =  \frac{ \vec x \cdot \vec v  }{ \vec v \cdot \vec v } \vec v =  \frac{ \vec v \vec v^T  }{ \| \vec v \|^2 } \vec x =  $$<br/>
 two vector $$  \vec  x $$ and $$  \vec y $$ are orthorgonal: &nbsp;&nbsp;&nbsp; $$  \vec  x \cdot \vec y  = 0 $$   <br/>
