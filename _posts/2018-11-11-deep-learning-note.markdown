@@ -55,8 +55,8 @@ $$z = w^Tx + b = \left[ w_1, w_2, \cdots, w_n  \right] \begin{bmatrix} \mid & \m
 $$\mathbf{W^{\left[ i \right]}}$$ 表示 从第i-1 层到第i层的paramter <br/>
 X ($$a^{\left[ 0 \right]}$$) 是 n by m 维, <br/>
 A ($$a^{\left[ 0 \right]}$$) 是 #$$a_i$$ by m 维, <br/>
-W 是 # $$A_{i}$$ by #$$A_{i-1}$$ 维, 表示从第i-1 层 到 第i层的参数,  # $$A_{i}$$是下一层layer的neuron(node) 数, # $$A_{i-1}$$是上一层neuron(node) 数， W的j行代表从 $$A_{i-1 }$$ 到 $$A_{i}$$ 第j nodes 所有参数   <br/>
-b 是 # $$A_{i}$$ by 1 维 <br/>
+W 是 # $$a_{i}$$ by #$$a_{i-1}$$ 维, 表示从第i-1 层 到 第i层的参数。 # $$a_{i}$$是下一层layer的neuron(node) 数, # $$a_{i-1}$$是上一层neuron(node) 数， W的j行代表从 $$A_{i-1 }$$ 到 $$a_{i}$$ 第j 个 nodes 所有参数   <br/>
+b 是 # $$a_{i}$$ by 1 维 <br/>
 
 $$z^{\left[ i \right]} = W^{\left[ i \right]}a^{\left[ i-1 \right]} + b^{\left[ i \right]} = \begin{bmatrix} ---W_1^{\left[ i \right]T}--- \\ ---W_2^{\left[ i \right]T}--- \\ \vdots \\ ---W_n^{\left[ i \right]T}--- \end{bmatrix}  \begin{bmatrix} \mid & \mid & \cdots & \mid \\ a_1^{\left[ i-1 \right]} & a_2^{\left[ i-1 \right]} & \cdots & a_m^{\left[ i-1 \right]} \\ \mid & \mid & \cdots & \mid \end{bmatrix} + \begin{bmatrix} b_1 \\ b_2 \\ \vdots \\ b_n \end{bmatrix}  $$
 
