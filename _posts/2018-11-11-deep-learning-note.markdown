@@ -37,12 +37,31 @@ tags:
 
 **Layer** 分为Input layer, hidden layer(not observed), 和 output layer <br/>
 **Activation** 每一层的input也是上一层的output, $$a^{\left[0 \right]} = X$$, $$a_2^{\left[1 \right]} $$, 第一层的第二个input, 也是第0层的第二个output <br/>
+当数neural network 时候不算input layer， 所以当 $$y = a^{\left[2 \right]}$$, 一个input layer, 一个hidden layer, 一个output layer时候，被称为2 layer NN
+
+m 是 number of training example, n 是 number of features
+
+**For Logistic Regression**
+x 是 n by m 维, <br/>
+W 是 n by 1 维 <br/>
+b 是 1 by 1 维， <br/>
+$$z = W^T x + b $$ 是 1 by m 维
+
+$$z = w^Tx + b = \left[ w_1, w_2, \cdots, w_n  \right] \begin{bmatrix} \mid & \mid & \cdots \mid \\ x_1 & x_2 & \cdots \x_m \\ \mid & \mid & \cdots \mid \end{bmatrix} + \left[ b\right] $$
+
+**For Neural Network**
 用$$\mathbf{\left[\i \right]}$$ 表示第i层, 用$$\mathbf{\left( i \right)}$$ 表示第i个training example <br/>
 $$\mathbf{W^{\left[ i \right]}}$$ 表示 从第i-1 层到第i层的paramter <br/>
+X ($$a^{\left[ 0 \right]}$$)is n by m 维, <br/>
+a ($$a^{\left[ 0 \right]}$$)is #$$a_i$$ by m 维, <br/>
+W 是 # $$a_{i}$$ by #$$a_{i-1}$$ 维, 表示从第i-1 层 到 第i层的参数,  # $$a_{i}$$是下一层layer的neuron(node) 数, # $$a_{i-1}$$是上一层neuron(node) 数， W的i行 代表下一个layer第i个neuron的数 <br/>
+b 是 # $$a_{i}$$ by 1 维 <br/>
+
+$$z^{\left[ i \right]} = W^{\left[ i \right]}a^{\left[ i-1 \right]} + b^{\left[ i \right]} = \begin{bmatrix} ---W_1^{\left[ i \right]T}--- \\ ---W_2^{\left[ i \right]T}--- \\ \vdots \\ ---W_n^{\left[ i \right]T}--- \end{bmatrix}  \begin{bmatrix} \mid & \mid & \cdots \mid \\ a_1^{\left[ i-1 \right]T} & x_2^{\left[ i-1 \right]T} & \cdots \x_m^{\left[ i-1 \right]T} \\ \mid & \mid & \cdots \mid \end{bmatrix} + \begin{bmatrix} b_1 \\ b_2 \\ \vdots \\ b_m \end{bmatrix}  $$
+
+
 z 是 x 的linear transformation $$z = wx + b$$
 a 是activation output, $$a = \sigma\left(z \right)$$
-
-当数neural network 时候不算input layer， 所以当 $$y = a^{\left[2 \right]}$$, 一个input layer, 一个hidden layer, 一个output layer时候，被称为2 layer NN
 
 ![](\img\post\Deep-Learning\pic3.png)
 
@@ -161,3 +180,16 @@ $$ \space \space \space \space \space   a^{\left[ 2 \right] \left( i \right)} = 
 $$z^{\left[ 1 \right]T} = w^{\left[ 1 \right]T}x + b^{\left[ 1 \right]T}$$
 
 $$z^{\left[ 1 \right]T}  = \begin{bmatrix} ---W_1^{\left[ 1 \right]T}--- \\ ---W_2^{\left[ 1 \right]T}--- \\ ---W_3^{\left[ 1 \right]T}--- \\ ---W_4^{\left[ 1 \right]T}--- \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \\ x_3 \end{bmatrix} + \begin{bmatrix} b_1^{\left[ 1 \right]} \\ b_2^{\left[ 1 \right]} \\ b_3^{\left[ 1 \right]} \\ b_4^{\left[ 1 \right]} \end{bmatrix}   $$ 
+
+
+**Forward Prop on m Examples**
+
+------------
+
+for i = 1 to m: <br/>
+ $$ \space \space \space \space \space   z^{\left[ 1 \right] \left( i \right)} = W^{\left[ 1 \right]} x^{\left( i \right)} + b^{\left[ 1 \right]} $$<br/>
+ $$\space \space \space \space \space   a^{\left[ 1 \right] \left( i \right)} = \sigma \left(z^{\left[ 1 \right]} x^{\left( i \right)} \right) $$<br/>
+$$ \space \space \space \space \space   z^{\left[ 2 \right] \left( i \right)} = W^{\left[ 2 \right]} x^{\left( i \right)} + b^{\left[ 2 \right]} $$<br/>
+$$ \space \space \space \space \space   a^{\left[ 2 \right] \left( i \right)} = \sigma \left(z^{\left[ 2 \right]} x^{\left( i \right)} \right) $$<br/>
+
+------------
