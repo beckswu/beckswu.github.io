@@ -223,3 +223,7 @@ Technically derivative is not well defined  when z is 0. But when implement in c
 <span style="color: red">**Downside**</span>: when z is negative, derivatives is zero. But in practive, enough of your hidden units will have z greater than 0. So learning can still be quite fast for most training examples
 
 ![](\img\post\Deep-Learning\pic4.png)
+
+<span style="color: red">**Why we need activation function**<span>: 如果不用的话, no matter how many layer you use, output is linear function of input, always computing linear activation functions, hidden layer 就没有用了. **Linear hidden layer is useless**. 
+
+**One Exception using linear activation function**: <span style="color: red">regression problem</span>. (e.g. predicting housing price), output layer is linear activation function but hidden layer 用ReLu function, output 也可以用relu function (因为价格都大于0）
