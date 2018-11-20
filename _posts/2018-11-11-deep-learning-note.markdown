@@ -216,7 +216,7 @@ $$\text{derivatives: } dz = 1 - \left( tanh \left(z \right) \right)^2$$
 
 当z趋近于10, $$tanh\left( z \right) \approx 1,  dz \approx 0$$ <br/>
 当z趋近于-10, $$tanh\left( z \right) \approx -1,  dz \approx 0$$ <br/>
-当z趋近于0, $$tanh\left( z \right) \approx 0,  dz \approx 1$$ 
+当z趋近于0, $$tanh\left( z \right) = 0,  dz = 1$$ 
 
 tanh performance always <span style="color: red"> better than </span> sigmoid function. <span style="background-color: #FFFF00">Tanh function the mean of activation close to 0. And when normalized data, 也有zero mean.  </span>.
 
