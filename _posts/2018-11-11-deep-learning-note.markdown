@@ -197,11 +197,11 @@ $$z^{\left[ 1 \right]}  = \begin{bmatrix} ---W_1^{\left[ 1 \right]T}--- \\ ---W_
 
 #### Activation Function
 
-1. Sigmoid Function 
+**1. Sigmoid Function**
 
 $$a = \frac{1}{1 + e^{-z}}$$
 
-2. Tanh Function
+**2. Tanh Function**
 
 $$a = \frac{ e^z - e^{-z}}{e^z + e^{-z}}$$
 
@@ -209,15 +209,15 @@ tanh performance always <span style="color: red"> better than </span> sigmoid fu
 
 Ng Suggestion: 不再使用sigmoid function， 都在使用tanh function.<span style="background-color: #FFFF00"> 一个exception 用sigmoid function 是在output layer，因为output layer 想要0 或者 1, 而不是1 or - 1 </span>
 
-<span style="color: red">**Downside**</span>: 当z非常大或者小的时候, gradient 会变得非常小, 会slow down gradient descent(因为slop every small)
+<span style="color: red">**Downside**</span>: 当z非常大或者小的时候, gradient 会变得非常小, 会slow down gradient descent(因为slope every small)
 
-3. ReLu Function (default choice for hidden unit)
+**3. ReLu Function** (default choice for hidden unit)
 
 $$\text{ReLu: }a = max\left(0,z \right) \space \space \text{Leaky ReLu: } a= max\left(0.01 z, z \right)$$
 
-when implement technique derivative when z is 0 is not well defined. But when implement in computer, you get z is smaller number( 0.000000001). 自己用的时候，可以pretend derivatives either 1 or 0
+Technically derivative is not well defined  when z is 0. But when implement in computer, you get z is smaller number( 0.000000001). 自己用的时候，可以pretend derivatives either 1 or 0
 
-<span style="color: red">**Advantage**</span>: the slope of the activation(gradient) function different from 0. Using ReLu or Leaky ReLu, neural network will learn much faster than when using the hanh or sigmoid activation function (不像tanh or sigmoid 当z很大很小时候,slope 很小, slow down learning)
+<span style="color: red">**Advantage**</span>: the slope of the activation(gradient) function different from 0. Using ReLu or Leaky ReLu, <span style="background-color: #FFFF00">neural network will learn **much faster** than when using the hanh or sigmoid activation function</span> (不像tanh or sigmoid 当z很大很小时候,slope 很小, slow down learning)
 
 
 <span style="color: red">**Downside**</span>: when z is negative, derivatives is zero. But in practive, enough of your hidden units will have z greater than 0. So learning can still be quite fast for most training examples
