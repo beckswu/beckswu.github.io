@@ -204,9 +204,9 @@ $$a = \frac{1}{1 + e^{-z}}$$
 $$\text{derivatives: } dz = g\left(z\right) * \left(1 - g\left(z\right) \right) = a * \left( 1- a\right)$$
 
 
-当z趋近于10, $$g\left(z \right) = 1, dz = 1 * \left( 1- 1) \approx 0$$ <br/>
-当z趋近于-10, $$g\left(z \right) \approx 0, dz = 0 * \left( 1- 0) \approx 0$$<br/>
-当z趋近于0, $$g\left(z \right) = \frac{1}{2}, dz = \frac{1}{2} * \left( 1- \frac{1}{2}) = \frac{1}{4}$$
+当z趋近于10, $$g\left(z \right) = 1, dz = 1 * \left( 1- 1\right) \approx 0$$ <br/>
+当z趋近于-10, $$g\left(z \right) \approx 0, dz = 0 * \left( 1- 0\right) \approx 0$$<br/>
+当z趋近于0, $$g\left(z \right) = \frac{1}{2}, dz = \frac{1}{2} * \left( 1- \frac{1}{2} \right) = \frac{1}{4}$$
 
 **2. Tanh Function**
 
@@ -241,6 +241,6 @@ $$\text{derivatives of Leaky ReLu: } dz = \begin{cases}  0.01 & \text{if z < 0} 
 
 ![](\img\post\Deep-Learning\pic4.png)
 
-<span style="color: red">**Why we need activation function**<span>: 如果不用的话, no matter how many layer you use, output is linear function of input, always computing linear activation functions, hidden layer 就没有用了. **Linear hidden layer is useless**. 
+<span style="color: red">**Why we need activation function**</span>: 如果不用的话, no matter how many layer you use, output is linear function of input, always computing linear activation functions, hidden layer 就没有用了. **Linear hidden layer is useless**. 
 
 **One Exception using linear activation function**: <span style="color: red">regression problem</span>. (e.g. predicting housing price), output layer is linear activation function but hidden layer 用ReLu function, output 也可以用relu function (因为价格都大于0）
