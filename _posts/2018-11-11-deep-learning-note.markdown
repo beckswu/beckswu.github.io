@@ -250,9 +250,9 @@ Technically derivative is not well defined  when z is 0. But when implement in c
 
 Define Cost is C and  gradient as $$\nabla_{ij}^{\left(l\right)} = \frac{\partial C}{\partial w_{ij}^{\left(l\right)}}$$ <br/>
 Define $$\delta_{ij}^{\left(l\right)}  = \frac{\partial C}{\partial z_{ij}^{\left(l\right)}} $$<br/>
-use $$w_{ij}^{\left(l\right)}}$$ means the parameters from layer l-1's i-th node to layer l's j-th node
+use $$w_{ij}^{\left(l\right)}$$ means the parameters from layer l-1's i-th node to layer l's j-th node
 
-1. first show $$\nabla_{ij}^{\left(l\right)} = \delta_{i}^{\left(l+1\right)}} * a_{j}^{\left(l\right)}} $$
+First show $$\nabla_{ij}^{\left(l\right)} = \delta_{i}^{\left(l+1\right)} * a_{j}^{\left(l\right)} $$
 
 
 #### Back Propagation
