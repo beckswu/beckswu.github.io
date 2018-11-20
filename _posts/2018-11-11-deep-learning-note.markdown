@@ -214,6 +214,10 @@ $$g\left(z \right) = \frac{ e^z - e^{-z}}{e^z + e^{-z}}$$
 
 $$\text{derivatives: } dz = 1 - \left( tanh \left(z \right) \right)^2$$
 
+$$\text{derivatives of ReLu: } dz = \begin{cases}  0 & \text{if z < 0}    \\ 1 & \text{ if z } \ge \text{0} \end{cases}$$
+
+$$\text{derivatives of Leaky ReLu: } dz = \begin{cases}  0.01 & \text{if z < 0}    \\ 1 & \text{ if z } \ge \text{0} \end{cases}$$
+
 当z趋近于10, $$tanh\left( z \right) \approx 1,  dz \approx 0$$ <br/>
 当z趋近于-10, $$tanh\left( z \right) \approx -1,  dz \approx 0$$ <br/>
 当z趋近于0, $$tanh\left( z \right) = 0,  dz = 1$$ 
@@ -235,12 +239,12 @@ Technically derivative is not well defined  when z is 0. But when implement in c
 
 <span style="color: red">**Downside**</span>: when z is negative, derivatives is zero. But in practive, enough of your hidden units will have z greater than 0. So learning can still be quite fast for most training examples
 
-$$\text{derivatives of ReLu: } dz = \begin{cases}  0 & \text{if z < 0}    \\ 1 & \text{ if z } \ge \text{0} \end{cases}$$
-
-$$\text{derivatives of Leaky ReLu: } dz = \begin{cases}  0.01 & \text{if z < 0}    \\ 1 & \text{ if z } \ge \text{0} \end{cases}$$
 
 ![](\img\post\Deep-Learning\pic4.png)
 
 <span style="color: red">**Why we need activation function**</span>: 如果不用的话, no matter how many layer you use, output is linear function of input, always computing linear activation functions, hidden layer 就没有用了. **Linear hidden layer is useless**. 
 
 **One Exception using linear activation function**: <span style="color: red">regression problem</span>. (e.g. predicting housing price), output layer is linear activation function but hidden layer 用ReLu function, output 也可以用relu function (因为价格都大于0）
+
+
+#### Back Propagation
