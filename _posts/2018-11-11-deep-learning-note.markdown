@@ -193,3 +193,33 @@ $$A^{\left[ 2 \right]} = \sigma\left(Z^{\left[ 2 \right]}\right)$$
 $$z^{\left[ 1 \right]} = w^{\left[ 1 \right]}x + b^{\left[ 1 \right]}$$
 
 $$z^{\left[ 1 \right]}  = \begin{bmatrix} ---W_1^{\left[ 1 \right]T}--- \\ ---W_2^{\left[ 1 \right]T}--- \\ ---W_3^{\left[ 1 \right]T}--- \\ ---W_4^{\left[ 1 \right]T}--- \end{bmatrix} \begin{bmatrix} \mid & \mid & \cdots & \mid \\ a_1^{\left[ i-1 \right]T} & a_2^{\left[ i-1 \right]T} & \cdots & a_m^{\left[ i-1 \right]T} \\ \mid & \mid & \cdots & \mid \end{bmatrix} + \begin{bmatrix} b_1^{\left[ 1 \right]} \\ b_2^{\left[ 1 \right]} \\ b_3^{\left[ 1 \right]} \\ b_4^{\left[ 1 \right]} \end{bmatrix}   $$ 
+
+
+#### Activation Function
+
+1. Sigmoid Function 
+
+$$a = \frac{1}{1 + e^{-z}}$$
+
+2. Tanh Function
+
+$$a = \frac{ e^z - e^{-z}}{e^z + e^{-z}}$$
+
+tanh performance always <span style="color: red"> better than </span> sigmoid function. <span style="background-color: #FFFF00">Tanh function the mean of activation close to 0. And when normalized data, 也有zero mean.  </span>.
+
+Ng Suggestion: 不再使用sigmoid function， 都在使用tanh function.<span style="background-color: #FFFF00"> 一个exception 用sigmoid function 是在output layer，因为output layer 想要0 或者 1, 而不是1 or - 1 </span>
+
+<span style="color: red">**Downside**</span>: 当z非常大或者小的时候, gradient 会变得非常小, 会slow down gradient descent(因为slop every small)
+
+3. ReLu Function (default choice for hidden unit)
+
+$$\text{ReLu: }a = max\left(0,z \right) \space \space \text{Leaky ReLu: } a= max\left(0.01 z, z \right)$$
+
+when implement technique derivative when z is 0 is not well defined. But when implement in computer, you get z is smaller number( 0.000000001). 自己用的时候，可以pretend derivatives either 1 or 0
+
+<span style="color: red">**Advantage**</span>: the slope of the activation(gradient) function different from 0. Using ReLu or Leaky ReLu, neural network will learn much faster than when using the hanh or sigmoid activation function (不像tanh or sigmoid 当z很大很小时候,slope 很小, slow down learning)
+
+
+<span style="color: red">**Downside**</span>: when z is negative, derivatives is zero. But in practive, enough of your hidden units will have z greater than 0. So learning can still be quite fast for most training examples
+
+![](\img\post\Deep-Learning\pic4.png)
