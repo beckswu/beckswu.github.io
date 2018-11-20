@@ -201,9 +201,22 @@ $$z^{\left[ 1 \right]}  = \begin{bmatrix} ---W_1^{\left[ 1 \right]T}--- \\ ---W_
 
 $$a = \frac{1}{1 + e^{-z}}$$
 
+$$\text{derivatives: } dz = g\left(z\right) * \left(1 - g\left(z\right) \right) = a * \left( 1- a\right)$$
+
+
+当z趋近于10, $$g\left(z \right) = 1, dz = 1 * \left( 1- 1) \approx 0$$ <br/>
+当z趋近于-10, $$g\left(z \right) \approx 0, dz = 0 * \left( 1- 0) \approx 0$$<br/>
+当z趋近于0, $$g\left(z \right) = \frac{1}{2}, dz = \frac{1}{2} * \left( 1- \frac{1}{2}) = \frac{1}{4}$$
+
 **2. Tanh Function**
 
-$$a = \frac{ e^z - e^{-z}}{e^z + e^{-z}}$$
+$$g\left(z \right) = \frac{ e^z - e^{-z}}{e^z + e^{-z}}$$
+
+$$\text{derivatives: } dz = 1 - \left( tanh \left(z \right) \right)^2$$
+
+当z趋近于10, $$tanh\left( z \right) \approx 1,  dz \approx 0$$ <br/>
+当z趋近于-10, $$tanh\left( z \right) \approx -1,  dz \approx 0$$ <br/>
+当z趋近于0, $$tanh\left( z \right) \approx 0,  dz \approx 1$$ 
 
 tanh performance always <span style="color: red"> better than </span> sigmoid function. <span style="background-color: #FFFF00">Tanh function the mean of activation close to 0. And when normalized data, 也有zero mean.  </span>.
 
@@ -221,6 +234,10 @@ Technically derivative is not well defined  when z is 0. But when implement in c
 
 
 <span style="color: red">**Downside**</span>: when z is negative, derivatives is zero. But in practive, enough of your hidden units will have z greater than 0. So learning can still be quite fast for most training examples
+
+$$\text{derivatives of ReLu: } dz = \begin{cases}  0 & \text{if z < 0}    \\ 1 & \text{ if z } \ge \text{0} \end{cases}$$
+
+$$\text{derivatives of Leaky ReLu: } dz = \begin{cases}  0.01 & \text{if z < 0}    \\ 1 & \text{ if z } \ge \text{0} \end{cases}$$
 
 ![](\img\post\Deep-Learning\pic4.png)
 
