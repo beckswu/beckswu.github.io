@@ -169,7 +169,7 @@ Loss function 加上负号 因为想要make probability large, we want to minimi
 for i = 1 to m: <br/>
  $$ \space \space \space \space \space   z^{\left[ 1 \right] \left( i \right)} = W^{\left[ 1 \right]} x^{\left( i \right)} + b^{\left[ 1 \right]} $$<br/>
  $$\space \space \space \space \space   a^{\left[ 1 \right] \left( i \right)} = \sigma \left(z^{\left[ 1 \right]} x^{\left( i \right)} \right) $$<br/>
-$$ \space \space \space \space \space   z^{\left[ 2 \right] \left( i \right)} = W^{\left[ 2 \right]} x^{\left( i \right)} + b^{\left[ 2 \right]} $$<br/>
+$$ \space \space \space \space \space   z^{\left[ 2 \right] \left( i \right)} = W^{\left[ 2 \right]} a^{\left[1 \right] \left( i \right)} + b^{\left[ 2 \right]} $$<br/>
 $$ \space \space \space \space \space   a^{\left[ 2 \right] \left( i \right)} = \sigma \left(z^{\left[ 2 \right]} x^{\left( i \right)} \right) $$<br/>
 
 ------------
@@ -245,6 +245,9 @@ Technically derivative is not well defined  when z is 0. But when implement in c
 <span style="color: red">**Why we need activation function**</span>: 如果不用的话, no matter how many layer you use, output is linear function of input, always computing linear activation functions, hidden layer 就没有用了. **Linear hidden layer is useless**. 
 
 **One Exception using linear activation function**: <span style="color: red">regression problem</span>. (e.g. predicting housing price), output layer is linear activation function but hidden layer 用ReLu function, output 也可以用relu function (因为价格都大于0）
+
+#### Back-prop Proof
+
 
 
 #### Back Propagation
