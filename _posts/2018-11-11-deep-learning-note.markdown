@@ -287,3 +287,9 @@ $$dW^{\left[ 1 \right]} = \frac{1}{m} dZ^{\left[ 1 \right]}  X^{T} $$<br/>
 $$db^{\left[ 1 \right]} = \frac{1}{m} np.sum\left(  dZ^{\left[ 1 \right]}, \text{ axis = 1, keepdims = true} \right)$$
 
 ------------
+
+$$dW^{\left[ 1 \right]} = \frac{1}{m} dZ^{\left[ 1 \right]}  X^{T}  $$
+
+$$ dW^{\left[ 1 \right]} = \frac{1}{m}  \begin{bmatrix} ---z_1^{\left[ 1 \right]} --- \\  ---z_2^{\left[ 1 \right]} \\ vdots \\ ---z_n^{\left[ 1 \right]} --- \end{bmatrix}    \begin{bmatrix} ---x_1^{\left[ 1 \right]} --- \\  ---x_2^{\left[ 1 \right]} \\ vdots \\ ---x_n^{\left[ 1 \right]} --- \end{bmatrix}      $$
+
+$$dZ^{\left[ 1 \right]}$$ column 是 m个training example, row是n个下层layer, $$ X^T$$ column 是 n 个attributes（每一列是属于同一种类 attribute）, row是 m 个training examples,
