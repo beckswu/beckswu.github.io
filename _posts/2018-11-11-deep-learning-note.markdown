@@ -277,7 +277,7 @@ $$\text{we know: } z_{k}^{\left[ l+1\right] } = \sum_j w_{kj}^{\left[ l+1\right]
 
 $$\frac{\partial z_{k}^{\left[ l + 1\right]} } { \partial z_{i}^{\left[ l \right] } } = \sum_j w_{kj}^{\left[ l+1\right]} * \frac{\partial g\left( z_{j}^{\left[ l \right ]} \right) }{ \partial z_{i}^{\left[ l \right] } }$$
 
-$$\begin{align} \text{if j } \neq \text{ then : } & w_{kj}^{\left[ l+1\right]} \frac{\partial g\left( z_{j}^{\left[ l \right]} \right) }{ \partial z_{i}^{\left[ l \right] } } = 0  \\  \text{if j = i then : } &  w_{kj}^{\left[ l+1\right]} * \frac{\partial g\left( z_{j}^{\left[ l \right]} \right) }{ \partial z_{i}^{\left[ l \right] } } = w_{ki}^{\left[ l+1\right]} * g' \left(  z_{i}^{\left[ l \right] }  \right)    \end{align}$$
+$$\begin{align} \text{if j } \neq \text{ then : } & w_{kj}^{\left[ l+1\right]} * \frac{\partial g\left( z_{j}^{\left[ l \right]} \right) }{ \partial z_{i}^{\left[ l \right] } } = 0  \\  \text{if j = i then : } &  w_{kj}^{\left[ l+1\right]} * \frac{\partial g\left( z_{j}^{\left[ l \right]} \right) }{ \partial z_{i}^{\left[ l \right] } } = w_{ki}^{\left[ l+1\right]} * g' \left(  z_{i}^{\left[ l \right] }  \right)    \end{align}$$
 
 $$\delta_{i}^{\left[ l\right]} = \sum_k \delta_k^{ \left[ l + 1\right] } w_{ki}^{\left[ l+1\right]} * g' \left( z_{i}^{\left[ l \right] } \right)     $$
 
