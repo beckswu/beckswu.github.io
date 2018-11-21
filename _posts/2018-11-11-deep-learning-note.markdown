@@ -284,7 +284,7 @@ $$\delta_{i}^{\left[ l\right]} = \sum_k \delta_k^{ \left[ l + 1\right] } w_{ki}^
 
 <span style="background-color: #FFFF00">**In All**
 
- $$ \frac{\partial C}{\partial w_{ij}^{\left[ l\right] }} = \delta_{i}^{\left[ l\right]}  a_{j}^{\left[ l -1 \right]} = \frac{\partial C}{\partial w_{ij}^{\left[ l\right] }}  a_{j}^{\left[ l -1 \right]}  $$
+ $$ \frac{\partial C}{\partial w_{ij}^{\left[ l\right] }} = \delta_{i}^{\left[ l\right]}  a_{j}^{\left[ l -1 \right]} =  \sum_k \delta_k^{ \left[ l + 1\right] } w_{ki}^{\left[ l+1\right]}  g' \left( z_{i}^{\left[ l \right] } \right)   a_{j}^{\left[ l -1 \right]}  $$
 
 #### Back Propagation
 
