@@ -252,7 +252,7 @@ Define Cost is C and  gradient as $$\nabla_{ij}^{\left[ l\right ]} = \frac{\part
 Define $$\delta_{ij}^{\left[ l\right ]}  = \frac{\partial C}{\partial z_{ij}^{\left[ l \right]}} $$<br/>
 use $$w_{ij}^{\left(l\right)}$$ means the parameters from layer l-1's i-th node to layer l's j-th node
 
-First show $$\nabla_{ij}^{\left[ l\right ] } = \delta_{i}^{\left[ l\right ]} * a_{j}^{\left[ l-1\right ]} $$ with $$\delta_i^{\left[ l\right ]} = \frac{\partial C}{\partial z_{i}^{\left[ l\right ]}} $$
+<span style="background-color: #FFFF00">First show $$\nabla_{ij}^{\left[ l\right ] } = \delta_{i}^{\left[ l\right ]} * a_{j}^{\left[ l-1\right ]} $$ </span> with $$\delta_i^{\left[ l\right ]} = \frac{\partial C}{\partial z_{i}^{\left[ l\right ]}} $$
 
 $$\nabla_{ij}^{\left[ l\right ]} = \frac{\partial C}{\partial z_{i}^{\left[ l\right] }} = \sum_k \frac{\partial C}{\partial z_{i}^{\left[ l\right ]}} \frac{\partial z_{i}^{\left[ l\right ]}}{ \partial w_{ij}^{\left[ l \right] } }$$
 
