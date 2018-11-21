@@ -248,17 +248,23 @@ Technically derivative is not well defined  when z is 0. But when implement in c
 
 #### Back-prop Proof
 
-Define Cost is C and  gradient as $$\nabla_{ij}^{\left(l\right)} = \frac{\partial C}{\partial w_{ij}^{\left(l\right)}}$$ <br/>
-Define $$\delta_{ij}^{\left(l\right)}  = \frac{\partial C}{\partial z_{ij}^{\left(l\right)}} $$<br/>
+Define Cost is C and  gradient as $$\nabla_{ij}^{\left[ l\right ]} = \frac{\partial C}{\partial w_{ij}^{\left[ l\right ]}}$$ <br/>
+Define $$\delta_{ij}^{\left[ l\right ]}  = \frac{\partial C}{\partial z_{ij}^{\left[ l \right]}} $$<br/>
 use $$w_{ij}^{\left(l\right)}$$ means the parameters from layer l-1's i-th node to layer l's j-th node
 
-First show $$\nabla_{ij}^{\left(l\right)} = \delta_{i}^{\left(l+1\right)} * a_{j}^{\left(l\right)} $$ with $$\delta_i^{\left(l+1\right)} = \frac{\partial C}{\partial z_{ij}^{\left(l+1\right)}} $$
+First show $$\nabla_{ij}^{\left[ l\right ] } = \delta_{i}^{\left[ l+1\right ]} * a_{j}^{\left[ l\right ]} $$ with $$\delta_i^{\left[ l+1\right ]} = \frac{\partial C}{\partial z_{ij}^{\left[ l+1\right ]}} $$
 
-$$\nabla_{ij}^{\left(l\right)} = \frac{\partial C}{\partial z_{i}^{\left(l\right)}} = \sum_k \frac{\partial C}{\partial z_{i}^{\left(l+1\right)}} \frac{\partial z_{i}^{\left(l+1\right)}}{ \partial w_{ij}^{\left( l \right)} }$$
+$$\nabla_{ij}^{\left[ l\right ]} = \frac{\partial C}{\partial z_{i}^{\left[ l\right] }} = \sum_k \frac{\partial C}{\partial z_{i}^{\left[ l+1\right ]}} \frac{\partial z_{i}^{\left[ l+1\right ]}}{ \partial w_{ij}^{\left[ l \right] } }$$
 
-$$\text{we know: } z_{k}^{\left(l+1\right)} = \sum_m w_{km}^{\left(l+1\right)} * a_{m}^{\left(l+1\right)} $$
+$$\text{we know: } z_{k}^{\left[ l+1\right] } = \sum_m w_{km}^{\left[ l+1\right ]} * a_{m}^{\left[ l+1\right] } $$
 
+$$\frac{\partial  z_{k}^{\left[ l+1\right] } }{ \partial  w_{ij}^{\left[ l\right] } } = \frac{\partial}{\partial  w_{ij}^{\left[ l\right] } } \sum_m w_{km}^{\left[ l\right] } *  a_{m}^{\left[ l\right]} = \sum_m \frac{\partial  w_{km}^{\left[ l\right]} }{ \partial  w_{ij}^{\left[ l \right]}  } *  a_{m}^{\left[ l\right]}  $$
 
+$$\text{if k}  \neq \text{ i and  m } \neq \text{ j ->  } \frac{\partial  w_{km}^{\left[ l\right]} }{ \partial  w_{ij}^{\left[ l \right]}  } *  a_{m}^{\left[ l\right]} = 0 $$
+
+$$\text{if k = i and m = j } \frac{\partial  w_{km}^{\left[ l\right]} }{ \partial  w_{ij}^{\left[ l \right]}  } *  a_{m}^{\left[ l\right]} = \frac{\partial  w_{ij}^{\left[ l\right]} }{ \partial  w_{ij}^{\left[ l \right]}  } *  a_{j}^{\left[ l\right]} $$
+
+$$\frac{\partial z_i^{\left[l+1 \right]}} {\partial w_{ij}^{\left[l \right]}  } = \frac{\partial w_{ij}^{\left[l+1 \right]}  } {\partial w_{ij}^{\left[l \right]}  } *a_{j}^{\left[l \right]} + \sum_{m \neq j} {\partial w_{im}^{\left[l \right]}  } *a_{m}^{\left[l \right]} = a_{j}^{\left[l \right]} + 0 = a_{j}^{\left[l \right]}   $$
 
 
 #### Back Propagation
