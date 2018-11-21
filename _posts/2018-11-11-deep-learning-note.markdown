@@ -252,7 +252,7 @@ Define Cost is C and  gradient as $$\nabla_{ij}^{\left[ l\right ]} = \frac{\part
 Define $$\delta_{ij}^{\left[ l\right ]}  = \frac{\partial C}{\partial z_{ij}^{\left[ l \right]}} $$<br/>
 use $$w_{ij}^{\left(l\right)}$$ means the parameters from layer l-1's i-th node to layer l's j-th node
 
-First show $$\nabla_{ij}^{\left[ l\right ] } = \delta_{i}^{\left[ l+1\right ]} * a_{j}^{\left[ l-1\right ]} $$ with $$\delta_i^{\left[ l+1\right ]} = \frac{\partial C}{\partial z_{ij}^{\left[ l+1\right ]}} $$
+First show $$\nabla_{ij}^{\left[ l\right ] } = \delta_{i}^{\left[ l\right ]} * a_{j}^{\left[ l-1\right ]} $$ with $$\delta_i^{\left[ l\right ]} = \frac{\partial C}{\partial z_{i}^{\left[ l\right ]}} $$
 
 $$\nabla_{ij}^{\left[ l\right ]} = \frac{\partial C}{\partial z_{i}^{\left[ l\right] }} = \sum_k \frac{\partial C}{\partial z_{i}^{\left[ l\right ]}} \frac{\partial z_{i}^{\left[ l\right ]}}{ \partial w_{ij}^{\left[ l \right] } }$$
 
@@ -264,10 +264,10 @@ $$\text{if k}  \neq \text{ i and  m } \neq \text{ j: } \frac{\partial  w_{km}^{\
 
 $$\text{if k = i and m = j: } \frac{\partial  w_{km}^{\left[ l\right]} }{ \partial  w_{ij}^{\left[ l \right]}  } *  a_{m}^{\left[ l-1\right]} = \frac{\partial  w_{ij}^{\left[ l\right]} }{ \partial  w_{ij}^{\left[ l \right]}  } *  a_{j}^{\left[ l-1\right]} $$
 
-$$\frac{\partial z_i^{\left[l \right]}} {\partial w_{ij}^{\left[l \right]}  } = \frac{\partial w_{ij}^{\left[l \right]}  } {\partial w_{ij}^{\left[l \right]}  } *a_{j}^{\left[l-1 \right]} + \sum_{m \neq j} \frac{\partial w_{im}^{\left[l \right]}  } \partial w_{ij}^{\left[l \right]}  } *a_{m}^{\left[l-1 \right]} = a_{j}^{\left[l-1 \right]} + 0 = a_{j}^{\left[l -1 \right]}   $$
+$$\frac{\partial z_i^{\left[ l \right]}} {\partial w_{ij}^{\left[ l \right] }  } = \frac{\partial w_{ij}^{ \left[ l \right]}  } {\partial w_{ij}^{\left[ l \right]}  } *a_{j}^{\left[ l-1 \right]} + \sum_{m \neq j} \frac{\partial w_{im}^{\left[ l \right]}  } { \partial w_{ij}^{\left[ l \right]}  } *a_{m}^{\left[ l-1 \right]} = a_{j}^{\left[ l-1 \right]} + 0 = a_{j}^{\left[ l -1 \right]}   $$
 
 
-$$\nabla_{ij}^{\left[ l\right ]} = \sum_k \frac{\partial C} {\partial z_k^{\left[ l \right]}}  \frac {\partial z_k^{\left[ l \right]}} {\partial w_{ij}^{\left[ l \right]} } = \frac{\partial C} {\partial z_i^{\left[ l \right]}}  \frac {\partial z_i^{\left[ l \right]}} {\partial w_{ij}^{\left[ l \right]} } = \frac{\partial C} {\partial z_i^{\left[ l \right]}} * a_j^{\left[ l - 1 \right]}}$$
+$$\nabla_{ij}^{\left[ l\right ]} = \sum_k \frac{\partial C} {\partial z_k^{\left[ l \right]}}  \frac {\partial z_k^{\left[ l \right]}} {\partial w_{ij}^{\left[ l \right]} } = \frac{\partial C} {\partial z_i^{\left[ l \right]}}  \frac {\partial z_i^{\left[ l \right]}} {\partial w_{ij}^{\left[ l \right]} } = \frac{ \partial C} {\partial z_i^{\left[ l \right]}} * a_j^{\left[ l - 1 \right]}$$
 
 
 #### Back Propagation
