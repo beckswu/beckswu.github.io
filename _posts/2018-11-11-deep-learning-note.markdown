@@ -254,15 +254,12 @@ use $$w_{ij}^{\left(l\right)}$$ means the parameters from layer l-1's i-th node 
 
 <span style="background-color: #FFFF00">First show $$\nabla_{ij}^{\left[ l\right ] } = \delta_{i}^{\left[ l\right ]} * a_{j}^{\left[ l-1\right ]} $$ </span> with $$\delta_i^{\left[ l\right ]} = \frac{\partial C}{\partial z_{i}^{\left[ l\right ]}} $$
 
-$$\nabla_{ij}^{\left[ l\right ]} = \frac{\partial C}{\partial z_{i}^{\left[ l\right] }} = \sum_k \frac{\partial C}{\partial z_{i}^{\left[ l\right ]}} \frac{\partial z_{i}^{\left[ l\right ]}}{ \partial w_{ij}^{\left[ l \right] } }$$
-
-$$\text{we know: } z_{k}^{\left[ l\right] } = \sum_m w_{km}^{\left[ l\right ]} * a_{m}^{\left[ l-1\right] } $$
+$$\nabla_{ij}^{\left[ l\right ]} = \frac{\partial C}{\partial z_{i}^{\left[ l\right] }} = \sum_k \frac{\partial C}{\partial z_{i}^{\left[ l\right ]}} \frac{\partial z_{i}^{\left[ l\right ]}}{ \partial w_{ij}^{\left[ l \right] } } \text{we know: } z_{k}^{\left[ l\right] } = \sum_m w_{km}^{\left[ l\right ]} * a_{m}^{\left[ l-1\right] } $$
 
 $$\frac{\partial  z_{k}^{\left[ l\right] } }{ \partial  w_{ij}^{\left[ l\right] } } = \frac{\partial}{\partial  w_{ij}^{\left[ l\right] } } \sum_m w_{km}^{\left[ l\right] } *  a_{m}^{\left[ l-1\right]} = \sum_m \frac{\partial  w_{km}^{\left[ l\right]} }{ \partial  w_{ij}^{\left[ l \right]}  } *  a_{m}^{\left[ l-1\right]}  $$
 
-$$\text{if k}  \neq \text{ i and  m } \neq \text{ j: } \frac{\partial  w_{km}^{\left[ l\right]} }{ \partial  w_{ij}^{\left[ l \right]}  } *  a_{m}^{\left[ l-1\right]} = 0 $$
-
-$$\text{if k = i and m = j: } \frac{\partial  w_{km}^{\left[ l\right]} }{ \partial  w_{ij}^{\left[ l \right]}  } *  a_{m}^{\left[ l-1\right]} = \frac{\partial  w_{ij}^{\left[ l\right]} }{ \partial  w_{ij}^{\left[ l \right]}  } *  a_{j}^{\left[ l-1\right]} $$
+$$\begin{align}  \text{if k}  \neq \text{ i and  m } \neq \text{ j: } & \frac{\partial  w_{km}^{\left[ l\right]} }{ \partial  w_{ij}^{\left[ l \right]}  } *  a_{m}^{\left[ l-1\right]} = 0     \\ 
+\text{if k = i and m = j: } & \frac{\partial  w_{km}^{\left[ l\right]} }{ \partial  w_{ij}^{\left[ l \right]}  } *  a_{m}^{\left[ l-1\right]} = \frac{\partial  w_{ij}^{\left[ l\right]} }{ \partial  w_{ij}^{\left[ l \right]}  } *  a_{j}^{\left[ l-1\right]} \end{align}$$
 
 $$\frac{\partial z_i^{\left[ l \right]}} {\partial w_{ij}^{\left[ l \right] }  } = \frac{\partial w_{ij}^{ \left[ l \right]}  } {\partial w_{ij}^{\left[ l \right]}  } *a_{j}^{\left[ l-1 \right]} + \sum_{m \neq j} \frac{\partial w_{im}^{\left[ l \right]}  } { \partial w_{ij}^{\left[ l \right]}  } *a_{m}^{\left[ l-1 \right]} = a_{j}^{\left[ l-1 \right]} + 0 = a_{j}^{\left[ l -1 \right]}   $$
 
