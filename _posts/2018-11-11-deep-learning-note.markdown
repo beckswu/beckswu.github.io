@@ -252,7 +252,7 @@ Define Cost is C and  gradient as $$\nabla_{ij}^{\left[ l\right ]} = \frac{\part
 Define $$\delta_{ij}^{\left[ l\right ]}  = \frac{\partial C}{\partial z_{ij}^{\left[ l \right]}} $$<br/>
 use $$w_{ij}^{\left(l\right)}$$ means the parameters from layer l-1's i-th node to layer l's j-th node
 
-<span style="background-color: #FFFF00">First show $$\nabla_{ij}^{\left[ l\right ] } = \delta_{i}^{\left[ l\right ]} * a_{j}^{\left[ l-1\right ]} $$ </span> with $$\delta_i^{\left[ l\right ]} = \frac{\partial C}{\partial z_{i}^{\left[ l\right ]}} $$
+<span style="background-color: #FFFF00">**First show** $$\nabla_{ij}^{\left[ l\right ] } = \delta_{i}^{\left[ l\right ]} * a_{j}^{\left[ l-1\right ]} $$ </span> with $$\delta_i^{\left[ l\right ]} = \frac{\partial C}{\partial z_{i}^{\left[ l\right ]}} $$
 
 $$\nabla_{ij}^{\left[ l\right ]} = \frac{\partial C}{\partial z_{i}^{\left[ l\right] }} = \sum_k \frac{\partial C}{\partial z_{i}^{\left[ l\right ]}} \frac{\partial z_{i}^{\left[ l\right ]}}{ \partial w_{ij}^{\left[ l \right] } } \text{we know: } z_{k}^{\left[ l\right] } = \sum_m w_{km}^{\left[ l\right ]} * a_{m}^{\left[ l-1\right] } $$
 
@@ -265,6 +265,11 @@ $$\frac{\partial z_i^{\left[ l \right]}} {\partial w_{ij}^{\left[ l \right] }  }
 
 
 $$\nabla_{ij}^{\left[ l\right ]} = \sum_k \frac{\partial C} {\partial z_k^{\left[ l \right]}}  \frac {\partial z_k^{\left[ l \right]}} {\partial w_{ij}^{\left[ l \right]} } = \frac{\partial C} {\partial z_i^{\left[ l \right]}}  \frac {\partial z_i^{\left[ l \right]}} {\partial w_{ij}^{\left[ l \right]} } = \frac{ \partial C} {\partial z_i^{\left[ l \right]}} * a_j^{\left[ l - 1 \right]}$$
+
+<br/>
+
+<span style="background-color: #FFFF00">**Second show Relationship between**  $$\delta^{\left[ l\right ] }$$ and $$ $$\delta^{\left[ l + 1\right ] } $$</span>
+
 
 
 #### Back Propagation
@@ -287,6 +292,7 @@ $$db^{\left[ 1 \right]} = \frac{1}{m} np.sum\left(  dZ^{\left[ 1 \right]}, \text
 
 $$dW^{\left[ 1 \right]} = \frac{1}{m} dZ^{\left[ 1 \right]}  X^{T}  $$
 
-$$ dW^{\left[ 1 \right]} = \frac{1}{m}  \begin{bmatrix} ---z_1^{\left[ 1 \right]} --- \\  ---z_2^{\left[ 1 \right]}--- \\ \vdots \\ ---z_n^{\left[ 1 \right]} --- \end{bmatrix}    \begin{bmatrix} ---x_1^{\left[ 1 \right]} --- \\  ---x_2^{\left[ 1 \right]}--- \\ \vdots \\ ---x_n^{\left[ 1 \right]} --- \end{bmatrix}      $$
+$$ dW^{\left[ 1 \right]} = \frac{1}{m}  \begin{bmatrix} \underbrace{---z_1^{\left[ 1 \right]} --- \\  ---z_2^{\left[ 1 \right]}--- \\ \vdots \\ ---z_n^{\left[ 1 \right]} ---}_{m 个columns} \end{bmatrix}    \begin{bmatrix} ---x_1^{\left[ 1 \right]} --- \\  ---x_2^{\left[ 1 \right]}--- \\ \vdots \\ ---x_m^{\left[ 1 \right]} --- \end{bmatrix}      $$
 
 $$dZ^{\left[ 1 \right]}$$ column 是 m个training example, row是n个下层layer, $$ X^T$$ column 是 n 个attributes（每一列是属于同一种类 attribute）, row是 m 个training examples,
+
