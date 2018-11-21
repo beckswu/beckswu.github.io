@@ -282,7 +282,7 @@ $$dW^{\left[ 2 \right]} = \frac{1}{m} dZ^{\left[ 2 \right]}  A^{\left[ 1 \right]
 $$db^{\left[ 2 \right]} = \frac{1}{m} np.sum\left(  dZ^{\left[ 2 \right]}, \text{ axis = 1, keepdims = true} \right)$$ <br/>
 如果不加keepdims 可能产生 np.array funny (n, )array, 加上keepdims = true 给出shape = $$\left( n^{\left[ 2 \right]} , 1\right)$$ <br/>
 $$dZ^{\left[ 1 \right]} = W^{\left[ 2 \right]T}   dZ^{\left[ 2 \right]} \cdot  g^{\left[ 1 \right]}' \left( Z^{\left[ 1 \right]} \right) $$<br/>
-$$W^{\left[ 2 \right]T}   dZ^{\left[ 2 \right]} $$ is $$\left( n^{\left[ 1 \right]}, m \right) matrix, g^{\left[ 1 \right]}' \left( Z^{\left[ 1 \right]} \right) $$ is also a $$\left( n^{\left[ 1 \right]}, m \right) matrix $$<br/>
+$$W^{\left[ 2 \right]T}   dZ^{\left[ 2 \right]} $$ is $$\left( n^{ \left[ 1 \right] }, m \right) $$ matrix, $$g^{\left[ 1 \right]}' \left( Z^{\left[ 1 \right]} \right) $$ is also a $$\left( n^{\left[ 1 \right]}, m \right) $$ matrix<br/>
 $$dW^{\left[ 1 \right]} = \frac{1}{m} dZ^{\left[ 1 \right]}  X^{T} $$<br/>
 $$db^{\left[ 1 \right]} = \frac{1}{m} np.sum\left(  dZ^{\left[ 1 \right]}, \text{ axis = 1, keepdims = true} \right)$$
 
