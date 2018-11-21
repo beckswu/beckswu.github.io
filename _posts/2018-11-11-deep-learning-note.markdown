@@ -271,11 +271,13 @@ $$\nabla_{ij}^{\left[ l\right ]} = \sum_k \frac{\partial C} {\partial z_k^{\left
 <span style="background-color: #FFFF00">**Second show Relationship between**  $$\delta^{\left[ l\right ] }$$ and $$ \delta^{\left[ l + 1\right ] } $$</span>
 
 
-$$\delta_{i}^{\left[ l\right ]} = \frac{\partial C}{\partial z_{i}^{\left[ l\right] }} = \sum_k \frac{\partial C}{\partial z_{k}^{\left[ l + 1 \right ]}} \frac{\partial z_{k}^{\left[ l + 1\right ]}}{ \partial z_{i}^{\left[ l \right] } } \text{we know: } z_{k}^{\left[ l+1\right] } = \sum_j w_{kj}^{\left[ l+1\right ]} * a_{j}^{\left[ l\right] } =  \sum_j w_{kj}^{\left[ l+1\right ]} * g\left( z_{j}^{\left[ l\right] } \right)$$
+$$\delta_{i}^{\left[ l\right ]} = \frac{\partial C}{\partial z_{i}^{\left[ l\right] }} = \sum_k \frac{\partial C}{\partial z_{k}^{\left[ l + 1 \right ]}} \frac{\partial z_{k}^{\left[ l + 1\right ]}}{ \partial z_{i}^{\left[ l \right] } } $$
 
-$$\frac{\partial z_{k}^{\left[ l + 1\right ]} } { \partial z_{i}^{\left[ l \right] } } = \sum_j w_{kj}^{\left[ l+1\right ]} \frac{\partial g\left( z_{j}^{\left[ l \right ]} \right) }{ \partial z_{i}^{\left[ l \right] } }$$
+$$\text{we know: } z_{k}^{\left[ l+1\right] } = \sum_j w_{kj}^{\left[ l+1\right ]} * a_{j}^{\left[ l\right] } =  \sum_j w_{kj}^{\left[ l+1\right ]} * g\left( z_{j}^{\left[ l\right] } \right)$$
 
-$$\begin{align} \text{if j } \neq \text{ then : } & w_{kj}^{\left[ l+1\right ]} \frac{\partial g\left( z_{j}^{\left[ l \right ]} \right) }{ \partial z_{i}^{\left[ l \right] } } = 0  \\  \text{if j = i then : } &  w_{kj}^{\left[ l+1\right ]} \frac{\partial g\left( z_{j}^{\left[ l \right ]} \right) }{ \partial z_{i}^{\left[ l \right] } } = w_{ki}^{\left[ l+1\right ]}  {z'}_{i}^{\left[ l \right] }    \end{align}$$
+$$\frac{\partial z_{k}^{\left[ l + 1\right ]} } { \partial z_{i}^{\left[ l \right] } } = \sum_j w_{kj}^{\left[ l+1\right ]} * \frac{\partial g\left( z_{j}^{\left[ l \right ]} \right) }{ \partial z_{i}^{\left[ l \right] } }$$
+
+$$\begin{align} \text{if j } \neq \text{ then : } & w_{kj}^{\left[ l+1\right ]} \frac{\partial g\left( z_{j}^{\left[ l \right ]} \right) }{ \partial z_{i}^{\left[ l \right] } } = 0  \\  \text{if j = i then : } &  w_{kj}^{\left[ l+1\right ]} * \frac{\partial g\left( z_{j}^{\left[ l \right ]} \right) }{ \partial z_{i}^{\left[ l \right] } } = w_{ki}^{\left[ l+1\right ]} * {z'}_{i}^{\left[ l \right] }    \end{align}$$
 
 #### Back Propagation
 
