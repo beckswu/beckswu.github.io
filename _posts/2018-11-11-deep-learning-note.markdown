@@ -252,7 +252,11 @@ Define Cost is C and  gradient as $$\nabla_{ij}^{\left(l\right)} = \frac{\partia
 Define $$\delta_{ij}^{\left(l\right)}  = \frac{\partial C}{\partial z_{ij}^{\left(l\right)}} $$<br/>
 use $$w_{ij}^{\left(l\right)}$$ means the parameters from layer l-1's i-th node to layer l's j-th node
 
-First show $$\nabla_{ij}^{\left(l\right)} = \delta_{i}^{\left(l+1\right)} * a_{j}^{\left(l\right)} $$
+First show $$\nabla_{ij}^{\left(l\right)} = \delta_{i}^{\left(l+1\right)} * a_{j}^{\left(l\right)} $$ with $$\delta_i^{\left(l+1\right)}$$
+
+$$\nabla_{ij}^{\left(l\right)} = \frac{\partial C}{\partial z_{i}^{\left(l\right)}} = \Sum_k \frac{\partial C}{\partial z_{i}^{\left(l+1\right)}} \frac{\partial z_{i}^{\left(l+1\right)}}{ \partial w_{ij}^{\left( l \right)} }$$
+
+$$\text{we know: } z_{k}^{\left(l+1\right)} = \Sum $$
 
 
 #### Back Propagation
