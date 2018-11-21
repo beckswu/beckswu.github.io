@@ -192,7 +192,7 @@ $$A^{\left[ 2 \right]} = \sigma\left(Z^{\left[ 2 \right]}\right)$$
 
 $$z^{\left[ 1 \right]} = w^{\left[ 1 \right]}x + b^{\left[ 1 \right]}$$
 
-$$z^{\left[ 1 \right]}  = \begin{bmatrix} ---W_1^{\left[ 1 \right]T}--- \\ ---W_2^{\left[ 1 \right]T}--- \\ ---W_3^{\left[ 1 \right]T}--- \\ ---W_4^{\left[ 1 \right]T}--- \end{bmatrix} \begin{bmatrix} \mid & \mid & \cdots & \mid \\ a_1^{\left[ i-1 \right]T} & a_2^{\left[ i-1 \right]T} & \cdots & a_m^{\left[ i-1 \right]T} \\ \mid & \mid & \cdots & \mid \end{bmatrix} + \begin{bmatrix} b_1^{\left[ 1 \right]} \\ b_2^{\left[ 1 \right]} \\ b_3^{\left[ 1 \right]} \\ b_4^{\left[ 1 \right]} \end{bmatrix}   $$ 
+$$z^{\left[ 1 \right]}  = \begin{bmatrix} ---W_1^{\left[ 1 \right]T}--- \\ ---W_2^{\left[ 1 \right]T}--- \\ ---W_3^{\left[ 1 \right]T}--- \\ ---W_4^{\left[ 1 \right]T}--- \end{bmatrix} \begin{bmatrix} \mid & \mid & \cdots & \mid \\ a_1^{\left[ i-1 \right]} & a_2^{\left[ i-1 \right]} & \cdots & a_m^{\left[ i-1 \right]} \\ \mid & \mid & \cdots & \mid \end{bmatrix} + \begin{bmatrix} b_1^{\left[ 1 \right]} \\ b_2^{\left[ 1 \right]} \\ b_3^{\left[ 1 \right]} \\ b_4^{\left[ 1 \right]} \end{bmatrix}   $$ 
 
 
 #### Activation Function
@@ -252,11 +252,13 @@ Define Cost is C and  gradient as $$\nabla_{ij}^{\left(l\right)} = \frac{\partia
 Define $$\delta_{ij}^{\left(l\right)}  = \frac{\partial C}{\partial z_{ij}^{\left(l\right)}} $$<br/>
 use $$w_{ij}^{\left(l\right)}$$ means the parameters from layer l-1's i-th node to layer l's j-th node
 
-First show $$\nabla_{ij}^{\left(l\right)} = \delta_{i}^{\left(l+1\right)} * a_{j}^{\left(l\right)} $$ with $$\delta_i^{\left(l+1\right)}$$
+First show $$\nabla_{ij}^{\left(l\right)} = \delta_{i}^{\left(l+1\right)} * a_{j}^{\left(l\right)} $$ with $$\delta_i^{\left(l+1\right)} = \frac{\partial C}{\partial z_{ij}^{\left(l+1\right)}} $$
 
-$$\nabla_{ij}^{\left(l\right)} = \frac{\partial C}{\partial z_{i}^{\left(l\right)}} = \Sum_k \frac{\partial C}{\partial z_{i}^{\left(l+1\right)}} \frac{\partial z_{i}^{\left(l+1\right)}}{ \partial w_{ij}^{\left( l \right)} }$$
+$$\nabla_{ij}^{\left(l\right)} = \frac{\partial C}{\partial z_{i}^{\left(l\right)}} = \sum_k \frac{\partial C}{\partial z_{i}^{\left(l+1\right)}} \frac{\partial z_{i}^{\left(l+1\right)}}{ \partial w_{ij}^{\left( l \right)} }$$
 
-$$\text{we know: } z_{k}^{\left(l+1\right)} = \Sum $$
+$$\text{we know: } z_{k}^{\left(l+1\right)} = \sum_m w_{km}^{\left(l+1\right)} * a_{m}^{\left(l+1\right)} $$
+
+
 
 
 #### Back Propagation
