@@ -308,5 +308,5 @@ $$dW^{\left[ 1 \right]} = \frac{1}{m} dZ^{\left[ 1 \right]}  X^{T}  $$
 
 $$ dW^{\left[ 1 \right]} = \frac{1}{m}  \begin{bmatrix} ---z_1^{\left[ 1 \right]} --- \\  ---z_2^{\left[ 1 \right]}--- \\ \vdots \\ \underbrace{ ---z_n^{\left[ 1 \right]} ---}_{m 个columns} \end{bmatrix}    \begin{bmatrix}  ---x_1^{\left[ 1 \right]} --- \\  ---x_2^{\left[ 1 \right]}--- \\ \vdots \\ \underbrace{-}_{\text{第一个attribute}}--x_m^{\left[ 1 \right]} --- \end{bmatrix}      $$
 
-$$dZ^{\left[ 1 \right]}$$ column 是 m个training example, row是n （现在layer的nodes个数) , $$ X^T$$ column 是 n 个attributes（每一列是属于同一种类 attribute）, row是 m 个training examples,
+$$dZ^{\left[ 1 \right]}$$ column 是 m个training example, row是n （第一层的nodes个数) , $$ X^T$$ column 是 n 个attributes（每一列是属于同一种类 attribute）, row是 m 个training examples,
 
