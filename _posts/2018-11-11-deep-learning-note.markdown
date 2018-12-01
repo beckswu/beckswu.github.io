@@ -45,8 +45,7 @@ m 是 number of training example, n 是 number of features
 x 是 n by m 维, <br/>
 W 是 n by 1 维 <br/>
 b 是 1 by 1 维， <br/>
-$$z = W^T x + b $$ 是 1 by m 维
-
+$$z = W^T x + b $$ 是 1 by m 维<br/>
 $$z = w^Tx + b = \left[ w_1, w_2, \cdots, w_n  \right] \begin{bmatrix} \mid & \mid & \cdots & \mid \\ x_1 & x_2 & \cdots & x_m \\ \mid & \mid & \cdots & \mid \end{bmatrix} + \left[ b\right] $$
 
 **For Neural Network**
@@ -311,3 +310,6 @@ $$ dW^{\left[ 1 \right]} = \frac{1}{m}  \begin{bmatrix} ---z_1^{\left[ 1 \right]
 
 $$dZ^{\left[ 1 \right]}$$ column 是 m个training example, row是n （第一层的nodes个数) , $$ X^T$$ column 是 n 个attributes（每一列是属于同一种类 attribute）, row是 m 个training examples,
 
+$$dZ^{\left[ 1 \right] }  = W^{\left[ 2 \right] T} dZ^{\left[ 2 \right] } \codt  {g'}  \left( Z^{\left[ 1 \right]} \right)     $$
+
+$$dZ^{\left[ 1 \right] }  =  \begin{bmatrix} \mid &  \mid &  \cdots & \mid  \\  w^{\left[ 1 \right] } & w^{\left[ 2 \right] } & \cdots &  w^{\left[ k \right] } \\  \underbrace{ \mid }_{\text{ 从第1层到第2层第1个neuron所有的w }} &  \mid &  \cdots & \mid \end{bmatrix} \begin{bmatrix} \mid &  \mid &  \cdots & \mid  \\  z^{\left[ 1 \right] } & z^{\left[ 2 \right] } & \cdots &  z^{\left[ m \right] } \\ \underbrace{ \mid &  \mid &  \cdots & \mid }_{\text{m 个columns}}  \\end{bmatrix} $$
