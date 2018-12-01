@@ -53,6 +53,7 @@ $$z = w^Tx + b = \left[ w_1, w_2, \cdots, w_n  \right] \begin{bmatrix} \mid & \m
 
 用$$\mathbf{\left[ i \right]}$$ 表示第i层, 用$$\mathbf{\left( i \right)}$$ 表示第i个training example <br/>
 $$\mathbf{W^{\left[ i \right]}}$$ 表示 从第i-1 层到第i层的paramter <br/>
+$$\mathbf{ Z^{\left[ i \right]}  =W^{\left[ i \right]} a^{\left[ i-1 \right]} + b^{\left[ i \right]}} $$ 表示 $$a^{\left[ i-1 \right]}$$ linear transformation
 X ($$a^{\left[ 0 \right]}$$) 是 n by m 维, <br/>
 A ($$a^{\left[ 0 \right]}$$) 是 #$$a_i$$ by m 维, 每列是每一个training example 每一行是different nodes <br/>
 W 是 # $$a_{i}$$ by #$$a_{i-1}$$ 维, 表示从第i-1 层 到 第i层的参数。 # $$a_{i}$$是下一层layer的neuron(node) 数, # $$a_{i-1}$$是上一层neuron(node) 数， W的j行代表从 $$a_{i-1 }$$ 到 $$a_{i}$$ 第j 个 nodes 所有参数   <br/>
