@@ -312,8 +312,7 @@ $$ dW^{\left[ 1 \right]} = \frac{1}{m}  \begin{bmatrix} ---z_1^{\left[ 1 \right]
 $$dZ^{\left[ 1 \right] }  = W^{\left[ 2 \right] T} dZ^{\left[ 2 \right] } \cdot  {g'}  \left( Z^{\left[ 1 \right]} \right)     $$
 
 
-$$ dZ^{\left[ 1 \right] }  =  \begin{bmatrix} \mid &  \mid &  \cdots & \mid  \\  w_1^{\left[ 2 \right] } & w_2^{\left[ 2 \right] } & \cdots &  w_k^{\left[ 2 \right] } \\  \underbrace{ \mid }_{\text{ 从第1层到第2层第1个node }} &  \mid &  \cdots & \mid \end{bmatrix}  n^{\left[ 2 \right]}  \text{个row} \begin{cases}  \begin{bmatrix} --z_1^{\left[ 1 \right]} -- \\  --z_2^{\left[ 1 \right]}-- \\ \vdots \\ \underbrace{ --z_k^{\left[ 1 \right]} --}_{m 个columns} \end{bmatrix} \end{cases} $$
-
+$$ dZ^{\left[ 1 \right] }  =  \begin{bmatrix} \mid &  \mid &  \cdots & \mid  \\  w_1^{\left[ 2 \right] } & w_2^{\left[ 2 \right] } & \cdots &  w_k^{\left[ 2 \right] } \\  \underbrace{ \mid }_{\text{ 从第1层到第2层第1个node }} &  \mid &  \cdots & \mid \end{bmatrix}  n^{\left[ 2 \right]}  \text{个row} \begin{cases}  \begin{bmatrix} --z_1^{\left[ 1 \right]} -- \\  --z_2^{\left[ 1 \right]}-- \\ \vdots \\ \underbrace{ --z_k^{\left[ 1 \right]} --}_{m 个columns} \end{bmatrix} \end{cases} $$ <br/>
 $$  \cdot \left. \begin{array}{l}  \begin{bmatrix} --{z_1'}^{\left[ 1 \right]} -- \\  --{z_2'}^{\left[ 1 \right]}-- \\ \vdots \\ \underbrace{ --{z_n'}^{\left[ 1 \right]} --}_{m 个columns} \end{bmatrix} \end{array} \right\}  n^{\left[ 1 \right]}  \text{个row} $$
 
 $$dZ^{\left[ 1 \right]}$$ column 是 m个training example, row是n （第一层的nodes个数) , $$ X^T$$ column 是 n 个attributes（每一列是属于同一种类 attribute）, row是 m 个training examples,
