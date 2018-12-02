@@ -318,3 +318,15 @@ $$  \cdot \left. \begin{array}{l}  \begin{bmatrix} --{z_1'}^{\left[ 1 \right]} -
 
 $$dZ^{\left[ 1 \right]}$$ column 是 m个training example, row是n （第一层的nodes个数) , $$ X^T$$ column 是 n 个attributes（每一列是属于同一种类 attribute）, row是 m 个training examples,
 
+#### Random Initialization: 
+
+initialize b all 0 is okay but initialize w all 0 have problem
+
+
+![](\img\post\Deep-Learning\pic5.png)
+
+$$w^{ \left[ 1 \right]} = \begin{bmatrix} 0 & 0 \\ 0 & 0 \end{bmatrix}$$, it turns out forward prop 第一层两个nodes一样的 $$a_1^{ \left[ 1 \right]} = a_2^{ \left[ 1 \right]}$$, for back prop $$dz_1^{ \left[ 1 \right]} = dz_2^{ \left[ 1 \right]}$$, $$dw_1^{ \left[ 1 \right]} = dw_2^{ \left[ 1 \right]}$$. <span style="background-color: #FFFF00">after every single iteration of training, two hidden units computing exactly the same function</span>
+
+<span style = "color: red">**Solution**</span> $$w^{ \left[ 1 \right]} = $$ np.random.rand((2,2))*0.01, $$b^{ \left[ 1 \right]} = $$  np.zeros((2,1))  $$w^{ \left[ 2 \right]} = $$ np.random.rand((2,2))*0.01, $$b^{ \left[ 2 \right]} = 0 $$ 
+
+<span style = "color: red">**Why w 乘以很小的数(0.01)**</span> 比如sigmoid function/tanh function, W大的话， Z = WX + b就是正的很大的数 or 负的很小的数， A = g(Z) 也就很大, gradient 接近于0(上面activation function图像),  gradient descent will be slow, and learning rate will be slow. <span style="background-color: #FFFF00">如果不用sigmoid or tanh function in neural network, not a issue</span>
