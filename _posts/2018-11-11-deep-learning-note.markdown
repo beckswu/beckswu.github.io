@@ -314,7 +314,7 @@ $$ \begin{bmatrix} \mid &  \mid &  \cdots & \mid  \\  z_1^{\left[ 2 \right] } & 
 $$dZ^{\left[ 1 \right] }  = W^{\left[ 2 \right] T} dZ^{\left[ 2 \right] } \cdot  {g'}  \left( Z^{\left[ 1 \right]} \right)     $$
 
 
-$$ dZ^{\left[ 1 \right] }  =  \begin{bmatrix} \mid &  \mid &  \cdots & \mid  \\  w_1^{\left[ 2 \right] } & w_2^{\left[ 2 \right] } & \cdots &  w_k^{\left[ 2 \right] } \\  \underbrace{ \mid }_{\text{ 从第1层到第2层第1个node }} &  \mid &  \cdots & \mid \end{bmatrix}  n^{\left[ 2 \right]}  \text{个row} \begin{cases}  \begin{bmatrix} \mid &  \mid &  \cdots & \mid  \\  z_1^{\left[ 2 \right] } & z_2^{\left[ 2 \right] } & \cdots &  z_m^{\left[ 2 \right] } \\  \mid &  \mid &  \cdots & \mid  \end{bmatrix}  \end{cases} $$
+$$ dZ^{\left[ 1 \right] }  =  \begin{bmatrix} \mid &  \mid &  \cdots & \mid  \\  w_1^{\left[ 2 \right] } & w_2^{\left[ 2 \right] } & \cdots &  w_{n2}^{\left[ 2 \right] } \\  \underbrace{ \mid }_{\text{ 从第1层到第2层第1个node }} &  \mid &  \cdots & \mid \end{bmatrix}  n^{\left[ 2 \right]}  \text{个row} \begin{cases}  \begin{bmatrix} \mid &  \mid &  \cdots & \mid  \\  z_1^{\left[ 2 \right] } & z_2^{\left[ 2 \right] } & \cdots &  z_m^{\left[ 2 \right] } \\  \mid &  \mid &  \cdots & \mid  \end{bmatrix}  \end{cases} $$
 
 $$  \cdot \left. \begin{array}{l}  \begin{bmatrix} \mid &  \mid &  \cdots & \mid  \\  {z_1'}^{\left[ 2 \right] } & {z_2'}^{\left[ 2 \right] } & \cdots &  {z_m'}^{\left[ 2 \right] } \\  \mid &  \mid &  \cdots & \mid  \end{bmatrix}  \end{array} \right\}  n^{\left[ 1 \right]}  \text{个row} $$
 
