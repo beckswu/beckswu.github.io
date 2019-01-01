@@ -338,7 +338,7 @@ $$w^{ \left[ 1 \right]} = \begin{bmatrix} 0 & 0 \\ 0 & 0 \end{bmatrix}$$, it tur
 
 ## Hyperparameter tuning, Regularization, Optimization 
 
-#### Train/Dev/Test Set: 
+#### Train/Dev/Test Set
 
 <span style="color: red"> Train 在 **Train set**</span>, Then use **Dev set(cross validation set)** to see wich of  <span style="background-color: #FFFF00">many different models performs the best on Dev set</span>. Then after having doe this long enough when you have final model that you want to evaluate. You can take the best model you have found and evaulate it on the **Test set**, <span style="background:#FFFF00;">为了获取unbiased estimate of how well you algorithm is doing</span>
 
@@ -349,7 +349,7 @@ In the previous era of machine learning: 60/20/20: 60% train set, 20% dev set, 2
 
 假如有100万个数据， dev set 只需要1万个，就够了， 99% train，0.5% dev set, 0.5% test set
 
-<span style='color:red;'>**Mismatched Train/Test Distribution**</span>
+<span style='color:red;'>**Problem of Mismatched Train/Test Distribution**</span>
 
 也许train 和 test set 的distribution 是不同的，比如train model to recognize cat, train set来自网页，而dev/test set来自user upload（有可能是自己拍摄的，比较模糊
 
