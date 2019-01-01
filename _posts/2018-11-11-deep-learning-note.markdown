@@ -170,9 +170,9 @@ Loss function 加上负号 因为想要make probability large, we want to minimi
 
 for i = 1 to m: <br/>
  $$ \space \space \space \space \space   z^{\left[ 1 \right] \left( i \right)} = W^{\left[ 1 \right]} x^{\left( i \right)} + b^{\left[ 1 \right]} $$<br/>
- $$\space \space \space \space \space   a^{\left[ 1 \right] \left( i \right)} = \sigma \left(z^{\left[ 1 \right]} x^{\left( i \right)} \right) $$<br/>
+ $$\space \space \space \space \space   a^{\left[ 1 \right] \left( i \right)} = \sigma \left(z^{\left[ 1 \right] \left( i \right)} \right) $$<br/>
 $$ \space \space \space \space \space   z^{\left[ 2 \right] \left( i \right)} = W^{\left[ 2 \right]} a^{\left[1 \right] \left( i \right)} + b^{\left[ 2 \right]} $$<br/>
-$$ \space \space \space \space \space   a^{\left[ 2 \right] \left( i \right)} = \sigma \left(z^{\left[ 2 \right]} x^{\left( i \right)} \right) $$<br/>
+$$ \space \space \space \space \space   a^{\left[ 2 \right] \left( i \right)} = \sigma \left(z^{\left[ 2 \right] \left( i \right)} \right) $$<br/>
 
 ------------
 
