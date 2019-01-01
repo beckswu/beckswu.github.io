@@ -332,3 +332,27 @@ $$w^{ \left[ 1 \right]} = \begin{bmatrix} 0 & 0 \\ 0 & 0 \end{bmatrix}$$, it tur
 <span style = "color: red">**Solution**</span> $$w^{ \left[ 1 \right]} = $$ np.random.rand((2,2))\*0.01, $$b^{ \left[ 1 \right]} = $$  np.zeros((2,1))  $$w^{ \left[ 2 \right]} = $$ np.random. rand((2,2)\)*0.01, $$b^{ \left[ 2 \right]} = 0 $$ 
 
 <span style = "color: red">**Why w 乘以很小的数(0.01)**</span> 比如sigmoid function/tanh function, W大的话， Z = WX + b就是正的很大的数 or 负的很小的数， A = g(Z) 也就很大, gradient 接近于0(上面activation function图像),  gradient descent will be slow, and learning rate will be slow. <span style="background-color: #FFFF00">如果不用sigmoid or tanh function in neural network, not a issue</span>
+
+
+
+
+## Hyperparameter tuning, Regularization, Optimization 
+
+#### Train/Dev/Test Set: 
+
+<span style="color: red"> Train 在 **Train set**</span>, Then use **Dev set(cross validation set)** to see wich of  <span style="background-color: #FFFF00">many different models performs the best on Dev set</span>. Then after having doe this long enough when you have final model that you want to evaluate. You can take the best model you have found and evaulate it on the **Test set**, <span style="background:#FFFF00;">为了获取unbiased estimate of how well you algorithm is doing</span>
+
+
+In the previous era of machine learning: 60/20/20: 60% train set, 20% dev set, 20% test set
+
+但是现在modern big data era, 拥有越来越多的数据，<span style="background:#FFFF00;">trend是 dev/test set 占得比例越来越小（small percentage）</span>，因为dev set just needs to be big enough to evaulate different algorithm choices, then decide which one is better, 
+
+假如有100万个数据， dev set 只需要1万个，就够了， 99% train，0.5% dev set, 0.5% test set
+
+<span style='color:red;'>**Mismatched Train/Test Distribution**</span>
+
+也许train 和 test set 的distribution 是不同的，比如train model to recognize cat, train set来自网页，而dev/test set来自user upload（有可能是自己拍摄的，比较模糊
+
+<span style="background:#FFFF00;">Make sure dev and test set come from the same distribution </span>. Then if do so, progress of machine learning algorithm will be faster 
+
+Not having test set might be okay (only dev set) (the goal of test 是为了 give you unbiased estimate of the performance of your final network that you selected 但是假如说你不需要 unbiased estimate 就可以不需要有 test set， so if you have only a dev set but not a test set， 实际上这时人们就把 training set 叫 training set，dev set 叫做 test set). <span style='color:red;'>Setting up train, dev, test set allow you to integrate more quickly 允许你 efficiently measure the bias and variance of your algorithm </span>
