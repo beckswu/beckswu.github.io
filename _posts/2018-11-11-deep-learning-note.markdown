@@ -345,7 +345,7 @@ $$w^{ \left[ 1 \right]} = \begin{bmatrix} 0 & 0 \\ 0 & 0 \end{bmatrix}$$, it tur
 
 In the previous era of machine learning: 60/20/20: 60% train set, 20% dev set, 20% test set
 
-但是现在modern big data era, 拥有越来越多的数据，<span style="background:#FFFF00;">trend是 dev/test set 占得比例越来越小（small percentage）</span>，因为dev set just needs to be big enough to evaulate different algorithm choices, then decide which one is better, 
+但是现在modern big data era, 拥有越来越多的数据，<span style="background-color:#FFFF00;">trend是 dev/test set 占得比例越来越小（small percentage）</span>，因为dev set just needs to be big enough to evaulate different algorithm choices, then decide which one is better, 
 
 假如有100万个数据， dev set 只需要1万个，就够了， 99% train，0.5% dev set, 0.5% test set
 
@@ -353,7 +353,7 @@ In the previous era of machine learning: 60/20/20: 60% train set, 20% dev set, 2
 
 也许train 和 test set 的distribution 是不同的，比如train model to recognize cat, train set来自网页，而dev/test set来自user upload（有可能是自己拍摄的，比较模糊
 
-<span style="background:#FFFF00;">Make sure dev and test set come from the same distribution </span>. Then if do so, progress of machine learning algorithm will be faster 
+<span style="background-color:#FFFF00;">Make sure dev and test set come from the same distribution </span>. Then if do so, progress of machine learning algorithm will be faster 
 
 Not having test set might be okay (only dev set) (the goal of test 是为了 give you unbiased estimate of the performance of your final network that you selected 但是假如说你不需要 unbiased estimate 就可以不需要有 test set， so if you have only a dev set but not a test set， 实际上这时人们就把 training set 叫 training set，dev set 叫做 test set). <span style='color:red;'>Setting up train, dev, test set allow you to integrate more quickly 允许你 efficiently measure the bias and variance of your algorithm </span>
 
@@ -403,7 +403,7 @@ L1 Regularization: W will end up being sparse, which means w vector will have a 
 omit b 的原因是: b is a single number, almost all the parameters are in w rather b, if adding b, it won't make much difference
 
 
-<span style="background:FFFF00;">L2 regularization is just used much more often</span>
+<span style="background-color:FFFF00;">L2 regularization is just used much more often</span>
 
 <span style = "color:red;">λ 被叫做regularization parameter</span>
 
@@ -431,11 +431,11 @@ Set 一个probability of eliminating a node in neural network(设置删除node�
 **Implementing dropout ("Inverted dropout"):**
 
 1. Initialize with layer l = 3. 在第三层dropout
-2. D3 = np.random.rand(a3.shape\[0], a3.shape\[1])  < keep prob. <span style="background:FFFF00;">D3(a random matrix) is used to decide to what to zero out in the third layer both in foward prop and back prop</span>   (比如 设置keep prob 概率为0.8， random number 小于0.8表示保留这个node， 大于0.8表示drop node， 0.8 概率这个D3 的node 为1，0.2的概率node 为0. 
+2. D3 = np.random.rand(a3.shape\[0], a3.shape\[1])  < keep prob. <span style="background-color: #FFFF00;">D3(a random matrix) is used to decide to what to zero out in the third layer both in foward prop and back prop</span>   (比如 设置keep prob 概率为0.8， random number 小于0.8表示保留这个node， 大于0.8表示drop node， 0.8 概率这个D3 的node 为1，0.2的概率node 为0. 
 3. a3 = np.multiply(a3,d3), This operation ends up zeroing out the corresponding element of d3
 4. a3 = a3 / keep prob，(inverted dropout technique)  a3 除去keep.prob(除去keep probability 的概率)
 
-**除以这个概率的原因是**： <span style="background:FFFF00;"> 比如这个hidden layer 有50个units(neurons)， 
+**除以这个概率的原因是**： <span style="background-color: #FFFF00;"> 比如这个hidden layer 有50个units(neurons)， 
 keep prob 为0.8，然后expect 留下来的node 为40 个，所以$$z^{\left[ 4 \right]}=w^{\left[ 4 \right]}a^{\left[ 3 \right]}+b^{\left[ 4 \right]}$$ , 预计的$$a^{\left[ 3 \right]}$$ 会reduced by 20% 为了不reduce 这个20% 在dropout layer，最好就是back up by roughly 20%, 
  从而not change expected value of $$a^{\left[ 3 \right]}$$, 这样做好处是 make test easier, 因为没有scale problem </span>
  
@@ -453,7 +453,7 @@ It is possible to vary keep probs by layers <br/>
 
 	
 	
-<span style="background:FFFF00;"> Not to use drop out  at test time,因为你不用想要你的output to be random 如果加上dropout，只会add noise to your prediction	</span>
+<span style="background-color:FFFF00;"> Not to use drop out  at test time,因为你不用想要你的output to be random 如果加上dropout，只会add noise to your prediction	</span>
 
 
 <span style="color:red;"> Dropout Intuition: can’t rely on any one feature（每个iteration 都会drop 不同的nodes）, so have to spread out weights → shrinking square norm of the weights. Dropout has the similar effect to L2 regularization. </span>
@@ -461,5 +461,9 @@ It is possible to vary keep probs by layers <br/>
 
 Computer Vision often use  dropout 因为他们的input  parameter 易overfitting(not having too many data)
 
- <span style="background:FFFF00;"> Dropout 的缺点： cost function J is no longer well-defined, at  every iteration, you randomly kill some nodes. It is hard to double check gradient descent 的cost function 每个iteration都decrease. 建议： 开始先turn off dropout, 看见每次的iteration 的cost function 确实在下降，再开启dropout </span>
+ <span style="background-color:FFFF00;"> Dropout 的缺点： cost function J is no longer well-defined, at  every iteration, you randomly kill some nodes. It is hard to double check gradient descent 的cost function 每个iteration都decrease. 建议： 开始先turn off dropout, 看见每次的iteration 的cost function 确实在下降，再开启dropout </span>
+
+
+
+
 
