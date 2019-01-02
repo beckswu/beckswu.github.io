@@ -403,7 +403,7 @@ L1 Regularization: W will end up being sparse, which means w vector will have a 
 omit b 的原因是: b is a single number, almost all the parameters are in w rather b, if adding b, it won't make much difference
 
 
-<span style="background-color:FFFF00;">L2 regularization is just used much more often</span>
+<span style="background-color:#FFFF00;">L2 regularization is just used much more often</span>
 
 <span style = "color:red;">λ 被叫做regularization parameter</span>
 
@@ -453,7 +453,7 @@ It is possible to vary keep probs by layers <br/>
 
 	
 	
-<span style="background-color:FFFF00;"> Not to use drop out  at test time,因为你不用想要你的output to be random 如果加上dropout，只会add noise to your prediction	</span>
+<span style="background-color:#FFFF00;"> Not to use drop out  at test time,因为你不用想要你的output to be random 如果加上dropout，只会add noise to your prediction	</span>
 
 
 <span style="color:red;"> Dropout Intuition: can’t rely on any one feature（每个iteration 都会drop 不同的nodes）, so have to spread out weights → shrinking square norm of the weights. Dropout has the similar effect to L2 regularization. </span>
@@ -461,7 +461,9 @@ It is possible to vary keep probs by layers <br/>
 
 Computer Vision often use  dropout 因为他们的input  parameter 易overfitting(not having too many data)
 
- <span style="background-color:FFFF00;"> Dropout 的缺点： cost function J is no longer well-defined, at  every iteration, you randomly kill some nodes. It is hard to double check gradient descent 的cost function 每个iteration都decrease. 建议： 开始先turn off dropout, 看见每次的iteration 的cost function 确实在下降，再开启dropout </span>
+ <span style="background-color:#FFFF00;"> Dropout 的缺点： cost function J is no longer well-defined, at  every iteration, you randomly kill some nodes. It is hard to double check gradient descent 的cost function 每个iteration都decrease. 建议： 开始先turn off dropout, 看见每次的iteration 的cost function 确实在下降，再开启dropout </span>
+
+
 
 
 
