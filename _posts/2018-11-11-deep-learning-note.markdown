@@ -391,8 +391,9 @@ Modern machine learning 可以只 reduce bias or variance without influencing(in
 
 **L2 Regularization: Euclidean norm or L2 Norm**
 
-$$ J\left(W,b\right) = \frac{1}{m} \sum_{i=1}^m {L \left(  \hat y^{\left(i \right)}, y^{\left(i \right),}\right)   + \frac{\lambda}{2m} \| w  \|_2 ^2  }  \text{, where } \| w  \|_2 ^2 = \sum_{j=1}^{nx} w_j^2 = w^Tw  $$$
+$$ J\left(W,b\right) = \frac{1}{m} \sum_{i=1}^m {L \left(  \hat y^{\left(i \right)}, y^{\left(i \right),}\right)   + \frac{\lambda}{2m} \| w  \|_2 ^2  }  \text{, where } \| w  \|_2 ^2 = \sum_{j=1}^{nx} w_j^2 = w^Tw  $$
 
 
 **L1 Regularization**
+
 $$ J\left(W,b\right) = \frac{1}{m} \sum_{i=1}^m {L \left(  \hat y^{\left(i \right)}, y^{\left(i \right),}\right)   + \frac{\lambda}{2m} \| w  \|_1   }  \text{, where } \| w  \|_1  = \sum_{j=1}^{nx} \mid w_j \mid $$
