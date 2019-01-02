@@ -365,7 +365,7 @@ Not having test set might be okay (only dev set) (the goal of test 是为了 giv
 **High bias:** underfitting (not training well for the training set) <br/>
 **High variance:** overfitting
 
-比如 train 一个 model 识别是不是猫脸, 我们用的 assumption 是 human 的 error 近似 0， base error ≈ 0%, <span style="background:#FFFF00;">Base error 可以用来对比 train set error / test set error 看是不是 underfit 或者 overfit 了</span> 
+比如 train 一个 model 识别是不是猫脸, 我们用的 assumption 是 human 的 error 近似 0， base error ≈ 0%, <span style="background-color:#FFFF00;">Base error 可以用来对比 train set error / test set error 看是不是 underfit 或者 overfit 了</span> 
 
 
 | Train Set Error  |  1% | 15%   |  15%  | 0.5%   |
@@ -462,6 +462,8 @@ It is possible to vary keep probs by layers <br/>
 Computer Vision often use  dropout 因为他们的input  parameter 易overfitting(not having too many data)
 
  <span style="background-color:FFFF00;"> Dropout 的缺点： cost function J is no longer well-defined, at  every iteration, you randomly kill some nodes. It is hard to double check gradient descent 的cost function 每个iteration都decrease. 建议： 开始先turn off dropout, 看见每次的iteration 的cost function 确实在下降，再开启dropout </span>
+
+
 
 
 
