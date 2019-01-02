@@ -389,7 +389,7 @@ Modern machine learning 可以只 reduce bias or variance without influencing(in
 
 #### Regularization
 
-**L2 Regularization: Euclidean norm or L2 Norm**
+**L2 Regularization (aslo called Weight Decay): use Euclidean norm or L2 Norm**
 
 $$ J\left(W,b\right) = \frac{1}{m} \sum_{i=1}^m {L \left(  \hat y^{\left(i \right)}, y^{\left(i \right),}\right)   + \frac{\lambda}{2m} \| w  \|_2 ^2  }  \text{, where } \| w  \|_2 ^2 = \sum_{j=1}^{nx} w_j^2 = w^Tw  $$
 
@@ -397,3 +397,22 @@ $$ J\left(W,b\right) = \frac{1}{m} \sum_{i=1}^m {L \left(  \hat y^{\left(i \righ
 **L1 Regularization**
 
 $$ J\left(W,b\right) = \frac{1}{m} \sum_{i=1}^m {L \left(  \hat y^{\left(i \right)}, y^{\left(i \right),}\right)   + \frac{\lambda}{2m} \| w  \|_1   }  \text{, where } \| w  \|_1  = \sum_{j=1}^{nx} \mid w_j \mid $$
+
+L1 Regularization: W will end up being sparse, which means w vector will have a lot of zeros in it. Some people say it can help compress the model, because the set of parameters are zero, and you need less memory to store the model(Ng comments: help a little but not that much)
+
+omit b 的原因是: b is a single number, almost all the parameters are in w rather b, if adding b, it won't make much difference
+
+
+<span style="background:FFFF00;">L2 regularization is just used much more often</span>
+
+<span style = "color:red;">λ 被叫做regularization parameter</span>
+
+For Neural NetworkL using **Frobenius norm** (not called L2 norm)
+
+$$ J\left( W^{\left[ 1 \right]}, b^{\left[ 1 \right]}, \cdots,  W^{\left[ L \right]}, b^{\left[ L \right]} \right) = \frac{1}{m} \sum_{i=1}^m L \left(\hat y^{\left( i\right)}, y^{\left( i\right)} \right) +  \frac{\lambda}{2m} \sum_{i=1}^L \| w^{\left[L \right] }\|_F^2 \text{ where } \| w^{\left[L \right] }\|_F^2 = \sum_{i=1}^{n^{\left[ l-1 \right]}} \sum_{i=1}^{n^{\left[ l \right]}} \left( w_{ij}^{\left[ l \right]} \right) $$
+
+
+$$ \begin{align}W^{\left[ l \right]} &:= W^{\left[ l \right]} - \alpha\left[ \left( \text{from backprop} \right) + \frac{\lambda}{m} w^{\left[ l \right]} \right] \\ &= w - \frac{\alpha \lambda}{m} W^{\left[ l \right]} -\alpha \left( \text{ from backprop}\right)    \end{align}
+ $$
+
+
