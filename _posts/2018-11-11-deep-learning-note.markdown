@@ -398,7 +398,7 @@ $$ J\left(W,b\right) = \frac{1}{m} \sum_{i=1}^m {L \left(  \hat y^{\left(i \righ
 
 $$ J\left(W,b\right) = \frac{1}{m} \sum_{i=1}^m {L \left(  \hat y^{\left(i \right)}, y^{\left(i \right),}\right)   + \frac{\lambda}{2m} \| w  \|_1   }  \text{, where } \| w  \|_1  = \sum_{j=1}^{nx} \mid w_j \mid $$
 
-L1 Regularization: W will end up being sparse, which means w vector will have a lot of zeros in it. Some people say it can help compress the model, because the set of parameters are zero, and you need less memory to store the model(Ng comments: help a little but not that much)
+L1 Regularization: W will end up being sparse, which means w vector will have a lot of zeros in it. Some people say it can<span style = "color:red;"> help compress the model </span>, because the set of parameters are zero, and you need less memory to store the model(Ng comments: help compress model a little but not that much)
 
 omit b 的原因是: b is a single number, almost all the parameters are in w rather b, if adding b, it won't make much difference
 
