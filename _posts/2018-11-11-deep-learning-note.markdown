@@ -340,7 +340,7 @@ $$w^{ \left[ 1 \right]} = \begin{bmatrix} 0 & 0 \\ 0 & 0 \end{bmatrix}$$, it tur
 
 #### Train/Dev/Test Set
 
-<span style="color: red"> Train 在 **Train set**</span>, Then use **Dev set(cross validation set)** to see wich of  <span style="background-color: #FFFF00">many different models performs the best on Dev set</span>. Then after having doe this long enough when you have final model that you want to evaluate. You can take the best model you have found and evaulate it on the **Test set**, <span style="background:#FFFF00;">为了获取unbiased estimate of how well you algorithm is doing</span>
+<span style="color: red"> Train 在 **Train set**</span>, Then use **Dev set(cross validation set)** to see wich of  <span style="background-color: #FFFF00">many different models performs the best on Dev set</span>. Then after having done this long enough when you have final model that you want to evaluate. You can take the best model you have found and evaulate it on the **Test set**, <span style="background:#FFFF00;">为了获取unbiased estimate of how well you algorithm is doing</span>
 
 
 In the previous era of machine learning: 60/20/20: 60% train set, 20% dev set, 20% test set
@@ -356,3 +356,32 @@ In the previous era of machine learning: 60/20/20: 60% train set, 20% dev set, 2
 <span style="background:#FFFF00;">Make sure dev and test set come from the same distribution </span>. Then if do so, progress of machine learning algorithm will be faster 
 
 Not having test set might be okay (only dev set) (the goal of test 是为了 give you unbiased estimate of the performance of your final network that you selected 但是假如说你不需要 unbiased estimate 就可以不需要有 test set， so if you have only a dev set but not a test set， 实际上这时人们就把 training set 叫 training set，dev set 叫做 test set). <span style='color:red;'>Setting up train, dev, test set allow you to integrate more quickly 允许你 efficiently measure the bias and variance of your algorithm </span>
+
+
+#### Bias/Variance
+
+![](\img\post\Deep-Learning\pic6.png)
+
+**High bias:** underfitting (not training well for the training set) <br/>
+**High variance:** overfitting
+
+比如 train 一个 model 识别是不是猫脸, 我们用的 assumption 是 human 的 error 近似 0， base error ≈ 0%, <span style="background:#FFFF00;">Base error 可以用来对比 train set error / test set error 看是不是 underfit 或者 overfit 了</span> 
+
+
+| Train Set Error  |  1% | 15%   |  15%  | 0.5%   |
+| ------------ | ------------ | ------------ | ------------ | ------------ |
+| Test Set Error  |  11% | 16%   | 30%   | 1%   |
+|   | High variance  train set 很棒，但是 fail to generalize 新的例 子  | High Bias, not doing well on trainng set  | High variance High bias 既没有把 training set train 好，也没有 把 test set 测好  |  Low bias and low variance   |
+
+<span style='color:red;'>**Basic Recipe for machine learning**</span>
+
+1, high bias? 
+   - Big network (更多的 hidden layers 或者更多的 hidden units)
+   - try some more advanced optimization algorithms (可以跟 base error 对比)(get more data 不会有帮助)
+
+2. 是否有 high variance: 
+   - get more data, 
+   - regularization
+  
+Modern machine learning 可以只 reduce bias or variance without influencing(increasing) variance / bias <br/>
+Get more deep network always 可以 reduce your bias 在不影响 your variance 情况下; get more data 通常会 reduce variance 不会 hurt bias
