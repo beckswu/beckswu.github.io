@@ -464,6 +464,24 @@ Computer Vision often use  dropout 因为他们的input  parameter 易overfittin
  <span style="background-color:#FFFF00;"> Dropout 的缺点： cost function J is no longer well-defined, at  every iteration, you randomly kill some nodes. It is hard to double check gradient descent 的cost function 每个iteration都decrease. 建议： 开始先turn off dropout, 看见每次的iteration 的cost function 确实在下降，再开启dropout </span>
 
 
+#### Other Regularization 
+
+1. Data augment: 比如训练model train 识别猫的图片，可以把每个train set 水平调过来， 还可以randomly zoom in image.
+比如训练nn 识别数字，也可以distort 图片. Data augmentation can be used as a regularization technique
+
+![](\img\post\Deep-Learning\pic9.png)
+
+2. Early Stopping
+	- Plot training error against iterations, 也plot dev set error,当dev set error 和train set 开始分离的时候，stop training at that time 
+	- What early stopping does is stop training at the mid, mid-size rate w, 当你开始train的时候，w基本为0或者很小很小的数字，当 train很好的时候w是很大的数，所以early stopping 保证w是个mid size
+
+![](\img\post\Deep-Learning\pic10.png)	
+	
+几个goal 对于machine learning ， 1.  Optimize cost function J 2. Not to overfit (regularization, dropout) <br/>
+<span style = "color:red">同时要minimize cost function 又要reduce variance 这个principle 叫做**orthogonalization**, Early stopping  couples 两个task break ， 因为 not doing great job to minimize cost function , 同时try to not to overfit it
+
+可以用L2 regularization  可以train 到尽可能的多 直到 train error非常少，缺点是要试很多lambda，
+Early stopping 的优点是：可以试用small w, mid w, large w
 
 
 
