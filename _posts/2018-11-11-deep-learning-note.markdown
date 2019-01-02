@@ -417,4 +417,4 @@ $$ \begin{align}W^{\left[ l \right]} &:= W^{\left[ l \right]} - \alpha\left[ \le
 
 **How does regularization prevent overfitting**
 
-通过regularization, w变小, z = wx + b, z也变小，比如tanh function 只会用中间linear的部分，而不会用两端的部分，$$\lambda \left(z \right)$$ will be roughly linear, will not fit those very complicated decision boundary
+通过regularization, w变小, z = wx + b, z也变小，比如tanh function 只会用中间linear的部分，而不会用两端的部分，$$\sigma \left(z \right)$$ will be roughly linear, will not fit those very complicated decision boundary
