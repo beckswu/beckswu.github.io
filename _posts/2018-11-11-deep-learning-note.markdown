@@ -349,7 +349,7 @@ In the previous era of machine learning: 60/20/20: 60% train set, 20% dev set, 2
 
 假如有100万个数据， dev set 只需要1万个，就够了， 99% train，0.5% dev set, 0.5% test set
 
-<span style='color:red;'>**Problem of Mismatched Train/Test Distribution**</span>
+<span style='color:red;'>**Problem of Mismatched Train/Test Distribution**: </span>
 
 也许train 和 test set 的distribution 是不同的，比如train model to recognize cat, train set来自网页，而dev/test set来自user upload（有可能是自己拍摄的，比较模糊
 
@@ -373,7 +373,7 @@ Not having test set might be okay (only dev set) (the goal of test 是为了 giv
 | Test Set Error  |  11% | 16%   | 30%   | 1%   |
 |   | High variance  train set 很棒，但是 fail to generalize 新的例 子  | High Bias, not doing well on trainng set  | High variance High bias 既没有把 training set train 好，也没有 把 test set 测好  |  Low bias and low variance   |
 
-<span style='color:red;'>**Basic Recipe for machine learning**</span>
+<span style='color:red;'>**Basic Recipe for machine learning**: </span>
 
 1, high bias? 
    - Big network (更多的 hidden layers 或者更多的 hidden units)
@@ -387,3 +387,12 @@ Modern machine learning 可以只 reduce bias or variance without influencing(in
 <span style='color:red;'>Get more deep network always 可以 reduce your bias 在不影响 your variance 情况下; get more data 通常会 reduce variance 不会 hurt bias</span>
 
 
+#### Regularization
+
+**L2 Regularization: Euclidean norm or L2 Norm**
+
+$$ J\left(W,b\right) = \frac{1}{m} \sum_{i=1}^m {L \left(  \hat y^{\left(i \right)}, y^{\left(i \right),}\right)   + \frac{\lambda}{2m} \| w  \|_2 ^2  }  \text{, where } \| w  \|_2 ^2 = \sum_{j=1}^{nx} w_j^2 = w^Tw  $$$
+
+
+**L1 Regularization**
+$$ J\left(W,b\right) = \frac{1}{m} \sum_{i=1}^m {L \left(  \hat y^{\left(i \right)}, y^{\left(i \right),}\right)   + \frac{\lambda}{2m} \| w  \|_1   }  \text{, where } \| w  \|_1  = \sum_{j=1}^{nx} \mid w_j \mid $$
