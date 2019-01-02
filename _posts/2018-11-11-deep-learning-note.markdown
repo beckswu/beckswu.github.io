@@ -418,3 +418,48 @@ $$ \begin{align}W^{\left[ l \right]} &:= W^{\left[ l \right]} - \alpha\left[ \le
 **How does regularization prevent overfitting**
 
 通过regularization, w变小, z = wx + b, z也变小，比如tanh function 只会用中间linear的部分，而不会用两端的部分，$$\sigma \left(z \right)$$ will be roughly linear, will not fit those very complicated decision boundary
+
+
+
+
+#### Dropout Regularization
+
+Set 一个probability of eliminating a node in neural network(设置删除node的概率)， 当决定remove 某个node 后，就remove 它的所有ingoing and outgoing things, 得到diminished network. <span style = "color:red;"> In different training example, randomly zero out different hidden units (而不是说每次iteration时候 zero out the same hidden units)</span>
+
+![](\img\post\Deep-Learning\pic7.png)
+
+**Implementing dropout ("Inverted dropout"):**
+
+1. Initialize with layer l = 3. 在第三层dropout
+2. D3 = np.random.rand(a3.shape\[0], a3.shape\[1])  < keep prob. <span style="background:FFFF00;">D3(a random matrix) is used to decide to what to zero out in the third layer both in foward prop and back prop</span>   (比如 设置keep prob 概率为0.8， random number 小于0.8表示保留这个node， 大于0.8表示drop node， 0.8 概率这个D3 的node 为1，0.2的概率node 为0. 
+3. a3 = np.multiply(a3,d3), This operation ends up zeroing out the corresponding element of d3
+4. a3 = a3 / keep prob，(inverted dropout technique)  a3 除去keep.prob(除去keep probability 的概率)
+
+**除以这个概率的原因是**： <span style="background:FFFF00;"> 比如这个hidden layer 有50个units(neurons)， 
+keep prob 为0.8，然后expect 留下来的node 为40 个，所以$$z^{\left[ 4 \right]}=w^{\left[ 4 \right]}a^{\left[ 3 \right]}+b^{\left[ 4 \right]}$$ , 预计的$$a^{\left[ 3 \right]}$$ 会reduced by 20% 为了不reduce 这个20% 在dropout layer，最好就是back up by roughly 20%, 
+ 从而not change expected value of $$a^{\left[ 3 \right]}$$, 这样做好处是 make test easier, 因为没有scale problem </span>
+ 
+同样当back prop 时候也要这样 dA3 =  dA3\*D3  D3是matrix 决定保留还是忽略的，在forward prop 时候生成的， 然后dA3 = dA3 / keep prob 同样 也不能reduce dA3 20% 如果有multiple iteration through the same training set, 在每一个iteration，应该randomly zero out different hidden unit (因为zero out 不同的node 在不同的passes)
+
+	
+![](\img\post\Deep-Learning\pic8.png)
+
+	
+It is possible to vary keep probs by layers <br/>
+可以看到第二个W 7\*7 ， 是最容易overfit的，所以设置这个layer 最低的keep prob， say 0.5, 第四个layer可以设置0.7, 不drop的layer设置成1.0
+
+有时也可以drop out input layer, in practice don't that often, 如果用的话，keep prob 也会很接近1 (0.9, 1), much less like that you eliminate half of your input features
+
+
+	
+	
+<span style="background:FFFF00;"> Not to use drop out  at test time,因为你不用想要你的output to be random 如果加上dropout，只会add noise to your prediction	</span>
+
+
+<span style="color:red;"> Dropout Intuition: can’t rely on any one feature（每个iteration 都会drop 不同的nodes）, so have to spread out weights → shrinking square norm of the weights. Dropout has the similar effect to L2 regularization. </span>
+
+
+Computer Vision often use  dropout 因为他们的input  parameter 易overfitting(not having too many data)
+
+ <span style="background:FFFF00;"> Dropout 的缺点： cost function J is no longer well-defined, at  every iteration, you randomly kill some nodes. It is hard to double check gradient descent 的cost function 每个iteration都decrease. 建议： 开始先turn off dropout, 看见每次的iteration 的cost function 确实在下降，再开启dropout </span>
+
