@@ -391,16 +391,16 @@ Modern machine learning 可以只 reduce bias or variance without influencing(in
 
 **L2 Regularization (aslo called Weight Decay): use Euclidean norm or L2 Norm**
 
-$$ J\left(W,b\right) = \frac{1}{m} \sum_{i=1}^m {L \left(  \hat y^{\left(i \right)}, y^{\left(i \right),}\right)   + \frac{\lambda}{2m} \| w  \|_2 ^2  }  \text{, where } \| w  \|_2 ^2 = \sum_{j=1}^{nx} w_j^2 = w^Tw  $$
+$$ J\left(W,b\right) = \frac{1}{m} \sum_{i=1}^m {L \left(  \hat y^{\left(i \right)}, y^{\left(i \right)}\right)   + \frac{\lambda}{2m} \| w  \|_2 ^2  }  \text{, where } \| w  \|_2 ^2 = \sum_{j=1}^{nx} w_j^2 = w^Tw  $$
 
 
 **L1 Regularization**
 
-$$ J\left(W,b\right) = \frac{1}{m} \sum_{i=1}^m {L \left(  \hat y^{\left(i \right)}, y^{\left(i \right),}\right)   + \frac{\lambda}{2m} \| w  \|_1   }  \text{, where } \| w  \|_1  = \sum_{j=1}^{nx} \mid w_j \mid $$
+$$ J\left(W,b\right) = \frac{1}{m} \sum_{i=1}^m {L \left(  \hat y^{\left(i \right)}, y^{\left(i \right)}\right)   + \frac{\lambda}{2m} \| w  \|_1   }  \text{, where } \| w  \|_1  = \sum_{j=1}^{nx} \mid w_j \mid $$
 
 L1 Regularization: W will end up being sparse, which means w vector will have a lot of zeros in it. Some people say it can<span style = "color:red;"> help compress the model </span>, because the set of parameters are zero, and you need less memory to store the model(Ng comments: help compress model a little but not that much)
 
-omit b 的原因是: b is a single number, almost all the parameters are in w rather b, if adding b, it won't make much difference
+L2/L1 Regularization omit b 的原因是: b is a single number, almost all the parameters are in w rather b, if adding b, it won't make much difference
 
 
 <span style="background-color:#FFFF00;">L2 regularization is just used much more often</span>
@@ -431,7 +431,7 @@ Set 一个probability of eliminating a node in neural network(设置删除node�
 **Implementing dropout ("Inverted dropout"):**
 
 1. Initialize with layer l = 3. 在第三层dropout
-2. D3 = np.random.rand(a3.shape\[0], a3.shape\[1])  < keep prob. <span style="background-color: #FFFF00;">D3(a random matrix) is used to decide to what to zero out in the third layer both in foward prop and back prop</span>   (比如 设置keep prob 概率为0.8， random number 小于0.8表示保留这个node， 大于0.8表示drop node， 0.8 概率这个D3 的node 为1，0.2的概率node 为0. 
+2. D3 = np.random.rand(a3.shape\[0], a3.shape\[1])  < keep prob. <span style="background-color: #FFFF00;">D3(a random matrix, 在forward prop 时候生成的) is used to decide to what to zero out in the third layer both in foward prop and back prop, </span>   (比如 设置keep prob 概率为0.8， random number 小于0.8表示保留这个node， 大于0.8表示drop node， 0.8 概率这个D3 的node 为1，0.2的概率node 为0. 
 3. a3 = np.multiply(a3,d3), This operation ends up zeroing out the corresponding element of d3
 4. a3 = a3 / keep prob，(inverted dropout technique)  a3 除去keep.prob(除去keep probability 的概率)
 
@@ -439,16 +439,16 @@ Set 一个probability of eliminating a node in neural network(设置删除node�
 keep prob 为0.8，然后expect 留下来的node 为40 个，所以$$z^{\left[ 4 \right]}=w^{\left[ 4 \right]}a^{\left[ 3 \right]}+b^{\left[ 4 \right]}$$ , 预计的$$a^{\left[ 3 \right]}$$ 会reduced by 20% 为了不reduce 这个20% 在dropout layer，最好就是back up by roughly 20%, 
  从而not change expected value of $$a^{\left[ 3 \right]}$$, 这样做好处是 make test easier, 因为没有scale problem </span>
  
-同样当back prop 时候也要这样 dA3 =  dA3\*D3  D3是matrix 决定保留还是忽略的，在forward prop 时候生成的， 然后dA3 = dA3 / keep prob 同样 也不能reduce dA3 20% 如果有multiple iteration through the same training set, 在每一个iteration，应该randomly zero out different hidden unit (因为zero out 不同的node 在不同的passes)
+同样当back prop 时候也要这样 dA3 =  dA3\*D3  A3 = dA3 / keep prob 同样 也不能reduce dA3 20% 如果有multiple iteration through the same training set, 在每一个iteration，应该randomly zero out different hidden unit (因为zero out 不同的node 在不同的passes)
 
 	
-![](\img\post\Deep-Learning\pic8.png)
-
 	
 It is possible to vary keep probs by layers <br/>
 可以看到第二个W 7\*7 ， 是最容易overfit的，所以设置这个layer 最低的keep prob， say 0.5, 第四个layer可以设置0.7, 不drop的layer设置成1.0
 
 有时也可以drop out input layer, in practice don't that often, 如果用的话，keep prob 也会很接近1 (0.9, 1), much less like that you eliminate half of your input features
+
+![](\img\post\Deep-Learning\pic8.png)
 
 
 	
