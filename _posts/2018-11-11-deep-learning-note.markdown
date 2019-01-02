@@ -383,5 +383,7 @@ Not having test set might be okay (only dev set) (the goal of test 是为了 giv
    - get more data, 
    - regularization
   
-Modern machine learning 可以只 reduce bias or variance without influencing(increasing) variance / bias <br/>
-Get more deep network always 可以 reduce your bias 在不影响 your variance 情况下; get more data 通常会 reduce variance 不会 hurt bias
+Modern machine learning 可以只 reduce bias or variance without influencing(increasing) variance/bias <br/>
+<span style='color:red;'>Get more deep network always 可以 reduce your bias 在不影响 your variance 情况下; get more data 通常会 reduce variance 不会 hurt bias</span>
+
+
