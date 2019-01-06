@@ -345,7 +345,7 @@ $$w^{ \left[ 1 \right]} = \begin{bmatrix} 0 & 0 \\ 0 & 0 \end{bmatrix}$$, it tur
 
 In the previous era of machine learning: 60/20/20: 60% train set, 20% dev set, 20% test set
 
-但是现在modern big data era, 拥有越来越多的数据，<span style="background:#FFFF00;">trend是 dev/test set 占得比例越来越小（small percentage）</span>，因为dev set just needs to be big enough to evaulate different algorithm choices, then decide which one is better, 
+但是现在modern big data era, 拥有越来越多的数据，<span style="background-color:#FFFF00;">trend是 dev/test set 占得比例越来越小（small percentage）</span>，因为dev set just needs to be big enough to evaulate different algorithm choices, then decide which one is better, 
 
 假如有100万个数据， dev set 只需要1万个，就够了， 99% train，0.5% dev set, 0.5% test set
 
@@ -353,7 +353,7 @@ In the previous era of machine learning: 60/20/20: 60% train set, 20% dev set, 2
 
 也许train 和 test set 的distribution 是不同的，比如train model to recognize cat, train set来自网页，而dev/test set来自user upload（有可能是自己拍摄的，比较模糊
 
-<span style="background:#FFFF00;">Make sure dev and test set come from the same distribution </span>. Then if do so, progress of machine learning algorithm will be faster 
+<span style="background-color:#FFFF00;">Make sure dev and test set come from the same distribution </span>. Then if do so, progress of machine learning algorithm will be faster 
 
 Not having test set might be okay (only dev set) (the goal of test 是为了 give you unbiased estimate of the performance of your final network that you selected 但是假如说你不需要 unbiased estimate 就可以不需要有 test set， so if you have only a dev set but not a test set， 实际上这时人们就把 training set 叫 training set，dev set 叫做 test set). <span style='color:red;'>Setting up train, dev, test set allow you to integrate more quickly 允许你 efficiently measure the bias and variance of your algorithm </span>
 
@@ -365,7 +365,7 @@ Not having test set might be okay (only dev set) (the goal of test 是为了 giv
 **High bias:** underfitting (not training well for the training set) <br/>
 **High variance:** overfitting
 
-比如 train 一个 model 识别是不是猫脸, 我们用的 assumption 是 human 的 error 近似 0， base error ≈ 0%, <span style="background:#FFFF00;">Base error 可以用来对比 train set error / test set error 看是不是 underfit 或者 overfit 了</span> 
+比如 train 一个 model 识别是不是猫脸, 我们用的 assumption 是 human 的 error 近似 0， base error ≈ 0%, <span style="background-color:#FFFF00;">Base error 可以用来对比 train set error / test set error 看是不是 underfit 或者 overfit 了</span> 
 
 
 | Train Set Error  |  1% | 15%   |  15%  | 0.5%   |
@@ -389,11 +389,103 @@ Modern machine learning 可以只 reduce bias or variance without influencing(in
 
 #### Regularization
 
-**L2 Regularization: Euclidean norm or L2 Norm**
+**L2 Regularization (aslo called Weight Decay): use Euclidean norm or L2 Norm**
 
-$$ J\left(W,b\right) = \frac{1}{m} \sum_{i=1}^m {L \left(  \hat y^{\left(i \right)}, y^{\left(i \right),}\right)   + \frac{\lambda}{2m} \| w  \|_2 ^2  }  \text{, where } \| w  \|_2 ^2 = \sum_{j=1}^{nx} w_j^2 = w^Tw  $$
+$$ J\left(W,b\right) = \frac{1}{m} \sum_{i=1}^m {L \left(  \hat y^{\left(i \right)}, y^{\left(i \right)}\right)   + \frac{\lambda}{2m} \| w  \|_2 ^2  }  \text{, where } \| w  \|_2 ^2 = \sum_{j=1}^{nx} w_j^2 = w^Tw  $$
 
 
 **L1 Regularization**
 
-$$ J\left(W,b\right) = \frac{1}{m} \sum_{i=1}^m {L \left(  \hat y^{\left(i \right)}, y^{\left(i \right),}\right)   + \frac{\lambda}{2m} \| w  \|_1   }  \text{, where } \| w  \|_1  = \sum_{j=1}^{nx} \mid w_j \mid $$
+$$ J\left(W,b\right) = \frac{1}{m} \sum_{i=1}^m {L \left(  \hat y^{\left(i \right)}, y^{\left(i \right)}\right)   + \frac{\lambda}{2m} \| w  \|_1   }  \text{, where } \| w  \|_1  = \sum_{j=1}^{nx} \mid w_j \mid $$
+
+L1 Regularization: W will end up being sparse, which means w vector will have a lot of zeros in it. Some people say it can<span style = "color:red;"> help compress the model </span>, because the set of parameters are zero, and you need less memory to store the model(Ng comments: help compress model a little but not that much)
+
+L2/L1 Regularization omit b 的原因是: b is a single number, almost all the parameters are in w rather b, if adding b, it won't make much difference
+
+
+<span style="background-color:#FFFF00;">L2 regularization is just used much more often</span>
+
+<span style = "color:red;">λ 被叫做regularization parameter</span>
+
+For Neural NetworkL using **Frobenius norm** (not called L2 norm)
+
+$$ J\left( W^{\left[ 1 \right]}, b^{\left[ 1 \right]}, \cdots,  W^{\left[ L \right]}, b^{\left[ L \right]} \right) = \frac{1}{m} \sum_{i=1}^m L \left(\hat y^{\left( i\right)}, y^{\left( i\right)} \right) +  \frac{\lambda}{2m} \sum_{i=1}^L \| w^{\left[L \right] }\|_F^2 \text{ where } \| w^{\left[L \right] }\|_F^2 = \sum_{i=1}^{n^{\left[ l-1 \right]}} \sum_{i=1}^{n^{\left[ l \right]}} \left( w_{ij}^{\left[ l \right]} \right) $$
+
+
+$$ \begin{align}W^{\left[ l \right]} &:= W^{\left[ l \right]} - \alpha\left[ \left( \text{from backprop} \right) + \frac{\lambda}{m} w^{\left[ l \right]} \right] \\ &= w - \frac{\alpha \lambda}{m} W^{\left[ l \right]} -\alpha \left( \text{ from backprop}\right)    \end{align}
+ $$
+
+**How does regularization prevent overfitting**
+
+通过regularization, w变小, z = wx + b, z也变小，比如tanh function 只会用中间linear的部分，而不会用两端的部分，$$\sigma \left(z \right)$$ will be roughly linear, will not fit those very complicated decision boundary
+
+
+
+
+#### Dropout Regularization
+
+Set 一个probability of eliminating a node in neural network(设置删除node的概率)， 当决定remove 某个node 后，就remove 它的所有ingoing and outgoing things, 得到diminished network. <span style = "color:red;"> In different training example, randomly zero out different hidden units (而不是说每次iteration时候 zero out the same hidden units)</span>
+
+![](\img\post\Deep-Learning\pic7.png)
+
+**Implementing dropout ("Inverted dropout"):**
+
+1. Initialize with layer l = 3. 在第三层dropout
+2. D3 = np.random.rand(a3.shape\[0], a3.shape\[1])  < keep prob. <span style="background-color: #FFFF00;">D3(a random matrix, 在forward prop 时候生成的) is used to decide to what to zero out in the third layer both in foward prop and back prop, </span>   (比如 设置keep prob 概率为0.8， random number 小于0.8表示保留这个node， 大于0.8表示drop node， 0.8 概率这个D3 的node 为1，0.2的概率node 为0. 
+3. a3 = np.multiply(a3,d3), This operation ends up zeroing out the corresponding element of d3
+4. a3 = a3 / keep prob，(inverted dropout technique)  a3 除去keep.prob(除去keep probability 的概率)
+
+**除以这个概率的原因是**： <span style="background-color: #FFFF00;"> 比如这个hidden layer 有50个units(neurons)， 
+keep prob 为0.8，然后expect 留下来的node 为40 个，所以$$z^{\left[ 4 \right]}=w^{\left[ 4 \right]}a^{\left[ 3 \right]}+b^{\left[ 4 \right]}$$ , 预计的$$a^{\left[ 3 \right]}$$ 会reduced by 20% 为了不reduce 这个20% 在dropout layer，最好就是back up by roughly 20%, 
+ 从而not change expected value of $$a^{\left[ 3 \right]}$$, 这样做好处是 make test easier, 因为没有scale problem </span>
+ 
+同样当back prop 时候也要这样 dA3 =  dA3\*D3  A3 = dA3 / keep prob 同样 也不能reduce dA3 20% 如果有multiple iteration through the same training set, 在每一个iteration，应该randomly zero out different hidden unit (因为zero out 不同的node 在不同的passes)
+
+	
+	
+It is possible to vary keep probs by layers <br/>
+可以看到第二个W 7\*7 ， 是最容易overfit的，所以设置这个layer 最低的keep prob， say 0.5, 第四个layer可以设置0.7, 不drop的layer设置成1.0
+
+有时也可以drop out input layer, in practice don't that often, 如果用的话，keep prob 也会很接近1 (0.9, 1), much less like that you eliminate half of your input features
+
+![](\img\post\Deep-Learning\pic8.png)
+
+
+	
+	
+<span style="background-color:#FFFF00;"> Not to use drop out  at test time,因为你不用想要你的output to be random 如果加上dropout，只会add noise to your prediction	</span>
+
+
+<span style="color:red;"> Dropout Intuition: can’t rely on any one feature（每个iteration 都会drop 不同的nodes）, so have to spread out weights → shrinking square norm of the weights. Dropout has the similar effect to L2 regularization. </span>
+
+
+Computer Vision often use  dropout 因为他们的input  parameter 易overfitting(not having too many data)
+
+ <span style="background-color:#FFFF00;"> Dropout 的缺点： cost function J is no longer well-defined, at  every iteration, you randomly kill some nodes. It is hard to double check gradient descent 的cost function 每个iteration都decrease. 建议： 开始先turn off dropout, 看见每次的iteration 的cost function 确实在下降，再开启dropout </span>
+
+
+#### Other Regularization 
+
+1. Data augment: 比如训练model train 识别猫的图片，可以把每个train set 水平调过来， 还可以randomly zoom in image.
+比如训练nn 识别数字，也可以distort 图片. Data augmentation can be used as a regularization technique
+
+![](\img\post\Deep-Learning\pic9.png)
+
+2. Early Stopping
+	- Plot training error against iterations, 也plot dev set error,当dev set error 和train set 开始分离的时候，stop training at that time 
+	- What early stopping does is stop training at the mid, mid-size rate w, 当你开始train的时候，w基本为0或者很小很小的数字，当 train很好的时候w是很大的数，所以early stopping 保证w是个mid size
+
+![](\img\post\Deep-Learning\pic10.png)	
+	
+几个goal 对于machine learning ， 1.  Optimize cost function J 2. Not to overfit (regularization, dropout) <br/>
+<span style = "color:red">同时要minimize cost function 又要reduce variance 这个principle 叫做**orthogonalization**, Early stopping  couples 两个task break ， 因为 not doing great job to minimize cost function , 同时try to not to overfit it
+
+可以用L2 regularization  可以train 到尽可能的多 直到 train error非常少，缺点是要试很多lambda，
+Early stopping 的优点是：可以试用small w, mid w, large w
+
+
+
+
+
+
+
