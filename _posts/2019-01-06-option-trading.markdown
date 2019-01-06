@@ -13,6 +13,9 @@ tags:
 
 > note from Sheldon Natenberg
 
+<script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"> </script>
+
+
 ## Basic Concept
 
 ![](\img\post\Deep-Learning\pic3.png)
