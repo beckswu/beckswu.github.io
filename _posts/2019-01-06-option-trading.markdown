@@ -1,15 +1,12 @@
 ---
 layout:     post
-title:      "Deep Learning Summary"
-subtitle:   "深度学习 Deep Learning - Note"
+title:      "Option Trading"
+subtitle:   "Note"
 date:       2019-01-06 12:00:00
 author:     "Becks"
 header-img: "img/post-bg-city-night.jpg"
 catalog:    true
 tags:
-    - Coursera
-    - Deep Learning
-    - Machine Learning
     - 总结
     - 学习笔记
 ---
@@ -121,4 +118,4 @@ Futures options on physical commodities <br/>
 
 <span style="background-color: #FFFF00">**European** </span> – the option may be exercised only at expiration. All stock index options are European
 
-<span style="background-color: #FFFF00">**American ** </span> – the option may be exercised at any time prior to expiration. Most individual equity options, as well as most options on futures, are American
+<span style="background-color: #FFFF00">**American** </span> – the option may be exercised at any time prior to expiration. Most individual equity options, as well as most options on futures, are American
