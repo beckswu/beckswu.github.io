@@ -306,6 +306,25 @@ Short Calendar Spread: -1 September 100 call +1 July 100 call; -1 November 65 pu
 
 ![](\img\post\option-trading\short-calendar-spread.png)
 
+
+#### Bull and Bear Spread
+
+Bull (Vertical) Spread Buy an option at a lower exercise price Sell an option at a higher exercise price <br/> 
++1 December 100 call -1 December 110 call; Or +1 December 100 put -1 December 110 put; <br/>
+minimum value = 0 maximum value = Xh - Xl
+
+Bear (Vertical) Spread Buy an option at a higher exercise price Sell an option at a lower exercise price <br/> 
+-1 December 100 call +1 December 110 call Or -1 December 100 put +1 December 110 put <br/>
+minimum value = 0 maximum value = Xh - Xl
+
+Both options must be the same type (both calls or both puts) and expire at the same time.
+
+
+
+![](\img\post\option-trading\bull-spread.png)
+
+![](\img\post\option-trading\bear-spread.png)
+
 | spread | delta | gamma | theta  | vega |
 | ------------ | ------------ | ------------ | ------------ | ------------ | 
 | Long Straddle/Strangle | 0  |  +  | -  |  +  |
