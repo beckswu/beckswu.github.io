@@ -236,7 +236,7 @@ $$\text{ReLu: }a = max\left(0,z \right) \space \space \text{Leaky ReLu: } a= max
 
 Technically derivative is not well defined  when z is 0. But when implement in computer, you get z is smaller number( 0.000000001). 自己用的时候，可以pretend derivatives either 1 or 0
 
-<span style="color: red">**Advantage**</span>: the slope of the activation(gradient) function different from 0. Using ReLu or Leaky ReLu, <span style="background-color: #FFFF00">neural network will learn **much faster** than when using the hanh or sigmoid activation function</span> (不像tanh or sigmoid 当z很大很小时候,slope 很小, slow down learning)
+<span style="color: red">**Advantage**</span>: the slope of the activation(gradient) function different from 0. Using ReLu or Leaky ReLu, <span style="background-color: #FFFF00">neural network will learn **much faster** than when using the tanh or sigmoid activation function</span> (不像tanh or sigmoid 当z很大很小时候,slope 很小, slow down learning)
 
 
 <span style="color: red">**Downside**</span>: when z is negative, derivatives is zero. But in practive, enough of your hidden units will have z greater than 0. So learning can still be quite fast for most training examples
