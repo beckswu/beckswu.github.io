@@ -293,7 +293,7 @@ Buy more than Sell: +3 August 105 call (delta 25) -1 August 95 call (delta 75); 
 -1 September 100 put (delta: -50) <br/>
 Sell more than Buy: -3 August 105 call +1 August 95 call
 
-![](\img\post\option-trading\-spread.pnc.png)
+![](\img\post\option-trading\-spread.png)
 
 #### Calendar Spread
 
@@ -302,9 +302,9 @@ also called Time Spread, Horizontal Spread
 Long Calendar Spread: +1 September 100 call  -1 July 100 call ; +1 November 65 put -1 October 65 put
 Short Calendar Spread: -1 September 100 call +1 July 100 call; -1 November 65 put +1 October 65 put
 
-![](\img\post\option-trading\long-calendar-spread.pnc.png)
+![](\img\post\option-trading\long-calendar-spread.png)
 
-![](\img\post\option-trading\short-calendar-spread.pnc.png)
+![](\img\post\option-trading\short-calendar-spread.png)
 
 | spread | delta | gamma | theta  | vega |
 | ------------ | ------------ | ------------ | ------------ | ------------ | 
