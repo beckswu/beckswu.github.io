@@ -144,7 +144,7 @@ E.g. Stick index = 525. Each index point has a value of $100, Exereice one 475 c
 
 #### Volatility 
 
-If we assume **normal distribution** of prices. One s.d. range $$F * \sigma * sqrt t$$
+If we assume **normal distribution** of prices. One s.d. range $$F * \sigma * \sqrt t$$
 
 If we assume **lognormal distribution** of prices. One standard deviation: $$ F * e^{n * \sigma * \sqrt t}$$
 
