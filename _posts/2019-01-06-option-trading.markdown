@@ -141,6 +141,13 @@ E.g. March S&P 500 futures = 2150, exerice one S&P 500 March 2100 call. You beco
 
 E.g. Stick index = 525. Each index point has a value of $100, Exereice one 475 call. Account is credited with (525 -475)\*$100 = $ 5000
 
+
+#### Volatility 
+
 If we assume **normal distribution** of prices. One s.d. range $$F * \sigma * sqrt t$$
 
 If we assume **lognormal distribution** of prices. One standard deviation: $$ F * e^{n * \sigma * \sqrt t}$$
+
+1.  In total points an <span style="background-color: #FFFF00">**at-the-money** </span> option is always more sensitive to a change in volatility than an equivalent in- or out-of-the-money option 
+2. In percentage terms an <span style="background-color: #FFFF00">**out-of-the-money** </span> option is always more sensitive to a change in volatility than an equivalent in- or at-the-the-money option 
+3. A long-term option is always more sensitive to a change in volatility than an equivalent short-term option
