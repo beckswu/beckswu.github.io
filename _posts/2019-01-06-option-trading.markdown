@@ -153,3 +153,9 @@ If we assume **lognormal distribution** of prices. One standard deviation: $$ F 
 3. A long-term option is always more sensitive to a change in volatility than an equivalent short-term option (长期比短期个更对波动性敏感)
 
 注: For <span style="color: red">short-term</span> interest rate products, volatility calculations are alwasy made using the inerest rate associated with the contract, not the contract price iteself。 例如: Euodollars, Euribor, Short Sterling. For <span style="color: red">Long-term</span> interest rate products such as trasury bonds and notes, volatility calculations are made using the actual contract price. 例如 Eurollar price = 95.75, annual volatilty of Eurodollars futures is 32%, daily standard deviation = (100-95.75) \* 32% /16 = 0.09
+
+Example. Eurodollar futures = 96.72, Volatility = 29.56%, Time to expiration = 77 days <br/>
+Assuming a lognormal distribution of interest rates, what is the likelihood that the 97.50 call will be in-the-money at expiration?<br/>
+Interest rates are currently 100 - 96.72 = 3.28(%). <br/>
+For the 97.50 call to be in-the-money at expiration, interest rates must be below 100 - 97.50 = 2.50(%) <br/>
+One standard deviation = .2956\*√(77/365) = .1358 Number of standard deviations: ln(2.50/3.28)/.1358 = 2.00 A 97.50 call is equivalent to a 2.50% put.
