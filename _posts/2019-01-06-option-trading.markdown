@@ -261,3 +261,75 @@ E.g.  Dividend is raised 0.34, call delta = 70, call decrease 0.34 \* 0.7 = 0.24
 5. <span  style="background-color: #FFFF00"> in-the-money, rho大, An in-the-money option has a greater rho value than an equivalent at-the-money or out-of-the-money option </span>
 6. <span  style="background-color: #FFFF00"> 时间越长，rho越大，Along-term option has a greater rho value than equivalent short-term option.</span>
 
+
+
+
+
+##  Spread
+
+A spread, usually delta neutral, which is sensitive to either the volatility of the underlying contract (**gamma**), or to changes in implied volatility (**vega**)
+
+#### Straddle
+
+Long Straddle: +1 June 100 call +1 June 100 put ; <br/>
+Short Straddle: -1 June 100 call -1 June 100 put   <br/>
+
+#### Strangle
+
+Long Strangle: +1 June 105 call +1 June 95 put ; <br/>
+Short Strangle: -1 June 105 call -1 June 95 put   <br/>
+
+#### Bufferfly
+
+Long Bufferfly: +1 July 95 call (wing), -2 July 100 calls (body), +1 July 105 call (wing） <br/>
+Short Bufferfly: -1 July 95 call  (wing), +2 July 100 calls (body), -1 July 105 call(wing）   <br/>
+
+![](\img\post\option-trading\spread.png)
+
+#### Ratio Spread
+
+underlying price = 100 <br/>
+Buy more than Sell: +3 August 105 call (delta 25) -1 August 95 call (delta 75);  +2 September 95 put (delta: -25)
+-1 September 100 put (delta: -50) <br/>
+Sell more than Buy: -3 August 105 call +1 August 95 call
+
+![](\img\post\option-trading\-spread.pnc.png)
+
+#### Calendar Spread
+
+also called Time Spread, Horizontal Spread
+
+Long Calendar Spread: +1 September 100 call  -1 July 100 call ; +1 November 65 put -1 October 65 put
+Short Calendar Spread: -1 September 100 call +1 July 100 call; -1 November 65 put +1 October 65 put
+
+![](\img\post\option-trading\long-calendar-spread.pnc.png)
+
+![](\img\post\option-trading\short-calendar-spread.pnc.png)
+
+| spread | delta | gamma | theta  | vega |
+| ------------ | ------------ | ------------ | ------------ | ------------ | 
+| Long Straddle/Strangle | 0  |  +  | -  |  +  |
+| Short Straddle/Strangle  |  0  | -  |  + | - |
+| Long Butterfly | 0  |  -  | +  |  -  |
+| Short Butterfly  |  0  | +  |  - | + |
+| Ratio Spread (Buy more than sell)| 0  |  + | -  | +  |
+| Ratio Spread (Sell more than Buy)  |  0  | -  |  + | - |
+| Long Calendar Spread | 0  |  -  | +  |  +  |
+| Short Calendar Spread   |  0  | +  |  - | -- |
+
+
+| spread | Downside Risk / Reward  | Upside Risk / Reward |
+| ------------ | ------------ | ------------ |
+| Long Straddle / Strangle | unlimited reward | unlimited reward |
+| Short Straddle / Strangle  | unlimited risk  | unlimited reward |
+| Long Butterfly | 0  |  limited risk |  limited risk |
+| Short Butterfly  | limited reward | limited risk |
+| Call Ratio Spread (Buy more than sell)| limited reward | unlimited reward  |
+| Put Ratio Spread (Buy more than sell)| unlimited reward | limited reward  |
+| Call Ratio Spread (Sell more than Buy)  |  limited risk | unlimited risk |
+| Put Ratio Spread (Sell more than Buy)  |  unlimited risk | limited risk |
+
+
+
+
+
