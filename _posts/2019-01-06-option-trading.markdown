@@ -182,6 +182,8 @@ Eg. Option delta = 50 (0.5). If underlying price up 1.20, option value up 0.6. I
 
 <span  style="background-color: #FFFF00">  All options have positive gamma values </span>
 
+At-the-money gamma 最大, 因为delta vs price change graph slope is greatest when close to options's exercise price.
+
 #### Theta 
 
 ($$\theta $$) The sensitivity of an option's value to the passage of time.
@@ -223,6 +225,8 @@ or options on futures, where the options are subject to stock-type settlement as
 If raising interest rates increases the forward price, as it does for stocks, then... <br/>
 <span  style="background-color: #FFFF00">calls have positive rho values </span> <br/>
 <span  style="background-color: #FFFF00">puts have negative rho values </span> <br/>
+
+rho is the least important than delta, gamma, theta, vega
 
 #### Dividend Risk
 
