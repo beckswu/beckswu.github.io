@@ -322,7 +322,7 @@ Short Calendar Spread: -1 September 100 call +1 July 100 call; -1 November 65 pu
 | ------------ | ------------ | ------------ |
 | Long Straddle / Strangle | unlimited reward | unlimited reward |
 | Short Straddle / Strangle  | unlimited risk  | unlimited reward |
-| Long Butterfly | 0  |  limited risk |  limited risk |
+| Long Butterfly  |  limited risk |  limited risk |
 | Short Butterfly  | limited reward | limited risk |
 | Call Ratio Spread (Buy more than sell)| limited reward | unlimited reward  |
 | Put Ratio Spread (Buy more than sell)| unlimited reward | limited reward  |
