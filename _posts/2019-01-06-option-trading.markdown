@@ -180,3 +180,18 @@ Eg. Option delta = 50 (0.5). If underlying price up 1.20, option value up 0.6. I
 
 <span  style="background-color: #FFFF00">  All options have positive gamma values </span>
 
+#### Theta 
+
+($$\theta $$) The sensitivity of an option's value to the passage of time.
+
+Theta depends on two factors:  <br/>
+decay in <span style="color: red">volatility value </span> <br/>
+    decay in <span style="color: red"> interest value </span>  <br/>
+    
+Since volatility value is usually more important than interest, the great majority of options lose value as time passes. 
+注: An option which loses value as time passes will have a negative theta （theta 一般是负的）
+
+Q： What would a positive theta mean? As time passes the option becomes more valuable. Is this possible? （interest rate 比 volatility 考虑的多）
+
+The expected value of the option at expiration must be very close to intrinsic value. value today = present value of the expected value. If there are no changes in other market conditions, as time passes, the value of the option will rise
+to intrinsic value. 
