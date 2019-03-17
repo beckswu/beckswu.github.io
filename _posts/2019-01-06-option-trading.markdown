@@ -216,7 +216,7 @@ Usually expressed as the change in value **per one percent change** in interest 
 If the underlying is a futures contract, and options are subject to <span style="color: red"> futures-type settlement</span>, <span style="color: red">all options have a rho value of zero</span>. Changes in interest rates will have no effect on an option’s value.
 
 
-or options on futures, where the options are subject to stock-type settlement as they are in the U.S., all options have negative rho values. When we raise interest rates, we reduce the present value of the option.
+or options on futures, where the options are subject to stock-type settlement as they are in the U.S., all options have negative rho values. When we raise interest rates, we <span style="color: red">reduce the present value of the option</span>.
 
 If raising interest rates increases the forward price, as it does for stocks, then... <br/>
 <span  style="background-color: #FFFF00">calls have positive rho values </span> <br/>
