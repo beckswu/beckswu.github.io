@@ -159,3 +159,24 @@ Assuming a lognormal distribution of interest rates, what is the likelihood that
 Interest rates are currently 100 - 96.72 = 3.28(%). <br/>
 For the 97.50 call to be in-the-money at expiration, interest rates must be below 100 - 97.50 = 2.50(%) <br/>
 One standard deviation = .2956\*√(77/365) = .1358 Number of standard deviations: ln(2.50/3.28)/.1358 = 2.00 A 97.50 call is equivalent to a 2.50% put.
+
+
+## Greeks
+
+#### Delta
+
+($$\delta$$) The rate of change in an options' value with respect to movement in the price of the underlying contract.
+
+Calls have positive delta values between 0 and 1.00 (100) <br/>
+Puts have negative delta values between 0 and -1.00 (-100) <br/>
+
+Delta is also approximately the <span  style="background-color: #FFFF00"> probability that an option will finish in-the money</span>. E>g. Delta = 10, 10% chane of finishing in-the-money
+
+Eg. Option delta = 50 (0.5). If underlying price up 1.20, option value up 0.6. If underlying price down 1.70, option price down 0.85
+
+#### Gamma (Curvature)
+
+($$\gamma$$)The rate of change in an option's delta respect to movement in the price of the underlying contract
+
+<span  style="background-color: #FFFF00">  All options have positive gamma values </span>
+
