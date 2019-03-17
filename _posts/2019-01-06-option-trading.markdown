@@ -293,7 +293,7 @@ Buy more than Sell: +3 August 105 call (delta 25) -1 August 95 call (delta 75); 
 -1 September 100 put (delta: -50) <br/>
 Sell more than Buy: -3 August 105 call +1 August 95 call
 
-![](\img\post\option-trading\-spread.png)
+![](\img\post\option-trading\ratio-spread.png)
 
 #### Calendar Spread
 
