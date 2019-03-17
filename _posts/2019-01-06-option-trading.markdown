@@ -291,7 +291,7 @@ Short Bufferfly: -1 July 95 call  (wing), +2 July 100 calls (body), -1 July 105 
 underlying price = 100 <br/>
 Buy more than Sell: +3 August 105 call (delta 25) -1 August 95 call (delta 75);  +2 September 95 put (delta: -25)
 -1 September 100 put (delta: -50) <br/>
-Sell more than Buy: -3 August 105 call +1 August 95 call
+Sell more than Buy: -3 August 105 call +1 August 95 call <br/>
 
 ![](\img\post\option-trading\ratio-spread.png)
 
@@ -299,8 +299,8 @@ Sell more than Buy: -3 August 105 call +1 August 95 call
 
 also called Time Spread, Horizontal Spread
 
-Long Calendar Spread: +1 September 100 call  -1 July 100 call ; +1 November 65 put -1 October 65 put
-Short Calendar Spread: -1 September 100 call +1 July 100 call; -1 November 65 put +1 October 65 put
+Long Calendar Spread: +1 September 100 call  -1 July 100 call ; +1 November 65 put -1 October 65 put <br/>
+Short Calendar Spread: -1 September 100 call +1 July 100 call; -1 November 65 put +1 October 65 put <br/>
 
 ![](\img\post\option-trading\long-calendar-spread.png)
 
