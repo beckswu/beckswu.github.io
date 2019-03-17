@@ -176,7 +176,7 @@ Eg. Option delta = 50 (0.5). If underlying price up 1.20, option value up 0.6. I
 
 #### Gamma (Curvature)
 
-($$\gamma$$)The rate of change in an option's delta respect to movement in the price of the underlying contract
+($$\gamma$$ Change in delta) The rate of change in an option's delta respect to movement in the price of the underlying contract
 
 <span  style="background-color: #FFFF00">  All options have positive gamma values </span>
 
