@@ -122,3 +122,15 @@ Futures options on physical commodities <br/>
 <span style="background-color: #FFFF00">**European** </span> – the option may be exercised only at expiration. All stock index options are European
 
 <span style="background-color: #FFFF00">**American** </span> – the option may be exercised at any time prior to expiration. Most individual equity options, as well as most options on futures, are American
+
+
+#### Settlement 
+
+<span style="background-color: #FFFF00">**Settlement into a future position** </span>– 
+1. Exercise results in a future position 
+2. The position is immediately subject to margin and variation
+3. There is a credit or debit equal to the difference between the exercise price and current futures price
+
+E.g. March S&P 500 futures = 2150, exerice one S&P 500 March 2100 call. You become long 1 March S&P 5000 futures contract at a price at a price of 2100. You must deposit the appropriate margin. Your account is credited with (2150-2100)\*250 = $12500
+
+
