@@ -254,4 +254,6 @@ E.g.  Dividend is raised 0.34, call delta = 70, call decrease 0.34 \* 0.7 = 0.24
 2. <span  style="background-color: #FFFF00">At-the-money options tend to be the most actively traded. </span>
 3. <span  style="background-color: #FFFF00">时间越长，vega约敏感 A long-term option always has a greater vega value than an equivalent short-term option. </span> 比如40% upward to 10, 60% downward to 10, 只有5秒expire 和 还有6周expire 比，还有六周的expire underlying更容易发生变化
 4. <span  style="background-color: #FFFF00"> 约靠近expiration, ATM theta 增加 </span> As time passes the theta of an at-the-money option increases.
+5. <span  style="background-color: #FFFF00"> in-the-money, rhoAn in-the-money option has a greater rho value than an equivalent at-the-money or out-of-the-money option </span>
+6. <span  style="background-color: #FFFF00"> Along-term option has a greater rho value than equivalent short-term option.</span>
 
