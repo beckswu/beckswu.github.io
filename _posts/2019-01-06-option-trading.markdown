@@ -281,8 +281,8 @@ Short Strangle: -1 June 105 call -1 June 95 put   <br/>
 
 #### Bufferfly
 
-Long Bufferfly: +1 July 95 call (wing), -2 July 100 calls (body), +1 July 105 call (wing） <br/>
-Short Bufferfly: -1 July 95 call  (wing), +2 July 100 calls (body), -1 July 105 call(wing）   <br/>
+Long Bufferfly: +1 July 95 call (wing), -2 July 100 calls (body), +1 July 105 call (wing）; +1 August 90 put (wing) -2 August 100 puts (body) +1 August 110 put (wing) <br/>
+Short Bufferfly: -1 July 95 call  (wing), +2 July 100 calls (body), -1 July 105 call(wing）; -1 August 90 put +2 August 100 puts -1 August 110 put   <br/>
 
 ![](\img\post\option-trading\spread.png)
 
