@@ -134,3 +134,12 @@ Futures options on physical commodities <br/>
 E.g. March S&P 500 futures = 2150, exerice one S&P 500 March 2100 call. You become long 1 March S&P 5000 futures contract at a price at a price of 2100. You must deposit the appropriate margin. Your account is credited with (2150-2100)\*250 = $12500
 
 
+<span style="background-color: #FFFF00">**Settlement into a cash position** </span>– 
+1. Used primarily for options on a cash index or for options on futures when the optionand underlying futures contract expire at the same time.
+2. Exerice results in no underlying position
+3. There is a cash credit or debit equal to the difference between the exercise price and current underlying price
+
+E.g. Stick index = 525. Each index point has a value of $100, Exereice one 475 call. Account is credited with (525 -475)\*$100 = $ 5000
+
+
+
