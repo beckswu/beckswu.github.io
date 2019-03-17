@@ -122,3 +122,214 @@ Futures options on physical commodities <br/>
 <span style="background-color: #FFFF00">**European** </span> – the option may be exercised only at expiration. All stock index options are European
 
 <span style="background-color: #FFFF00">**American** </span> – the option may be exercised at any time prior to expiration. Most individual equity options, as well as most options on futures, are American
+
+
+#### Settlement 
+
+<span style="background-color: #FFFF00">**Settlement into a future position** </span>– 
+1. Exercise results in a future position 
+2. The position is immediately subject to margin and variation
+3. There is a credit or debit equal to the difference between the exercise price and current futures price
+
+E.g. March S&P 500 futures = 2150, exerice one S&P 500 March 2100 call. You become long 1 March S&P 5000 futures contract at a price at a price of 2100. You must deposit the appropriate margin. Your account is credited with (2150-2100)\*250 = $12500
+
+
+<span style="background-color: #FFFF00">**Settlement into a cash position** </span>– 
+1. Used primarily for options on a cash index or for options on futures when the optionand underlying futures contract expire at the same time.
+2. Exerice results in no underlying position
+3. There is a cash credit or debit equal to the difference between the exercise price and current underlying price
+
+E.g. Stick index = 525. Each index point has a value of $100, Exereice one 475 call. Account is credited with (525 -475)\*$100 = $ 5000
+
+
+#### Volatility 
+
+If we assume **normal distribution** of prices. One s.d. range $$F * \sigma * \sqrt t$$
+
+If we assume **lognormal distribution** of prices. One standard deviation: $$ F * e^{n * \sigma * \sqrt t}$$
+
+1.  In total points an <span style="background-color: #FFFF00">**at-the-money** </span> option is always more sensitive to a change in volatility than an equivalent in- or out-of-the-money option (波动性改变对 at the money total points 改变最大)
+2. In percentage terms an <span style="background-color: #FFFF00">**out-of-the-money** </span> option is always more sensitive to a change in volatility than an equivalent in- or at-the-the-money option  (波动性改变的让 out of the money percentage变化最大）
+3. A long-term option is always more sensitive to a change in volatility than an equivalent short-term option (长期比短期个更对波动性敏感)
+
+注: For <span style="color: red">short-term</span> interest rate products, volatility calculations are alwasy made using the inerest rate associated with the contract, not the contract price iteself。 例如: Euodollars, Euribor, Short Sterling. For <span style="color: red">Long-term</span> interest rate products such as trasury bonds and notes, volatility calculations are made using the actual contract price. 例如 Eurollar price = 95.75, annual volatilty of Eurodollars futures is 32%, daily standard deviation = (100-95.75) \* 32% /16 = 0.09
+
+Example. Eurodollar futures = 96.72, Volatility = 29.56%, Time to expiration = 77 days <br/>
+Assuming a lognormal distribution of interest rates, what is the likelihood that the 97.50 call will be in-the-money at expiration?<br/>
+Interest rates are currently 100 - 96.72 = 3.28(%). <br/>
+For the 97.50 call to be in-the-money at expiration, interest rates must be below 100 - 97.50 = 2.50(%) <br/>
+One standard deviation = .2956\*√(77/365) = .1358 Number of standard deviations: ln(2.50/3.28)/.1358 = 2.00 A 97.50 call is equivalent to a 2.50% put.
+
+
+## Greeks
+
+#### Delta
+
+($$\Delta$$) The rate of change in an options' value with respect to movement in the price of the underlying contract.
+
+Calls have positive delta values between 0 and 1.00 (100) <br/>
+Puts have negative delta values between 0 and -1.00 (-100) <br/>
+
+Delta is also approximately the <span  style="background-color: #FFFF00"> probability that an option will finish in-the money</span>. E>g. Delta = 10, 10% chane of finishing in-the-money
+
+Eg. Option delta = 50 (0.5). If underlying price up 1.20, option value up 0.6. If underlying price down 1.70, option price down 0.85
+
+注：buy calls and sell puts 是long delta position
+
+#### Gamma (Curvature)
+
+($$\Gamma$$ Change in delta) The rate of change in an option's delta respect to movement in the price of the underlying contract
+
+<span  style="background-color: #FFFF00">  All options have positive gamma values </span>
+
+At-the-money gamma 最大, 因为delta vs price change graph slope is greatest when close to options's exercise price.
+
+#### Theta 
+
+($$\theta $$) The sensitivity of an option's value to the passage of time.
+
+Theta depends on two factors:  <br/>
+decay in <span style="color: red">volatility value </span> <br/>
+decay in <span style="color: red"> interest value </span>  <br/>
+    
+Since volatility value is usually more important than interest, the great majority of options lose value as time passes. 
+注: An option which loses value as time passes will have a negative theta （theta 一般是负的）
+
+Q： What would a positive theta mean? As time passes the option becomes more valuable. Is this possible? （interest rate 比 volatility 考虑的多）
+
+The expected value of the option at expiration must be very close to intrinsic value. value today = present value of the expected value. If there are no changes in other market conditions, as time passes, the value of the option will rise
+to intrinsic value. 比如underlying = 100, call = 40, 其他的不变，present value of 60: 60/(1+r\*t). As time passes, the option value will rise to 60
+
+
+#### Vega
+
+($$\Vega$$) The senstivity of an options's value to a change in volatility 
+
+Usually expressed as the change in value **per one percentage point change** in volatility
+
+The vega is often interpreted as the sensitivity of an option’s price to a change in <span  style="background-color: #FFFF00">implied volatility</span>.
+
+<span  style="background-color: #FFFF00"> All options have positive vega values</span>: If we raise volatility, we raise the value of the option
+
+#### Rho
+
+($$\rho$$) The sensitivity of an option’s value to a change in interest rates
+
+Usually expressed as the change in value **per one percent change** in interest rates
+
+If the underlying is a futures contract, and options are subject to <span style="color: red"> futures-type settlement</span>, <span style="color: red">all options have a rho value of zero</span>. Changes in interest rates will have no effect on an option’s value.
+
+
+or options on futures, where the options are subject to stock-type settlement as they are in the U.S., all options have negative rho values. When we raise interest rates, we <span style="color: red">reduce the present value of the option</span>.
+
+If raising interest rates increases the forward price, as it does for stocks, then... <br/>
+<span  style="background-color: #FFFF00">calls have positive rho values </span> <br/>
+<span  style="background-color: #FFFF00">puts have negative rho values </span> <br/>
+
+rho is the least important than delta, gamma, theta, vega
+
+#### Dividend Risk
+
+Raise dividends: lower forward price,  calls decrease, puts increase <br/>
+Lower dividends: raise forward price. call increase, puts decrease<br/>
+
+<span  style="background-color: #FFFF00">In stock option markets, interest and dividends always have the opposite effect on option values.</span>
+
+Q. 怎么measure change dividend effect？ A: 用delta
+
+E.g.  Dividend is raised 0.34, call delta = 70, call decrease 0.34 \* 0.7 = 0.24.  put delta = -20, put increase 0.34\*0.2 = 0.07. Dividend is cut 0.51, call delta = 35, call increase 0.51 \* 0.35 = 0.18
+
+| measure | calls   |  puts  | underlying  |
+| ------------ | ------------ | ------------ | ------------ |
+| delta  | positive   | negative  | positive  |
+| gamma  | positive   | positive   | zero  |
+| theta | negative  | negative  | zero  |
+| vega | positive | positive | zero  |
+| rho (stocks) | positive | negative  | zero  |
+| rho (futures) | negative  | negative  | zero |
+
+| measure | In-the-money   |  at-the-money  | out-of-the-money  |
+| ------------ | ------------ | ------------ | ------------ |
+| gamma  |    | ✔️   |   |
+| theta  |    | ✔️   |   |
+| vega |   | ✔️   |   |
+
+1. <span  style="background-color: #FFFF00">An **at-the-money option** always has a greater gamma, theta, and vega than an equivalent in-the-money or out-of-the-money option. </span> 
+2. <span  style="background-color: #FFFF00">At-the-money options tend to be the most actively traded. </span>
+3. <span  style="background-color: #FFFF00">时间越长，vega约敏感 A long-term option always has a greater vega value than an equivalent short-term option. </span> 比如40% upward to 10, 60% downward to 10, 只有5秒expire 和 还有6周expire 比，还有六周的expire underlying更容易发生变化
+4. <span  style="background-color: #FFFF00"> 约靠近expiration, ATM theta 增加 </span> As time passes the theta of an at-the-money option increases.
+5. <span  style="background-color: #FFFF00"> in-the-money, rho大, An in-the-money option has a greater rho value than an equivalent at-the-money or out-of-the-money option </span>
+6. <span  style="background-color: #FFFF00"> 时间越长，rho越大，Along-term option has a greater rho value than equivalent short-term option.</span>
+
+
+
+
+
+##  Spread
+
+A spread, usually delta neutral, which is sensitive to either the volatility of the underlying contract (**gamma**), or to changes in implied volatility (**vega**)
+
+#### Straddle
+
+Long Straddle: +1 June 100 call +1 June 100 put ; <br/>
+Short Straddle: -1 June 100 call -1 June 100 put   <br/>
+
+#### Strangle
+
+Long Strangle: +1 June 105 call +1 June 95 put ; <br/>
+Short Strangle: -1 June 105 call -1 June 95 put   <br/>
+
+#### Bufferfly
+
+Long Bufferfly: +1 July 95 call (wing), -2 July 100 calls (body), +1 July 105 call (wing） <br/>
+Short Bufferfly: -1 July 95 call  (wing), +2 July 100 calls (body), -1 July 105 call(wing）   <br/>
+
+![](\img\post\option-trading\spread.png)
+
+#### Ratio Spread
+
+underlying price = 100 <br/>
+Buy more than Sell: +3 August 105 call (delta 25) -1 August 95 call (delta 75);  +2 September 95 put (delta: -25)
+-1 September 100 put (delta: -50) <br/>
+Sell more than Buy: -3 August 105 call +1 August 95 call
+
+![](\img\post\option-trading\-spread.pnc.png)
+
+#### Calendar Spread
+
+also called Time Spread, Horizontal Spread
+
+Long Calendar Spread: +1 September 100 call  -1 July 100 call ; +1 November 65 put -1 October 65 put
+Short Calendar Spread: -1 September 100 call +1 July 100 call; -1 November 65 put +1 October 65 put
+
+![](\img\post\option-trading\long-calendar-spread.pnc.png)
+
+![](\img\post\option-trading\short-calendar-spread.pnc.png)
+
+| spread | delta | gamma | theta  | vega |
+| ------------ | ------------ | ------------ | ------------ | ------------ | 
+| Long Straddle/Strangle | 0  |  +  | -  |  +  |
+| Short Straddle/Strangle  |  0  | -  |  + | - |
+| Long Butterfly | 0  |  -  | +  |  -  |
+| Short Butterfly  |  0  | +  |  - | + |
+| Ratio Spread (Buy more than sell)| 0  |  + | -  | +  |
+| Ratio Spread (Sell more than Buy)  |  0  | -  |  + | - |
+| Long Calendar Spread | 0  |  -  | +  |  +  |
+| Short Calendar Spread   |  0  | +  |  - | -- |
+
+
+| spread | Downside Risk / Reward  | Upside Risk / Reward |
+| ------------ | ------------ | ------------ |
+| Long Straddle / Strangle | unlimited reward | unlimited reward |
+| Short Straddle / Strangle  | unlimited risk  | unlimited reward |
+| Long Butterfly | 0  |  limited risk |  limited risk |
+| Short Butterfly  | limited reward | limited risk |
+| Call Ratio Spread (Buy more than sell)| limited reward | unlimited reward  |
+| Put Ratio Spread (Buy more than sell)| unlimited reward | limited reward  |
+| Call Ratio Spread (Sell more than Buy)  |  limited risk | unlimited risk |
+| Put Ratio Spread (Sell more than Buy)  |  unlimited risk | limited risk |
+
+
+
+
+
