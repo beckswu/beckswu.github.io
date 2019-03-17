@@ -165,7 +165,7 @@ One standard deviation = .2956\*√(77/365) = .1358 Number of standard deviation
 
 #### Delta
 
-($$\delta$$) The rate of change in an options' value with respect to movement in the price of the underlying contract.
+($$\Delta$$) The rate of change in an options' value with respect to movement in the price of the underlying contract.
 
 Calls have positive delta values between 0 and 1.00 (100) <br/>
 Puts have negative delta values between 0 and -1.00 (-100) <br/>
@@ -176,7 +176,7 @@ Eg. Option delta = 50 (0.5). If underlying price up 1.20, option value up 0.6. I
 
 #### Gamma (Curvature)
 
-($$\gamma$$ Change in delta) The rate of change in an option's delta respect to movement in the price of the underlying contract
+($$\Gamma$$ Change in delta) The rate of change in an option's delta respect to movement in the price of the underlying contract
 
 <span  style="background-color: #FFFF00">  All options have positive gamma values </span>
 
@@ -199,7 +199,7 @@ to intrinsic value. 比如underlying = 100, call = 40, 其他的不变，present
 
 #### Vega
 
-($$\vega$$) The senstivity of an options's value to a change in volatility 
+($$\Vega$$) The senstivity of an options's value to a change in volatility 
 
 Usually expressed as the change in value **per one percentage point change** in volatility
 
@@ -220,5 +220,13 @@ or options on futures, where the options are subject to stock-type settlement as
 
 If raising interest rates increases the forward price, as it does for stocks, then... <br/>
 <span  style="background-color: #FFFF00">calls have positive rho values </span> <br/>
-    <span  style="background-color: #FFFF00">puts have negative rho values </span> <br/>
+<span  style="background-color: #FFFF00">puts have negative rho values </span> <br/>
+
+#### Dividend Risk
+
+Raise dividends: lower forward price,  calls decrease, puts increase <br/>
+Lower dividends: raise forward price. call increase, puts decrease<br/>
+
+<span  style="background-color: #FFFF00">In stock option markets, interest and dividends always have the opposite effect on option values.</span>
+
 
