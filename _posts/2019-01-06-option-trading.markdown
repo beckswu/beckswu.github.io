@@ -174,6 +174,8 @@ Delta is also approximately the <span  style="background-color: #FFFF00"> probab
 
 Eg. Option delta = 50 (0.5). If underlying price up 1.20, option value up 0.6. If underlying price down 1.70, option price down 0.85
 
+注：buy calls and sell puts 是long delta position
+
 #### Gamma (Curvature)
 
 ($$\Gamma$$ Change in delta) The rate of change in an option's delta respect to movement in the price of the underlying contract
