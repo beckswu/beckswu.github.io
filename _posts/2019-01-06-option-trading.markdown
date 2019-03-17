@@ -329,7 +329,36 @@ Short Calendar Spread: -1 September 100 call +1 July 100 call; -1 November 65 pu
 | Call Ratio Spread (Sell more than Buy)  |  limited risk | unlimited risk |
 | Put Ratio Spread (Sell more than Buy)  |  unlimited risk | limited risk |
 
+Interest Rate Increase:  (时间越长，rho 越大)
 
+Long Call Calendar Spread Rho ⬆️,  +1 September 1 call rho ⬆️⬆️, -1 July 100 call ⬆️
+Long Put Calendar Spread  ⬇️ +1 September 100 put ⬇️⬇️  -1 July 100 put ⬇️
 
+Dividend (跟rho 相反)
+
+Long Call Calendar Spread Rho ⬇️ ,  +1 September 1 call   -1 July 100 call
+Long Put Calendar Spread ⬆️, +1 September 100 put  -1 July 100 put 
+
+| gamma / vega | spread|
+| ------------ | ------------ |
+| +   + | longstraddle, longstrangle, short butterfly, ratio spread (buy more than sell) | 
+| - - | short straddle, short strangle, long butterfly, ratio spread (sell more than buy) | 
+| - + | long calendar spread |
+| + - | short calendar spread |
+
+#### Decision
+
+Q: Under what conditions might you choose a difference spread: <br/>
+A: Most trading decisions depend on price vs. value. If something has a high price and a low value,prefer to be a seller. If something has a low price and a high value, prefer to be a buyer. In option trading.... <br/>
+<span  style="background-color: #FFFF00"> price = implied volatility value = (future) realized volatility </span>
+
+If you believe the future volatility over the life of the option(s) will be higher than the current implied volatility, you want to be a buyer of realized volatility. e.g. future realized volatility 25% implied volatility 25% . You want to create a position with a positive gamma: long straddles, long strangles, short butterflies, ratio spreads where you buy more than sell
+
+If you believe the future volatility over the life of the option(s) will be lower than the current implied volatility, you want to be a seller of realized volatility. e.g. future realized volatility 20%  implied volatility 25%
+You want to create a position with a negative gamma: short straddles short strangles long butterflies ratio spreads where you sell more than buy
+
+If you believe <span  style="background-color: #FFFF00">  implied volatility will rise at least as quickly as realized volatility </span>, you want to create a position with a positive vega:  buy calendar spreads
+
+If you believe <span  style="background-color: #FFFF00">  implied volatility will fall at least as quickly as realized volatility </span>, you want to create a position with a negative vega: sell calendar spreads
 
 
