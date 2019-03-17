@@ -233,6 +233,13 @@ Q. 怎么measure change dividend effect？ A: 用delta
 
 E.g.  Dividend is raised 0.34, call delta = 70, call decrease 0.34 \* 0.7 = 0.24.  put delta = -20, put increase 0.34\*0.2 = 0.07. Dividend is cut 0.51, call delta = 35, call increase 0.51 \* 0.35 = 0.18
 
-
+| measure | calls   |  puts  | underlying  |
+| ------------ | ------------ | ------------ | ------------ |
+| delta  | positive   | negative  | positive  |
+| gamma  | positive   | positive   | zero  |
+| theta | negative  | negative  | zero  |
+| vega | positive | positive | zero  |
+| rho (stocks) | positive | negative  | zero  |
+| rho (futures) | negative  | negative  | zero |
 
 
