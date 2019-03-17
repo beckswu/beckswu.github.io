@@ -186,7 +186,7 @@ Eg. Option delta = 50 (0.5). If underlying price up 1.20, option value up 0.6. I
 
 Theta depends on two factors:  <br/>
 decay in <span style="color: red">volatility value </span> <br/>
-    decay in <span style="color: red"> interest value </span>  <br/>
+decay in <span style="color: red"> interest value </span>  <br/>
     
 Since volatility value is usually more important than interest, the great majority of options lose value as time passes. 
 注: An option which loses value as time passes will have a negative theta （theta 一般是负的）
@@ -194,4 +194,31 @@ Since volatility value is usually more important than interest, the great majori
 Q： What would a positive theta mean? As time passes the option becomes more valuable. Is this possible? （interest rate 比 volatility 考虑的多）
 
 The expected value of the option at expiration must be very close to intrinsic value. value today = present value of the expected value. If there are no changes in other market conditions, as time passes, the value of the option will rise
-to intrinsic value. 
+to intrinsic value. 比如underlying = 100, call = 40, 其他的不变，present value of 60: 60/(1+r\*t). As time passes, the option value will rise to 60
+
+
+#### Vega
+
+($$\vega$$) The senstivity of an options's value to a change in volatility 
+
+Usually expressed as the change in value **per one percentage point change** in volatility
+
+The vega is often interpreted as the sensitivity of an option’s price to a change in <span  style="background-color: #FFFF00">implied volatility</span>.
+
+<span  style="background-color: #FFFF00"> All options have positive vega values</span>: If we raise volatility, we raise the value of the option
+
+#### Rho
+
+($$\rho$$) The sensitivity of an option’s value to a change in interest rates
+
+Usually expressed as the change in value **per one percent change** in interest rates
+
+If the underlying is a futures contract, and options are subject to <span style="color: red"> futures-type settlement</span>, <span style="color: red">all options have a rho value of zero</span>. Changes in interest rates will have no effect on an option’s value.
+
+
+or options on futures, where the options are subject to stock-type settlement as they are in the U.S., all options have negative rho values. When we raise interest rates, we reduce the present value of the option.
+
+If raising interest rates increases the forward price, as it does for stocks, then... <br/>
+<span  style="background-color: #FFFF00">calls have positive rho values </span> <br/>
+    <span  style="background-color: #FFFF00">puts have negative rho values </span> <br/>
+
