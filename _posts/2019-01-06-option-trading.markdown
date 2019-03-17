@@ -148,6 +148,8 @@ If we assume **normal distribution** of prices. One s.d. range $$F * \sigma * sq
 
 If we assume **lognormal distribution** of prices. One standard deviation: $$ F * e^{n * \sigma * \sqrt t}$$
 
-1.  In total points an <span style="background-color: #FFFF00">**at-the-money** </span> option is always more sensitive to a change in volatility than an equivalent in- or out-of-the-money option 
-2. In percentage terms an <span style="background-color: #FFFF00">**out-of-the-money** </span> option is always more sensitive to a change in volatility than an equivalent in- or at-the-the-money option 
-3. A long-term option is always more sensitive to a change in volatility than an equivalent short-term option
+1.  In total points an <span style="background-color: #FFFF00">**at-the-money** </span> option is always more sensitive to a change in volatility than an equivalent in- or out-of-the-money option (波动性改变对 at the money total points 改变最大)
+2. In percentage terms an <span style="background-color: #FFFF00">**out-of-the-money** </span> option is always more sensitive to a change in volatility than an equivalent in- or at-the-the-money option  (波动性改变的让 out of the money percentage变化最大）
+3. A long-term option is always more sensitive to a change in volatility than an equivalent short-term option (长期比短期个更对波动性敏感)
+
+注: For <span style="color: red">short-term</span> interest rate products, volatility calculations are alwasy made using the inerest rate associated with the contract, not the contract price iteself。 例如: Euodollars, Euribor, Short Sterling. For <span style="color: red">Long-term</span> interest rate products such as trasury bonds and notes, volatility calculations are made using the actual contract price. 例如 Eurollar price = 95.75, annual volatilty of Eurodollars futures is 32%, daily standard deviation = (100-95.75) \* 32% /16 = 0.09
