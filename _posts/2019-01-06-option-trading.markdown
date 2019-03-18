@@ -402,8 +402,8 @@ e.g.
 
 ## Put Call Parity
 
-$$C - P = \left( F - X \right) / \left(1 + r\*t\right)$$
-
+For stock options $$C - P = \left( F - X \right) / \left(1 + r\*t\right)$$
+For stock $$C - P = S - X/ \left(1 + r\*t\right) - D$$
 
 
 
