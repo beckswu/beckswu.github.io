@@ -350,8 +350,8 @@ Both options must be the same type (both calls or both puts) and expire at the s
 
 Interest Rate Increase:  (时间越长，rho 越大)
 
-Long Call Calendar Spread Rho ⬆️,  +1 September 1 call rho ⬆️⬆️, -1 July 100 call ⬆️
-Long Put Calendar Spread  ⬇️ +1 September 100 put ⬇️⬇️  -1 July 100 put ⬇️
+Long Call Calendar Spread Rho ⬆️,  +1 September 1 call rho ⬆️⬆️, -1 July 100 call ⬆️ <br/>
+Long Put Calendar Spread  ⬇️ +1 September 100 put ⬇️⬇️  -1 July 100 put ⬇️ <br/>
 
 Dividend (跟rho 相反)
 
