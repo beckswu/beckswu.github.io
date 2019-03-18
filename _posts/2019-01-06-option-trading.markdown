@@ -380,4 +380,23 @@ If you believe <span  style="background-color: #FFFF00">  implied volatility wil
 
 If you believe <span  style="background-color: #FFFF00">  implied volatility will fall at least as quickly as realized volatility </span>, you want to create a position with a negative vega: sell calendar spreads
 
+## Synthetics
+
+long call + short put = sythetic long underlying ≈ long underlying
+
+short call + long put = sythetic short underlying ≈ short underlying
+
+Both options must have the same exercise price and expiration date.
+
+long put + long underlying ≈ sythetic long call <br/>
+short put + short underlying ≈ sythetic short call  <br/>
+long call + short underlying ≈ sythetic long put <br/>
+short call + long underlying ≈ sythetic short put  <br/>
+
+Any strategy can be done using a synthetic equivalent: 
+
+e.g. 
++2 December 100 calls -1 underlying contract; <br/>
++1 December 100 call, combine +1 December 100 call and  -1 underlying contract <br/>
++1 December 100 call +1 December 100 put <span style="color: red"> Straddle </span>
 
