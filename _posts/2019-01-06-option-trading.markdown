@@ -249,9 +249,9 @@ If raising interest rates increases the forward price, as it does for stocks, th
 
 rho is the least important than delta, gamma, theta, vega
 
-Rho 和 dividend 都follow 下面的rule
-1.Rho in the money > at / out-the-money options 
-2.时间越长，rho 越大 
+Rho 和 dividend 都follow 下面的rule <br/> 
+1.Rho in the money > at / out-the-money options <br/> 
+2.时间越长，rho 越大  <br/> 
 
 #### Dividend Risk
 
