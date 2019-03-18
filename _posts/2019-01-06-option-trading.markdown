@@ -405,6 +405,10 @@ If you believe <span  style="background-color: #FFFF00">  implied volatility wil
 
 If you believe <span  style="background-color: #FFFF00">  implied volatility will fall at least as quickly as realized volatility </span>, you want to create a position with a negative vega: sell calendar spreads
 
+![](\img\post\option-trading\greek-summary.png)
+
+![](\img\post\option-trading\greek-summary2.png)
+
 ## Synthetics
 
 long call + short put = sythetic long underlying ≈ long underlying
