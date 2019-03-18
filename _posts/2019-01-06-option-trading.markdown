@@ -183,13 +183,17 @@ Eg. Option delta = 50 (0.5). If underlying price up 1.20, option value up 0.6. I
 
 2，3 原理是 As volatity rises, call deltas close to 50, put deltas close to -50. As volatility falls or time passes, call deltas far away from 50, put deltas far away from -50. 当volatility increase, in-the-money delta decreases, out-of-money delta increases
 
+<span style="color: red"> Implied data </span>: the delta that results if we use the implied volatility (also have implied gamma, theta, vega)
+
 #### Gamma (Curvature)
 
 ($$\Gamma$$ Change in delta) The rate of change in an option's delta respect to movement in the price of the underlying contract
 
 <span  style="background-color: #FFFF00">  All options have positive gamma values </span>
 
-At-the-money gamma 最大, 因为delta vs price change graph slope is greatest when close to options's exercise price.
+1. At-the-money gamma 最大, 因为delta vs price change graph slope is greatest when close to options's exercise price.
+2. At-the-money options: as volatility falls or time passes, gamma increase; As volatility rises, gamma values fall (时间越短，volatility越小，gamma 越大)
+3. For out-of-the-money options. As volatility falls or time passes, gamma values fall. As volatility rises, gamma values increases. (OTM gamma 时间越长，vol越大，gamma 越大)
 
 #### Theta 
 
@@ -207,6 +211,12 @@ Q： What would a positive theta mean? As time passes the option becomes more va
 The expected value of the option at expiration must be very close to intrinsic value. value today = present value of the expected value. If there are no changes in other market conditions, as time passes, the value of the option will rise
 to intrinsic value. 比如underlying = 100, call = 40, 其他的不变，present value of 60: 60/(1+r\*t). As time passes, the option value will rise to 60
 
+1. At-the-money options, Theta 最大
+2. At-the-money options: 时间越短，theta 越大
+3. In-the-money / out-the-money options: 时间越大，theta 越大
+4. volatility 越小，At / in / out-the-money options: theta 越小
+
+
 
 #### Vega
 
@@ -217,6 +227,10 @@ Usually expressed as the change in value **per one percentage point change** in 
 The vega is often interpreted as the sensitivity of an option’s price to a change in <span  style="background-color: #FFFF00">implied volatility</span>.
 
 <span  style="background-color: #FFFF00"> All options have positive vega values</span>: If we raise volatility, we raise the value of the option
+
+1. At-the-money options 最大
+2. At / in / out-the-money options： 时间越长，vega 越大
+3. volatility 减小，In / out-the-money options vega 减小， At-the-money vega 不变
 
 #### Rho
 
@@ -234,6 +248,10 @@ If raising interest rates increases the forward price, as it does for stocks, th
 <span  style="background-color: #FFFF00">puts have negative rho values </span> <br/>
 
 rho is the least important than delta, gamma, theta, vega
+
+Rho 和 dividend 都follow 下面的rule
+1.Rho in the money > at / out-the-money options 
+2.时间越长，rho 越大 
 
 #### Dividend Risk
 
