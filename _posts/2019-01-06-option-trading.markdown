@@ -400,3 +400,10 @@ e.g.
 +1 December 100 call, combine +1 December 100 call and  -1 underlying contract <br/>
 +1 December 100 call +1 December 100 put <span style="color: red"> Straddle </span>
 
+## Put Call Parity
+
+$$C - P = \left( F - X \right) / \left(1 + r\*t\right)$$
+
+
+
+
