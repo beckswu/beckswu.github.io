@@ -181,7 +181,7 @@ Eg. Option delta = 50 (0.5). If underlying price up 1.20, option value up 0.6. I
 3. Out the money, 时间越短, delta越小，volatility越小，delta越小
 4. At the money, delta is unaffected by changes in volatility or the passage of time. 
 
-2，3 原理是 As volatity rises, call deltas close to 50, put deltas close to -50. As volatility falls or time passes, call deltas far away from 50, put deltas far away from -50
+2，3 原理是 As volatity rises, call deltas close to 50, put deltas close to -50. As volatility falls or time passes, call deltas far away from 50, put deltas far away from -50. 当volatility increase, in-the-money delta decreases, out-of-money delta increases
 
 #### Gamma (Curvature)
 
