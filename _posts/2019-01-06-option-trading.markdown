@@ -203,7 +203,7 @@ to intrinsic value. 比如underlying = 100, call = 40, 其他的不变，present
 
 #### Vega
 
-($$\Vega$$) The senstivity of an options's value to a change in volatility 
+The senstivity of an options's value to a change in volatility 
 
 Usually expressed as the change in value **per one percentage point change** in volatility
 
@@ -402,8 +402,8 @@ e.g.
 
 ## Put Call Parity
 
-For stock options $$C - P = \left( F - X \right) / \left(1 + r\*t\right)$$
-For stock $$C - P = S - X/ \left(1 + r\*t\right) - D$$
+For stock options $$C - P = \left( F - X \right) / \left(1 + r * t\right)$$
+For stock $$C - P = S - X/ \left(1 + r * t\right) - D$$
 
 
 
