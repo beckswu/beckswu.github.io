@@ -176,6 +176,13 @@ Eg. Option delta = 50 (0.5). If underlying price up 1.20, option value up 0.6. I
 
 注：buy calls and sell puts 是long delta position
 
+1. 越 in-the-money, delta 越大
+2. In the money, 时间越短，delta越大; volatility越小，delta 越大
+3. Out the money, 时间越短, delta越小，volatility越小，delta越小
+4. At the money, delta is unaffected by changes in volatility or the passage of time. 
+
+2，3 原理是 As volatity rises, call deltas close to 50, put deltas close to -50. As volatility falls or time passes, call deltas far away from 50, put deltas far away from -50
+
 #### Gamma (Curvature)
 
 ($$\Gamma$$ Change in delta) The rate of change in an option's delta respect to movement in the price of the underlying contract
