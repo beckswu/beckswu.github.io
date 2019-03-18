@@ -234,7 +234,7 @@ The vega is often interpreted as the sensitivity of an option’s price to a cha
 
 #### Rho
 
-($$\rho$$) The sensitivity of an option’s value to a change in interest rates
+($$ \rho $$) The sensitivity of an option’s value to a change in interest rates
 
 Usually expressed as the change in value **per one percent change** in interest rates
 
@@ -273,11 +273,14 @@ E.g.  Dividend is raised 0.34, call delta = 70, call decrease 0.34 \* 0.7 = 0.24
 | rho (stocks) | positive | negative  | zero  |
 | rho (futures) | negative  | negative  | zero |
 
+最大的greek
+
 | measure | In-the-money   |  at-the-money  | out-of-the-money  |
 | ------------ | ------------ | ------------ | ------------ |
 | gamma  |    | ✔️   |   |
 | theta  |    | ✔️   |   |
 | vega |   | ✔️   |   |
+| rho | ✔️  |    |   |
 
 1. <span  style="background-color: #FFFF00">An **at-the-money option** always has a greater gamma, theta, and vega than an equivalent in-the-money or out-of-the-money option. </span> 
 2. <span  style="background-color: #FFFF00">At-the-money options tend to be the most actively traded. </span>
