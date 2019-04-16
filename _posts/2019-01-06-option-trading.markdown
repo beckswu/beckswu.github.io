@@ -193,7 +193,7 @@ Eg. Option delta = 50 (0.5). If underlying price up 1.20, option value up 0.6. I
 
 1. At-the-money gamma 最大, 因为delta vs price change graph slope is greatest when close to options's exercise price.
 2. At-the-money options: as volatility falls or time passes, gamma increase; As volatility rises, gamma values fall (时间越短，volatility越小，gamma 越大)
-3. For out-of-the-money options. As volatility falls or time passes, gamma values fall. As volatility rises, gamma values increases. (OTM gamma 时间越长，vol越大，gamma 越大)
+3. For out-of-the-money options. As volatility falls or time passes, gamma values fall. As volatility rises, gamma values increases. (OTM gamma 时间越短，vol越小，gamma 越小)
 
 #### Theta 
 
