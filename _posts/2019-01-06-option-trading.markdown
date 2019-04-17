@@ -209,7 +209,7 @@ Since volatility value is usually more important than interest, the great majori
 Q： What would a positive theta mean? As time passes the option becomes more valuable. Is this possible? （interest rate 比 volatility 考虑的多）
 
 The expected value of the option at expiration must be very close to intrinsic value. value today = present value of the expected value. If there are no changes in other market conditions, as time passes, the value of the option will rise
-to intrinsic value. 比如underlying = 100, call = 40, 其他的不变，present value of 60: 60/(1+r\*t). As time passes, the option value will rise to 60
+to intrinsic value. 比如underlying = 100, call = 40, 其他的不变，present value of 60: 60/(1+r\*t). As time passes, the option value will rise to 60(The option must be deeply in-the-money, the option must be European, the option must be subject to stock type settlement)
 
 1. At-the-money options, Theta 最大
 2. At-the-money options: 时间越短，theta 越大
