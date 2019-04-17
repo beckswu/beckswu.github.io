@@ -18,8 +18,6 @@ tags:
 
 ## Basic Concept
 
-![](\img\post\Deep-Learning\pic3.png)
-
 **forward contract**: A forward contract is an agreement between a buyer and seller whereby the price is negotiated right now, but the actual exchange of money for goods takes place at a later date (the <span style="color: red">maturity date, delivery date, or expiration date</span>).
 
 The **nominal value or notional value** of a physical <span style="background-color: #FFFF00">commodity futures contract </span>: the unit value multiplied by the number of units to be delivered. unit value = $1175。 units to be delivered = 100 nominal value = $1175 x 100 = $117,500
