@@ -2,7 +2,7 @@
 layout:     post
 title:      "Linux - 笔记"
 subtitle:   "linux learning note "
-date:       2018-09-18 20:00:00
+date:       2018-05-28 20:00:00
 author:     "Becks"
 header-img: "img/post-bg2.jpg"
 catalog:    true
@@ -59,6 +59,8 @@ ls -lS #sort directory by size and show long format
 ls -lS > out.txt #put all the show into out.txt file
 
 ls -d */ #只显示所有的directory
+
+ls -R #显示每个子文件夹都包含什么文件
 
 man ls #显示所有ls 的function, 按Q退出
 
@@ -131,6 +133,18 @@ mkdir -p names/{john,tom,bob}  #creat several directory inside current directory
 
 
 
+##rm & rmdir
+
+```shell
+
+rmdir abc # remove abc的folder
+rmdir a/b/c/d/e #只remove 最后e的directory
+rmdir -p a/b/c/d/e  #remove 所有的directory structure
+rmdir -pv a/b/c/d/e #remove 所有directory structure，并显示(verb)remove的进程
+
+```
+
+
 ##Cat
 
 ```shell
@@ -138,7 +152,6 @@ mkdir -p names/{john,tom,bob}  #creat several directory inside current directory
 
 
 ```
-
 
 ![](/img/post/git-note/gitpic1.png)
 
