@@ -19,7 +19,7 @@ Command Line or Shell: aslo called **CLI(Command Line Interface)**
 
 File in Linux system are arranged in **hierarchical directory structure**: organized in a tree-like pattern
 
-##初始化 LS
+## 初始化 LS
 
 ```shell
 #Open Terminal 快捷键
@@ -67,7 +67,7 @@ man ls #显示所有ls 的function, 按Q退出
 ```
 
 
-##CD
+## CD
 
 **home directory和root directory** 不一样, root是/, home 是 /Users/ username 的文件夹
 
@@ -85,7 +85,7 @@ cd 'My Books' #功能与上面一样
 
 
 
-##Cat
+## Cat
 
 cat: 1. Display Txt 2. combine Txt file 3. Create new Txt file
 
@@ -118,7 +118,7 @@ cat list1.txt >> list2.txt #修改上面一行的error，append list1.txt 到lis
 
 
 
-##mkdir
+## mkdir
 
 ```shell
 mkdir image #生成image directory
@@ -133,7 +133,9 @@ mkdir -p names/{john,tom,bob}  #creat several directory inside current directory
 
 
 
-##rm & rmdir
+## rm & rmdir
+
+**rmdir**: remove directory, **rm**: rmove file and directory
 
 ```shell
 
@@ -141,11 +143,15 @@ rmdir abc # remove abc的folder
 rmdir a/b/c/d/e #只remove 最后e的directory
 rmdir -p a/b/c/d/e  #remove 所有的directory structure
 rmdir -pv a/b/c/d/e #remove 所有directory structure，并显示(verb)remove的进程
+#如果a/b/c/d/e 每个并不是空的文件夹，会显示error, failed to remove directory a/b: Directory not empty
+
+rm -rv a/b 
+rm -rv a #与上面一行作用是一样的
 
 ```
 
 
-##Cat
+## Cat
 
 ```shell
 
