@@ -1,0 +1,276 @@
+---
+layout:     post
+title:      "Linux - 笔记"
+subtitle:   "linux learning note "
+date:       2018-09-18 20:00:00
+author:     "Becks"
+header-img: "img/post-bg2.jpg"
+catalog:    true
+tags:
+    - Linux
+    - 学习笔记
+---
+
+**Shell**: a program that take commands from keyboard and give them to operating system to perform;
+
+Command Line or Shell: aslo called **CLI(Command Line Interface)**
+
+**Terminal**: a tool which you can use to pass your shell commands.  A program that opens a window and lets you interact with the shell
+
+File in Linux system are arranged in **hierarchical directory structure**: organized in a tree-like pattern
+
+##初始化 LS
+
+```shell
+#Open Terminal 快捷键
+press ctrl alt T
+
+#show current(home) directory
+pwd
+
+clear #clear terminal
+
+
+# 给options 再到directory
+ls [options] [name of directory]
+
+#list all file in current directory
+ls
+ls ~ #跟上面作用一样，显示home directory
+
+ls Documents/ #Documents必须在当前文件夹下，显示Documents文件夹所有文件
+ls Documents/*.html #显示Documents中只包含.html的文件
+ls Documents/*.* #show all the files
+
+ls / #显示root的所有文件，注意root的directory跟现在文件夹可能不同
+
+ls .. #显示parent directory 所有文件
+
+ls ../.. #显示parent 的parent directory所有文件
+cd ../.. #Go to parent's parent folder
+
+ls -l #list all directory in long format, 显示详细的信息, user, what is rights of files (write? read?), size of file,Date of creating
+#drwxr-xr-x: drwxr directory (r) read (w)write, x(execute), read,  -xr (group right): only execute and read, -x (others): only execute 
+
+ls -a # give hidden files also, in linux, .表示hidden files
+ls -al #show hidden file and show long format
+
+ls -lS #sort directory by size and show long format
+ls -lS > out.txt #put all the show into out.txt file
+
+ls -d */ #只显示所有的directory
+
+man ls #显示所有ls 的function, 按Q退出
+
+```
+
+
+##CD
+
+**home directory和root directory** 不一样, root是/, home 是 /Users/ username 的文件夹
+
+```shell
+cd / #go to root directory
+cd ~ #home directory
+cd .. #到parent directory
+cd Documents #go to Document Directory
+cd /home/programming/Documents/ #功能与上面一样, Go to Document Directory
+cd My\ Books # go to My Books folder, 在My Books中间有空格
+cd "My Books" #功能与上面一样
+cd 'My Books' #功能与上面一样
+
+```
+
+
+
+##Cat
+
+cat: 1. Display Txt 2. combine Txt file 3. Create new Txt file
+
+syntax: cat options file1 file2 ... 
+
+```shell
+cat Hello World #会打印 echo Hello world
+#Ctrl D means the end of cat command 
+
+cat list1.txt #显示list1.txt 所有内容
+cat list1.txt list2.txt #显示list1.txt 和list2.txt所有内容，先显示list1的再显示list2的
+
+cat -b list1.txt #把list1.txt的 不是blank的line(空行) 显示序号
+cat -n list1.txt #把list1.txt的 所有行(空行或者不空行) 都显示序号
+cat -s list1.txt #squeeze 连续 blank line to one blank line
+
+cat -E list1.txt #add $ at the end of each line
+
+man cat #显示cat所有function
+
+cat > test.txt  #把接下来input的内容 output 到test.txt，输完了 按Ctrl+D， test.txt之前内容被remove
+cat >> text.txt #把接下来input的内容 append 到test.txt
+
+cat list1.txt list2.txt > out.txt #把mlist1, list2的内容合并，生成out.txt
+cat list1.txt list2.txt > list2.txt #这样是不行的，不能把input 当成output file
+cat list1.txt >> list2.txt #修改上面一行的error，append list1.txt 到list2.txt
+
+```
+
+
+
+
+##mkdir
+
+```shell
+mkdir image #生成image directory
+mkdir image/pic #生成pic directory inside image directory
+mkdir names/mark #当names 不在当前文件夹下，显示error, No such file or directory
+mkdir -p names/mark (mkdir --parents names/mark ) #-p means -- parents
+mkdir -p names/{john,tom,bob}  #creat several directory inside current directory, 建立三个文件夹,john, tom,bob
+# {john,tom,bob} 不能有空格，否则建立的文件夹是 {john,
+
+
+```
+
+
+
+##Cat
+
+```shell
+
+
+
+```
+
+
+![](/img/post/git-note/gitpic1.png)
+
+untracked: git 就根本不知道我们有这个文件，我们要把文件 添加到git 当中; add 文件 就到了staged 状态了, 然后就可以commit，commit之后就变成了unstaged 的状态;  unmodified, modified 都是属于unstaged的状态
+
+<span style="background-color: #FFFF00">每次更改文件后需要到先到stage 状态 (git add)才可以commit </span>
+
+## 记录修改
+
+```shell
+git log #显示所有更改的commit的信息，比如commit两回，显示两次commit
+git log --oneline #显示每个commit用1行
+git log --oneline --graph #用图形的方式显示, 当只有一个分支, 会在commit前加上星号成一条线,
+
+#显示现在文件和上次commit的不同
+git diff #红色是之前的commit的, 绿色是现在文件
+
+git diff --cached #当文件已经stage, git diff 显示不出不同，需要这句话，显示staged后的文件和上次commit的不同
+
+#当文件stage, 没有commit, 又做了修改，需要下面cmd看不同，如果用git diff --cached，只会显示staged的部分，不会显示又更改的部分
+git diff HEAD 
+```
+<span style="background-color: #FFFF00">当修改已经被stage (git add) 再看git diff是看不出不同的, 如想看不同需要git diff --cached </span>
+
+## 回到从前
+
+**reset** 
+```shell
+
+#覆盖上次的commit的, amend 把stage 状态放在上个commit当中,  no edit是不更改上次commit的评论
+git commit --amend --no-edit  #改完之后发现message 没变，但是id是会变得
+
+#返回从stage的状态 到modified的状态
+git reset 1.py #把 1.py 返回unstaged的状态
+
+#把commit的过后的版本返回到上一个， 调整head 到上一个，上上一个; 
+git reset --hard HEAD #把head 移到了现在commit上面 #git status会显示没有任何修改了
+git reset --hard HEAD^ #把head 移到前一个commit, git reset --hard HEAD^^ 移到前两个commit
+
+git reset --hard 7a7ecea #把head 移到 7a7ecea这个id上面去 (看id: git status --oneline)
+#再git status --oneline 就不能看现在head未来的commit的
+
+#也可以吧head回到未来, 从上上个移动到现在的
+git reflog #看每一个的变化, 显示每一个head的移动
+git reset --hard 3f27543 #通过reflog 找到未来的head id，可以返回了
+git reset --hard HEAD@{0} #也可以把之前复制过来
+```
+![](/img/post/git-note/gitpic2.PNG)
+
+**checkout** 
+```shell
+#只让一个文件回到过去
+git checkout 7a7ecea -- 1.py  #7a7ecea是之前commit的id,  只恢复1.py; 2.py 还是现在的状态
+#之后修改再commit, 会建立新的commit的，git log --oneline 显示这次在过去的commit上面，过去的commit不会像reset一样消失
+```
+
+## 管理分支
+
+比如master是client用的，要稳定版，自己要用一个开会的分支
+```shell
+#比如master的分支, 都是
+git branch dev #建立一个名为dev的
+git checkout -b dev #建立一个名为dev的, 并把head移动到dev分支上
+
+git branch #显示现在所有的分支, 星号表示现在的分支
+git checkout dev #从现在分支切换到dev上, 再git branch, dev分支上显示星号
+git branch -d dev #删除dev的分支, 报错，因为现在就在dev分支上, 先切换别的分支，才能删除
+git branch -D dev #如果git branch -d dev, 大写的D表示强行删除
+
+#把dev merge到master上来, -m "keep merge in info"把信息记录在log, --no-ff, no faster forward, 默认是faster forward是不会留信息
+git merge --no-ff -m "keep merge in info" dev #要确定在master上面不能在dev branch上
+#merge 之后再看git log --oneline --graph #会有图像显示branch的分支产生，merge
+```
+
+
+## 分支冲突
+<span style="background-color: #FFFF00">**Merge** </span> 
+
+比如 两个分支master, dev各有修改, 当git merge dev 时候有conflict, 然后file里显示什么冲突了, 把冲突的部分删除掉，做修改，修改过后的状态是modified, stage (git add .) 再commit(git commit -m "solve conflict") (or 直接 git commit --am "solve conflict"), 再git log --oneline --graph 会显示两个分支合并了
+
+
+<span style="background-color: #FFFF00">**rebase** </span> 
+
+比如在branch A上工作 c3是基于c1的, branch B是主分支,然后有天有人提交了bug, 在主分支branch b的上进行了提交, 这时如果想把bug融合到c3上; 
+
+方法是: 先把branch A的c3拿走，空出来, 把c2,c4合并到上面去, 再把c3放到合并以后的地方, <span style="background-color: #FFFF00">注:现在c3基于c4, 以前的c3不复存在了</span> 所以rebase是危险的方式, rebase 后c3的commit id和rebase前c3的id是不一样的
+
+
+![](/img/post/git-note/gitpic3.PNG)
+
+```shell
+#先checkout master,然后再主分支的修改基于dev的修改 (上图的branch A是master, branch b是dev)
+git checkout master
+git rebase dev #(把master分支基于dev分支)
+#如果有conflict, 跟merge一样的, 去修改conflict
+#修改完conflict, git branch  发现不在任何一个分支上
+
+#stage + commit 
+git rebase --continue #继续rebase
+#如果碰到conflict，想放弃rebase
+git rebase --abort
+
+git log --oneline --graph #会发现dev的commit插到master上面来了,
+```
+## 临时修复
+
+比如要改之前的程序, 而现在的改进程序还没有完成, 不想把改进的和要改的程序放在一起, 用stash可以改进的code暂存一下, 等改后之前的, 再继续工作, 有不同的commit, 不会有冲突
+```shell
+git checkout dev
+#git status -s 显示文件已经被更改
+git stash #把现在的文件放在缓存区
+git status -s #此时就没有任何的modified 文件了
+#此时再建一个新的branc: git checkout -b boss; 在这个branch中修改之前的code, stash缓存的更改不会建立在这个branch中
+
+#修改完boss分支后, 再checkout 回dev: 
+git checkout dev
+git stash pop #就会把之前修改暂存的返回回来
+```
+
+<span style="background-color: #FFFF00">当stash后再建立新的branch, stash缓存的内容不会出现的新的branch中, 新的branch只显示上次commit 的内容 </span> 
+
+## GitHub
+
+```shell
+git push -u origin master #把master分支推到origin上面, origin指得是online的管理库
+git push -u origin dev #把dev分支推到origin上面
+
+git config --get remote.origin.url #查看remote url
+
+#修改已经存在的origin为新的http://....
+git remote set-url origin https://  #已经有remote url，改变现有的url
+git remote add origin https://      #初始url
+```
+
+origin指得是online的管理库, history显示所有的改变, change显示每次commit发生变化, 本地的.git文件也被上传到管理库
