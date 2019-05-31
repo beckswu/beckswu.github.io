@@ -277,6 +277,8 @@ nao abc.cpp #会有color, code highlighting, 不光是cpp, 也可以是Java,c
 
 ![](/img/post/linux/pic3.png)
 
+![](/img/post/linux/pic4.png)
+
 
 ## Cat
 
