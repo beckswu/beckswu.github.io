@@ -15,6 +15,7 @@ tags:
 **mv**: move and rename <br/>
 **Less**:  View some part of the file (lookup, view line by line / page by page) <br/>
 **Touch**: create new file(cannot create directory), change file timestamp   <br/>
+**Nano**: txt e   <br/>
 
 
 **Shell**: a program that take commands from keyboard and give them to operating system to perform;
@@ -255,14 +256,26 @@ touch file1.txt #修改file1.txt的timestamp, 不修改内容，只修改了time
 
 
 
-## Cat
+## Nano
+
+Nano is a small and friendly text editor, besides it has interactive search, replace, go to line, and indentation 
 
 ```shell
+nano file.txt #open txt editor, file open but not show has been created, 因为还没有save
+
+#press ctrl + o, -> means write out
+#press ctrl + x  -> quit the file
+#press ctrl + k -> cut
+#press ctrl + u -> paste
+
+nao abc.cpp #会有color, code highlighting, 不光是cpp, 也可以是Java,c 
 
 
 
 ```
 
+
+![](/img/post/linux/pic3.png)
 
 
 ## Cat
