@@ -11,6 +11,12 @@ tags:
     - 学习笔记
 ---
 
+**cp**: copy and paste  <br/>
+**mv**: move and rename <br/>
+**Less**:  View some part of the file (lookup, view line by line / page by page) <br/>
+**Touch**: create new file(cannot create directory), change file timestamp   <br/>
+
+
 **Shell**: a program that take commands from keyboard and give them to operating system to perform;
 
 Command Line or Shell: aslo called **CLI(Command Line Interface)**
@@ -151,6 +157,104 @@ rm -rv a #与上面一行作用是一样的
 ```
 
 
+## CP
+
+CP: copy and paste
+
+```shell
+
+cp options source destination
+
+cp file1.txt file2.txt #if file2.txt not exist will creat file2.txt. Content from file1 will copy to file2 
+
+cp file1.txt dir1 # 把file1.txt copy 到directory 1
+
+cp file1.txt file2.txt dir1 # 把file1.txt 和file2.txt copy 到directory 1
+
+cp -i  file1.txt file2.txt dir1 #如果directory 1 里面有file1.txt -i 会ask 是否要overwrite, 选n, 就会只copy file2 不会copy file1
+
+cp ../f1.txt ../f2.txt . #从parent directory copy f1.txt和f2.txt 到现在directory, 因为没有-i, 会overwrite
+
+cp dir1 dir3 # error， 因为dir1 有文件，不能被copy
+cp -R dir1 dir3 # -R means recursive copy,copy everything from dir1 to dir3
+#whenever destination (dir3) doesn't exist, it create destination and copy all content from source
+#如果存在destination, 只copy paste
+cp -vR dir1 dir3 #显示详细的copy 哪些文件
+
+
+```
+![](/img/post/linux/pic1.png)
+
+
+## mv
+
+mv: rename, move
+
+```shell
+
+mv options source dest
+
+mv f1.txt f2.txt #rename f1.txt 成f2.txt 
+
+mv f1.txt dir1/ #把f1.txt 移动到dir1
+#如果dir1 中有f1.txt, move 会overwrite 原有的file 内容
+
+mv -i f1.txt dir1 #move f1.txt 到dir1 folder中, 如果要overwrite 会问
+mv -i f1.txt dir1/ #与上面一样的
+
+mv dir1 dir2 #把dir1 移动到dir2 中, content 也会move,  不用-R
+#dir1就现在文件夹下不存在了,dir1 在dir2中
+
+#tricky，如果当dir3 不存在
+mv dir2 dir3 #dir2中的内容移动到dir3中，所以dir3中只含有dir1，dir2也消失了
+#如果dir3 也存在，那么dir3 中有dir2, dir2中有dir1 
+
+mv -v file3.txt dir3 #V, verb, 显示具体怎么移动的
+```
+
+
+## Less
+
+read file and search pattern in the file, 比如用cat print整个文件，当文件很大，当print完成，不能显示文件开头，用less，可以看
+
+```shell
+
+less big.txt   #only show the starting point of the file, 然后用键盘的↓，enter show one more row below at one time
+#用键盘的↑，enter show one row above at one time
+#键盘的space show page by page below
+#键盘的shift+B show page by page above
+#键盘的shift+G to the end of file
+#键盘先1 + G or g (without shift) to go to the begining of the file
+#想找文件从上到下，比如找book, type  /book + enter, 找next, type n
+#想找文件从下到上，比如找book, type ?book + enter, 找上一个，type n
+#想退出less command, press q
+
+
+
+```
+
+
+
+## Touch
+
+Touch is the easist way to create new empty file in Linux. It is also used for changing timestamp on existing file or directory 
+
+<span style="background-color: #FFFF00">you cannot create new directory using touch, can only create empty file</span>
+
+```shell
+
+touch file6 #建一个新的empty file6
+touch f7.txt #建立一个新的txt, 名字是f7
+
+touch file1.txt #修改file1.txt的timestamp, 不修改内容，只修改了timestamp
+
+
+```
+
+![](/img/post/linux/pic2.png)
+
+
+
 ## Cat
 
 ```shell
@@ -159,7 +263,26 @@ rm -rv a #与上面一行作用是一样的
 
 ```
 
-![](/img/post/git-note/gitpic1.png)
+
+
+## Cat
+
+```shell
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
 
 untracked: git 就根本不知道我们有这个文件，我们要把文件 添加到git 当中; add 文件 就到了staged 状态了, 然后就可以commit，commit之后就变成了unstaged 的状态;  unmodified, modified 都是属于unstaged的状态
 
