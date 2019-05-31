@@ -15,7 +15,7 @@ tags:
 **mv**: move and rename <br/>
 **Less**:  View some part of the file (lookup, view line by line / page by page) <br/>
 **Touch**: create new file(cannot create directory), change file timestamp   <br/>
-**Nano**: txt e   <br/>
+**Nano**: txt/code editor   <br/>
 
 
 **Shell**: a program that take commands from keyboard and give them to operating system to perform;
