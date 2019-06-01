@@ -11,11 +11,22 @@ tags:
     - 学习笔记
 ---
 
+```shell
+
+Ctrl + d # open new terminal window tab
+
+```
+
 **cp**: copy and paste  <br/>
 **mv**: move and rename <br/>
 **Less**:  View some part of the file (lookup, view line by line / page by page) <br/>
 **Touch**: create new file(cannot create directory), change file timestamp   <br/>
 **Nano**: txt/code editor   <br/>
+**sudo**: grant super user priviledge <br/>
+**Top**: provide you dynamic real time view of running system <br/>
+**Echo** print, can include variable in "" <br/>
+**chmod** add/remove access for user, group, others (u,g,o), 可以是给octal(数字的形式) <br/>
+
 
 
 **Shell**: a program that take commands from keyboard and give them to operating system to perform;
@@ -280,11 +291,21 @@ nao abc.cpp #会有color, code highlighting, 不光是cpp, 也可以是Java,c
 ![](/img/post/linux/pic4.png)
 
 
-## Cat
+## Sudo
+
+Sudo: superuser do: allow you some priviledge as adminstrator or a power user
+
+有时候比如mkdir dir, show permission denied error, 用sudo tell linux command to execute as administrator
+
+比如install G++, GCC, will ask user priviledge 
 
 ```shell
 
+sudo mkdir dir #需要provide password, run as administrator 
 
+sudo apt-get install g++ # apt-get install : install software
+
+sudo -s #change priviledge from local user to root 
 
 ```
 
@@ -292,11 +313,191 @@ nao abc.cpp #会有color, code highlighting, 不光是cpp, 也可以是Java,c
 
 
 
+## Top
+
+Top: provide you dynamic real time view of running system. Used to see which program take more of your CPU and which program consuming more of your memory
+
+```shell
+top #give you view of system, it refreshing every second
+s # can update time, 输入1 refresh every 1 second
+i # to filter idle process
+k # 把鼠标选中PID, press k, kill process
+q # quit the top view
+
+```
+
+PID: process ID, 同一个程序不同时候run pid 可能不一样的 <br/>
+
+![](/img/post/linux/pic5.png)
 
 
 
 
 
+## Kill
+
+kill process
+
+```shell
+
+kill -flags pid # syntax
+
+piodf unity-control-center #lookup pid by name
+
+kill 3286 # kill pid = 3286 process
+
+kill -KILL 3294 #force to kill process
+
+kill -9 3294 # force to kill  process (flag -9)
+
+ps -ux  #find pid; give a long list of running process (current user)
+ps -aux #find pid; give a long list of all running process (all users)
+ps -U  Becks #give all process under User Becks
+ps -C gnome-terminal #give all process related to program gnome-terminal, 可能连着多个instances
+```
+
+
+
+## Echo
+
+used for bash scripting to print 
+
+```shell
+
+echo hello world # 在terminal 打印出hello world
+echo "hello world" #与上面一样, better use "" for echo
+
+myvar="Mark" #myvar= 不能有空格, assign variable
+echo $myvar #print variable
+
+x=10
+echo "the value of x is $x" #print the value of x is 10
+
+echo -e 'some \text' #-e use escape,  \t -> tab,   print:  some     ext
+
+```
+
+
+## File Permissions, Chmod
+
+drwxr-xr-x 1 beckswu staff 22 Jul 23 18:56 file: d means directory <br/>
+-rw-rw-r- 1 beckswu staff 没有d 表示normal file, 如果开头是c, 表示character special file。如果是b，表示binary special file
+
+左面第一堆表示owner of file access, 第二堆表示group of file, 第三堆表示permission for everybody else, 1表示symbolic links of the file, 接下来表示owner of the file, next is the group of the file, 22 表示size of the file, July 23 18:56 date of created. file is the name of file
+
+symbolic link is a term for any file that contains a reference to another file or directory in the form of an absolute or relative path and that affects pathname resolution
+
+
+```shell
+
+#o means other group, + add permission, - minus permission,
+chmod o+x file #给file 的other user(第三堆) 加execute permission
+
+chmod g+x file #给file 的group(第二堆) 加execute permission
+chmod g-wx file #给file的group 移走write execute permission
+
+chmod ug=rwx file #给user(owner), group read write execute permission 
+
+chmod a-rwx file #给所有的（owerner, group, others) remove read, write, execution permission
+
+
+chmod u+rw, g=rw, o+r file #给user add read write, 给group read, write permission, 给other add read permission
+
+```
+
+
+
+## Directory Permission
+
+
+```shell
+
+chmod u-w dir #remove user write permission for directory
+#cd 进dir, touch f.txt 显示permission denied
+
+chmod u-r dir #remove read access from user
+#cd dir 显示 permission denied
+
+chmod u-x dir #remove execute access from user 
+#cd dir 或者 ls dir/ 都显示permission denied
+
+
+```
+
+
+## Octal & Numerical Permissions
+
+![](/img/post/linux/pic6.png)
+
+![](/img/post/linux/pic7.png)
+
+比如你想给user access read write and x, you need to give number as 7(binary start from right to left for each group)
+
+```shell
+
+chmod 755 file.txt #give user read, write execute(7), give both group and othe group read and execute access
+
+```
+
+
+
+
+
+## Bash Script
+
+Script: txt file contain sequence of command
+
+```shell
+
+nano myscript.sh #open editor 
+
+#! /bin/bash  #需要contain location of bash
+which bash #会告诉哪里有bash，give location 
+
+./myscript.sh #./ 是去run bash script
+#显示permission denied 因为file created not have execute permission 
+
+#先给permission 
+chmod +x myscript.sh #give permission for all groups
+./myscript.sh #显示会成功
+
+
+```
+
+![](/img/post/linux/pic8.png)
+
+![](/img/post/linux/bash.png)
+
+
+
+## which & what
+
+```shell
+#which ls #give location where ls command located
+
+```
+
+
+
+## Kill
+
+kill process
+
+```shell
+
+
+```
+
+
+
+## Kill
+
+kill process
+
+```shell
+
+
+```
 
 
 untracked: git 就根本不知道我们有这个文件，我们要把文件 添加到git 当中; add 文件 就到了staged 状态了, 然后就可以commit，commit之后就变成了unstaged 的状态;  unmodified, modified 都是属于unstaged的状态
