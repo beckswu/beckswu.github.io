@@ -28,19 +28,21 @@ Ctrl + d # open new terminal window tab
 **chmod** add/remove access for user, group, others (u,g,o), 可以是给octal(数字的形式) <br/>
 **which**: where software/command located <br/>
 **whatis**: display short manual(man command) page description <br/>
-**useradd** create new user  <br/>
-**passwd** change password for user <br/>
-**userdel** delete exisiting user <br/>
-**groups** show which group is currently user connected to <br/>
-**groupadd** add new group in system <br/>
-**groupdel** delete existing group <br/>
-**gpasswd -a** add user to exisiting group <br/>
-**gpasswd -d** delete user from exisiting group <br/>
-**df**  the amount of disk space being used by your file system <br/>
-**du** estimate and display the disk space used by files in details <br/>
-**free**display the total amount free and used physical and swap memory in the system  <br/>
-**watch** run command at a regular interval or repeatedly <br/>
-**head/tail** print first / last part of the file <br/>
+**useradd**: create new user  <br/>
+**passwd**: change password for user <br/>
+**userdel**: delete exisiting user <br/>
+**groups**: show which group is currently user connected to <br/>
+**groupadd**: add new group in system <br/>
+**groupdel**: delete existing group <br/>
+**gpasswd -a**: add user to exisiting group <br/>
+**gpasswd -d**: delete user from exisiting group <br/>
+**df**: the amount of disk space being used by your file system <br/>
+**du**: estimate and display the disk space used by files in details <br/>
+**free**: display the total amount free and used physical and swap memory in the system  <br/>
+**watch**: run command at a regular interval or repeatedly <br/>
+**head/tail**: print first / last part of the file <br/>
+**find**: Find the file (by name, by time) <br/>
+**wc**: print a count of lines, words and characters for each files <br/>
 
 
 **Shell**: a program that take commands from keyboard and give them to operating system to perform;
@@ -657,26 +659,47 @@ head -3 log.txt kern.log #先print 3 lines of log.txt 再print 3 lines of kern.l
 
 
 
-## Kill
+## Find
 
 
 
 ```shell
+
+find location -name file_name #syntax
+
+find /home/ -name test.sh #-name search by name, return directory 
+find /home/dir1 -name test.* #search in /home/dir1 folder by name, any file start with test. 可以是.txt, .sh
+find /home/dir1 -name *.txt #search any file extension is txt
+find / -name dmesg #search in the root directory, 也许有permission error 因为有些directory 不允许access
+sudo find / -name dmesg 
+
+find /home  -mtime -1  #look at the file created 1 days before, 也可以用加号，+1, + 2
 
 
 ```
 
 
 
-## Kill
+## wc
 
+wc: world count, print a count of lines, words and characters for each files
 
 
 ```shell
 
+wc test.txt #打出#lines, #words, #characters
+wc -c test.txt #只打出#characters
+wc -l test.txt #只打出#lines
+wc -w test.txt #只打出#words
+
+wc -L test.txt #只给出number of character in longest line
+
 
 ```
 
+1, 6, 42: 1 number of line, 6 number of words, 42 number of characters
+
+![](/img/post/linux/wc.png)
 
 ## Kill
 
