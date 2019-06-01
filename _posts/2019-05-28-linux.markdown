@@ -43,6 +43,11 @@ Ctrl + d # open new terminal window tab
 **head/tail**: print first / last part of the file <br/>
 **find**: Find the file (by name, by time) <br/>
 **wc**: print a count of lines, words and characters for each files <br/>
+**Cal**: 显示calendar <br/>
+**Date**: print  and change system date and time information <br/>
+**Multiple Command** ; &&  ||  <br/>
+**ifconfig**: interface configuration: used to view and change network interface configuration on your system <br/>
+
 
 
 **Shell**: a program that take commands from keyboard and give them to operating system to perform;
@@ -701,63 +706,126 @@ wc -L test.txt #只给出number of character in longest line
 
 ![](/img/post/linux/wc.png)
 
-## Kill
+
+## Cal
+
+show conventially formatted calendar on your command line
+
+```shell
+
+cal #显示calendar, weekday on the top
+ncal  #显示calendar, weekday on the left 
+cal 2016 #显示2016的calendar
+cal 2 2016 #显示2016年 2月 calendar
+cal -3 #give you current month, previous month and next month calendar
+#default 是 -1, 比如cal, 等于cal -1
+```
+
+
+
+## Date
+
+used to print out and change system date and time information
+
+```shell
+
+date #print 现在系统的时间
+
+date -s "11/20/2003 12:48:00" #设置system time 为 11/20/2003 12:48:00
+
+date +%d%h%y #显示13Jan17
+
+date +%d/%h/%y #显示13-Jan-17
+
+man date #可以显示详细的date format的格式
+
+
+date "+Date: %m/%d/y%n" #显示01/13/17 %n 是空行线
+
+
+
+```
+设置时间格式
+![](/img/post/linux/date.png)
+
+
+## Run Multiple Terminal(; && || )
 
 
 
 ```shell
+
+#; sequence matter 
+ls; pwd #先run ls 再显示pwd
+date; cal ; pwd #先run date, 再run cal, 再pwd
+
+#如果有中间一个command 是错的
+date; CAL;  pwd #date, pwd run 成功了, CAL 会显示command not found 
+
+#&& sequence matter, 顺序一个接一个
+ls && pwd && date && cal #先run ls, 再pwd, 再date, 再cal
+
+ls && CAL && pwd #先run ls, CAL error, not run pwd
+
+ls || pwd #如果第一个command 成功了，不会run 第二个command
+
+CAL || pwd #CAL command failure, pwd 会被run
+
+```
+
+<span style="background-color: #FFFF00">Difference</span>: ; run every command regardless success/failure of each command. && 如果中间的failure, does not go to the next command
+
+
+## apt-get
+
+apt-get(urbantu): install, uninstall, update packages. apt: advance packaging tool
+
+对于centos: 用yum, dnf instead of apt-get 
+
+```shell
+
+sudo apt-get update #resync your local package file to the server package file, update all the packages
+
+java -version #check if java installed, and if so check version
+php5 -version #check if php installed, 如果没有install 会给出install的hint
+
+sudo apt-get install php5 #安装首先what is required extra dependency to install php5, 也会显示多少space required to install
+php5 -v #显示php5 version
+
+sudo apt-get remove php5 #remove php5
+sudo apt-get remove --purge php5 #remove all configuration file related to php5
+sudo apt-get autoremove  #auto remove the dependency which required for the package(php5) and no longer needed for other packages
+
 
 
 ```
 
 
 
-## Kill
 
+## ifconfig
 
+ifconfig: interface configuration: used to view and change network interface configuration on your system
 
 ```shell
+ifconfig #show you some output
 
+ifconfig eth0 #only show eth0 interface
+
+#up, down to disable internet connection 
+sudo ifconfig eth0 down #internet connection will be down
+
+sudo ifconfig eth0 up #enable internet 
 
 ```
 
+ethO: wired internet cable  <br/>
+WLAN0: wireless internet connection <br/>
+0: is the first internet interface. 如果有multiple internet interface, 显示eth1, or WLAN2
+l0: loop back interface. An interface that system use to communcate to excel
 
 
-## Kill
-
-
-
-```shell
-
-
-```
-
-
-
-## Kill
-
-
-
-```shell
-
-
-```
-
-
-
-
-## Kill
-
-
-
-```shell
-
-
-```
-
-
-
-## Kill
+## Tar
 
 
 
