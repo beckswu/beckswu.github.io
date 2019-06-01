@@ -629,7 +629,7 @@ watch -n 0,5 free -m #让free -m command run every 0.5 second
 
 ```
 
-
+![](/img/post/linux/watch.png)
 
 ## Head Tail
 
