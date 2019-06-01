@@ -21,12 +21,26 @@ Ctrl + d # open new terminal window tab
 **mv**: move and rename <br/>
 **Less**:  View some part of the file (lookup, view line by line / page by page) <br/>
 **Touch**: create new file(cannot create directory), change file timestamp   <br/>
-**Nano**: txt/code editor   <br/>
+**Nano(or gedit)**: txt/code editor   <br/>
 **sudo**: grant super user priviledge <br/>
 **Top**: provide you dynamic real time view of running system <br/>
 **Echo** print, can include variable in "" <br/>
 **chmod** add/remove access for user, group, others (u,g,o), 可以是给octal(数字的形式) <br/>
-
+**which**: where software/command located <br/>
+**whatis**: display short manual(man command) page description <br/>
+**useradd** create new user  <br/>
+**passwd** change password for user <br/>
+**userdel** delete exisiting user <br/>
+**groups** show which group is currently user connected to <br/>
+**groupadd** add new group in system <br/>
+**groupdel** delete existing group <br/>
+**gpasswd -a** add user to exisiting group <br/>
+**gpasswd -d** delete user from exisiting group <br/>
+**df**  the amount of disk space being used by your file system <br/>
+**du** estimate and display the disk space used by files in details <br/>
+**free**display the total amount free and used physical and swap memory in the system  <br/>
+**watch** run command at a regular interval or repeatedly <br/>
+**head/tail** print first / last part of the file <br/>
 
 
 **Shell**: a program that take commands from keyboard and give them to operating system to perform;
@@ -472,16 +486,180 @@ chmod +x myscript.sh #give permission for all groups
 
 ## which & what
 
+which: where software/command located
+
+what: display short manual page description
+
 ```shell
 #which ls #give location where ls command located
 
+which firefox # location of bash
+which bash # location of bash
+
+whatis ls # short description, to know what ls doing command
+whatis grep #short description, to know what is grep command
+
+```
+
+
+
+## useradd
+
+create user
+
+```shell
+
+useradd the_name_of_user #syntax
+
+sudo useradd mark -m -s /bin/bash -g users -c "my comment"
+#-m:  create default home directory for this user
+#-s /bin/bash allow usesr to use shell
+#-g assign group, default group is users
+#-c "my comment" provide comment to user 
+#-G assign/give user defined group
+#sudo: because you don't want anybody create user, only root can create user
+
+sudo passwd mark  #change password for user
+
+
+```
+
+
+
+## userdel
+
+
+
+```shell
+
+sudo userdel mark #delete user mark (username, password, data), not delete home directory for user
+
+sudo userdel -r mark #delete user (home directory, username, password, data)
+
+sudo -r /home/mark/  #remove all the data from user
+
+```
+![](/img/post/linux/userdel.png)
+
+
+
+## groups, groupadd, groupdel
+
+group show which group is currently user connected to
+
+```shell
+groups #show which group is currently user connected to
+
+cat /etc/group #show all the group in your system,  group <-> user connected to 
+
+sudo groupadd Java #add newgroup in system
+sudo groupdel Java #delete existing group
+
+#-a add user to group, -d remove user from group
+sudo gpasswd -a mark Java # add mark to the Java group
+sudo gpasswd -d mark Java #remove user from Group
+
+
+```
+
+
+
+
+## bashrc
+
+bashrc is a script executed whenever a new terminal session start in interactive mode
+
+some linux system， .bashrc file exist when a new terminal session start. Some not
+
+Bashrc file is used for setting up environment variable such as Java. When use git, which repo you checked or cloned, use Bashrc
+
+```shell
+
+ls -a #在home directory ls -a 可以看见有.bashrc
+
+nano .bashrc #查看.bashrc
+gedit .bashrc #查看 .bashrc
+
+```
+
+可以修改 .bashrc file 比如加上alias ls='ls --color=auto -l', 之后open new terminal, 输入ls, 显示long list of ls 
+
+![](/img/post/linux/bashrc.png)
+
+
+![](/img/post/linux/bashrc2.png)
+
+## du, df, free
+
+View Resources
+
+
+
+
+```shell
+df #the amount of disk space being used by your file system
+df -h #the human readable output, 显示多少G, M, k
+
+du #estimate and display the disk space used by files in details
+du -h #human readable format
+du -sh #-s summary 只给你现在所在directory 文件所占的大小
+sudo du -sh #用sudo 原因是因为可能有的file permission denied 需要用sudo 
+du -sh /etc/ #show summary used space by etc folder
+
+free #display the total amount free and used physical and swap memory in the system as well as buffer in the kernel
+free -b  #-b btye, -k KB, -m MB, -G GB, -T TB
+
+```
+
+
+## Watch
+
+run scripts for command at a regular interval or repeatedly
+
+
+```shell
+
+watch free -m #可以看见几秒会更新一次
+Ctrl + C #exit watch command
+watch -n 1 free -m #让free -m command run every 1 second
+watch -n 0,5 free -m #让free -m command run every 0.5 second
+
+
+```
+
+
+
+## Head Tail
+
+Head: output the first part of the file 
+Tail: output the last part of the file
+
+
+```shell
+head log.txt #show first 10 line of file 
+tail log.txt #show last 10 line of file 
+
+
+head -n3 log.txt #show first 3 lines of file
+head -3 log.txt #跟上面一样
+
+tail -n3 log.txt #show last 3 lines of file
+tail -3 log.txt #跟上面一样
+
+tail -f log.txt #output last 10 lines of file. watch the file, whenever file change, will show last 10 lines of code
+ctrl + C #exit 
+head  log.txt kern.log #先print 10 lines of log.txt 再print 10 lines of kern.log
+
+head -3 log.txt kern.log #先print 3 lines of log.txt 再print 3 lines of kern.log
+
+
 ```
 
 
 
 ## Kill
 
-kill process
+
 
 ```shell
 
@@ -492,12 +670,106 @@ kill process
 
 ## Kill
 
-kill process
+
 
 ```shell
 
 
 ```
+
+
+## Kill
+
+
+
+```shell
+
+
+```
+
+
+
+## Kill
+
+
+
+```shell
+
+
+```
+
+
+
+## Kill
+
+
+
+```shell
+
+
+```
+
+
+
+## Kill
+
+
+
+```shell
+
+
+```
+
+
+
+
+## Kill
+
+
+
+```shell
+
+
+```
+
+
+
+## Kill
+
+
+
+```shell
+
+
+```
+
+
+
+## Kill
+
+
+
+```shell
+
+
+```
+
+
+
+## Kill
+
+
+
+```shell
+
+
+```
+
+
+
+
+
+
 
 
 untracked: git 就根本不知道我们有这个文件，我们要把文件 添加到git 当中; add 文件 就到了staged 状态了, 然后就可以commit，commit之后就变成了unstaged 的状态;  unmodified, modified 都是属于unstaged的状态
