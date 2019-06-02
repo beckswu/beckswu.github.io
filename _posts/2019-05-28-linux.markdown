@@ -109,7 +109,7 @@ man ls #显示所有ls 的function, 按Q退出
 ```
 
 
-## CD
+## cd
 
 **home directory和root directory** 不一样, root是/, home 是 /Users/ username 的文件夹
 
@@ -127,7 +127,7 @@ cd 'My Books' #功能与上面一样
 
 
 
-## Cat
+## cat
 
 cat: 1. Display Txt 2. combine Txt file 3. Create new Txt file
 
@@ -193,7 +193,7 @@ rm -rv a #与上面一行作用是一样的
 ```
 
 
-## CP
+## cp
 
 CP: copy and paste
 
@@ -249,7 +249,7 @@ mv -v file3.txt dir3 #V, verb, 显示具体怎么移动的
 ```
 
 
-## Less
+## less
 
 read file and search pattern in the file, 比如用cat print整个文件，当文件很大，当print完成，不能显示文件开头，用less，可以看
 
@@ -271,7 +271,7 @@ less big.txt   #only show the starting point of the file, 然后用键盘的↓�
 
 
 
-## Touch
+## touch
 
 Touch is the easist way to create new empty file in Linux. It is also used for changing timestamp on existing file or directory 
 
@@ -291,9 +291,9 @@ touch file1.txt #修改file1.txt的timestamp, 不修改内容，只修改了time
 
 
 
-## Nano
+## nano
 
-Nano is a small and friendly text editor, besides it has interactive search, replace, go to line, and indentation 
+nano is a small and friendly text editor, besides it has interactive search, replace, go to line, and indentation 
 
 ```shell
 nano file.txt #open txt editor, file open but not show has been created, 因为还没有save
@@ -315,9 +315,9 @@ nao abc.cpp #会有color, code highlighting, 不光是cpp, 也可以是Java,c
 ![](/img/post/linux/pic4.png)
 
 
-## Sudo
+## sudo
 
-Sudo: superuser do: allow you some priviledge as adminstrator or a power user
+sudo: superuser do: allow you some priviledge as adminstrator or a power user
 
 有时候比如mkdir dir, show permission denied error, 用sudo tell linux command to execute as administrator
 
@@ -337,9 +337,9 @@ sudo -s #change priviledge from local user to root
 
 
 
-## Top
+## top
 
-Top: provide you dynamic real time view of running system. Used to see which program take more of your CPU and which program consuming more of your memory
+top: provide you dynamic real time view of running system. Used to see which program take more of your CPU and which program consuming more of your memory
 
 ```shell
 top #give you view of system, it refreshing every second
@@ -358,7 +358,7 @@ PID: process ID, 同一个程序不同时候run pid 可能不一样的 <br/>
 
 
 
-## Kill
+## kill
 
 kill process
 
@@ -382,7 +382,7 @@ ps -C gnome-terminal #give all process related to program gnome-terminal, 可能
 
 
 
-## Echo
+## echo
 
 used for bash scripting to print 
 
@@ -402,7 +402,7 @@ echo -e 'some \text' #-e use escape,  \t -> tab,   print:  some     ext
 ```
 
 
-## File Permissions, Chmod
+## File Permissions, chmod
 
 drwxr-xr-x 1 beckswu staff 22 Jul 23 18:56 file: d means directory <br/>
 -rw-rw-r- 1 beckswu staff 没有d 表示normal file, 如果开头是c, 表示character special file。如果是b，表示binary special file
@@ -622,7 +622,7 @@ free -b  #-b btye, -k KB, -m MB, -G GB, -T TB
 ```
 
 
-## Watch
+## watch
 
 run scripts for command at a regular interval or repeatedly
 
@@ -639,7 +639,7 @@ watch -n 0,5 free -m #让free -m command run every 0.5 second
 
 ![](/img/post/linux/watch.png)
 
-## Head Tail
+## head tail
 
 Head: output the first part of the file 
 Tail: output the last part of the file
@@ -667,7 +667,7 @@ head -3 log.txt kern.log #先print 3 lines of log.txt 再print 3 lines of kern.l
 
 
 
-## Find
+## find
 
 
 
@@ -710,7 +710,7 @@ wc -L test.txt #只给出number of character in longest line
 ![](/img/post/linux/wc.png)
 
 
-## Cal
+## cal
 
 show conventially formatted calendar on your command line
 
@@ -726,7 +726,7 @@ cal -3 #give you current month, previous month and next month calendar
 
 
 
-## Date
+## date
 
 used to print out and change system date and time information
 
@@ -828,7 +828,7 @@ WLAN0: wireless internet connection <br/>
 l0: loop back interface. An interface that system use to communcate to excel
 
 
-## Tar
+## tar
 
 tar: Tape Archive, compress and extract file 
 
