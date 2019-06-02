@@ -12,15 +12,8 @@ tags:
 ---
 
 
-**cp**: copy and paste  <br/>
+**\c**: 再echo之后 让cursor继续在这一行，不重新开启一行 <br/>
 **mv**: move and rename <br/>
-**Less**:  View some part of the file (lookup, view line by line / page by page) <br/>
-**Touch**: create new file(cannot create directory), change file timestamp   <br/>
-**Nano(or gedit)**: txt/code editor   <br/>
-**sudo**: grant super user priviledge <br/>
-**Top**: provide you dynamic real time view of running system <br/>
-**Echo** print, can include variable in "" <br/>
-
 
 
 ```shell
@@ -36,101 +29,187 @@ touch hello.sh #生成hello
 chmod +x hello.sh #grant execute access
 
 ./hello.sh #run shell script
+
 ```
 
 Bash code (文件命名为hello.sh)
 ```bash
-#! bin/bash  #intepreter know it is bash script
+#! /bin/bash  #intepreter know it is bash script
+
+#this is a comment
 echo "Hello world" #print Hello world
+
 ```
+
+
 
 ## variable
 
-```shell
-
-```
 
 
-## cd
+**System Variable**: created and maintained by operating system, 通常是大写的
+**User Variable**: created and maintained by user, 习惯是定义成小写的
 
-**home directory和root directory** 不一样, root是/, home 是 /Users/ username 的文件夹
+```bash
+#! /bin/bash
+echo $BASH #give name of version 
+echo $BASH_VERSION #give Bash version
+echo $HOME #give home directory
+echo current directory is $PWD  #give present working directory
 
-```shell
-cd / #go to root directory
-cd ~ #home directory
-cd .. #到parent directory
-cd Documents #go to Document Directory
-cd /home/programming/Documents/ #功能与上面一样, Go to Document Directory
-cd My\ Books # go to My Books folder, 在My Books中间有空格
-cd "My Books" #功能与上面一样
-cd 'My Books' #功能与上面一样
+#user defined, variable cannot start with number, 比如不能是定义变量为 10val
+name=Mark
+echo The name is $name #print The name is Mark
 
-```
-
-
-
-## cat
-
-cat: 1. Display Txt 2. combine Txt file 3. Create new Txt file
-
-syntax: cat options file1 file2 ... 
-
-```shell
-cat Hello World #会打印 echo Hello world
-#Ctrl D means the end of cat command 
-
-cat list1.txt #显示list1.txt 所有内容
-cat list1.txt list2.txt #显示list1.txt 和list2.txt所有内容，先显示list1的再显示list2的
-
-cat -b list1.txt #把list1.txt的 不是blank的line(空行) 显示序号
-cat -n list1.txt #把list1.txt的 所有行(空行或者不空行) 都显示序号
-cat -s list1.txt #squeeze 连续 blank line to one blank line
-
-cat -E list1.txt #add $ at the end of each line
-
-man cat #显示cat所有function
-
-cat > test.txt  #把接下来input的内容 output 到test.txt，输完了 按Ctrl+D， test.txt之前内容被remove
-cat >> text.txt #把接下来input的内容 append 到test.txt
-
-cat list1.txt list2.txt > out.txt #把mlist1, list2的内容合并，生成out.txt
-cat list1.txt list2.txt > list2.txt #这样是不行的，不能把input 当成output file
-cat list1.txt >> list2.txt #修改上面一行的error，append list1.txt 到list2.txt
-
-```
-
-
-
-
-## mkdir
-
-```shell
-mkdir image #生成image directory
-mkdir image/pic #生成pic directory inside image directory
-mkdir names/mark #当names 不在当前文件夹下，显示error, No such file or directory
-mkdir -p names/mark (mkdir --parents names/mark ) #-p means -- parents
-mkdir -p names/{john,tom,bob}  #creat several directory inside current directory, 建立三个文件夹,john, tom,bob
-# {john,tom,bob} 不能有空格，否则建立的文件夹是 {john,
+10val=10 #error
+echo value $10val
 
 
 ```
 
 
+## Read User Input  
 
-## rm & rmdir
 
-**rmdir**: remove directory, **rm**: rmove file and directory
+```bash
 
-```shell
+#! /bin/bash
 
-rmdir abc # remove abc的folder
-rmdir a/b/c/d/e #只remove 最后e的directory
-rmdir -p a/b/c/d/e  #remove 所有的directory structure
-rmdir -pv a/b/c/d/e #remove 所有directory structure，并显示(verb)remove的进程
-#如果a/b/c/d/e 每个并不是空的文件夹，会显示error, failed to remove directory a/b: Directory not empty
+echo "Enter name: "
+read name #input is recorded into variable name, input 是在Next line
+echo "Entered name: $name"
 
-rm -rv a/b 
-rm -rv a #与上面一行作用是一样的
+echo "Enter names: "
+read name1 name2 name3 #separate variables by space, input 在next line
+echo "Names: $name1, $name2, $name3"
+
+
+read -p 'username: ' user_var #allow input on the same line, 如果不加flag -p 有error
+echo "username $user_var"
+
+#want to make input silence, not show what is typing 
+
+read -sp "password: " pass_var
+echo  #避免print on the same line after slience input
+echo "password: " $pass_var
+
+#read in array -a
+echo "Enter names "
+read -a names 
+echo "Names:  ${names[0]} ${names[1]}" #需要curly bracket
+
+#enter read without any variable, input go to builtin variable $REPLY
+echo "Enter names"
+read 
+echo "Names: $REPLY"
+
+```
+
+
+
+## Pass Arguments to Bash Script
+
+
+
+```bash
+
+#! /bin/bash
+
+echo $0 $1 $2 $3 ' > echo $1 $2 $3 ' #$0 is script name, first argument pass $1, second argument pass to $2
+
+#./hello.sh Mark Tom John
+# print Mark Tom John > echo  $1, $2 $3
+
+#pass variable into array, declare variable args, $@ is used to store argument as array
+args=("$@") #比一定非要用args, 可以用ch=("$@") 也是可以的
+echo ${args[0]}, ${args[1]} 
+#./hello.sh Mark Tom John
+# print Mark Tom, args[0] 是 argument 不是filename 
+
+echo $@ #print all the argument will be printed. 有几个pass, 有几个print
+echo $# #print number of argument passed
+
+```
+
+<span style="background-color: #FFFF00">Difference between pass into array and variable</span>,$0 是 file name, 但是array index 0 是first argument
+
+
+
+## if
+
+
+
+```bash
+#! /bin/bash
+
+#syntax
+if[ condition ] 
+then 
+    statement
+fi #end of if statement 
+
+count = 10 
+if [$count -eq  10 ]
+then 
+    echo "condition is true"
+fi 
+
+
+#or 
+if (($count >  9))
+then 
+    echo "condition is true"
+else 
+    echo "condition is false"
+fi 
+
+#or
+if (($count ==  10)) #注意不能写成 [$count == 10 ]会报错
+then 
+    echo "condition is true"
+else 
+    echo "condition is false"
+fi 
+
+
+
+
+#string, == 和 = 都是一样的，是不是相等
+word=abc
+#string 写成 word="abc" or word=abc 都可以
+if [ $word == "abc"]
+then 
+    echo "condition is true"
+fi
+
+word="a"
+if [[ $word == "b" ]]
+then 
+    echo "condition b is true"
+elif [[ $word == "a" ]]
+then
+    echo "condition a is true"
+else 
+    echo "condition is false"
+fi
+
+```
+
+<span style="background-color: #FFFF00">**注意**</span>： 多于numeric, >=,  ==, >, >= 比较需要用 双小括号，(($count > 10)), 多于string ==, !=, >, <, 需要用双中括号 [[]]
+
+<span style="background-color: #FFFF00">**注意**</span>： 写if condition 需要让括号和里面内容有空格，比如 if [[ $word == "a" ]] 是可以的，如果是 if [[ $word == "a"]] 是错误的 
+
+![](/img/post/shell/if.png)
+
+
+
+## File Test Operator
+
+
+```bash
+#! /bin/bash
+
+echo "Enter the name of the file :\c" #\c is to keep the cursor on the line after echo, 不会重新开启一行
 
 ```
 
@@ -161,7 +240,6 @@ cp -vR dir1 dir3 #显示详细的copy 哪些文件
 
 
 ```
-![](/img/post/linux/pic1.png)
 
 
 ![](/img/post/linux/watch.png)
