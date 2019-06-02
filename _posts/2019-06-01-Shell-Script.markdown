@@ -15,6 +15,19 @@ tags:
 **\c**: 再echo之后 让cursor继续在这一行，不重新开启一行 <br/>
 **mv**: move and rename <br/>
 
+让echo 和read 在一行
+```bash
+
+#Method 1 
+echo -e "Enter the name of the file :\c" #\c is to keep the cursor on the line after echo, 不会重新开启一行
+#-e flag: enable interpretation of backslash 如果不用-e, 会直接print \c 
+read file_name 
+
+#Method 2
+read -p 'username: ' user_var #allow input on the same line, 如果不加flag -p 有error
+echo "username $user_var"
+
+```
 
 ```shell
 
@@ -205,41 +218,361 @@ fi
 
 ## File Test Operator
 
+if statement flag: <br/>
+**-e**: check if exist <br/>
+**-f**: check if it is file <br/>
+**-d**: check if it is directory  <br/>
+**-b**: check if it is blocked special file(txt) <br/>
+**-c**: check if it is character special file (pic, video) <br/>
+**-s**: check if file is empty <br/>
+**-r**: check if file has read permission <br/>
+**-w**: check if file has write permission <br/>
+**-x**: check if file has execute permission <br/>
+
+
+
 
 ```bash
 #! /bin/bash
 
-echo "Enter the name of the file :\c" #\c is to keep the cursor on the line after echo, 不会重新开启一行
+echo -e "Enter the name of the file :\c" #\c is to keep the cursor on the line after echo, 不会重新开启一行
+#-e flag: enable interpretation of backslash 如果不用-e, 会直接print \c 
+read file_name 
+
+if [ -e $file_name ] #-e check if file exist
+then  
+    echo "$file_name found"
+else
+    echo "$file_name not found"
+fi
+
+
+if [ -f $file_name ] #-f check if it is normal file when file exisit
+then  
+    echo "$file_name is file"
+else
+    echo "$file_name not file"
+fi
+
+
+if [ -d $dir_name ] #-d check if it is normal file when file exisit
+then  
+    echo "$dir_name is file"
+else
+    echo "$dir_name not file"
+fi
+
+
+#block special file: contain some text or data like txt  
+# character special file: binary file e.g. picture video 
+
+if [ -b $file_name ] #-b check if it is blocked special file
+then  
+    echo "$file_name is blocked special file"
+fi 
+
+
+if [ -c $file_name ] #-c check if it is character special file
+then  
+    echo "$file_name is character special file"
+fi 
+
+if [ -s $file_name ] #-s check if file is empty or not 
+then  
+    echo "$file_name is character special file"
+fi 
 
 ```
 
 
-## cp
+## Append Output to text file
 
-CP: copy and paste
+cat >> $file_name: append to the file
+cat > $file_name: overwrite the file
 
-```shell
 
-cp options source destination
+```bash
+#! /bin/bash
 
-cp file1.txt file2.txt #if file2.txt not exist will creat file2.txt. Content from file1 will copy to file2 
+echo -e "Enter the name of the file :\c" #\c is to keep the cursor on the line after echo, 不会重新开启一行
+#-e flag: enable interpretation of backslash 如果不用-e, 会直接print \c 
+read file_name 
 
-cp file1.txt dir1 # 把file1.txt copy 到directory 1
+if [ -f $file_name ] #-f check if it is normal file when file exisit
+then  
+   if [ -w $file_name ] #-w check if file has write permission 
+   then 
+        echo "Type some text data. To quit press ctrl + d"
+        cat >> $file_name
+   else 
+        echo "The file not have write permission"
+   fi
+else
+    echo "$file_name not file"
+fi
 
-cp file1.txt file2.txt dir1 # 把file1.txt 和file2.txt copy 到directory 1
 
-cp -i  file1.txt file2.txt dir1 #如果directory 1 里面有file1.txt -i 会ask 是否要overwrite, 选n, 就会只copy file2 不会copy file1
+#如果file 没有write permission, run command
+chmod +w $filename 
 
-cp ../f1.txt ../f2.txt . #从parent directory copy f1.txt和f2.txt 到现在directory, 因为没有-i, 会overwrite
+```
 
-cp dir1 dir3 # error， 因为dir1 有文件，不能被copy
-cp -R dir1 dir3 # -R means recursive copy,copy everything from dir1 to dir3
-#whenever destination (dir3) doesn't exist, it create destination and copy all content from source
-#如果存在destination, 只copy paste
-cp -vR dir1 dir3 #显示详细的copy 哪些文件
+
+
+
+
+## Logical And
+
+
+
+```bash
+#! /bin/bash
+
+age=25
+
+#Method 1 && 
+if [ $age -gt 18 ] && [ $age -lt 30 ] # 18 < age < 30 
+then 
+    echo "valid age"
+else 
+    echo "age not valid"
+fi 
+
+if [[ $age -gt 18 && $age -lt 30 ]] # require double [[]]
+then 
+    echo "valid age"
+else 
+    echo "age not valid"
+fi 
+
+
+#Method 2 -a: stands for and 
+
+age=25
+
+if [ $age -gt 18 -a $age -lt 30 ] # 18 < age < 30 
+then 
+    echo "valid age"
+else 
+    echo "age not valid"
+fi 
+
 
 
 ```
+
+
+
+## Logical Or
+
+
+
+```bash
+#! /bin/bash
+
+
+age=60
+
+#Method 1 || 
+if [ $age -gt 18 ] || [ $age -lt 30 ] # 18 < age < 30 
+then 
+    echo "valid age"
+else 
+    echo "age not valid"
+fi 
+
+if [[ $age -eq 18 || $age -eq 30 ]] # require double [[]]
+then 
+    echo "valid age"
+else 
+    echo "age not valid"
+fi 
+
+
+#Method 2 -o: stands for or 
+
+age=60
+
+if [ $age -gt 18 -o $age -lt 30 ] # 18 < age < 30 
+then 
+    echo "valid age"
+else 
+    echo "age not valid"
+fi 
+
+
+
+```
+
+
+
+## Append Output to text file
+
+
+
+```bash
+#! /bin/bash
+
+
+```
+
+
+
+## Append Output to text file
+
+
+
+```bash
+#! /bin/bash
+
+
+```
+
+
+
+## Append Output to text file
+
+
+
+```bash
+#! /bin/bash
+
+
+```
+
+
+
+## Append Output to text file
+
+
+
+```bash
+#! /bin/bash
+
+
+```
+
+
+
+## Append Output to text file
+
+
+
+```bash
+#! /bin/bash
+
+
+```
+
+
+
+## Append Output to text file
+
+
+
+```bash
+#! /bin/bash
+
+
+```
+
+
+## Append Output to text file
+
+
+
+```bash
+#! /bin/bash
+
+
+```
+
+
+
+## Append Output to text file
+
+
+
+```bash
+#! /bin/bash
+
+
+```
+
+
+
+## Append Output to text file
+
+
+
+```bash
+#! /bin/bash
+
+
+```
+
+
+
+## Append Output to text file
+
+
+
+```bash
+#! /bin/bash
+
+
+```
+
+
+
+## Append Output to text file
+
+
+
+```bash
+#! /bin/bash
+
+
+```
+
+
+
+## Append Output to text file
+
+
+
+```bash
+#! /bin/bash
+
+
+```
+
+
+
+
+## Append Output to text file
+
+
+
+```bash
+#! /bin/bash
+
+
+```
+
+
+
+
+## Append Output to text file
+
+
+
+```bash
+#! /bin/bash
+
+
+```
+
 
 
 ![](/img/post/linux/watch.png)
