@@ -877,7 +877,7 @@ grep -nv "Some options" f1.txt #显示f1.txt 不包含Some options的行
 grep -help #显示有的flag, options 用grep command
 
 ```
-
+![](/img/post/linux/grep.png)
 
 
 ## netstat
