@@ -325,7 +325,7 @@ chmod +w $filename
 
 
 
-```bash
+```shell
 #! /bin/bash
 
 age=25
@@ -337,6 +337,8 @@ then
 else 
     echo "age not valid"
 fi 
+
+
 
 if [[ $age -gt 18 && $age -lt 30 ]] # require double [[]]
 then 
@@ -1061,11 +1063,12 @@ readonly -f #see all the readonly functions
 
 
 ```
+把hello function readonly, 再call readonly -f, 会显示出hello function 
 
 ![](/img/post/shell/readonly.png)
 
 
-## Function
+## Signals, Traps
 
 
 ```bash
