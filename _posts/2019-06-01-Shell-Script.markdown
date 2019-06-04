@@ -1168,7 +1168,7 @@ bash -x ./hellp.sh
 
 
 
-Method 2 add x at the end of bash path
+Method 2: add x at the end of bash path
 
 ```bash
 #! /bin/bash -x 
@@ -1190,7 +1190,7 @@ done
 ```
 
 
-Method 3 Set x in the file
+Method 3: Set x in the file
 
 ```bash
 #! /bin/bash 
