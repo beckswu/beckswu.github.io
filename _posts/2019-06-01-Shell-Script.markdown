@@ -1070,13 +1070,79 @@ readonly -f #see all the readonly functions
 
 ## Signals, Traps
 
+$$ print the PID of the script itself
+
+ctrl c: interrupt signal: sig-in, press ctrl+c to terminate <br/>
+ctrl z: suspend signal, sig ts TP: script is running and by press ctrl + z stop running <br/>
+kill -9 PID: 知道PID的话，也可以直接kill process
+
+some unexpected behavior or signal can come to interrupt the execution of the script. **Trap command** provides the script to capture and interrupt and then clean it up within tte script. 可以捕获interrupt signal do some thing before exiting out
+
+Except for Trap: cannot catch sigkill and sigstop command
 
 ```bash
 #! /bin/bash
 
+trap "echo Exit signal is detected" SIGINT #SIGINT 是 2, 可以用2代替SIGINT, 
+#上面表示whenever recieve signal 2(Interrupt), it need to execute this command to echo
+
+trap "echo Exit signal is detected" SIGKILL 
+#上面表示whenever recieve signal 9(SIGKILL), 不会echo 上面的 因为SIGKILL 不能被trap catch
+
+
+
+echo "pid is $$"
+while (( COUNT < 10 ))
+do 
+    sleep 10
+    (( COUNT ++ ))
+    echo $COUNT
+done 
+exit 0
+
+
+
+man 7 signal #show signal and vaue
 
 
 ```
+
+![](/img/post/shell/signalstraps.png)
+
+
+```bash
+
+
+#! /bin/bash
+
+
+#e.g. 1 
+trap "echo Exit command is detected" 0 #signal 0 means success
+#上面表示whenever recieve signal 0, it need to execute this command to echo 
+
+echo "Hello world"
+
+exit 0 #0 is success signal
+#print
+#"Hello world" "
+# "Exit command is detected"
+
+#e.g. 2 when recieve signal delete file
+
+file="home/test/Desktop/file.txt"
+trap "rm -f $file && echo file deleted;exit" 0 2 15 #combine 两个 command remove file and exit, 当遇到SIGNAL 0(sucess), 2(SIGINT), 15(terminate)
+
+
+```
+
+当一个terminal 运行file, 另一个terminal call trap, 会print 额外的信息，remove 额外的信息，call trap - signal_listed_in_file
+
+
+![](/img/post/shell/signalstraps2.png)
+
+![](/img/post/shell/signalstraps3.png)
+
+
 
 ## Function
 
