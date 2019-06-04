@@ -1144,18 +1144,73 @@ trap "rm -f $file && echo file deleted;exit" 0 2 15 #combine 两个 command remo
 
 
 
-## Function
+## Debug
 
+Method 1: add -x flag  when running shell
 
 ```bash
 #! /bin/bash
 
+echo "pid is $$"
+while (( COUNT < 10 ) #少一个括号， run ./hello.sh error 显示在done 那行
+do 
+    sleep 10
+    (( COUNT ++ ))
+    echo $COUNT
+done 
 
+#run script 
+bash -x ./hellp.sh  
+#print everything for the code when code runing
+#if something is wrong, you will be strictly aware of your script is not working in which line
 
 ```
 
 
 
+Method 2 add x at the end of bash path
+
+```bash
+#! /bin/bash -x 
+#print everything for the code when code runing
+#if something is wrong, you will be strictly aware of your script is not working in which line
+
+
+echo "pid is $$"
+while (( COUNT < 10 ) #少一个括号， run ./hello.sh error 显示在done 那行
+do 
+    sleep 10
+    (( COUNT ++ ))
+    echo $COUNT
+done 
+
+#run script 
+./hellp.sh  
+
+```
+
+
+Method 3 Set x in the file
+
+```bash
+#! /bin/bash 
+set -x #activate debugging from writting set -x
+
+echo "pid is $$"
+set +x #deactivate debugging from writting set +x
+
+
+while (( COUNT < 10 ) #少一个括号， run ./hello.sh error 显示在done 那行
+do 
+    sleep 10
+    (( COUNT ++ ))
+    echo $COUNT
+done 
+
+#run script 
+./hellp.sh  
+
+```
 
 
 
