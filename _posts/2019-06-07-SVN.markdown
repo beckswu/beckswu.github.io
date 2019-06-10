@@ -1,0 +1,65 @@
+---
+layout:     post
+title:      "Tortoise SVN - 笔记"
+subtitle:   "Tortoise SVN learning note "
+date:       2019-06-07 20:00:00
+author:     "Becks"
+header-img: "img/post-bg2.jpg"
+catalog:    true
+tags:
+    - SVN
+    - 学习笔记
+---
+
+**Tag**: archive purpose / release <br/>
+**Branch** 分支 <br/>
+**Trunk** For Development <br/>
+
+## 创建Branch
+
+首先在本地，你的working folder(代表trunk 的) 右键TortoiseSVN ->  Branch/tag, 如下图，把To path 设置成 branches/app-1.0, 其中app-1.0是在remote repository 的branches中还没有创建的文件， repo folder是remote working directory
+
+![](/img/post/SVN/svn1.PNG)
+
+此后去Remote repo 的Repo-browser的branches 下面可以发现一个新建的app-1.0 folder, 有所有现在本地working directory(代表trunk的)的文件的copy, app-1.0 就是一个sub branch
+
+![](/img/post/SVN/svn2.PNG)
+
+接下来从repo 上可以checkout这个新建的app-1.0 folder, 在你local folder 右键 SVN checkout, 注意URL of repository 是 / branches / app-1.0
+
+![](/img/post/SVN/svn3.PNG)
+
+checkout 之后 在本地，会出现app-1.0 folder, <span style="background-color: #FFFF00">对app-1.0 folder进行任何修改commit，会直接影响remote repo 的branches / app-1.0 而不会影响trunk </span>
+
+![](/img/post/SVN/svn4.PNG)
+
+## 创建Tags
+
+
+首先在本地，你的working folder(代表trunk 的) 右键TortoiseSVN ->  Branch/tag, 如下图，把To path 设置成 tags/app-1.0-release, 其中app-1.0-release是在remote repository 的tags中还没有创建的文件， repo folder是remote working directory
+
+![](/img/post/SVN/tag1.PNG)
+
+此后去Remote repo 的Repo-browser的tags 下面可以发现一个新建的app-1.0-release folder
+
+![](/img/post/SVN/tag2.PNG)
+
+tags 与branches, 也可以进行checkout
+
+
+## Merge Trunk from Branches
+
+对app-1.0 (Branches) folder 内容进行修改 并commit后，此时app-1.0 和 trunk 已经不一样了，想把 app-1.0 (Branches )内容 覆盖到 trunk上面。 在本地的trunk folder 右键TortoiseSVN ->  Merge , 选择Merge a range of revisions
+
+![](/img/post/SVN/merge1.PNG)
+
+merge from 选择branches/app-1.0, 并在Revision range to range中选择 all revisions
+
+
+![](/img/post/SVN/merge2.PNG)
+
+再选择Compare whitespaces 点击Merge
+
+
+![](/img/post/SVN/merge3.PNG)
+
