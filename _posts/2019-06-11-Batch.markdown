@@ -2,7 +2,7 @@
 layout:     post
 title:      "Batch - 笔记"
 subtitle:   "Batch Script learning note "
-date:       2019-05-28 20:00:00
+date:       2019-06-11 20:00:00
 author:     "Becks"
 header-img: "img/post-bg2.jpg"
 catalog:    true
@@ -11,55 +11,123 @@ tags:
     - 学习笔记
 ---
 
-Internal or external command are buildin to cmd.exe command. Batch let you run program within the shell. cmd.exe inside C:/Windows/System32
+Internal or external command are buildin to cmd.exe command. Batch let you run program within the shell. cmd.exe inside C:/Windows/System32 <br/>
+如果直接双击 batch script without pause, it 可能闪退 without letting you see the output
 
 ## command
 
-```batch
+```shell
 
-dir ::show everything inside the folder 
+dir #show everything inside the folder 
 
-ver ::show the version of Microsoft Windows
+ver #show the version of Microsoft Windows
 
-cls ::clear screen
+cls #clean cmd 
+
+pause #wait to press input 
 
 
 ```
 
+## Data Type, varibles
+
+Integer: 1 0 -1 -30 9000 <br/>
+Character:  a  b c d e <br/>
+String:  "Hey! My name is" (sometimes, we use 双引号，有时候不用双引号) <br/> 
 
 
-## cat
-
-cat: 1. Display Txt 2. combine Txt file 3. Create new Txt file
-
-syntax: cat options file1 file2 ... 
 
 ```shell
-cat Hello World #会打印 echo Hello world
-#Ctrl D means the end of cat command 
+set varname=Howdy   #把varname 等于 Howdy
 
-cat list1.txt #显示list1.txt 所有内容
-cat list1.txt list2.txt #显示list1.txt 和list2.txt所有内容，先显示list1的再显示list2的
+%varname% #显示'Howdy' is not recognized as a internal or external command
 
-cat -b list1.txt #把list1.txt的 不是blank的line(空行) 显示序号
-cat -n list1.txt #把list1.txt的 所有行(空行或者不空行) 都显示序号
-cat -s list1.txt #squeeze 连续 blank line to one blank line
+set varname="Howdy" #加quotation mark
+echo %varname% #显示'"Howdy"'
+#even though it is string, it still interpret quotation mark which we don't want that
 
-cat -E list1.txt #add $ at the end of each line
+```
 
-man cat #显示cat所有function
+## Environment Variables
 
-cat > test.txt  #把接下来input的内容 output 到test.txt，输完了 按Ctrl+D， test.txt之前内容被remove
-cat >> text.txt #把接下来input的内容 append 到test.txt
+windows/batch has some stored variables, we can access this variables. They are called environment variables because these are variables stored in the environment  
 
-cat list1.txt list2.txt > out.txt #把mlist1, list2的内容合并，生成out.txt
-cat list1.txt list2.txt > list2.txt #这样是不行的，不能把input 当成output file
-cat list1.txt >> list2.txt #修改上面一行的error，append list1.txt 到list2.txt
+<span style="background-color: #FFFF00">注:</span> 假如我在prompt 中运行batch script(test.bat)， batch script中有set aab=Hello. 即使我run 完script, 只要不关闭prompt, aab会一直存在cmd 中, echo %aab% 会打印hello
 
+
+```shell
+set #显示all the variables whindows track of 
+echo %%COMPUTERNAME% #显示 电脑名字
+
+set varname=Howdy 
+set #打出的environment variables 显示varname=Howdy
+set var #打出所有environment variables starting with var
+set USER #打出所有environment variables starting with USER
 ```
 
 
 
+## String Concatenation
+
+```shell
+
+set string=becks 
+set string+=wu #用+= string 依旧是becks
+echo %string% #打印becks
+#实际上，又建立了一个新的variable 叫string+
+echo %string+% #打印wu
+
+
+set string=%string% wu #string 现在是 becks wu (有空格)
+%string% #显示'becks' is not recognized as an internal or external command
+echo %string% #显示becks wu
+
+```
+
+## Echo
+
+```shell
+
+echo Hello There #会打印出Hello There
+echo "Hello There" #会打印出"Hello There"
+echo #打印 echo is on
+echo. #打印出一个konghang
+
+```
+
+
+## Command Argument, Help
+
+```shell
+
+dir Desktop #显示Desktop的dir
+
+vol ##显示C盘的volume Serial Number, default is C Disk
+vol D:  #显示D盘的volume Serial Number
+
+help #show every command
+
+help dir #give dir 的help 所有可以用的flag 
+dir /? #与help dir 效果一样
+
+```
+
+## @Symbol
+
+@ 作用:  stop command from displaying within the prompt 在batch script中
+
+```shell
+
+@echo Hello Wolrd
+echo Hello World
+#上面两个作用一样
+
+#比如文件中不想打印出ver
+@ver, 只显示ver的结果，不会先打印ver, 再显示ver在cmd中，只显示ver的结果
+@dir, 只显示dir的结果，不会打印dir 再显示结果在cmd中
+
+
+```
 
 ## mkdir
 
