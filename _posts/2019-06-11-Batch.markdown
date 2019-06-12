@@ -17,7 +17,11 @@ Internal or external command are buildin to cmd.exe command. Batch let you run p
 
 ```batch
 
-dir #show everything inside the folder 
+dir ::show everything inside the folder 
+
+ver ::show the version of Microsoft Windows
+
+cls ::clear screen
 
 
 ```
