@@ -129,134 +129,156 @@ echo Hello World
 
 ```
 
-## mkdir
+## Echo off
+
+如果script用@echo off，不会display everything inside the batch, 只显示output
 
 ```shell
-mkdir image #生成image directory
-mkdir image/pic #生成pic directory inside image directory
-mkdir names/mark #当names 不在当前文件夹下，显示error, No such file or directory
-mkdir -p names/mark (mkdir --parents names/mark ) #-p means -- parents
-mkdir -p names/{john,tom,bob}  #creat several directory inside current directory, 建立三个文件夹,john, tom,bob
-# {john,tom,bob} 不能有空格，否则建立的文件夹是 {john,
+help echo #显示ECHO 可以 ON | OFF 
+echo /? #与上面作用一样 
 
+
+echo #显示ECHO is on. 
+
+echo off #stop display prompty
+
+echo on #turn prompt back on 
 
 ```
 
 
 
-## rm & rmdir
+## Escape Characters
 
-**rmdir**: remove directory, **rm**: rmove file and directory
+%% scape %, ^<, ^> escape <>, ^^ escape ^
 
 ```shell
+@echo off
 
-rmdir abc # remove abc的folder
-rmdir a/b/c/d/e #只remove 最后e的directory
-rmdir -p a/b/c/d/e  #remove 所有的directory structure
-rmdir -pv a/b/c/d/e #remove 所有directory structure，并显示(verb)remove的进程
-#如果a/b/c/d/e 每个并不是空的文件夹，会显示error, failed to remove directory a/b: Directory not empty
+set variable=PROBLEM
 
-rm -rv a/b 
-rm -rv a #与上面一行作用是一样的
+echo This is a  %%variable%% #显示This is a %variable%
+
+#显示 >  < ^
+echo ^<html^> #显示<html> 用^ escape <>
+
+echo ^^ #显示^
 
 ```
 
 
-## cp
+## Math
 
-CP: copy and paste
+SET /A 表示数学
 
-```shell
+![](/img/post/batch/math.png)
 
-cp options source destination
-
-cp file1.txt file2.txt #if file2.txt not exist will creat file2.txt. Content from file1 will copy to file2 
-
-cp file1.txt dir1 # 把file1.txt copy 到directory 1
-
-cp file1.txt file2.txt dir1 # 把file1.txt 和file2.txt copy 到directory 1
-
-cp -i  file1.txt file2.txt dir1 #如果directory 1 里面有file1.txt -i 会ask 是否要overwrite, 选n, 就会只copy file2 不会copy file1
-
-cp ../f1.txt ../f2.txt . #从parent directory copy f1.txt和f2.txt 到现在directory, 因为没有-i, 会overwrite
-
-cp dir1 dir3 # error， 因为dir1 有文件，不能被copy
-cp -R dir1 dir3 # -R means recursive copy,copy everything from dir1 to dir3
-#whenever destination (dir3) doesn't exist, it create destination and copy all content from source
-#如果存在destination, 只copy paste
-cp -vR dir1 dir3 #显示详细的copy 哪些文件
-
-
-```
-![](/img/post/linux/pic1.png)
-
-
-## mv
-
-mv: rename, move
+注: 在prompt 中可以用 % (mod), 但在script中，对于mod需要 % escape %
 
 ```shell
 
-mv options source dest
+@echo off
 
-mv f1.txt f2.txt #rename f1.txt 成f2.txt 
+set sum=1+1 #把1+1设置成了string
+echo The sum is %sum% #This sum is 1+1
 
-mv f1.txt dir1/ #把f1.txt 移动到dir1
-#如果dir1 中有f1.txt, move 会overwrite 原有的file 内容
+#可以用help 
+set /?
 
-mv -i f1.txt dir1 #move f1.txt 到dir1 folder中, 如果要overwrite 会问
-mv -i f1.txt dir1/ #与上面一样的
+set /a sum=1+1
+echo The sum is %sum% #This sum is 2
 
-mv dir1 dir2 #把dir1 移动到dir2 中, content 也会move,  不用-R
-#dir1就现在文件夹下不存在了,dir1 在dir2中
+set /a sum=5 * 2 
+echo The multiplier is %sum% #This multiplier is 10
 
-#tricky，如果当dir3 不存在
-mv dir2 dir3 #dir2中的内容移动到dir3中，所以dir3中只含有dir1，dir2也消失了
-#如果dir3 也存在，那么dir3 中有dir2, dir2中有dir1 
+#下面的在prompt中可以用
+set /a sum=10 / 2 
+echo The divider is %sum% #This divider is 5
 
-mv -v file3.txt dir3 #V, verb, 显示具体怎么移动的
+set /a mod=10%3
+echo The module is %sum% #This module is 1
+
+#在script中
+
+set /a mod=10 %% 3
+echo The module is %sum% #This module is 1
+
 ```
 
 
-## less
+## Input
 
-read file and search pattern in the file, 比如用cat print整个文件，当文件很大，当print完成，不能显示文件开头，用less，可以看
+set /p 读取input from user 
 
 ```shell
 
-less big.txt   #only show the starting point of the file, 然后用键盘的↓，enter show one more row below at one time
-#用键盘的↑，enter show one row above at one time
-#键盘的space show page by page below
-#键盘的shift+B show page by page above
-#键盘的shift+G to the end of file
-#键盘先1 + G or g (without shift) to go to the begining of the file
-#想找文件从上到下，比如找book, type  /book + enter, 找next, type n
-#想找文件从下到上，比如找book, type ?book + enter, 找上一个，type n
-#想退出less command, press q
+@echo off
+set /p input=Please enter your name!
+echo Your name is %name%; 
 
+#换行输入
+echo Please enter your name! #第一行显示 Please enter your name!，第二行输入
+set /p input=
+echo Your name is %name%; 
 
 
 ```
 
 
+## Label, Goto
 
-## touch
 
-Touch is the easist way to create new empty file in Linux. It is also used for changing timestamp on existing file or directory 
-
-<span style="background-color: #FFFF00">you cannot create new directory using touch, can only create empty file</span>
+batch won't interpret when label is not starting position of each line
 
 ```shell
+#echo off
 
-touch file6 #建一个新的empty file6
-touch f7.txt #建立一个新的txt, 名字是f7
+:another 
 
-touch file1.txt #修改file1.txt的timestamp, 不修改内容，只修改了timestamp
+cls #belong to another
+ver #belong to another
 
+:label #everything below label is part of label
+#label is belong to another
+
+vol #belong to label 
 
 ```
 
-![](/img/post/linux/pic2.png)
+
+Goto 
+
+```shell
+@echo fof
+
+echo This is the very beginning of the program!
+
+goto :start #跳到start, print start, middle, end
+goto :middle #跳到start, print middle, end
+goto :end #跳到start, print  end
+
+
+:start 
+echo This is the START of the program!
+#goto :end 跳到：end, 跳过middle
+
+:middle 
+echo This is the MIDDLE of the program!
+
+:end 
+echo This is the end of the program!
+
+```
+
+
+
+## Comment
+
+```batch
+
+rem This is a comment 
+
+```
 
 
 
