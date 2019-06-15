@@ -274,53 +274,270 @@ echo This is the end of the program!
 
 ## Comment
 
-```batch
+rem 会读取这一行的内容，slowdown your execution of program, 
+:: comment， 但这也是label, 因为是label，必须是beginning of line
 
-rem This is a comment 
+```shell
+
+@echo off 
+
+ehco This is a script
+
+rem This is a comment #rem 会读取这一行的内容 即使表示comment，slowdown your execution
+help rem #显示REM [ comment]
+
+:: This is comment/label! #comments, 但也是labels, 不会打印出来
+
 
 ```
 
 
 
-## nano
+## Function
 
-nano is a small and friendly text editor, besides it has interactive search, replace, go to line, and indentation 
+**%~1** as the function first input <br/>
+**goto** : eof, finish current job, if main exit, if function (label), return to main <br/>
+**endlocal**: delete all variable being seen from setlocal <br/>
+**Group command &** 在function 结尾 endlocal & set /a x=%x% + 1 , x会更改main 中的x <br/>
+**pass value to function** default pass to function is string, 如果想pass value 加上是百分号 %y% <br/>
+
 
 ```shell
-nano file.txt #open txt editor, file open but not show has been created, 因为还没有save
 
-#press ctrl + o, -> means write out
-#press ctrl + x  -> quit the file
-#press ctrl + k -> cut
-#press ctrl + u -> paste
+@echo off 
 
-nao abc.cpp #会有color, code highlighting, 不光是cpp, 也可以是Java,c 
+goto :main #jump to main function 
 
 
+:function 
+    echo This is another function
+goto :eof
+
+
+:main
+    echo Main function is being called!
+    call :function  #call another function
+    echo End of main function
+    echo End of program
+goto :eof #end of file, goto eof 会exit
 
 ```
 
 
-![](/img/post/linux/pic3.png)
-
-![](/img/post/linux/pic4.png)
-
-
-## sudo
-
-sudo: superuser do: allow you some priviledge as adminstrator or a power user
-
-有时候比如mkdir dir, show permission denied error, 用sudo tell linux command to execute as administrator
-
-比如install G++, GCC, will ask user priviledge 
-
+Function Arguments
 ```shell
 
-sudo mkdir dir #需要provide password, run as administrator 
+@echo off 
 
-sudo apt-get install g++ # apt-get install : install software
+goto :main #jump to main function 
 
-sudo -s #change priviledge from local user to root 
+
+:say_something 
+    echo I am saying %~1  and %~2
+goto :eof
+
+:main
+    echo Main function is being called!
+    call :say_something tiger boat #call another function, tiger is string, boat is string
+goto :eof #end of file, goto eof 会exit
+
+```
+
+可以更改function的%~1 值，更改外面的variable
+
+```shell
+@echo off 
+goto :main #jump to main function 
+
+
+:function_return 
+    echo    Changing a variable
+    set variable=Value 
+goto :eof
+
+
+:change_variable
+    echo    Changing a variable
+    set %~1=Lunch
+goto :eof
+
+
+:main
+    echo Main function is being called!
+
+    echo %variable% #显示Echo is off, 因为没有variable
+    call :function_return
+    eco The variable  is %variable%  #显示The variable new value is Value
+
+    set new_var=Dinner
+    call :change_variable new_var
+    eco The variable is %new_var%  #显示The variable new value is Lunch
+
+goto :eof #end of file, goto eof 会exit
+
+
+```
+
+local variable: setlocal, endlocal
+
+```shell
+@echo off
+
+:local_var
+setlocal 
+    echo  Func says %p% #显示The says is 4
+    set x=30 
+    echo Func says x is %x %#显示Func says X is 30
+endlocal
+goto :eof
+
+:main
+setlocal
+    echo Main function is being called!
+    set p=4
+    echo Main says p is %p% #显示Main says P is 4
+
+    call :local_var
+    echo Main says x is %x% #显示Main says X is (因为x在local_var中式local)
+
+endlocal
+goto :eof 
+
+```
+
+script local scope: <span style="background-color: #FFFF00">script不设置setlocal(不管是main 还是function, function 不设local，也会存进system_variable中), 只要不关闭prompt,script中 set的variable 设置的会在system_variable中 </span>
+
+```shell
+@echo off
+goto :main
+
+:main 
+    set global_var=exisiting
+goto :eof 
+
+#上面的file run了之后，global_var会存在system variable中
+
+:main 
+setlocal
+    set global_var=exisiting
+endlocal
+goto :eof 
+
+```
+
+return local, Group command & : 在function 结尾endlocal & set /a x=%x% + 1 , x会更改main 中的x
+
+
+```shell
+@echo off
+goto :main
+
+:add_one 
+setlocal
+    echo Performing ADD ONE on x
+endlocal & set /a x=%x% + 1   #group command, 先执行endlocal, 再执行x = x+1
+goto :eof 
+
+:main 
+setlocal
+    echo Main function is running
+    echo Setting X to 1 #显示Setting X to 1
+    set /a x=1
+    call :add_one
+    echo The value of X is now %x% #显示The value of X to 2
+
+endlocal #x 不会存进system 当run 完code， 因为endlocal 删除了 x, 即使add_one set不是 local 
+goto :eof 
+
+```
+
+
+```shell
+@echo off
+goto :main
+
+:add_one 
+setlocal
+    echo Running 'add_one'
+endlocal & set /a %~1=%~2 + 1   #group command, 先执行endlocal, 再执行x = x+1
+goto :eof 
+
+:main 
+setlocal
+    set /a x = 1
+    set /a y = 50
+
+    echo Created variable X and set it to %x%
+
+    call: add_one  y   %y% #pass y as first variable, pass value of y as second variable
+    #如果pass y function 认为是string, 
+
+    echo The value of y is %y% #显示the value of x is 51
+
+endlocal #x 不会存进system 当run 完code， 因为endlocal 删除了 x, 即使add_one set不是 local 
+goto :eof 
+
+```
+
+
+
+
+## If 
+
+equ : ==   <br/>
+neq : != <br/>
+lss : < less than <br/>
+leq : <= less than or equal <br/>
+gtr : > greater than <br/>
+geq : <= greater than or equal <br/>
+
+if statement, 不用parathesis 来include condition 表示group command 
+
+ <span style="background-color: #FFFF00">else 需要在）的同一行接着，不能换在)下一个行 加else, 否则会报错</span>
+
+```shell
+#echo off 
+
+goto :main 
+
+
+:main 
+setlocal
+    set /a food=10
+    set /a needed_food=10
+
+    if %food%==%needed_food% ( #beginning of if 
+        echo We have enough food
+    ) else  (
+        echo We do not have enough food!
+    )
+
+
+
+    if %food% equ %needed_food% ( #beginning of if 
+        echo We have enough food
+    ) #end of if
+
+    if not %food%==%needed_food% ( #beginning of if 
+        echo We do not have enough food
+    ) #end of if
+
+    if %food% neq %needed_food% ( #beginning of if 
+        echo We do not have enough food
+    ) #end of if
+
+
+    if %food% leq %needed_food% ( #beginning of if 
+        echo We  have enough food
+    ) #end of if
+
+    if %food% gtr %needed_food% ( #beginning of if 
+        echo We more than enough food
+    ) #end of if
+
+
+endlocal
+goto :eof
 
 ```
 
@@ -328,95 +545,169 @@ sudo -s #change priviledge from local user to root
 
 
 
-## top
+## Nesting
 
-top: provide you dynamic real time view of running system. Used to see which program take more of your CPU and which program consuming more of your memory
 
 ```shell
-top #give you view of system, it refreshing every second
-s # can update time, 输入1 refresh every 1 second
-i # to filter idle process
-k # 把鼠标选中PID, press k, kill process
-q # quit the top view
+@echo off
 
-```
+goto :main 
 
-PID: process ID, 同一个程序不同时候run pid 可能不一样的 <br/>
+:main 
+setlocal
+    set /a food=50
+    set /a needed_food=50
+    set /a people=10
 
-![](/img/post/linux/pic5.png)
+    set /a rations=5
+    set /a all_food=%people%*%rations%
 
+    if %food% geq %needed_food%(
+        echo We have a good amount of food!
 
+        if %all_food% leq %food% (
+            echo We have enough food for all %people% peoples!
+        )else (
+            echo We do not have enough food for all these people!
+        )
+    )else (
+        echo We do not have enough food!
+    )
 
+endlocal
+goto :eof
 
-
-## kill
-
-kill process
-
-```shell
-
-kill -flags pid # syntax
-
-piodf unity-control-center #lookup pid by name
-
-kill 3286 # kill pid = 3286 process
-
-kill -KILL 3294 #force to kill process
-
-kill -9 3294 # force to kill  process (flag -9)
-
-ps -ux  #find pid; give a long list of running process (current user)
-ps -aux #find pid; give a long list of all running process (all users)
-ps -U  Becks #give all process under User Becks
-ps -C gnome-terminal #give all process related to program gnome-terminal, 可能连着多个instances
 ```
 
 
 
-## echo
 
-used for bash scripting to print 
+
+## Delayed Variable Expression
+
+在if statement 括号里，括号里是group command, in fact they are only one command. 如果用普通set 加上 %% 会报错 显示unexpected, 因为是one command, set 会在所有command 结束后才create variable，但是我们需要create variable right away to see if condition，<span style="background-color: #FFFF00">需要加上setlocal  enabledelayedexpension</span>, 当call variable时候，需要用！, e.g. !food！, 对于echo 感叹号, <span style="background-color: #FFFF00">需要escape，e.g. Hello World ^^!  </span>
+
+
 
 ```shell
+@echo off
+setlocal  enabledelayedexpension
+goto :main
 
-echo hello world # 在terminal 打印出hello world
-echo "hello world" #与上面一样, better use "" for echo
+:main
+setlocal
 
-myvar="Mark" #myvar= 不能有空格, assign variable
-echo $myvar #print variable
+    echo Hello World ^^! #需要^^ escape !, 打出 Hello World!
+    echo "Hello World!" #打出 "Hello World!"
 
-x=10
-echo "the value of x is $x" #print the value of x is 10
+    set /a food=50
+    set /a needed_food=50
+    set /a people=10
 
-echo -e 'some \text' #-e use escape,  \t -> tab,   print:  some     ext
+    set /a rations=5
+   
+
+    if !food! geq !needed_food!(
+        echo We have a good amount of food!
+
+        set /a all_food=%people%*%rations%
+
+        echo !all_food!
+
+        if !all_food! leq !food! (
+            echo We have enough food for all !people! peoples!
+        )else (
+            echo We do not have enough food for all these people!
+        )
+    )else (
+        echo We do not have enough food!
+    )
+endlocal
+goto :eof
 
 ```
 
 
-## File Permissions, chmod
 
-drwxr-xr-x 1 beckswu staff 22 Jul 23 18:56 file: d means directory <br/>
--rw-rw-r- 1 beckswu staff 没有d 表示normal file, 如果开头是c, 表示character special file。如果是b，表示binary special file
+## While
 
-左面第一堆表示owner of file access, 第二堆表示group of file, 第三堆表示permission for everybody else, 1表示symbolic links of the file, 接下来表示owner of the file, next is the group of the file, 22 表示size of the file, July 23 18:56 date of created. file is the name of file
-
-symbolic link is a term for any file that contains a reference to another file or directory in the form of an absolute or relative path and that affects pathname resolution
-
+Batch 不支持while, 需要用label + goto
 
 ```shell
+@echo off 
 
-#o means other group, + add permission, - minus permission,
-chmod o+x file #给file 的other user(第三堆) 加execute permission
+setlocal enabledelayedexpansion 
 
-chmod g+x file #给file 的group(第二堆) 加execute permission
-chmod g-wx file #给file的group 移走write execute permission
+goto :main 
 
-chmod ug=rwx file #给user(owner), group read write execute permission 
+:main 
+setlocal
 
-chmod a-rwx file #给所有的（owerner, group, others) remove read, write, execution permission
+    set /a counter=0
+    set /a limit=10
+
+    :loop
+    if !counter! < lss !limit! (
+        echo !counter!
+        sete /a counter=!counter!+1
+        goto :loop
+    )
+    
+    echo. 
+
+endlocal
+goto :eof
+
+```
 
 
-chmod u+rw, g=rw, o+r file #给user add read write, 给group read, write permission, 给other add read permission
+## For Loop
+
+in batch script, specify %%variable instead of %variable. set () 中用space 分开表示不同的需要loop 的是variable, 如果用引号就表是set中只有一个variable需要loop 的
+
+```shell
+@echo off
+setlocal enabledelayedexpansion
+
+goto :main 
+
+:main 
+setlocal 
+
+    set string=Heloo world^^!
+    echo !string!
+    set /a test=3
+
+    for %%g in  (1 2 3 4 5) do ( #需要%% 来表示variable, 
+        echo %%g
+        if !test! equ %%a (
+            echo !test! in %%g
+        )
+    )
+
+    for %%g in  (a b c d e) do ( #需要%% 来表示variable, 
+        echo %%g
+        if !test! equ %%a (
+            echo !test! in %%g
+        )
+    )
+
+    for %%g in  (This is a block of words) do ( #需要%% 来表示variable, space分开不同的string
+        echo %%g #打印第一行This, 第二行is, 第三行 a ....
+        if !test! equ %%a (
+            echo !test! in %%g
+        )
+    )
+
+    for %%g in  ("This is a block of words") do ( 
+        echo %%g #打印第一行"This is a block of words" 有引号的
+        if !test! equ %%a (
+            echo !test! in %%g
+        )
+    )
+
+endlocal
+goto :eof
 
 ```
 
