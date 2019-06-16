@@ -663,7 +663,16 @@ goto :eof
 
 ## For Loop
 
+/l: %%g in (start, step, end) <br/>
+/d : directory
+
+
+
+#### basic
+
 in batch script, specify %%variable instead of %variable. set () 中用space 分开表示不同的需要loop 的是variable, 如果用引号就表是set中只有一个variable需要loop 的
+
+For Loop Number Syntax: for /l %%g in (start, step, end) . end 是include的
 
 ```shell
 @echo off
@@ -706,12 +715,62 @@ setlocal
         )
     )
 
+    for /l %%g in  (1, 1, 20) do (  # /l   l-type, start, step, end, (1, 1, 20), 从1到20 每一次增加1
+        echo %%g 
+    )
+
+    for /l %%g in  (0, 5, 20) do (  # 0 -> 5 -> 10 -> 15 -> 20
+        echo %%g 
+    )
+
 endlocal
 goto :eof
 
 ```
 
 
+#### directory, file
+
+/d: directory, 不能显示file，只能显示directory<br/>
+\* : wildcard, dispaly every file <br/>
+不能用. (表示现在的directory)，需要用wildcard \*
+
+```shell
+@echo off
+setlocal enabledelayedexpansion
+
+goto :main 
+
+:main 
+setlocal 
+
+    set string=Heloo world^^!
+    echo !string!
+    set /a test=3
+
+    for /d %%g in  (*) do ( #/d display directory, * wildcard
+        echo %%g
+    )
+
+    for /d %%g in  (D*) do ( #/d display directory, D* any folder start with D
+        echo %%g
+    )
+
+    for /d %%g in  (D*s) do ( #/d display directory, D*o any folder start with D and end with s
+        echo %%g
+    )
+
+    for /d %%g in  ( . ) do ( #. 表示现在directory, 不会显示任何东西，因为需要用* wildcard
+        echo %%g
+    )
+
+
+
+
+endlocal
+goto :eof
+
+```
 
 ## Directory Permission
 
