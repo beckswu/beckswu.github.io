@@ -14,6 +14,18 @@ tags:
 Internal or external command are buildin to cmd.exe command. Batch let you run program within the shell. cmd.exe inside C:/Windows/System32 <br/>
 如果直接双击 batch script without pause, it 可能闪退 without letting you see the output
 
+
+**mkdir dir1**: make directory named as dir1 <br/>
+**cd ..** : jump back to the parent directory <br/>
+**rmdir dir1** : remove directory named dir1, 如果directory不是empty, 显示error: The directory is not empty. <br/>
+**rmdir /S** : removes everything inside the folder 包括folder, used to remove a directory tree. <br/>
+**rmdir /S /Q** : Quiet Mode, 功能与rmdir /S一样，但是不会问是不是要remove directory tree. <br/>
+**del dir1** : delete everything inside the folder，但是不会delete folder，需要再call rmdir dir1 去remove the folder <br/>
+**move** : move [Y : /-Y] [path1]filename1 [path2]filename2 , 如果path1等于path2, 那么move 也等于rename,    /-Y flag: 不让prompt confirm 当overwrite file的时候, /-Y prompt会confirm是不是要overwrite file <br/>
+**copy** copy source destination : destination可以只是path，不用说具体名字，那么copy时候会保持文件/文件夹 名字一致
+**delete** : /P 删除前prompt 会确认是否删除。 /s Delet from all subdirectories . /Q Quite mode 删除时候不会问
+**type** Displays the contents of a text file or fiels 像linux 的cat 
+
 ## command
 
 ```shell
@@ -936,22 +948,86 @@ goto :eof
 
 ## Working with File
 
+
+
 ```shell
 
-chmod 755 file.txt #give user read, write execute(7), give both group and othe group read and execute access
+dir *.bat #只显示所有的.bat的file
+D: #比如现在 在C盘，nagivate 到D盘，不用cd, 直接打D:
+
+#move
+move new_file.txt other_name.txt #move 相当于rename file 从new_file 变成other_name
+move new_file.txt ..\ #把new_file 移动到 parent class folder
+move ..\new_file.txt . #把parent folder中的new_file 移动到现在这个folder
+move /Y folder folder_2 #把folder 给rename 成 folder2
+
+#copy
+
+copy new_file.txt other_file.txt #把new_file内容 copy 到other_file.txt, 如果没有other_file.txt 生层一个新的file
+
+copy *.txt folder #copy 现在所有的txt file 到新的folder，名字与现在被copy 的保持一致
+
+#Append 
+copy new_file.txt+other_file.txt new_folder #把现在directory中new_file 和other_file内容, 一起copy 到新的在new_folder 这个folder 中的new_file.txt
+
+#如果不想用append, 用for loop
+
+for %%i in (new_file.txt other_file.txt) do (
+    copy %%i new_folder
+)
+
+copy new_file.txt D: #把现在文件夹下的new_file.txt copy到D盘
+
+
+
+#delete
+
+del file.txt #删除file.txt 
+del /P file.txt #删除file.txt 与上一行不同的是，这个删除前会让你确认
+
+del /S *.txt  #删除现在folder 和子folder 中所有的.txt file
+
+
+
+
+#type 
+type new_file.txt #打印所有content 到screen
 
 ```
 
 
-## W
+## Customized Prompt Console
+
+**color** 第一个参数表示background color, 第二个参数表示foreground color 如果foreground 和 background 颜色一样显示 errorlevel to 1，但是color 只能暂时更改，当更改后，color会恢复原来的default. 如果想永远更改，需要右键properties， 但是右键properties改完后，比如你run admin的command 颜色还是default. solution: 可以create cmd shortcut 在desktop上，这样以后每次点这个short cut，更改它的properties 会固定了
+
+command的properties 可以改比如按 ↑ 可以回多少个之前的command，buffer 存之前多少个command
 
 ```shell
 
-chmod 755 file.txt #give user read, write execute(7), give both group and othe group read and execute access
+color /? # 查color command syntax
+color background-color foreground-color #syntax
+color fc #背景是bright white, 字体是light red
+color F0 #背景是bright white， 字体是Black
+color #恢复default 背景字体颜色
+
 
 ```
 
+prompt 
 
+```shell
+@echo off 
+
+#因为prompt command 会change prompt 不能加setlocal 和 endlocal
+prompt $C$S%USERNAME%@%COMPUTERNAME%$S$F_$P$S$G$S #$C left parenthesis,  $S space,  $F right parenthesis $P current drive and path, #G > greater-than sign, $_ 换行
+
+#上面会改变prompt 每次输入时候，先打印 ( becks@windows ) 第二行会打印出现在的path >
+
+prompt #把prompt 改成default
+
+
+
+```
 
 
 ## W
