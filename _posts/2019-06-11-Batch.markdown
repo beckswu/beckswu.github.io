@@ -22,8 +22,8 @@ Internal or external command are buildin to cmd.exe command. Batch let you run p
 **rmdir /S /Q** : Quiet Mode, 功能与rmdir /S一样，但是不会问是不是要remove directory tree. <br/>
 **del dir1** : delete everything inside the folder，但是不会delete folder，需要再call rmdir dir1 去remove the folder <br/>
 **move** : move [Y : /-Y] [path1]filename1 [path2]filename2 , 如果path1等于path2, 那么move 也等于rename,    /-Y flag: 不让prompt confirm 当overwrite file的时候, /-Y prompt会confirm是不是要overwrite file <br/>
-**copy** copy source destination : destination可以只是path，不用说具体名字，那么copy时候会保持文件/文件夹 名字一致
-**delete** : /P 删除前prompt 会确认是否删除。 /s Delet from all subdirectories . /Q Quite mode 删除时候不会问
+**copy** copy source destination : destination可以只是path，不用说具体名字，那么copy时候会保持文件/文件夹 名字一致 <br/>
+**delete** : /P 删除前prompt 会确认是否删除。 /s Delet from all subdirectories . /Q Quite mode 删除时候不会问 <br/>
 **type** Displays the contents of a text file or fiels 像linux 的cat 
 
 ## command
@@ -261,7 +261,7 @@ vol #belong to label
 Goto 
 
 ```shell
-@echo fof
+@echo off
 
 echo This is the very beginning of the program!
 
