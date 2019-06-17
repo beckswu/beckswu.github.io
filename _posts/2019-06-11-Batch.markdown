@@ -678,6 +678,8 @@ goto :eof
 /l: %%g in (start, step, end) <br/>
 /d : directory
 
+**%%** ： for %%i in  <span style="background-color: #FFFF00">用于batch script （.bat)中</span>
+**%** : for %i in <span style="background-color: #FFFF00"> 用于prompt console 中, 不在script中</span>
 
 
 #### basic
@@ -972,8 +974,8 @@ copy new_file.txt+other_file.txt new_folder #把现在directory中new_file 和ot
 
 #如果不想用append, 用for loop
 
-for %%i in (new_file.txt other_file.txt) do (
-    copy %%i new_folder
+for %i in (new_file.txt other_file.txt) do (
+    copy %i new_folder
 )
 
 copy new_file.txt D: #把现在文件夹下的new_file.txt copy到D盘
