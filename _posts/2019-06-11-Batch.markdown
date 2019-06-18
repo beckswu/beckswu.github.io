@@ -25,6 +25,7 @@ Internal or external command are buildin to cmd.exe command. Batch let you run p
 **copy** copy source destination : destination可以只是path，不用说具体名字，那么copy时候会保持文件/文件夹 名字一致 <br/>
 **delete** : /P 删除前prompt 会确认是否删除。 /s Delet from all subdirectories . /Q Quite mode 删除时候不会问 <br/>
 **type** Displays the contents of a text file or fiels 像linux 的cat 
+**exit /b** 与goto :eof 功能一样 退出程序
 
 ## command
 
@@ -225,12 +226,12 @@ set /p 读取input from user
 ```shell
 
 @echo off
-set /p input=Please enter your name!
+set /p name=Please enter your name!
 echo Your name is %name%; 
 
 #换行输入
 echo Please enter your name! #第一行显示 Please enter your name!，第二行输入
-set /p input=
+set /p name=
 echo Your name is %name%; 
 
 
@@ -1012,8 +1013,14 @@ color fc #背景是bright white, 字体是light red
 color F0 #背景是bright white， 字体是Black
 color #恢复default 背景字体颜色
 
+colormsg c "Hellworld" #print Helloworld in red
+colormsg 3a "Helloworld" #print Helloworld 字体是Aqua, 背景是Light Green
+
 
 ```
+![](/img/post/linux/color.png)
+
+
 
 prompt 
 
@@ -1032,18 +1039,119 @@ prompt #把prompt 改成default
 ```
 
 
-## W
+## Substring
+
+!var:~a,b! 
+a>0 : 表示从左向右的第a个位置开始 <br/>
+a<=0 : 表示从右向左的第a个位置开始 <br/>
+b>0 : 表示从位置a开始 向右侧b个substring <br/>
+b<0 : 表示从位置a开始 向左侧b个substring <br/>
+
+
+!var:cat=dog! #把var中所有的cat 用 dog 代替
+
+%~I - expands %I removing any surrounding quotes (")
+
+
 
 ```shell
 
-chmod 755 file.txt #give user read, write execute(7), give both group and othe group read and execute access
+@echo off
+setlocal enabledelayedexpansion
+
+goto :main 
+
+:main 
+setlocal 
+
+    set var=This is totally a string 
+    echo !var:~8! #print: totally a string  
+    echo !var:~2! #print: This is totally a string 
+    echo !var:~8,7! #start at position 8 and length 7, print totally
+    echo !var:~0:4! #This
+
+    echo !var:~0:-6! #start from end and length 6， print string, -6 length 从右向左, print string
+    echo !var:~6:6! #start from 倒数第6位，然后从左向右的六个substring
+
+
+
+
+#substitution
+
+    set var=The cat in the hat ate the mat
+    set var=!var:cat=dog #用dog 代替所有的 cat, 并assign 给var
+    echo !var:hat=raincoat! #用raincoat 代替所有的hat 
+    echo !var:hat=! #把所有的hat 去掉
+
+
+#string quotation 
+#useback + %%~g: only get the string surround 比如 "More information, more " word " 不会移除more 和word之间的引号，只移除两边的引号，
+
+    set string="TEXT"
+    for /f "useback tokens=*" %%g in (!string!) do set string=%%~g  #string 是被remove双引号, 
+
+
+endlocal 
+goto :eof
 
 ```
 
 
+#### create string function
 
 
+```shell
+#命名file 为create_string.bat
+@echo off
 
+#Create String Function 
+set string=%2
+set /a takeaway=5
+for /f "useback tokens=*" %%g in ('%string%') do set string=%%~g 
+
+
+echo %2 > %TEMP%\tempfile.txt #%TEMP% is the temporarily folder in windows
+
+for %%g in (%TEMP%\tempfile.txt) do (
+    if %string% equ %%~g ( #
+        set /a takeway=3
+        
+    set /a @1_length=$$~zg - 5  #$$~zg to get length of vriable, -5 to get rid of some character which we don't care about
+)
+del %TEMP%\tempfile.txt #delete the temporary file
+set %1=%string%   #设置第一个传入function 的参数
+
+```
+
+
+```shell
+command script 
+#有了上面的create_string.bat 
+> create_string.bat four "lines" 
+> echo %four% #返回lines (没有引号)
+> echo %four_length% #返回5
+
+```
+
+
+```shell
+
+#有了上面的create_string.bat 
+
+@echo off
+setlocal EnableDelayedExpansion
+goto :main
+
+:main 
+setlocal 
+    call create_string var "This is some text!"
+    echo !var!
+    echo !var_length!
+
+endlocal
+goto :eof
+
+```
 
 
 ## W
@@ -1087,7 +1195,7 @@ chmod +x myscript.sh #give permission for all groups
 
 ```
 
-![](/img/post/linux/pic8.png)
+
 
 ![](/img/post/linux/bash.png)
 
