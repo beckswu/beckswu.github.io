@@ -33,7 +33,9 @@ Internal or external command are buildin to cmd.exe command. Batch let you run p
 
 <span style="background-color: #FFFF00">**Initialization is not assignment**</span>. Initialization happens when a variable is given a value *when it is created*.(创建变量时 赋予它一个初始值). Assignment obliterates an object's current value and replaces that value with a new one (把对象当前值擦除，用一个新值代替)
 
-List Initialization 
+#### Initialization, Definition, Declaration, Scope
+
+**List Initialization**
 
 下面四种初始化都正确
 
@@ -50,31 +52,75 @@ when used with variables of built-in type, List Initialization has one important
 long double id = 3.1415026536;
 int a{ld}, b = {ld}; //error: 存在丢失信息风险
 
-int c(ld), d = ld;
+int c(ld), d = ld; // 转化执行，但是丢失了部分值 (truncated)
+```
 
+The compiler rejects the initializations of a and b because using a long double to initialize an int is likely to lose data. the fractional part of ld will be truncated. (long double 初始化int 变量时可能丢失数据，所以编译器拒绝了a 和 b的初始请求. 至少ld 的小数部分丢失，而且int 也可能存不下ld的整数部分因为是long)
+
+
+**Default Initialization**
+
+Most classess let us define objects without <span style="color: red">explict initializers</span>. Such classes supply an appropriate default value. e.g. std:string empty; //empty implicitly initialized to the empty string. 
+
+Note: Uninitialized objects of built-in type defined inside a function body have undefined value. Objects of class type that we do not explicitly initialize have a value that is defined by the class.
+
+**Variable Declarations and Definitions**
+
+ <span style="background-color: #FFFF00">**A declaration makes a name known to the program. A definition creates the associated entity.**</span>
+
+A variable **declaration**  <span style="background-color: #FFFF00"> specifies the type and name of a variable</span>. A variable definition is a declaration. In addition to specifying the name and type, a **definition** also <span style="background-color: #FFFF00"> allocates storage and may provide the variable with an initial value</span>. 变量声明规定了变量的类型和名字，在这一点上定义与之相同. 但除此之外, 定义还申请存储空间, 也可能会为变量赋一个初始值
+
+如果想声明一个变量而非定义它，在变量前添加extern
+
+```c++
+extern int i; //声明i而非定义i
+
+int j; //声明并定义j
+```
+
+任何包含了显示初始化的声明既是定义. 给extern 表含的变量一个初始值，抵消了extern的作用
+
+```c++
+extern int i = 5; //定义
+```
+
+<span style="background-color: #FFFF00"> Variable must be defined exactly once but can be declared many times</span> 变量只能被定义一次，但可以被声明多次
+
+**Nested Scopes**
+
+用 :: 访问global variable (explicitly request global variable)
+
+```c++
+int reused = 42;
+int main(){
+    cout << resused <<endl; // 42
+
+    int reused = 0; //新建局部变量，覆盖全局变量
+
+    cout << resused <<" global " << ::resused <<endl; // 0 , 42
+}
 ```
 
 
-## Data Type, varibles
-
-Integer: 1 0 -1 -30 9000 <br/>
-Character:  a  b c d e <br/>
-String:  "Hey! My name is" (sometimes, we use 双引号，有时候不用双引号) <br/> 
 
 
+#### Compound Types
 
-```shell
-set varname=Howdy   #把varname 等于 Howdy
+A **compount type** is a type that is defined in terms of another type, which is references and pointers
 
-%varname% #显示'Howdy' is not recognized as a internal or external command
+**Reference**
 
-set varname="Howdy" #加quotation mark
-echo %varname% #显示'"Howdy"'
-#even though it is string, it still interpret quotation mark which we don't want that
+At here, reference is only lvalue reference not rvalue reference. 
 
+<span style="background-color: #FFFF00"> reference must be assigned at initlization </span>
+
+
+```C++
+int val = 1024;
+int &refval = val; // correct
+
+int &refval2; //error
 ```
-
-![](/img/post/linux/userdel.png)
 
 
 
