@@ -601,6 +601,8 @@ goto :eof
 在if statement 括号里，括号里是group command, in fact they are only one command. 如果用普通set 加上 %% 会报错 显示unexpected, 因为是one command, set 会在所有command 结束后才create variable，但是我们需要create variable right away to see if condition，<span style="background-color: #FFFF00">需要加上setlocal  enabledelayedexpension</span>, 当call variable时候，需要用！, e.g. !food！, 对于echo 感叹号, <span style="background-color: #FFFF00">需要escape，e.g. Hello World ^^!  </span>
 
 
+<span style="background-color: #FFFF00">如果script a 有enabledelayedexpension， 即使script b 不说enabledelayedexpension, 但是script b被script a called, 所以b inherit a 的environment，也会有delayedexpension </span>
+
 
 ```shell
 @echo off
@@ -1154,11 +1156,28 @@ goto :eof
 ```
 
 
-## W
+## Array
 
 ```shell
 
-chmod 755 file.txt #give user read, write execute(7), give both group and othe group read and execute access
+@echo off
+#even if we don't say setlocal enabledelayedexpansion, but we will use !var!, because it inherit the environment from the script calling
+
+:: create_string name "delimiter" "content"
+:: create_string grocery_list " " "Apples Bananas Meat" #
+
+goto :main
+
+:main 
+
+    call create_string delimiter %2
+    call create_string content %3
+
+    set /a offset=0
+    set /a index=0
+
+goto :eof
+
 
 ```
 
