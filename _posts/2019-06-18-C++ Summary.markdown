@@ -11,22 +11,6 @@ tags:
     - 学习笔记
 ---
 
-Internal or external command are buildin to cmd.exe command. Batch let you run program within the shell. cmd.exe inside C:/Windows/System32 <br/>
-如果直接双击 batch script without pause, it 可能闪退 without letting you see the output
-
-
-**mkdir dir1**: make directory named as dir1 <br/>
-**cd ..** : jump back to the parent directory <br/>
-**rmdir dir1** : remove directory named dir1, 如果directory不是empty, 显示error: The directory is not empty. <br/>
-**rmdir /S** : removes everything inside the folder 包括folder, used to remove a directory tree. <br/>
-**rmdir /S /Q** : Quiet Mode, 功能与rmdir /S一样，但是不会问是不是要remove directory tree. <br/>
-**del dir1** : delete everything inside the folder，但是不会delete folder，需要再call rmdir dir1 去remove the folder <br/>
-**move** : move [Y : /-Y] [path1]filename1 [path2]filename2 , 如果path1等于path2, 那么move 也等于rename,    /-Y flag: 不让prompt confirm 当overwrite file的时候, /-Y prompt会confirm是不是要overwrite file <br/>
-**copy** copy source destination : destination可以只是path，不用说具体名字，那么copy时候会保持文件/文件夹 名字一致 <br/>
-**delete** : /P 删除前prompt 会确认是否删除。 /s Delet from all subdirectories . /Q Quite mode 删除时候不会问 <br/>
-**type** Displays the contents of a text file or fiels 像linux 的cat 
-**exit /b** 与goto :eof 功能一样 退出程序
-
 ## Variable and Basic Types
 
 **Object**: an object is a region of memory that has a type. In the book, we will freely use the term *object* regardless of whether the object has built-in or class type, named or unnamed (命名的还是未命名的), or can be read or written.
@@ -98,7 +82,7 @@ int main(){
     int reused = 0; //新建局部变量，覆盖全局变量
 
     cout << resused <<" global " << ::resused <<endl; // 0 , 42
-    
+
 }
 ```
 
