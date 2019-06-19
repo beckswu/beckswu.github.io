@@ -112,18 +112,32 @@ A **compount type** is a type that is defined in terms of another type, which is
 
 At here, reference is only lvalue reference not rvalue reference. 
 
-<span style="background-color: #FFFF00"> reference must be assigned at initlization </span>
+<span style="background-color: #FFFF00"> reference must be assigned at initlization </span>. 程序把引用和初始值绑定(bind)到一起，而不是将初始值拷给引用, 引用无法绑定到另一个对象. <span style="color: red"> A reference is not an object. Instead, a reference is just another name for an already existing object </span>
 
 
 ```C++
 int val = 1024;
-int &refval = val; // correct
+int &refval = val, &r = i; // correct
+
+refval = 2; //val = 2
 
 int &refval2; //error
+
+int &refval3 = 10 ;//error: initializer must be an object
+
+double dval = 3.14;
+int &refVal5 = dval; // error: initializer must be an int object
 ```
 
+We can define multiple references in a single definition
 
+```C++
+int i2 = 2048; // i and i2 are both ints 
 
+int i3= 1024, &ri = i3; // i3 is an int;ri is a reference bound to i3 
+
+int &r3 = i3, &r4 = i2; // both r3 and r4 are references
+```
 
 
 
