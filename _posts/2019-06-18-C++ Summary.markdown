@@ -98,6 +98,7 @@ int main(){
     int reused = 0; //新建局部变量，覆盖全局变量
 
     cout << resused <<" global " << ::resused <<endl; // 0 , 42
+    
 }
 ```
 
@@ -115,7 +116,7 @@ At here, reference is only lvalue reference not rvalue reference.
 <span style="background-color: #FFFF00"> reference must be assigned at initlization </span>. 程序把引用和初始值绑定(bind)到一起，而不是将初始值拷给引用, 引用无法绑定到另一个对象. <span style="color: red"> A reference is not an object. Instead, a reference is just another name for an already existing object </span>
 
 
-```C++
+```c++
 int val = 1024;
 int &refval = val, &r = i; // correct
 
@@ -131,7 +132,7 @@ int &refVal5 = dval; // error: initializer must be an int object
 
 We can define multiple references in a single definition
 
-```C++
+```c++
 int i2 = 2048; // i and i2 are both ints 
 
 int i3= 1024, &ri = i3; // i3 is an int;ri is a reference bound to i3 
