@@ -38,12 +38,10 @@ List Initialization
 下面四种初始化都正确
 
 ```c++
-
 int units_sold = 0;
 int units_sold = {0};
 int units_sold {0};
 int units_sold(0);
-
 ```
 
 when used with variables of built-in type, List Initialization has one important property: The compiler will not let us initialize variables of built-in type if the initializer might lead to the loss of information. (编译器将会报错，如果使用列表初始化且初始值存在丢失信息的风险). 
@@ -51,6 +49,7 @@ when used with variables of built-in type, List Initialization has one important
 ```c++
 long double id = 3.1415026536;
 int a{ld}, b = {ld}; //error: 存在丢失信息风险
+
 int c(ld), d = ld;
 
 ```
