@@ -97,7 +97,7 @@ A **compount type** is a type that is defined in terms of another type, which is
 
 At here, reference is only lvalue reference not rvalue reference. 
 
-<span style="background-color: #FFFF00"> reference must be assigned at initlization </span>. 程序把引用和初始值绑定(bind)到一起，而不是将初始值拷给引用, 引用无法绑定到另一个对象. <span style="color: red"> A reference is not an object. Instead, a reference is just another name for an already existing object </span>
+<span style="background-color: #FFFF00"> reference must be assigned at initlization </span>. 程序把引用和初始值绑定(bind)到一起，而不是将初始值拷给引用, 引用无法绑定到另一个对象. <span style="color: red"> **A reference is not an object**. Instead, a reference is just another name for an already existing object </span>
 
 
 ```c++
@@ -128,10 +128,9 @@ int &r3 = i3, &r4 = i2; // both r3 and r4 are references
 
 **Pointer**
 
-assign pointer 需要assign 的类型和被assign 类型compatible
+assign pointer 需要assign 的类型和被assign 类型compatible. **Pointer is a object whereas reference is not object**
 
 ```c++
-
 double dval;
 double *pd = &dval; //ok: initializer is the address of a doub;e
 
@@ -145,6 +144,7 @@ pi = &dval; //error: assigning the address of a double to a pointer to int
 
 int dval;
 double *pi = &dval;//error: types of pi and pd differ, 一个int,一个double, 也是compile error
+
 
 ```
 
@@ -211,6 +211,7 @@ A reference is not an object. Hence, we may not have a pointer to a reference. H
 
 
 ```c++
+
 int i = 42; 
 int *p; //p is a pointer to int
 
@@ -220,15 +221,25 @@ int *&r = p;  // r is a reference to the pointer p
 r = &i;// r refers to a pointer; assigning &i to r makes p point to i
 
 *r = 0; // dereferencing r yields i, the object to which p points; changes i to 0
+
 ```
 
 <span style="background-color: #FFFF00"> **离变量名最近的符号(symbol， 上面例子 &r 的符号& ) 对变量类型有最直接的影响, 因此r是一个引用;**</span>
 
 #### Const Qualifier
 
-we can’t change the value of a const object after we create it, it must be initialized. (const 对象必须初始化)
+
+1. 对于reference non-const initialize 等号左右两边类型必须相同（因为reference 不是object） 
+2. 对于const 非reference, 左右两边等号类型可以不同. 
+3. **对于const reference 等号两百年可以不同类型，compiler会做转换**  const double pi = 3.14; const int & i = pi; //okay
+4. 对于non-const pointer, reference, 不能initialize pointe to a const value 比如const double pi = 3.14;  double \* ptr = &pi; wrong; double &ref = pi; //wrong
+5. 
+比如const double pi = 3.14; int p2 = pi;
+
+we can’t change the value of a const object after we create it, it must be initialized. (const 对象必须初始化). 
 
 ```c++
+
 const int i = get_size(); // ok: initialized at run time 
 
 const int j = 42; // ok: initialized at compile time 
@@ -237,26 +248,162 @@ const int k; // error: k is uninitialized const
 
 ```
 
-Below example, Although ci is a const int, the value in ci is an int. The constness of ci matters only for operations that might change ci.(ci的constness 只能当改变ci时才会发生作用) When we copy ci to initialize j, we don’t care that ci is a const
+<span style="background-color: #FFFF00">when we use an object to initialize another object, it doesn’t matter whether either or both of the objects are consts(如果用一个对象初始化另一个对象，则他们是不是const 都不要紧)</span>. Below example, Although ci is a const int, the value in ci is an int. The constness of ci matters only for operations that might change ci.(ci的constness 只能当改变ci时才会发生作用) When we copy ci to initialize j, we don’t care that ci is a const. <span style="background-color: #FFFF00">const 的variable 可以用来initialzie non-const variable， 但是const reference 不能bind 到non-const reference，因为reference is not object </span>
 
 ```c++
 
 int i = 42;
 const int ci = i; // ok: the value in i is copied into ci 
 
+const int &  c_r = i;
 int j= ci; // ok:the value in ci is copied into j
+
+int & j_r = c_r; //error cannot bind non-const reference initialize to const reference
 
 ```
 
 const int bufSize = 512; <span style="color: red"> the compiler will usually replace uses of the variable with its corresponding value during compilation.</span> That is, the compiler will generate code using the value 512 in the places that our code uses bufSize. Compiler会找到代码中所有用到bufSize的地方，然后用512代替。
 
-不能用非const reference 指向const object
+ <span style="color: red"> **不能用非const reference 指向const object </span>
 
 
 ```c++
+
 const int ci = 1024;
 int &r2 = ci;// error: non const reference to a const object
 
 int i = 42;
+```
+
+**One exception for const references**: initailize const from any expression that can be converted to the type of the reference. <span style="background-color: #FFFF00">当initilize const reference, 我们可以用任意表达式. </span>
+
+```c++
+
+int i = 42;
+const int &r1 = i; // we can bind a const int& to a plain int object 
+
+const int &r2 = 42; // ok: r1 is a reference to const
+
+const int &r3 = r1 * 2; // ok: r3 is a reference to const
+
+int &r4 = r1 * 2; // error: r4 is a plain, non const reference
+
+
+```
+to understand this exception in initialization rules:
+
+```c++
+
+double dval = 3.14;
+
+const int &ri = dval; //okay,
+
+```
+
+上面例子中.To sure object to which ri is bound is an int, compiler transforms the code into something like
+
+```c++
+
+const int temp = dval;//create a temporary const int from the double
+
+const int &r1 =temp;//bind ri to that temporary
+
+```
+
+In this case, ri is bound to a **temporary object**. A temporary object is an unnamed object created by the compiler when it needs a place to store a result from evaluating an expression. 而加入ri 不是const, if ri weren't const, we 允许ri赋值, 这样做would change the object to which ri is bound.（会改变ri 引用对象的值), 而对于ri, <span style="color: red">如果我们改变ri,想的是改变dval,但是绑定的不是dval, 而是一个temporary object</span>. C++ will make it illegal
+
+
+**A Reference to const May Refer to an Object That Is Not const**
+
+It is important to realize that a reference to const restricts only what we can do through that reference. Binding a reference to const to an object says nothing about whether the underlying object itself is const. Because the underlying object might be nonconst, it might be changed by other means. span style="color: red">const reference 并没有说underlying object是const, underlying object可能不是const，也可以被修改</span>
+
+```c++
+
+int i = 42;
+int&r1=i; //r1 boundto i
+
+const int &r2 = i; //r2 also bound to i; but cannot be used to change i
+
+
+r1=0; // r1 is not const; i is now 0
+//r2 = 0;//error: r2 is a reference to const
+
+cout<<i<< ", "<<r1<<", "<<r2<<endl; //print 0, 0 , 0
+
+```
+
+
+**Pointer and const**
+
+**low-level const**(object is const): const 在pointer 左面表data is const, cannot change underlying data value. but can point to different underlying. <br/>
+**top-level const**(pointer is const): const 在pointer 右面表示 pointer is const (**a const pointer**), 不能改变指向对象，但可以改变the value of underlying object
+
+```c++
+
+int i = 0;
+int *const p1 = &i; // we can't change the value of p1; const is top-level 
+
+const int ci = 42; // we cannot change ci; const is top-level
+
+const int *p2 = &ci; // we can change p2; const is low-level
+
+const int *const p3 = p2; // right-most const is top-level, left-most is not
+
+const int &r = ci; // const in reference types is always low-level
+
+```
+
+<span style="background-color: #FFFF00">The distinction between top-level and low-level matters when we copy an object</span>. When we copy an object, **top-level consts are ignored:**
+
+```c++
+
+i = ci; // ok: copying the value of ci; top-level const in ci is ignored 
+
+p2 = p3; // ok: pointed-to type matches; top-level const in p3 is ignored
+
+```
+
+<span style="background-color: #FFFF00">On the other hand, low-level const is never ignored.(lower-level 从不会被忽略)</span>.  When we copy an object, both objects must have the same low-level const qualification or there must be a conversion between the types of the two objects(拷贝 输出对象必须具有相同的底层const 资格). In general, we can convert a nonconst to const but not the other way round:
+
+```c++
+
+int *p = p3; // error: p3 has a low-level const but p doesn't
+
+p2 = p3; // ok: p2 has the same low-level const qualification as p3
+
+p2 = &i; // ok: we can convert int* to const int*
+
+int &r = ci; // error: can't bind an ordinary int& to a const int object 
+
+const int &r2 = i; // ok: can bind const int& to plain int
+
+```
+
+The types of a pointer and the object to which it points must match(等号左右两边类型必须match). 
+
+The first exception is that we can use a pointer to const to point to a nonconst object: 可以用const pointer指向non-const object
+
+```c++
+
+const double pi = 3.14; // pi is const; its value may not be changed
+
+double *ptr = &pi; // error: ptr is a plain pointer
+
+const double *cptr = &pi; // ok: cptr may point to a double that is 
+
+const *cptr = 42; // error: cannot assign to *cptr
+
+double dval = 3.14; // dval is a double; its value can be changed
+ 
+cptr = &dval; // ok: but can't change dval through cptr
+
+
+```
+
+```c++
+
+double pi = 3.14159;
+const double *const pip = &pi; // pip is a const pointer (在pointer右边的const) to a const object
+
 ```
 
