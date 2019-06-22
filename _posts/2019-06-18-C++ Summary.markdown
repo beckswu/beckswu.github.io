@@ -177,6 +177,86 @@ The type void\* is a special pointer type that can hold the address of any objec
 
 a variable definition consists of a base type and a list of declarators. Each declarator can relate its variable to the base type differently from the other declarators in the same definition. 
 
+int\* p1, 修饰符 (type modifier \*)仅仅是修饰一个variable, 而非修饰整行所有变量, prefer using int \*p1;
+
 ```c++
-int i = 1024, *p = &i, &r = i;
+int i = 1024, *p = &i, &r = i;// i is an int; p is a pointer to int; r is a reference to int
+
+int* p1, p2;//p1 is a pointer to int; p2 is an int (not pointer), 
+
+//上面的*， 仅仅修饰了p1, 而非让所有变量的类型一样都是int pointer
+
+int *p1, *p2; // both p1 and p2 are pointers to int
 ```
+
+**Pointers to Pointers**
+
+```c++
+int ival = 1024;
+int *pi = &ival; // pi points to an int
+
+int **ppi = &pi; // ppi points to a pointer to an int
+
+
+cout << "The value of ival\n"
+    << "direct value: " << ival << "\n" 
+    << "indirect value: " << *pi << "\n"
+     << "doubly indirect value: " << **ppi << endl;//print 1024, 1024, 1024
+
+```
+
+**References to Pointers**
+
+A reference is not an object. Hence, we may not have a pointer to a reference. However, because a pointer is an object, we can define a reference to a pointer:
+
+
+```c++
+int i = 42; 
+int *p; //p is a pointer to int
+
+int *&r = p;  // r is a reference to the pointer p
+//cannot write as  int &*r = p; because reference don't have pointer, but pointer has refernece
+
+r = &i;// r refers to a pointer; assigning &i to r makes p point to i
+
+*r = 0; // dereferencing r yields i, the object to which p points; changes i to 0
+```
+
+<span style="background-color: #FFFF00"> **离变量名最近的符号(symbol， 上面例子 &r 的符号& ) 对变量类型有最直接的影响, 因此r是一个引用;**</span>
+
+#### Const Qualifier
+
+we can’t change the value of a const object after we create it, it must be initialized. (const 对象必须初始化)
+
+```c++
+const int i = get_size(); // ok: initialized at run time 
+
+const int j = 42; // ok: initialized at compile time 
+
+const int k; // error: k is uninitialized const
+
+```
+
+Below example, Although ci is a const int, the value in ci is an int. The constness of ci matters only for operations that might change ci.(ci的constness 只能当改变ci时才会发生作用) When we copy ci to initialize j, we don’t care that ci is a const
+
+```c++
+
+int i = 42;
+const int ci = i; // ok: the value in i is copied into ci 
+
+int j= ci; // ok:the value in ci is copied into j
+
+```
+
+const int bufSize = 512; <span style="color: red"> the compiler will usually replace uses of the variable with its corresponding value during compilation.</span> That is, the compiler will generate code using the value 512 in the places that our code uses bufSize. Compiler会找到代码中所有用到bufSize的地方，然后用512代替。
+
+不能用非const reference 指向const object
+
+
+```c++
+const int ci = 1024;
+int &r2 = ci;// error: non const reference to a const object
+
+int i = 42;
+```
+
