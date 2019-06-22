@@ -91,11 +91,19 @@ int main(){
 
 #### Compound Types
 
+
+1. 对于reference, pointer (non const) 等号两边类型必须相同， 比如 double dval = 3.14;,int &refVal5 = dval;
+2.  non-const initialize 等号左右两边类型必须相同（因为reference 不是object） 
+3. 对于const 非reference, 左右两边等号类型可以不同. 
+4. **对于const reference 等号两百年可以不同类型，compiler会做转换**  const double pi = 3.14; const int & i = pi; //okay
+5. 对于non-const pointer, reference, 不能initialize pointe to a const value 比如const double pi = 3.14;  double \* ptr = &pi; wrong; double &ref = pi; //wrong
+6. 
+比如const double pi = 3.14; int p2 = pi;
+
+
 A **compount type** is a type that is defined in terms of another type, which is references and pointers
 
-**Reference**
-
-At here, reference is only lvalue reference not rvalue reference. 
+**Reference** (At here, reference is only lvalue reference not rvalue reference)
 
 <span style="background-color: #FFFF00"> reference must be assigned at initlization </span>. 程序把引用和初始值绑定(bind)到一起，而不是将初始值拷给引用, 引用无法绑定到另一个对象. <span style="color: red"> **A reference is not an object**. Instead, a reference is just another name for an already existing object </span>
 
@@ -228,13 +236,6 @@ r = &i;// r refers to a pointer; assigning &i to r makes p point to i
 
 #### Const Qualifier
 
-
-1. 对于reference non-const initialize 等号左右两边类型必须相同（因为reference 不是object） 
-2. 对于const 非reference, 左右两边等号类型可以不同. 
-3. **对于const reference 等号两百年可以不同类型，compiler会做转换**  const double pi = 3.14; const int & i = pi; //okay
-4. 对于non-const pointer, reference, 不能initialize pointe to a const value 比如const double pi = 3.14;  double \* ptr = &pi; wrong; double &ref = pi; //wrong
-5. 
-比如const double pi = 3.14; int p2 = pi;
 
 we can’t change the value of a const object after we create it, it must be initialized. (const 对象必须初始化). 
 
