@@ -72,7 +72,7 @@ extern int i = 5; //定义
 
 **Nested Scopes**
 
-用 :: 访问global variable (explicitly request global variable)
+<span style="background-color: #FFFF00"> 用 :: 访问global variable (explicitly request global variable) </span>
 
 ```c++
 int reused = 42;
@@ -126,3 +126,47 @@ int &r3 = i3, &r4 = i2; // both r3 and r4 are references
 
 
 
+**Pointer**
+
+assign pointer 需要assign 的类型和被assign 类型compatible
+
+```c++
+
+double dval;
+double *pd = &dval; //ok: initializer is the address of a doub;e
+
+double *p2 = pd;//ok: initializer is a pointer to doub;e
+
+int *pi = pd;//error: types of pi and pd differ, 一个int,一个double
+pi = &dval; //error: assigning the address of a double to a pointer to int
+
+//上面两个error 都会compile fail
+
+
+int dval;
+double *pi = &dval;//error: types of pi and pd differ, 一个int,一个double, 也是compile error
+
+```
+
+<span style="background-color: #FFFF00">It is error to copy or try to access the value of an invalid pointer</span>. As when we use an uninitialized variable, <span style="color: red">this error is one that the compiler is unlikely to detect(编译器不会检查access invalid pointer)</span>. The result of accessing an invalid pointer is undefined. 
+
+
+& 赋值是改变等号左侧 pointer指代对象, \* 不改变指代对象，改变的是指代对象的值 
+```c++
+int r = 1;
+int *p = &r;
+int *p2 = p;
+    
+*p2 = 10; //change pointed value, aslo change value of the object pointer points to
+cout << *p <<" , "<<*p2  <<" , "<< r <<endl; //print 10 ,10, 10
+
+int c = 5;
+p = &c; //change object that pointer points to
+cout << *p  <<" , "<< r <<" , "<< c<<endl;//print 5, 10 , 5
+
+```
+
+Given two valid pointers of the same type, we can compare them use<span style="background-color: #FFFF00"> the equality(==) or inequality(!=) operator, Two pointers are equal if the yhold the same address (两个指针存放的地址相同) </span>
+
+
+**void \* **
