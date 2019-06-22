@@ -169,4 +169,7 @@ cout << *p  <<" , "<< r <<" , "<< c<<endl;//print 5, 10 , 5
 Given two valid pointers of the same type, we can compare them use<span style="background-color: #FFFF00"> the equality(==) or inequality(!=) operator, Two pointers are equal if the yhold the same address (两个指针存放的地址相同) </span>
 
 
-**void \* **
+** void \* **
+
+
+The type void\* is a special pointer type that can hold the address of any object. (可以存放任意对象).  Like any other pointer, a void* pointer holds an address, but the type of the object at that address is unknown: <span style="background-color: #FFFF00"> 不了解地址中是个什么类型的对象</span>. Generally,we use a void* pointer to deal with memory as memory, rather than using the pointer to access the object stored in that memory. 
