@@ -76,9 +76,9 @@ int main(){
 如果这么按照上面的方式executable 那么写cmake, run exe时候会有link error， 解决方法是加上add_library 和 target_link_libraries, 
 
 
-<span style="background-color:FFFF00">**add_library()**</span> 第一个参数是link library名字(可以随意建立) + library 模式(static or shared), 第二个参数 是头文件，第三个参数 cpp文件
+**<span style="background-color:#FFFF00">add_library()</span>** 第一个参数是link library名字(可以随意建立) + library 模式(static or shared), 第二个参数 是头文件，第三个参数 cpp文件
 
-<span style="background-color:FFFF00">**target_link_libraries()**</span> 第一个参数是executable, link到谁， 第二个参数是link interface mode, 第三个参数 被link的library
+**<span style="background-color:#FFFF00">target_link_libraries()</span>** 第一个参数是executable, link到谁， 第二个参数是link interface mode, 第三个参数 被link的library
 
 <span style="color:red">加上add_library 和 target_link_libraries run cmake --build . (on windows) or make (on linux), 不用run cmake . </span>, 因为会automatically detect 如果CmakeLists.txt 被更改了 (out of date), 如果更改了，会自动run cmake .
 
@@ -119,23 +119,17 @@ add_library(
 )
 
 
-add_library( 
-    say-hello MO  #创建一个static linked library
-    hello.h
-    hello.cpp
-)
-
 
 ```
 
-在linux 上，ldd 可以看linker dependency of lib,<span style="background-color:FFFF00"> 如果是shared library, ldd 可以看见libsay-hello (我们上面创建的lib)的dependency, 如果是static, ldd就看不见这个library </span>
+在linux 上，ldd 可以看linker dependency of lib,<span style="background-color:#FFFF00"> 如果是shared library, ldd 可以看见libsay-hello (我们上面创建的lib)的dependency, 如果是static, ldd就看不见这个library </span>
 
 ```shell
 ldd cmake-good
 
 ```
 
-我们可以更改add_library static library的选项 成shared, <span style="background-color:FFFF00">通过cmake -D BUILD_SHARED_LIBS=TRUE . , 即使我们不声明add_library 成shared, 也会生成shared library </span>
+我们可以更改add_library static library的选项 成shared, <span style="background-color: #FFFF00">通过cmake -D BUILD_SHARED_LIBS=TRUE . , 即使我们不声明add_library 成shared, 也会生成shared library </span>
 
 ```shell
 
