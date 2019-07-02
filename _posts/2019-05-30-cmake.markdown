@@ -29,7 +29,14 @@ File in Linux system are arranged in **hierarchical directory structure**: organ
 cmake_minimum_required(VERSION 3.14.5) #VERSION  必须大写，否则报错
 project(MyProject VERSION 1.0)
 
-add_executable(cmake-good main.cpp) #make exectuable 
+add_executable(cmake-good main.cpp) #make exectuable, 生成exe会叫cmake-good
+
+```
+
+```shell
+
+ cmake .  #引用source directory
+ cmake --build . #引用already configured binary directory, 必须要有cache的文件, cache文件会由cmake . 生成 
 
 ```
 
