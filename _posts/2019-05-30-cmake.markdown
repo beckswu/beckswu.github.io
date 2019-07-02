@@ -20,12 +20,16 @@ Command Line or Shell: aslo called **CLI(Command Line Interface)**
 
 File in Linux system are arranged in **hierarchical directory structure**: organized in a tree-like pattern
 
-## 初始化 LS
+## Executable 
+
+注意需要命名下面的文件为CMakeList.txt 才可以，然后command prompt cd 到这个文件夹, 输入 cmake . (不要忘记点.)
 
 ```shell
 
+cmake_minimum_required(VERSION 3.14.5) #VERSION  必须大写，否则报错
+project(MyProject VERSION 1.0)
 
-cmake --version #check what is current cmake version
+add_executable(cmake-good main.cpp) #make exectuable 
 
 ```
 
@@ -95,31 +99,5 @@ mkdir -p names/{john,tom,bob}  #creat several directory inside current directory
 ```
 
 
-
-## rm & rmdir
-
-**rmdir**: remove directory, **rm**: rmove file and directory
-
-```shell
-
-rmdir abc # remove abc的folder
-rmdir a/b/c/d/e #只remove 最后e的directory
-rmdir -p a/b/c/d/e  #remove 所有的directory structure
-rmdir -pv a/b/c/d/e #remove 所有directory structure，并显示(verb)remove的进程
-#如果a/b/c/d/e 每个并不是空的文件夹，会显示error, failed to remove directory a/b: Directory not empty
-
-rm -rv a/b 
-rm -rv a #与上面一行作用是一样的
-
-```
-
-
-## Cat
-
-```shell
-
-
-
-```
 
 ![](/img/post/git-note/gitpic1.png)
