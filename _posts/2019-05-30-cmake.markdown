@@ -25,11 +25,15 @@ add_executable(cmake-good main.cpp) #make exectuable, 生成exe会叫cmake-good
 ```shell
 
 #build CMakeFiles
- cmake .  #引用source directory
+cmake .  #引用source directory
  
- #build exe
- cmake --build . #引用already configured binary directory, 必须要有cache的文件, cache文件会由cmake . 生成 
- 
+#build exe
+cmake --build . #引用already configured binary directory, 必须要有cache的文件, cache文件会由cmake . 生成 
+# windows 环境中 会把exe 建立在Debug folder 中, 因为默认是DEBUG
+
+cmake --build . --config Debug 
+#等同于上边的command,
+#cmake will run underlying msbuild tool to build VS Solution
 
 ```
 
@@ -139,35 +143,15 @@ cmake -D BUILD_SHARED_LIBS=TRUE .
 
 
 
-## Cat
+## CMAKE in Visual Studio
+
+ZERO-CHECK： check if CMAKE configuration file is out of date and needs to regenerate VS studio project. All projects will depend on ZERO CHECK project. You can aslo build ZERO CHECK within Visual Studio itself to regenerate the configuration within visual studio without building any projects
+
+当compile project, can run as executable by right-click set as start project then start debugger.  
 
 cat: 1. Display Txt 2. combine Txt file 3. Create new Txt file
 
-syntax: cat options file1 file2 ... 
-
-```shell
-cat Hello World #会打印 echo Hello world
-#Ctrl D means the end of cat command 
-
-cat list1.txt #显示list1.txt 所有内容
-cat list1.txt list2.txt #显示list1.txt 和list2.txt所有内容，先显示list1的再显示list2的
-
-cat -b list1.txt #把list1.txt的 不是blank的line(空行) 显示序号
-cat -n list1.txt #把list1.txt的 所有行(空行或者不空行) 都显示序号
-cat -s list1.txt #squeeze 连续 blank line to one blank line
-
-cat -E list1.txt #add $ at the end of each line
-
-man cat #显示cat所有function
-
-cat > test.txt  #把接下来input的内容 output 到test.txt，输完了 按Ctrl+D， test.txt之前内容被remove
-cat >> text.txt #把接下来input的内容 append 到test.txt
-
-cat list1.txt list2.txt > out.txt #把mlist1, list2的内容合并，生成out.txt
-cat list1.txt list2.txt > list2.txt #这样是不行的，不能把input 当成output file
-cat list1.txt >> list2.txt #修改上面一行的error，append list1.txt 到list2.txt
-
-```
+当在visual studio 里面更改Debug 到release， 不用重新run cmake 直接build project即可, 
 
 
 
