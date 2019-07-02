@@ -88,7 +88,7 @@ int main(){
 
 <span style="color:red">加上add_library 和 target_link_libraries run cmake --build . (on windows) or make (on linux), 不用run cmake . </span>, 因为会automatically detect 如果CmakeLists.txt 被更改了 (out of date), 如果更改了，会自动run cmake .
 
-```
+```shell
 cmake_minimum_required(VERSION 3.14.5) #VERSION  必须大写，否则报错
 project(MyProject VERSION 1.0)
 
@@ -107,6 +107,47 @@ target_link_libraries(cmake-good PRIVATE say-hello) #把建立的library 和main
 ```
 
 再run Debug\cmake-good.exe 会打印出我们想要的结果
+
+注: we don't specify the type of library, but it build a static library(default), 如果我们specified SHARED, 如下面，就会建立一个shared linked library
+
+```shell
+
+add_library( 
+    say-hello SHARED  #创建一个shared linked library
+    hello.h
+    hello.cpp
+)
+
+add_library( 
+    say-hello STATIC  #创建一个static linked library
+    hello.h
+    hello.cpp
+)
+
+
+add_library( 
+    say-hello MO  #创建一个static linked library
+    hello.h
+    hello.cpp
+)
+
+
+```
+
+在linux 上，ldd 可以看linker dependency of lib,<span style="background-color:FFFF00"> 如果是shared library, ldd 可以看见libsay-hello (我们上面创建的lib)的dependency, 如果是static, ldd就看不见这个library </span>
+
+```shell
+ldd cmake-good
+
+```
+
+我们可以更改add_library static library的选项 成shared, <span style="background-color:FFFF00">通过cmake -D BUILD_SHARED_LIBS=TRUE . , 即使我们不声明add_library 成shared, 也会生成shared library </span>
+
+```shell
+
+cmake -D BUILD_SHARED_LIBS=TRUE .
+
+```
 
 
 
