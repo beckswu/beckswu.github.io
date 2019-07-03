@@ -12,6 +12,7 @@ tags:
     - 学习笔记
 ---
 
+## Executable
 
 ```shell
 
@@ -149,10 +150,16 @@ ZERO-CHECK： check if CMAKE configuration file is out of date and needs to rege
 
 当compile project, can run as executable by right-click set as start project then start debugger.  
 
-cat: 1. Display Txt 2. combine Txt file 3. Create new Txt file
+当在visual studio 里面更改Debug 到release， 不用重新run cmake 直接build project即可, cmake will run the underlying msbuild build tool in order to build this visual studio solution. Cmake natively understands how to drive MS build to build generated projects. It means you can using Visual studio Solution even without having installation of Visual studio. <span "background-color:#FFFF00"> Visual C++ build tools are sufficient to generate and build Visual Studio Solutions without having the actual IDE installed (Visual C++ 足够generate solution 即使没有装IDE).</span>
 
-当在visual studio 里面更改Debug 到release， 不用重新run cmake 直接build project即可, 
 
+ We can also build specific targets by using -- target flag
+
+```shell
+
+cmake --build . --config Debug target simple
+
+```
 
 
 
