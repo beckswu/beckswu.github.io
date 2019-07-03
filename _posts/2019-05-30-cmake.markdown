@@ -36,6 +36,7 @@ cmake --build . --config Debug
 #等同于上边的command,
 #cmake will run underlying msbuild tool to build VS Solution
 
+
 ```
 
 
@@ -241,19 +242,111 @@ ninja cmake  #build project
 <span style="background-color:#FFFF00">**Summary:  Visual Studio Configure 最慢, NMAKE configure 第二慢, Ninja Configure 最快**</span>
 
 
-## mkdir
+## Visual Studio Code
+
+下载extension cmake (provide by twxs to support syntax highlight ) & cmake tools (it provide extra feature and tweaks helped support cmake based project in editor), 然后点view -> command palette -> 输入 cmcon (Cmake configure) 选择想要的compiler
+
+
+## Subdirectory &Target
+
+**add_subdirectory** 会include subdirectory的CMakeLists.txt
+
+```c+
+
+/*------------------Hello.h---------------------*/
+
+namespace hello
+{
+	void say_hello();
+};
+
+
+/*------------------Hello.cpp---------------------*/
+
+#include "hello.h"
+#include <iostream>
+using namespace std;
+
+void hello::say_hello(){
+    cout << " hi "<<endl;
+}
+
+
+
+/*------------------main.cpp---------------------*/
+#include <iostream>
+#include "say-hello/hello.h"
+using namespace std;
+
+int main(){
+    hello::say_hello();
+	system("Pause");
+}
+
+```
+
 
 ```shell
-mkdir image #生成image directory
-mkdir image/pic #生成pic directory inside image directory
-mkdir names/mark #当names 不在当前文件夹下，显示error, No such file or directory
-mkdir -p names/mark (mkdir --parents names/mark ) #-p means -- parents
-mkdir -p names/{john,tom,bob}  #creat several directory inside current directory, 建立三个文件夹,john, tom,bob
-# {john,tom,bob} 不能有空格，否则建立的文件夹是 {john,
+
+建立如下面的folder 
+
+say-hello
+    -- src
+        --say-hello
+            --hello.h
+            --hello.cpp
+    -- CMAKELISTS.txt (1)
+
+hello-exe
+   -- CMAKELISTS.txt (2)
+   -- main.cpp
+   
+CMAKELISTS.txt (3)
 
 
 ```
 
 
+CMAKELISTS.txt (1)
+```shell
+
+add_library( 
+    say-hello  #创建一个link library
+    src/say-hello/hello.h #让path match relative to CMakeLists.txt
+    src/say-hello/hello.cpp #让path match relative to CMakeLists.txt
+)
+
+#因为main 与 hello.h 不在一个文件夹，所以要把hello.h include 到search path
+target_include_directories(say-hello PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
+#PUBLIC 是 interface mode
+#${CMAKE_CURRENT_SOURCE_DIR} refer to the  directory process 现在这个cmakelists, 就是say-hello 这个directory
+
+```
+
+CMAKELISTS.txt (2)
+```shell
+
+add_executable(cmake-good main.cpp) #make exectuable, 生成exe会叫cmake-good
+
+target_link_libraries(cmake-good PRIVATE say-hello) #把建立的library 和main link到一起
+#第一个argument是executable, link到谁， 第二个argument是link interface mode, 第三个argument 被link的library
+
+```
+
+
+CMAKELISTS.txt (3)
+```shell
+
+cmake_minimum_required(VERSION 3.14.5) #VERSION  必须大写，否则报错
+project(MyProject VERSION 1.0)
+
+add_subdirectory(say-hello) #say-hello 是directory的名字
+#会include subdirectory的CMakeLists.txt
+
+add_subdirectory(hello-exe) 
+#因为hello-exe中的main call 了 say-hello 中的header 所以需要放在后面
+#还以为hello-exe中的CMakeLists.txt的target_link_libraries call 了say-hello library
+
+```
 
 
