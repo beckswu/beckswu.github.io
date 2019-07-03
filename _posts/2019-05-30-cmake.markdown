@@ -238,7 +238,7 @@ cmake -G Ninja -DCMAKE_C_COMPILE=cl -DCMAKE_C_COMPILE = cl .. #产生cmake files
 ninja cmake  #build project
 ```
 
-<span  "style=background-color:#FFFF00">**Summary:  Visual Studio Configure 最慢, NMAKE configure 第二慢, Ninja Configure 最快**</span>
+<span "style=background-color:#FFFF00">**Summary:  Visual Studio Configure 最慢, NMAKE configure 第二慢, Ninja Configure 最快**</span>
 
 
 ## mkdir
