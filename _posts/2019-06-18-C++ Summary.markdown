@@ -92,11 +92,17 @@ int main(){
 #### Compound Types
 
 
-1. reference, pointer (non const):
-    - 等号两边类型必须相同, 比如 double dval = 3.14;,int &refVal5 = dval;//error
-    - cannot assign 底层const, 可以assign 顶层const, (<span style="background-color: #FFFF00">因为拷贝对象时候底层const 不能被忽略，顶层可以忽略</span>, 详见**Pointer and const**) 比如 
+1. reference, pointer:
+    - <span style="background-color: #FFFF00">等号两边类型(type)必须相同 </span> type modifier 不一定相同
+        - 比如 double dval = 3.14;,int &refVal5 = dval;//error
+    - 对于同type modifier <span style="background-color: #FFFF00">拷贝对象时候底层const (low-level) 不能被忽略，顶层(top-level)可以忽略</span>, 详见Pointer and const) 比如 
         - int r = 3; int * const pi = &r(顶层const); int *ref = pi; 是okay的
         - int r = 3; const int * pi = &r(底层const); int *ref = pi; 不okay的
+        - int r = 3; const int * pi = &r(底层const); const int *ref = pi; 底层const match
+    - 对于没有type modifier的, <span style="background-color: #FFFF00">拷贝对象时候底层const (low-level) </span>可以被忽视
+        - const int r = 3(底层const); int i = r;  okay的
+    - 对于不同type, (NA -> Pointer, NA-> reference), 不能忽视底层
+        - 
 2. non-const initialize 等号左右两边类型必须相同（因为reference 不是object） 
 3. 对于const(不是), 等号左右两边等号类型可以不同. 
 4. **对于const reference 等号两边可以不同类型，compiler会做转换**  const double pi = 3.14; const int & i = pi; //okay
