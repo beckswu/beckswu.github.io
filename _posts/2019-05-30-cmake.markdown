@@ -146,6 +146,8 @@ cmake -D BUILD_SHARED_LIBS=TRUE .
 
 ## CMAKE in Visual Studio
 
+#### MSBUILD
+
 ZERO-CHECK： check if CMAKE configuration file is out of date and needs to regenerate VS studio project. All projects will depend on ZERO CHECK project. You can aslo build ZERO CHECK within Visual Studio itself to regenerate the configuration within visual studio without building any projects
 
 当compile project, can run as executable by right-click set as start project then start debugger.  
@@ -161,6 +163,82 @@ cmake --build . --config Debug target simple
 
 ```
 
+可以在CMakeLists.txt 文件夹中右键open in visual studio. Visual Studio detects the CMakeLists.txt and open natively without any special commands needing to be run. It show file structure in solution Explore as if it had generated a real solution. Visual Studio Output windows 中可以看见 Visual Studio会自动run cmake for us and generate ninja
+
+#### NINJA
+
+**CL.exe**
+
+Visual C++ 可以是 MSVC or microsoft visual C++ 缩写. 就像GCC and clang, visual C++ 也有 a command line called *CL.EXE* and the linker is called *link.exe*, 如果装了Visual C++, 可能有很多的CL.exe 和 Link.exe, target不同的platform
+
+比如run下面的会报错，因为unlike GCC and Clang,  CL.exe has no built-in default include path. You need to either set in command line or special environment that CL.exe will check and use when it does the search. 最简单的方法set environment is to use Visual Studio Developer Command Prompt, 打开它会显示Environment initialized, <span style="background-color:#FFFF00">因为它include batch file that set the environment variables necessary to compile and link programs</span>, 在Developer Command prompt 就可以run: cl main.cpp (we don't generate any build system, and compile and link to this program manually by executing cl main.cpp )
+
+```shell
+
+#在普通command prompt中run 会报错
+"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.21.27702\bin\Hostx64\x64\cl.exe" main.cpp 
+
+#在developer command prompt run
+cl main.cpp 
+
+```
+
+```shell
+#developer command prompt 中
+pwsh #切换到powershell
+
+ls Env:  #查看所有的environment variable
+
+echo $$env:INCLUDE$ #可以看developer command prompt的include path
+echo $$env:LIB$ #可以看developer command prompt linker search library path
+
+```
+![](/img/post/cmake/NINJA.png)
+
+**vcvarshall**
+
+```shell 
+
+"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat" x64 
+#在普通command 上run 这个会切换到与developer command prompt中一样的environment vairable
+#CL.exe is on path and ready is use
+
+
+```
+
+
+**nmake**
+
+nmake is a partial reimplementation of standard UNIX make, go to cmake project folder (有CMakeLists.txt的), build using nmake. Nmake instead of producing MSBuild file, it will produce nmake format files that can be executed with nmake。 Then ask nmake to build cmake executable for us (与cmake build 花的时间差不多),
+
+NMake 和 CMake 花的时间都挺长的，可以用**NINJA**, 有可能报错if GCC or Clang in your path 因为NINJA called GCC compiler, because NINJA is a make file generaterator 即使ninja doesn't emit make file style build files, 需要specify CMAKE_C_COMPILE 是CL
+
+NINJA 最快，因为during compilation tests, CMake generates a small C make project and tries to build and compile it. Ninja is inherently much faster because it's targeted specifically at compiling large numbers of source files in parallel as much as it can. (Ninja 被用于Chrome project to build webbrowser 因为Chrome 有enormous number of source files)
+
+Using NINJA：Github download NINJA, 需要把NINJA add to system search path 
+
+```shell
+
+#Load Environment Variable
+"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat" x64 
+
+mkdir build
+cd build
+cmake -G "NMake Makefiles" .. #using nmake as target generator #产生cmake files
+
+nnamke cmake #build cmake executable using name
+
+cmake ..  (与cmake build 花的时间差不多)
+
+#用NINJA Build 
+cmake -G Ninja ..
+
+#specify compiler
+cmake -G Ninja -DCMAKE_C_COMPILE=cl -DCMAKE_C_COMPILE = cl .. #产生cmake files
+ninja cmake  #build project
+```
+
+<span  "style=background-color:#FFFF00">**Summary:  Visual Studio Configure 最慢, NMAKE configure 第二慢, Ninja Configure 最快**</span>
 
 
 ## mkdir
@@ -178,4 +256,4 @@ mkdir -p names/{john,tom,bob}  #creat several directory inside current directory
 
 
 
-![](/img/post/git-note/gitpic1.png)
+
