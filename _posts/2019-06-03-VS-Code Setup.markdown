@@ -129,3 +129,15 @@ g++ --version #如果MinGW 放进Environment variable，会显示信息
 3. 修改launch.json 如下图, ( preLaunchTask 和 program) , 之后就可以设置break point Debug了
 
 ![](/img/post/VSCode/mac_Debug2.png)
+
+#### 设置多个Tasks
+
+1. 可以在Task.json 中设置多个Tasks, 这样build 完成后可以run build的结果，Task 如下图配置
+
+![](/img/post/VSCode/mac_task1.png)
+
+2. Terminal (窗口) --> run task (运行任务) --> Never scan the task output, 终端中会先build 生成.out 然后run 这个.out
+
+![](/img/post/VSCode/mac_task2.png)
+
+![](/img/post/VSCode/mac_task3.png)
