@@ -67,7 +67,7 @@ g++ --version #如果MinGW 放进Environment variable，会显示信息
 
 #### Debug in VS Code
 
-1. 点击左侧 Debug Panel, 点击绿色箭头 --> 因为我们用MinGW, 选择C++ (GDB//LLDB) 
+1. 点击左侧 Debug Panel, 点击绿色箭头 --> 因为我们用MinGW, 选择C++ (GDB//LLDB), 生成一个Default lauch.json 
 2. 修改launch.json
 	- 修改 "miDebuggerPath": "C:\\MinGW\\bin\\gdb.exe"  (gdb.exe 是debugger)
 	- add "preLaunchTask": "echo",  这个preLaunchTask 需要与tasks.json task 命名一样, (是为了build code first, then start debugging)
@@ -78,6 +78,8 @@ g++ --version #如果MinGW 放进Environment variable，会显示信息
 ![](/img/post/VSCode/win_Debug1.png)
 
 ![](/img/post/VSCode/win_Debug2.png)
+
+注: stopAtEntry, 表示当debug开始, 程序一开始先停住
 
 ![](/img/post/VSCode/win_Debug3.png)
 
@@ -114,3 +116,16 @@ g++ --version #如果MinGW 放进Environment variable，会显示信息
 ![](/img/post/VSCode/version1.png)
 
 ![](/img/post/VSCode/version2.png)
+
+
+#### Debug
+
+1. Ctrl + Shift + P, Tasks,--> Tasks: Configure Task --> create task.json file from template -->  Others
+2. change command and add args (如下图), 设置后之后, Ctrl + Shift + B 就可以build code了
+
+
+![](/img/post/VSCode/mac_Debug1.png)
+
+3. 修改launch.json 如下图, ( preLaunchTask 和 program) , 之后就可以设置break point Debug了
+
+![](/img/post/VSCode/mac_Debug2.png)
