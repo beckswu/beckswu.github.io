@@ -38,6 +38,31 @@ tags:
 
 ![](/img/post/VSCode/MinGW5.png)
 
+**Build C++**
+
+1. 建一个folder, folder 里面有main.cpp,  需要build的程序
+2. Ctrl + shift + p , search tasks, choose Tasks: Configure Task -->  选择create task.json file from template --> 选择 Others (Example to run an arbitrary external command）, 会生成一个tasks.json文件， 我们把 "command" 改成 "g++ -g main.cpp"   (-g is debug) or 写成如下图格式
+3. Ctrl + Shift + B 可以build project (如果出现permission defined 错误，关掉VS Code, 重新打开再Ctrl+Shift +B, build)
+4. 可以在VS Code中新建terminal, 点plus button. run  a.exe
+
+![](/img/post/VSCode/task1.png)
+
+![](/img/post/VSCode/task2.png)
+
+![](/img/post/VSCode/task3.png)
+
+注：不用Ctrl + shift + p, search C\Cpp: Edit Configurations, 在新的VS Code的configuration中自动设置好了MinGW include path
+
+
+
+查看是不是把 MinGW 放进Environment variable,打开prompt, 输入 
+
+```shell
+
+g++ --version #如果MinGW 放进Environment variable，会显示信息
+
+```
+
 
 
 ```shell
