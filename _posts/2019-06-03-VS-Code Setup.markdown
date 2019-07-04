@@ -45,6 +45,8 @@ tags:
 3. Ctrl + Shift + B 可以build project (如果出现permission defined 错误，关掉VS Code, 重新打开再Ctrl+Shift +B, build)
 4. 可以在VS Code中新建terminal, 点plus button. run  a.exe
 
+![](/img/post/VSCode/task0.png)
+
 ![](/img/post/VSCode/task1.png)
 
 ![](/img/post/VSCode/task2.png)
