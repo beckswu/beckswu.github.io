@@ -19,9 +19,9 @@ tags:
 2. click install
 3. 右键所有的Package -> mark for installation, 再点Installation ->  ApplyChanges
 
-![](/img/post/VScode/MinGW1.png)
+![](/img/post/VSCode/MinGW1.png)
 
-![](/img/post/VScode/MinGW2.png)
+![](/img/post/VSCode/MinGW2.png)
 
 
 ```shell
