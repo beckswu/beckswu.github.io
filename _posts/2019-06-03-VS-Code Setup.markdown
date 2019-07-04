@@ -13,6 +13,17 @@ tags:
     - Setup
 ---
 
+## Theme
+
+#### File ICON THEME
+
+1. 到VSCode Extension 下载Ayu 然后Reload
+2. 然后Ctrl + Shift + P, Preference:File Icon Theme --> Ayu
+
+
+![](/img/post/VSCode/File_Icon_Theme.png)
+
+
 ## C++ Windows
 
 #### 下载MINGW
@@ -141,3 +152,23 @@ g++ --version #如果MinGW 放进Environment variable，会显示信息
 ![](/img/post/VSCode/mac_task2.png)
 
 ![](/img/post/VSCode/mac_task3.png)
+
+
+## Python Mac
+
+到VS Code extenison 安装Python 和 Python for VSCode
+
+- 方法一:  下载code runner (详见C++ Mac 下载code runner), 点run code,
+- 方法二:  在script上右键 Run Python File in Terminal 
+
+#### Switch Python Version 
+
+在VS code 左下角显示当天Python 版本，点击它如图
+
+![](/img/post/VSCode/python_version.png)
+
+![](/img/post/VSCode/python_version2.png)
+
+如果选了2.7, 再run python, 会显示2.7 
+
+![](/img/post/VSCode/python_version3.png)
