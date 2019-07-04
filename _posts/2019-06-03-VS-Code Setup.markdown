@@ -15,6 +15,8 @@ tags:
 
 ## C++ Windows
 
+**下载MINGW*
+
 1. 下载MinGW Installation Manager
 2. click install
 3. 右键所有的Package -> mark for installation, 再点Installation ->  ApplyChanges
@@ -22,6 +24,20 @@ tags:
 ![](/img/post/VSCode/MinGW1.png)
 
 ![](/img/post/VSCode/MinGW2.png)
+
+
+**add MINGW to system path*
+
+1. 控制面板--> 系统和安全 --> 系统  --> 高级系统设置
+2. 高级 --> 环境变量
+3. 系统变量内找到Path, 双击编辑, 把;C:\MinGW\bin 加在变量值的后面
+
+![](/img/post/VSCode/MinGW3.png)
+
+![](/img/post/VSCode/MinGW4.png)
+
+![](/img/post/VSCode/MinGW5.png)
+
 
 
 ```shell
