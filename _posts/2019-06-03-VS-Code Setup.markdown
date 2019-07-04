@@ -80,3 +80,21 @@ g++ --version #如果MinGW 放进Environment variable，会显示信息
 ![](/img/post/VSCode/win_Debug2.png)
 
 ![](/img/post/VSCode/win_Debug3.png)
+
+
+
+## C++ Mac
+
+#### 下载code runner
+
+1. 到extension 中找到code runner，下载
+2. 到user/用户名/⁨ .vscode⁩ / ⁨extensions⁩ / ⁨formulahendry.code-runner-0.9.10⁩ / out⁩ /,codeManager.js, comment 掉line 12 和 line 225~236, 如图
+3. 重新加载，或关掉VS Code 再打开，点击右上角箭头，run
+
+![](/img/post/VSCode/coderunner1.png)
+
+![](/img/post/VSCode/coderunner2.png)
+
+![](/img/post/VSCode/coderunner3.png)
+
+
