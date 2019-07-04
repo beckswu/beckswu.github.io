@@ -172,3 +172,117 @@ g++ --version #如果MinGW 放进Environment variable，会显示信息
 如果选了2.7, 再run python, 会显示2.7 
 
 ![](/img/post/VSCode/python_version3.png)
+
+
+#### Setup Default Python Path
+
+可以设置所有python 版本 默认的路径: 设置 --> usersetting --> 加上python.pythonpath
+
+![](/img/post/VSCode/coderunner4.png)
+
+
+
+![](/img/post/VSCode/python_path.png)
+
+
+#### Setup Python Virtual Environment
+
+
+###### Basic 
+
+install certain packages for certain projects, 比如你以前的project 用了django version 1, 现在你想要用django version 2 对于新的project, 可能会break 以前的project。我们不想same project points to the same version of django, each project should have the same packages each other
+
+
+- don't put any file inside your virtual environment, 因为environment 可以随时throw away and rebuild
+- You shouldn't commit your virtual Environment into source control, 一般git ignore file的template for python project 一般都ignore virtual environment
+- You should commit requirement.txt 让其他人build environment you used to run project
+
+在Terminal 中
+
+- 创建virtual environment,
+    -  创建virtual environment folder名为project_env: *python3 -m venv project_env*, 不会把系统的packages引用到virtual environment，所有的packages 都需要装
+    -  引用system packages到virtual environment:  *python3 -m venv project_env --system-site-packages*
+- activate virtual environment, source project_env/bin/activate 
+- 安装library 
+    - 安装local的library, 不会安装到system library上: *pip install library名字*
+    - 安装别人export的library, *pip install -r requirement.txt*
+- 显示当前virtual environment 的packages
+    - 显示所的library *pip list*
+    - 显示只在local安装的, *pip list --local*
+- 输出requirement.txt 用于其他然安装, 有library 名字和版本
+    - 只输出在virtual environment中本地安装的: *pip freeze --local > requirement.txt*
+    - 输出virtual environment所有library: *pip freeze> requirement.txt*
+- dctivate virtual environment: *deactivate*
+
+
+```shell
+
+pip list #查看所有装的library 和 version
+
+cd desktop
+python3 -m venv project_env #创建virtual environment 名为project_env
+#-m module (这里是venv), python会search sys.path and execute that module as main module
+
+#To activate virtual environment 
+source project_env/bin/activate 
+
+which python 
+#会显示Desktop上的python, python environment 就是project_env中virtual environment
+
+pip list #显示pip, setuptools
+#如果现在装什么library通过pip, 只会装在project_env的environment
+
+pip install tqdm #装tqdm进virtual environment
+
+pip list #显示pip, setuptools, tqdm
+
+pip install requests
+
+pip list #显示certifi, chardetidna (2.8), pip (9.0.1), requests (2.22.0), setuptools (28.8.0),tqdm (4.32.2), urllib3 (1.25.3)
+#除了requests 和tqdm，其他的library 是dependency of request
+
+
+
+#export packages, 可以让其他人去install your packages and dependency you are using, the version也会install一样的
+pip freeze #similar to pip list, it gives packages and the correct format for requirement of txt file
+
+pip freeze > requirement.txt #输出
+
+
+#deactivate virtual environment 
+deactivate 
+
+#delete environemnt 
+rm -rf project_env/ #删除project_env/ 这个folder
+
+
+
+
+
+
+mkdir my_project 
+python3 -m venv my_project/venv  #my_project/venv 是my_project下面文件夹名字
+source my_project/venv/bin/activate #activate environment 
+
+#装我们之前virtual environemnt export的library
+pip install -r requirement.txt
+
+pip list #显示所有装好的library，应该与之前export 的library是一样的
+
+cd my_project/
+
+
+#把现在所有的装好的library 都放进新virtual environment
+python3 -m venv venv_folder --system-site-packages
+source venv_folder/bin/activate 
+pip list #显示python global装好的library
+
+#接下来以后在virtual environment装的library不会影响system的packages
+pip install Flask
+pip list --local #只显示在local 装的library Flask，local 不会影响system packages
+
+pip freeze --local > requirement.txt #只会把在local library output到requirement.txt
+
+deactivate 
+pip list #不会显示local装的flask
+```
