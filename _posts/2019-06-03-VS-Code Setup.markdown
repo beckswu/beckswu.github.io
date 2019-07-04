@@ -89,7 +89,8 @@ g++ --version #如果MinGW 放进Environment variable，会显示信息
 
 1. 到extension 中找到code runner，下载
 2. 到user/用户名/⁨ .vscode⁩ / ⁨extensions⁩ / ⁨formulahendry.code-runner-0.9.10⁩ / out⁩ /,codeManager.js, comment 掉line 12 和 line 225~236, 如图
-3. 重新加载，或关掉VS Code 再打开，点击右上角箭头，run
+3. 重新加载，或关掉VS Code 再打开，点击右上角箭头，run, 但这时候如果code 有cin, 不能在输出panel上 输入到程序
+
 
 ![](/img/post/VSCode/coderunner1.png)
 
@@ -97,4 +98,19 @@ g++ --version #如果MinGW 放进Environment variable，会显示信息
 
 ![](/img/post/VSCode/coderunner3.png)
 
+4. 点右下角 -->  设置, 在用户设置中 (user settings) 加上 "code-runner.runInTerminal": true
+5. 再点run code时候，就会在terminal 中run code, 
 
+![](/img/post/VSCode/coderunner4.png)
+
+![](/img/post/VSCode/coderunner5.png)
+
+
+#### 设置C++ 版本
+
+1. 点右下角 -->  设置, 在用户设置中 (user settings) 输入 ”code-runner.executorMap":, 然后点tooltip，会蹦出default的格式,
+2. 只保留cpp, 其他的可以删掉，在g++ 后面加上 -std=c++17, 再点run code 会显示c++版本
+
+![](/img/post/VSCode/version1.png)
+
+![](/img/post/VSCode/version2.png)
