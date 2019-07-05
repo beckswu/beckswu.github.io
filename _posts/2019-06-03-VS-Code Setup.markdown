@@ -350,3 +350,18 @@ venv
 ![](/img/post/VSCode/git5.png)
 
 - 点击右上角的...button， click  push to, 可以push git 到remote repository
+
+#### Debug
+
+1. Go to Debug panel --> click Add Configuration --> Python File, 会create a launch.json 在work space directory
+
+![](/img/post/VSCode/python_debug1.png)
+
+2. 然后就可以click Debug button, start at the break point
+3. can add variable in the watch section, to monitor its current value, 比如我们想观测a的值, 就可以输入a, a变化，watch section 的a也会发生变化
+
+![](/img/post/VSCode/python_debug2.png)
+
+4. 我们也可以在Debug Console (调试控制台中) 输入variable，debug console 就会输出它的值
+
+![](/img/post/VSCode/python_debug3.png)
