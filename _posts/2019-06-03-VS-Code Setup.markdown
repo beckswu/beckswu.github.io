@@ -319,3 +319,33 @@ VS code automatically pick up virtual environment. 点击python 的版本, 会�
 
 
 #### Git
+
+1. Ctrl + Shift + P : Git Init, 选择初始化的folder, 在VSCode working directory不会显示.git, 因为VSCode filter it out
+2. 在working directory to create git ignore file to ignore virtual environment
+
+
+![](/img/post/VSCode/git.png)
+
+.gitignore 文件中的content
+```shell
+venv
+.vscode
+
+```
+
+- 点➕, stage change, or 点击右上角的...button, stage all change
+
+![](/img/post/VSCode/git2.png)
+
+- 点✅ , 然后输入文字, to commit changes
+
+![](/img/post/VSCode/git3.png)
+
+
+- commit之后更改源代码, 会在line number有个红点，点它，会显示上次commit的原版本
+- 更改完源代码，go to git panel, click unstaged file, 会显示更改的side by side 
+
+![](/img/post/VSCode/git4.png)
+
+![](/img/post/VSCode/git5.png)
+
