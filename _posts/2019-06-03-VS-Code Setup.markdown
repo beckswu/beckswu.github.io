@@ -13,6 +13,14 @@ tags:
     - Setup
 ---
 
+如果想open code directiory from command line, 可以用code command
+
+```shell
+code Unit-Test-Demo/
+
+```
+如果code command 报错, go to VSCode, Ctrl+Shift+P, 输入shell, 点shell Command: Install code command in PATH
+
 ## Theme
 
 #### File ICON THEME
@@ -22,6 +30,8 @@ tags:
 
 
 ![](/img/post/VSCode/File_Icon_Theme.png)
+
+
 
 
 ## C++ Windows
@@ -365,3 +375,25 @@ venv
 4. 我们也可以在Debug Console (调试控制台中) 输入variable，debug console 就会输出它的值
 
 ![](/img/post/VSCode/python_debug3.png)
+
+#### Unit Testing
+
+1. Ctrl + Shift + P, Discover --> Python: Discover Tests --> 之后会让你选择framework of unit test, 我们选择unittest --> root --> 选择pattern of unit test (test 文件是怎么命名的), 选择了test_*.py (表示所有的test 都是 test_cal.py, test_class.py, 不能是testcal.py) 
+
+![](/img/post/VSCode/python_unittest1.png)
+
+![](/img/post/VSCode/python_unittest2.png)
+
+2. 再打开任意的test_*.py, 可以看见每一个test case上有run_test (只run这一个test case， 点后如果pass，会打对勾) 和 debug_test 两个选项可以点, class上也有run_test 和 debug_test, class上的run_test 是run all test case, 
+    - 如果test pass, 会打对勾，如果test fail 会打叉
+  
+![](/img/post/VSCode/python_unittest3.png)
+
+3. 点击VSCode 下面的warning, 可以选择View Unit Test Output or Run Failed Tests
+   
+![](/img/post/VSCode/python_unittest4.png)
+   
+   - 点了View Unit Test Output, it shows where test case failed
+
+![](/img/post/VSCode/python_unittest5.png)
+
