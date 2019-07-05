@@ -155,7 +155,7 @@ g++ --version #如果MinGW 放进Environment variable，会显示信息
 ![](/img/post/VSCode/mac_task3.png)
 
 
-## Python Environment
+## Virtual Environment
 
 install certain packages for certain projects, 比如你以前的project 用了django version 1, 现在你想要用django version 2 对于新的project, 可能会break 以前的project。我们不想same project points to the same version of django, each project should have the same packages each other
 
@@ -349,3 +349,4 @@ venv
 
 ![](/img/post/VSCode/git5.png)
 
+- 点击右上角的...button， click  push to, 可以push git 到remote repository
