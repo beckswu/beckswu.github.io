@@ -119,6 +119,7 @@ g++ --version #如果MinGW 放进Environment variable，会显示信息
 ![](/img/post/VSCode/coderunner5.png)
 
 
+
 #### 设置C++ 版本
 
 1. 点右下角 -->  设置, 在用户设置中 (user settings) 输入 ”code-runner.executorMap":, 然后点tooltip，会蹦出default的格式,
@@ -154,41 +155,7 @@ g++ --version #如果MinGW 放进Environment variable，会显示信息
 ![](/img/post/VSCode/mac_task3.png)
 
 
-## Python Mac
-
-到VS Code extenison 安装Python 和 Python for VSCode
-
-- 方法一:  下载code runner (详见C++ Mac 下载code runner), 点run code,
-- 方法二:  在script上右键 Run Python File in Terminal 
-
-#### Switch Python Version 
-
-在VS code 左下角显示当天Python 版本，点击它如图
-
-![](/img/post/VSCode/python_version.png)
-
-![](/img/post/VSCode/python_version2.png)
-
-如果选了2.7, 再run python, 会显示2.7 
-
-![](/img/post/VSCode/python_version3.png)
-
-
-#### Setup Default Python Path
-
-可以设置所有python 版本 默认的路径: 设置 --> usersetting --> 加上python.pythonpath
-
-![](/img/post/VSCode/coderunner4.png)
-
-
-
-![](/img/post/VSCode/python_path.png)
-
-
-#### Setup Python Virtual Environment
-
-
-###### Basic 
+## Python Environment
 
 install certain packages for certain projects, 比如你以前的project 用了django version 1, 现在你想要用django version 2 对于新的project, 可能会break 以前的project。我们不想same project points to the same version of django, each project should have the same packages each other
 
@@ -286,3 +253,69 @@ pip freeze --local > requirement.txt #只会把在local library output到require
 deactivate 
 pip list #不会显示local装的flask
 ```
+
+## Python Mac
+
+到VS Code extenison 安装Python 和 Python for VSCode; Shift + Option + F 安装format code autopep8, 装好后Shift + Option + F 会auto mate code; 再装pyLint: 在run之前，会显示出code的error or warning 
+
+- 方法一:  下载code runner (详见C++ Mac 下载code runner), 点run code,
+- 方法二:  在script上右键 Run Python File in Terminal 
+
+
+#### Switch Python Version 
+
+在VS code 左下角显示当天Python 版本，点击它如图
+
+![](/img/post/VSCode/python_version.png)
+
+![](/img/post/VSCode/python_version2.png)
+
+如果选了2.7, 再run python, 会显示2.7 
+
+![](/img/post/VSCode/python_version3.png)
+
+
+#### Setup Default Python Path
+
+可以设置所有python 版本 默认的路径: 设置 --> usersetting --> 加上python.pythonpath
+
+![](/img/post/VSCode/coderunner4.png)
+
+
+
+![](/img/post/VSCode/python_path.png)
+
+
+#### Setup Python Virtual Environment
+
+通过terminal 建立一个folder
+
+```shell
+
+python3 -m venv venv
+
+source venv/bin/activate #activate virtual environment
+
+```
+
+![](/img/post/VSCode/ve1.png)
+
+VS code automatically pick up virtual environment. 点击python 的版本, 会看见新建的python virtual environment
+
+之后打开VScode 文件夹中的setting, python-path是venv文件夹中的virtual environment的python. 
+
+![](/img/post/VSCode/ve2.png)
+
+**Change Code Runner Python Version**: change to the python interpret that python is currently using 
+
+设置 --> usersetting --> 设置"code-runner.executorMap", 如果想自己customized setting, 可以去Extension的code runner安装下面有说明
+
+![](/img/post/VSCode/coderunner4.png)
+
+
+![](/img/post/VSCode/ve3.png)
+
+之后点code runner, code runner 的版本应该与我们选择python 版本一致
+
+
+#### Git
