@@ -17,7 +17,7 @@ tags:
 ```shell
 
 cmake_minimum_required(VERSION 3.14.5) #VERSION  必须大写，否则报错
-project(MyProject VERSION 1.0)
+project(MyProject VERSION 1.0) #PROJECT CALL是必须的
 
 add_executable(cmake-good main.cpp) #make exectuable, 生成exe会叫cmake-good
 
@@ -381,3 +381,172 @@ Build 后 run的结果
 ![](/img/post/cmake/subdir.png)
 
 
+## Scripting
+
+The only type in cmake is string. Everything is string. 一行内argument 不同的string 用空格隔开，多少空格都可以，可以move and shift whitespace 
+
+command_name(LIST OF ARGUMENT) #command is a function. you cannot have two command on the same line, it's a syntax error  
+
+message(STATUS "") 打印到屏幕 <br/>
+set(MY_VARIABLE "123") 给VARIABLE 设置变量 <br/>
+${PROJECT_NAME}, ${PROJECT_VERSION}, call project name & version from Project command
+
+```
+
+cmake_minimum_required(VERSION 3.15)
+
+#Everything you pass is a string
+project(MyProject VERSION 1.0) #MyProject, VERSION, 1.0 are all string
+#project("MyProject" VERSION 1.0) #跟上面是一样的
+# 我们不put comma between string, put whitespace, whitespace 可以被move and shift as we need 
+#project("MyProject"           VERSION
+#         1.0) 也是可以的
+
+message(STATUS "I am a message") #message(STATUS)  就是 print message， 会打印I am a message
+# " 引号是需要的，因为prevent pass each argument as separate item, 
+# 如果去掉引号，run cmake. 会显示Iamamessage , all argument together with no space
+
+set(MY_VARIABLE "I am Variable") #set variables
+message(STATUS "The variable name ${MY_VARIABLE}") #需要${} 去print variable
+#${MY_VARIABLE} pass variable inline into the whole string before print message
+
+message(STATUS "The Project name ${PROJECT_NAME} version: ${PROJECT_VERSION}") 
+#pass project from most recent project call  and call project Version 来自Project call
+
+```
+
+输出
+
+![](/img/post/cmake/script1.png)
+
+
+#### if 
+
+- if(${my_bool} ) 和 if(my_bool) 作用一样，都是deference varaible my_bool
+- NOT: to negate. e.g. if(NOT my_bool)
+- Cmake treat一些string pattern as true, 其他的as false, 具体的pattern 在documentation
+- AND, OR, LESS : logical
+- Difference between <span style="background-color:red">STREQUAL, EQUAL</span> is : EQUAL do the arithmatic comparison, STREQUAL is do string comparison
+- elseif(MY_STRING MATCHES "string$") : <span style="background-color:red">"MATCH</span> regularization, match if string is the end of MY_STRING
+
+
+```shell
+
+cmake_minimum_required(VERSION 3.15)
+
+project(MyProject VERSION 1.0) 
+
+set(my_bool, TRUE)
+
+if(my_bool) #cmake treat this unquoted argument as variable reference  my_bool, 
+#if(${my_bool} ) 与if(my_bool)  一样
+#if(NOT my_bool) Not is to negate condition
+
+#if("TRUE") #string literal true, CMake intepret as true condition 
+#if("FALSE") 
+    message(STATUS "Condition was met")
+else() 
+    message(STATUS "Conditional failed")
+endif()
+
+
+
+#--------------_String  Compare-------------
+
+set(MY_STRING "This is a string")
+set(MY_OTHER_STRING "This is a string")
+
+
+if(MY_STRING ) #Cmake treat一些string pattern as true, 其他的as false
+    message(STATUS "String (a) Condition was met")
+else() 
+    message(STATUS "String (a) Conditional failed")
+endif()
+
+set(my_value 1)
+
+if(MY_STRING STREQUAL MY_OTHER_STRING ) #Cmake treat一些string pattern as true, 其他的as false
+#具体的见cmake documentation 
+#if(MY_STRING STREQUAL "MY_OTHER_STRING" ) 如果加了引号cmake will treat it as string not variable 
+#if(NOT MY_STRING STREQUAL MY_OTHER_STRING ) NEGATE
+    message(STATUS "String(b) Condition was met")
+else() 
+    message(STATUS "String(b) Conditional failed")
+endif()
+
+
+if((MY_STRING STREQUAL MY_OTHER_STRING ) AND (my_value EQUAL "3"))
+#Difference between STREQUAL, EQUAL is : EQUAL do the arithmatic comparison 
+    message(STATUS "String(c) Condition was met")
+elseif(MY_STRING MATCHES "string$") #match if string is the end of MY_STRING
+#MATCHES is regular expression 
+    message(STATUS "String(c) string is the end of MY_STRING")
+else() 
+    message(STATUS "String(c) Conditional failed")
+endif()
+
+```
+
+![](/img/post/cmake/script2.png)
+
+
+#### While
+
+```shell
+cmake_minimum_required(VERSION 3.15)
+
+project(MyProject VERSION 1.0) 
+
+set(MY_STRING "This is a string")
+set(MY_OTHER_STRING "This is a string")
+set(my_value 1)
+
+while(my_value LESS 10)
+    message(STATUS "VALUE is ${my_value}")
+    math(EXPR my_value "${my_value} + 1") 
+    #EXPR always是第一位, 第二个参数是store的, 第三个是math expression
+endwhile()
+
+
+```
+
+![](/img/post/cmake/script3.png)
+
+
+
+#### For Loop
+
+Loop Mode
+
+- IN ITEMS : 加LOOP 的ITEMS
+- RANGE : 可以加数字
+
+```shell
+cmake_minimum_required(VERSION 3.15)
+
+project(MyProject VERSION 1.0) 
+
+
+set(MY_STRING "This is a string")
+set(MY_OTHER_STRING "This is a string")
+set(my_value 1)
+
+foreach(item IN ITEMS foo bar baz ) #第一个参数 is loop variable, 第二个参数是 loop mode: IN ITEMS  
+    message(STATUS "ITEM is ${item}")
+endforeach() 
+
+foreach(idx RANGE 5) #loop from [0,5] inclusive
+    message(STATUS "index_a is ${idx}")
+endforeach() 
+
+foreach(idx RANGE 1 5) #loop from [1,5] inclusive
+    message(STATUS "index_b is ${idx}")
+endforeach() 
+
+foreach(idx RANGE 1 5 2) #loop from [1,5] inclusive, step is 2 
+    message(STATUS "index_c is ${idx}")
+endforeach() 
+
+```
+
+![](/img/post/cmake/script4.png)
