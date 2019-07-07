@@ -269,6 +269,9 @@ using namespace std;
 
 void hello::say_hello(){
     cout << " hi "<<endl;
+    cout<< "Preprocessor Definititon "<< SAY_HELLO_VERSION <<endl;
+    //SAY_HELLO_VERSION 来自CMAKE 的definition
+
 }
 
 
@@ -281,6 +284,7 @@ using namespace std;
 int main(){
     hello::say_hello();
 	system("Pause");
+    cout<< "Preprocessor Definititon "<< SAY_HELLO_VERSION <<endl;
 }
 
 ```
@@ -308,6 +312,16 @@ CMAKELISTS.txt (3)
 
 
 CMAKELISTS.txt (1)
+
+
+<span style="background-color:#FFFF00">定义target_compile_definitions 好处是，不用修改code, 直接这里改，然后一build 就好了 </span>
+
+<span style="background-color:#FFFF00">**PUBLIC:  如果target_compile_definitions 定义成了PUBLIC, 谁都可见**</span>, PUBLIC says both we and our consumers recieve the value.
+
+<span style="background-color:#FFFF00">**PRIVATE:  如果target_compile_definitions 定义成了PRIVATE, 只有这个library 可以看见，其他的library 还有main function 都看不见**</span>
+
+<span style="background-color:#FFFF00">**INTERFACE:  如果target_compile_definitions 定义成了INTERFACE, 除了这个library 其他的library都可见**</span>, 因为INTERFACE has the opposite effect of PRIVATE, only consumers receives this value properties but we ourself do not
+
 ```shell
 
 add_library( 
@@ -321,9 +335,22 @@ target_include_directories(say-hello PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
 #PUBLIC 是 interface mode
 #${CMAKE_CURRENT_SOURCE_DIR} refer to the  directory process 现在这个cmakelists, 就是say-hello 这个directory
 
+
+
+target_compile_definitions(say-hello PUBLIC SAY_HELLO_VERSION=8) 
+#set preprocessor version = 8
+#相当于#define SAY_HELLO_VERSION 8 在C++中
+#因为set 了public, SAY_HELLO_VERSION will propagate to everyone who link to it 
+
+#target_compile_definitions(say-hello PRIVATE SAY_HELLO_VERSION=4)
+#target_compile_definitions(say-hello INTERFACE SAY_HELLO_VERSION=4) 
+
+
+
 ```
 
 CMAKELISTS.txt (2)
+
 ```shell
 
 add_executable(cmake-good main.cpp) #make exectuable, 生成exe会叫cmake-good
@@ -348,5 +375,9 @@ add_subdirectory(hello-exe)
 #还以为hello-exe中的CMakeLists.txt的target_link_libraries call 了say-hello library
 
 ```
+
+Build 后 run的结果
+
+![](/img/post/cmake/subdir.png)
 
 
