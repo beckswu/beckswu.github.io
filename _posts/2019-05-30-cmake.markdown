@@ -380,6 +380,20 @@ Build 后 run的结果
 
 ![](/img/post/cmake/subdir.png)
 
+- message: to print on screen 
+    - status: is one of enum argument represent the mode of printing
+    - 单引号括variable 会当成单引号, 双引号括 variable 会当specifier
+- set :  给VARIABLE 设置变
+- {PROJECT_NAME}, ${PROJECT_VERSION}, call project name & version from Project command
+
+```
+
+set(my_variable 123)
+message(STATUS "${my_variable}") #打印 123
+message(STATUS '${my_variable}') #打印 '123'
+
+```
+
 
 ## Scripting
 
@@ -426,8 +440,8 @@ message(STATUS "The Project name ${PROJECT_NAME} version: ${PROJECT_VERSION}")
 - NOT: to negate. e.g. if(NOT my_bool)
 - Cmake treat一些string pattern as true, 其他的as false, 具体的pattern 在documentation
 - AND, OR, LESS : logical
-- Difference between <span style="background-color:red">STREQUAL, EQUAL</span> is : EQUAL do the arithmatic comparison, STREQUAL is do string comparison
-- elseif(MY_STRING MATCHES "string$") : <span style="background-color:red">"MATCH</span> regularization, match if string is the end of MY_STRING
+- Difference between <span style="color:red">STREQUAL, EQUAL</span> is : EQUAL do the arithmatic comparison, STREQUAL is do string comparison
+- elseif(MY_STRING MATCHES "string$") : <span style="color:red">"MATCH</span> regularization, match if string is the end of MY_STRING
 
 
 ```shell
@@ -520,6 +534,7 @@ Loop Mode
 
 - IN ITEMS : 加LOOP 的ITEMS
 - RANGE : 可以加数字
+— LIST : 用from list
 
 ```shell
 cmake_minimum_required(VERSION 3.15)
@@ -550,3 +565,201 @@ endforeach()
 ```
 
 ![](/img/post/cmake/script4.png)
+
+#### Property
+
+CMake passing argument property: automated list expansion. List in cmake is semicolon lists of values (e.g. 1;2;3)
+
+- set_property
+    - GLOBAL: first argument . 设置property 为cmake property behave like ENUM argument 
+    - DIRECTORY: first argument . 设置property为 directory property，只能用get_property 接
+    - PROPERTY: is key word specifier for argument
+    - PROPERTY FOO: is the value of keyword argument property
+- get_cmake_property: get value from GLOBAL Scope property to assign to variable
+- get_property: 用来接DIRECTORY property
+
+```shell
+
+cmake_minimum_required(VERSION 3.15)
+
+project(MyProject VERSION 1.0) 
+
+#property is different from variable 
+set_property( #set property at global scope called foo
+# PROPERTY FOO 1 2 3 are all separate string argument,
+    GLOBAL #GLOBAL behave like ENUM argument 
+   # "GLOBAL"  #如果用引号和不用引号一样，因为是string argument
+    PROPERTY FOO #PROPERTY is key word specifier for argument  FOO
+    #FOO is the value of keyword argument property
+    1 
+    2
+    3
+)
+
+#foo_value 用; separate element from list 
+get_cmake_property(foo_value FOO) #get value from property
+message(STATUS "Value of foo is ${foo_value}") #打印Value of foo is 1;2;3
+
+
+set_property( 
+    DIRECTORY #set the property foo on the directory,
+    #所以在这个程序里面 get_cmake_property, 会显示FOO2 not found
+    #因为我们没有cmake property FOO2, we have directory property
+    PROPERTY FOO2 
+    1 
+    2
+    3
+)
+
+#也可以把list传入property
+
+set(my_list 1 2 3)
+set_property(
+    GLOBAL
+    PROPERTY FOO3
+    '${my_list}'   
+)
+
+get_cmake_property(foo_value3 FOO) #get value from property
+message(STATUS "Value of foo3 is ${foo_value3}") #打印Value of foo is 1;2;3
+
+
+set(target GLOBAL) #GLOBAL HERE is not specifical behavior
+# this is set the value of target to string "GLOBAL"
+set_property(
+    "${target}" #可以把string 传入作为GLOBAL
+    PROPERTY FOO4
+    "${my_list}"   
+)
+
+
+set(target DIRECTORY "${PROJECT_SOURCE_DIR}") #可以set directory 具体的位置 作为list 
+#to set property on the project source directory
+set_property(
+    #'${target}' #这么写会报错，因为这么写会写成 DIRECTORY; \work\src 的格式，有个分号
+    ${target} #这么写 会自动list expansion in place
+    PROPERTY FOO5
+    "${my_list}"
+)
+
+
+get_property(foo_value5 ${target} PROPERTY FOO5 ) #get value from property
+# ${target} do the list expansion in place
+message(STATUS "Value of foo3 is ${foo_value5}") #打印Value of foo is 1;2;3
+
+```
+
+![](/img/post/cmake/script5.png)
+
+
+#### Function 
+
+- 第一个argument is function, 随后的argument is argument name
+- 当call function 时候, must pass at least the number of argument declared in the function, function declared 几个参数 call时候只能多 不能少
+- 当function 不知道pass 了几个argument 时候可以用ARGV ARGN, ARGV: 所有传进function的参数都在ARGV 或者 ARGN当中。<span style="background-color:#FFFF00"> 不同点是ARGV 是包括了传入function 所有参数(all variable), ARGN只包括传入function 除了function declare 的参数外的参数(argument have not been bound to a named argument to the function)</span>
+- 当定义GLOBAL variable， 可以定义在任何地方，因为global variale被function called 的时候才做expansion
+    - the variable scope of a function is initially copied from the variable within the parent scope. 当call function, cmake will make a copy of entire parent variable scope and set into function call。 当function called 完, restore the original global scope. <span style="background-color:#FFFF00"> 这意味着改global variable inside function will not change variable outside function except explicitly set to change original </span>
+    - 注：下面例子中 set(MY_GLOBAL_VAR 13 PARENT_SCOPE) 只会改变parent scope 变量，但不会改变current scope 的变量，因为我们没有改copy的，只改了original的
+- function 以 参数pass 的时候，相当于set, 见下面例子
+
+```shell
+
+function(increment var) 
+#function 用过variable 来called， 相当于等于 set(var, value)
+
+    message(STATUS "VALUE before increment is ${var}") #print value
+    message(STATUS "VALUE after increment is ${${var}} ") 
+    #we deference once to get value, we deference again to get 14
+endfunction()
+
+set(value 14)
+increment(value)
+
+```
+
+```shell
+
+cmake_minimum_required(VERSION 3.15)
+
+project(MyProject VERSION 1.0) 
+
+function(do_cmake_good first_arg) #First Argument is function name, subsequent argument is function 参数
+    message(STATUS "You called Cmake Function ${first_arg}")
+endfunction()
+
+#function declared 几个参数 call时候只能多 不能少
+do_cmake_good(1 2 3 )#I can pass more argument,
+#first_arg is bound to 1, 但是 2, 3, 4 不bound any variable in the function
+
+
+function(do_cmake_good2 first second third) 
+    foreach(arg IN LISTS ARGN) #ARGN 会从第四个参数开始
+        message(STATUS "You called Cmake ARGN Function ${arg}")
+    endforeach()
+    foreach(arg IN LISTS ARGV) #ARGN 会从第一个参数开始
+        message(STATUS "You called Cmake ARGV Function ${arg}")
+    endforeach()
+endfunction()
+
+do_cmake_good2(1 2 3 4 )
+
+
+function(do_cmake_good3)
+    message(STATUS "My global var is ${MY_GLOBAL_VAR}") #print Meow
+    #expansion happens only when actually evaluate 
+    message(STATUS "My global var2 is ${MY_GLOBAL_VAR2}") #print Meow
+
+    set(MY_GLOBAL_VAR 12)
+    message(STATUS "My global var is ${MY_GLOBAL_VAR}") #print 12
+
+    set(MY_GLOBAL_VAR2 13 PARENT_SCOPE) #会改变parent scope 的variable
+    #但是不改变its current scope
+    message(STATUS "My global var2 is ${MY_GLOBAL_VAR}") #print MEOW
+
+endfunction()
+
+set(MY_GLOBAL_VAR Meow) #即使global variable定义在function的后面
+#varaible 也可以expand 到function 
+set(MY_GLOBAL_VAR2 Meow)
+
+do_cmake_good3()
+message(STATUS "My global var is after function ${MY_GLOBAL_VAR}") #print Meow
+#因为cmake called function时候, 是copy variable from parent scope, 
+# 而不是带着global variable在function 里面跑
+
+message(STATUS "My global var2 is after function ${MY_GLOBAL_VAR2}") #print 13
+
+
+function(increment var) 
+#function 用过variable 来called， 相当于等于 set(var, value)
+
+    # message(STATUS "VALUE before increment is ${var}") #print value
+
+    message(STATUS "value before increment is ${${var}}")
+    math(EXPR new_value "${${var}} + 1")
+    message(STATUS "VALUE after increment is ${new_value}") 
+    #we deference once to get value, we deference again to get 14
+
+    set("${var}" "${new_value}" PARENT_SCOPE) #用scope 改变function 外面value的值,
+    #因为set(var, value)  value = ${var} 
+
+endfunction()
+
+set(value 14)
+increment(value)
+message(STATUS "VALUE after increment outside function is ${value}") 
+
+
+function(sum out a b)
+    math(EXPR ret "${a} + ${b}") #新variable ret = a + b
+    set("${out}" ret)
+endfunction()
+
+sum(value 5 3) #把 5 + 3 assign 给 value 
+message(STATUS "sum is ${value}")
+
+
+```
+
+
+![](/img/post/cmake/script6.png)
