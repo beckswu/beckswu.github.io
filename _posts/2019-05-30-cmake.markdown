@@ -763,3 +763,111 @@ message(STATUS "sum is ${value}")
 
 
 ![](/img/post/cmake/script6.png)
+
+
+## Source/Binary Directories
+
+
+File Structure, C文件与之前一样，没有更改
+```shell
+
+建立如下面的folder 
+
+say-hello
+    -- src
+        --say-hello
+            --hello.h
+            --hello.cpp
+    -- CMAKELISTS.txt (1)
+
+hello-exe
+   -- CMAKELISTS.txt (2)
+   -- main.cpp
+   
+CMAKELISTS.txt (3)
+PrintVariable.cmake
+
+
+```
+
+CMAKELISTS.txt (1)
+
+```shell
+
+project(HelloLibrary VERSION 1.3.9)
+
+add_library(
+    say-hello
+    src/hello_lib/hello.h
+    src/hello_lib/hello.cpp
+)
+
+target_include_directories(say-hello PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
+
+target_compile_definitions(say-hello PUBLIC SAY_HELLO_VERSION=8)
+
+```
+
+CMAKELISTS.txt (2)
+
+```shell
+
+project(HeloProgram VERSION 2.0.1)
+
+add_executable(cmake-good main.cpp)
+
+print_variable() 
+
+target_link_libraries(cmake-good PRIVATE say-hello)
+
+
+```
+
+CMAKELISTS.txt (3)
+
+```shell
+
+
+cmake_minimum_required(VERSION 3.15)
+
+project(TopProject VERSION 2.0)
+
+include(PrintVariables.cmake) #include 额外的Cmake Script
+
+#print_variable() #call function from PrintVariables.cmake
+
+
+add_subdirectory(say-hello example-binary-subdir)
+#可以pass 第二个argument 作为binary build directory instead of default binary directory generated
+add_subdirectory(hello-exe)
+
+
+```
+
+PrintVariables.cmake 
+
+``shell
+#Project calls in sub directories do not affect the value of project 
+#named project version, project source, binary dir in the parent directory.
+
+
+function(print_variable)
+    message(STATUS "The Cmake Source Directory is ${CMAKE_SOURCE_DIR}")
+    #SOURCE DIR is top level of source tree
+    message(STATUS "The Cmake Binary Directory is ${CMAKE_BINARY_DIR}")
+    #BINARY DIR is top level of build tree
+    message(STATUS "The Source Directory of ${PROJECT_NAME} is ${PROJECT_SOURCE_DIR}")
+    message(STATUS "The BINARY Directory of ${PROJECT_NAME} is ${PROJECT_BINARY_DIR}")
+    message(STATUS "The version of the current project is ${PROJECT_VERSION}")
+    message(STATUS "The current Source Directory is ${CMAKE_CURRENT_SOURCE_DIR}") 
+    #CMAKE_CURRENT_SOURCE_DIR directory of current CmakeLists.txt
+    message(STATUS "The current Binary Directory is ${CMAKE_CURRENT_BINARY_DIR}")
+    message(STATUS "The current script file is ${CMAKE_CURRENT_LIST_FILE}")
+    message(STATUS "The current script directory is ${CMAKE_CURRENT_LIST_DIR}")
+endfunction()
+
+```
+
+run cmake. give output 
+
+![](/img/post/cmake/dir1.png)
