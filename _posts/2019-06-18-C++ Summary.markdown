@@ -11,6 +11,15 @@ tags:
     - 学习笔记
 ---
 
+
+```c++
+
+cout<<" File Name "<< __FILE__ << endl; //打印现在file name
+
+cout<<" Line Number "<<__LINE__<<endl; //打印现在现在的行数
+
+```
+
 ## Variable and Basic Types
 
 **Object**: an object is a region of memory that has a type. In the book, we will freely use the term *object* regardless of whether the object has built-in or class type, named or unnamed (命名的还是未命名的), or can be read or written.
