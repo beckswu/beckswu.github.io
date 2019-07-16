@@ -12,6 +12,14 @@ tags:
     - 学习笔记
 ---
 
+**aux_source_directory(. SRC_DIR)** 会查找指定目录下的所有源文件, 这里查找 . (current directory), 并查找结果存进SRC_DIR <br/>
+**option (USE_MATH "Use provided math implementation" ON)**: Provide an option for the user to select as ON or OFF. If no initial value is provided, OFF is used. "Use provided math implementation" 使用来help string describing option
+
+
+
+
+
+
 ## Executable
 
 ```shell
@@ -774,15 +782,22 @@ File Structure, C文件与之前一样，没有更改
 建立如下面的folder 
 
 say-hello
-    -- src
-        --say-hello
-            --hello.h
-            --hello.cpp
-    -- CMAKELISTS.txt (1)
+    |
+    +---  src
+        |
+    |   +--- say-hello
+    |        |
+    |        +--- hello.h
+    |        |
+    |        +--- hello.cpp
+    |
+    +---  CMAKELISTS.txt (1)
 
 hello-exe
-   -- CMAKELISTS.txt (2)
-   -- main.cpp
+   |
+   +--- CMAKELISTS.txt (2)
+   |
+   +---  main.cpp
    
 CMAKELISTS.txt (3)
 PrintVariable.cmake
@@ -846,7 +861,8 @@ add_subdirectory(hello-exe)
 
 PrintVariables.cmake 
 
-``shell
+```shell
+
 #Project calls in sub directories do not affect the value of project 
 #named project version, project source, binary dir in the parent directory.
 
@@ -871,3 +887,82 @@ endfunction()
 run cmake. give output 
 
 ![](/img/post/cmake/dir1.png)
+
+
+## Example 
+
+####  Same Folder
+
+```shell
+
+./Demo2
+    |
+    +--- main.cpp
+    |
+    +--- MathFunctions.cpp
+    |
+    +--- MathFunctions.h
+```
+
+```shell
+
+cmake_minimum_required(VERSION 3.15.0)
+
+project(DEMO, VERSION 1.0.0)
+
+#aux_source_directory 会查找指定目录下的所有源文件,
+#这里查找 . (current directory), 并查找结果存进SRC_DIR
+aux_source_directory(. SRC_DIR)
+
+add_executable(DEMO ${SRC_DIR})
+
+```
+
+#### Library in Sub Folder
+
+```shell
+
+./Demo3
+    |
+    +--- main.cpp
+    |
+    +--- math/
+          |
+          +--- MathFunctions.cpp
+          |
+          +--- MathFunctions.h
+          |
+          +--- CMakeLists.txt (1)
+    |
+    +--- CMakeLists.txt (2)
+```
+
+CMakeLists.txt (2),**add_subdirectory** 指明本项目包含一个子目录 math，这样 math 目录下的 CMakeLists.txt 文件和源代码也会被处理, **target_link_libraries** 指明可执行文件 main 需要连接一个名为 MathFunctions 的链接库 。
+```shell
+
+cmake_minimum_required (VERSION 2.8)
+# 项目信息
+project (Demo3)
+# 查找当前目录下的所有源文件
+# 并将名称保存到 DIR_SRCS 变量
+aux_source_directory(. DIR_SRCS)
+# 添加 math 子目录
+add_subdirectory(math)
+# 指定生成目标 
+add_executable(Demo main.cpp)
+# 添加链接库
+target_link_libraries(Demo MathFunctions)
+
+```
+
+CMakeLists.txt (1)
+```shell
+# 查找当前目录下的所有源文件
+# 并将名称保存到 DIR_LIB_SRCS 变量
+aux_source_directory(. DIR_LIB_SRCS)
+# 生成链接库
+add_library (MathFunctions ${DIR_LIB_SRCS})
+
+```
+
+

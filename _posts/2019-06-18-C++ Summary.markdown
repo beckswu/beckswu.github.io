@@ -419,3 +419,103 @@ const double *const pip = &pi; // pip is a const pointer (在pointer右边的con
 
 ```
 
+
+
+## Include Guard
+
+n the C and C++, an **#include guard**, sometimes called a **macro guard**, **header guard** or **file guard**, is a particular construct used to avoid the problem of double inclusion when dealing with the include directive.避免double include 
+
+C preprocessor 把include 的file 复制its contents  into a copy of the source file known as translation unit. The files included in this regard are generally header files(), which typically contain declarations of functions and classes or structs. If certain C or C++ language constructs are defined twice, the resulting translation unit is invalid (如果被defined两次, translation unit invalid). #include guards prevent this erroneous construct from arising by the double inclusion mechanism.
+
+
+
+The addition of <span style="background-color:#FFFF00">**#include guards**</span> to a header file is one way to make that file idempotent. Another construct to combat double inclusion is <span style="background-color:#FFFF00">**#pragma once**</span>, which is non-standard but nearly universally supported among C and C++ compilers.
+
+
+**Double Inclusion**
+
+
+File "grandparent.h"
+```c++
+struct foo {
+    int member;
+};
+
+```
+
+
+File "parent.h"
+
+```c++
+#include "grandparent.h"
+
+```
+
+
+File "child.c"
+
+```c++
+#include "grandparent.h"
+#include "parent.h"
+
+```
+
+Result
+
+```c++
+
+struct foo {
+    int member;
+};
+struct foo {
+    int member;
+};
+
+```
+
+Here, the file "child.c" has indirectly included two copies of the text in the header file "grandparent.h". This causes a <span style="color:red""> compilation error</span>, since the structure type foo will thus be defined twice. In C++, this would be called a violation of the [one definition rule](https://en.wikipedia.org/wiki/One_Definition_Rule)
+
+**Use of #include guards**
+
+In this section, the addition of #include guards, the C preprocessor preprocesses the header files, including and further preprocessing them recursively. This will result in a correct source file, 
+
+File "grandparent.h"
+
+```c++
+#ifndef GRANDPARENT_H
+#define GRANDPARENT_H
+
+struct foo {
+    int member;
+};
+
+#endif /* GRANDPARENT_H */
+
+```
+
+File "parent.h"
+
+```c++
+#include "grandparent.h"
+
+```
+
+File "child.c"
+
+```c++
+#include "grandparent.h"
+#include "parent.h"
+
+```
+
+Result
+
+``````c++
+struct foo {
+    int member;
+};
+```
+
+
+Here, the first inclusion of "grandparent.h" causes the macro GRANDPARENT_H to be defined. 在parent 之后, when "child.c" includes "grandparent.h" the second time, the #ifndef test returns false, and the preprocessor skips down to the #endif(<span style="background-color:#FFFF00"> 当第二次include parent.h, ifndef返回false, preprocessor skips to endif </span>), thus avoiding the second definition of struct foo. The program compiles correctly.
+
