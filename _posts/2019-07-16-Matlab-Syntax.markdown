@@ -170,7 +170,7 @@ ds(1,:) %取所有第一行的数据
 ds(1,2) %取所有第一行第二个的数据
 
 
-#Get Subset from dataset
+%Get Subset from dataset
 params(strcmpi(ds.Name, 'JOHN'),:); %取所有Name = "JOHN"的数据,  返回所有name = John所有行和列
 %strcmpi(ds.Name, 'JOHN') 是对比每个Name的column, 返回array size = ds.Name, if == John, 那个位置返回1,else, 该位置为0
 
@@ -224,6 +224,34 @@ params(any(ix,2),:) = []
 
 
 ```
+
+**Export DataSet**
+
+```matlab
+
+%To Txt File 
+% Export the dataset array, a text file named ds.txt. By default, export writes to a tab-delimited text file
+% 会create ds.txt in working folder, 如果file 已经存在, overwrites the existing file. 
+export(ds) %ds is dataset
+
+
+%Export without Column Name
+%Export ds with variable names suppressed to a text file named NoLabels.txt.
+export(ds,'File','NoLabels.txt','WriteVarNames',false)
+%There are no variable names in the first line of the created text file, NoLabels.txt.
+
+%Export to a comma-delimited format.
+export(ds,'File','Fun.csv','Delimiter',',')
+
+
+%Export to an Excel spreadsheet.
+export(ds,'XLSFile','Fun.xlsx')
+
+```
+
+
+#### Struct
+
 
 
 #### char 
