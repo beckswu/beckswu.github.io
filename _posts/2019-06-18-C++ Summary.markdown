@@ -20,6 +20,9 @@ cout<<" Line Number "<<__LINE__<<endl; //打印现在现在的行数
 
 ```
 
+- function return reference 可以用non-reference 去接, non-reference 接的话借的是copy 
+- namespace 中function 不是在class 但是声明了 static 是  give **internal linkage**, meaning that it is only accessible within the translation unit that contains the definition. Without static, it has external linkage, and is accessible in any translation unit. So you'd use static (or, alternatively, an unnamed namespace) when writing a function that's only intended for use within this unit; the internal linkage means that other units can define different functions with the same name without causing naming conflicts.
+
 ## Variable and Basic Types
 
 **Object**: an object is a region of memory that has a type. In the book, we will freely use the term *object* regardless of whether the object has built-in or class type, named or unnamed (命名的还是未命名的), or can be read or written.
