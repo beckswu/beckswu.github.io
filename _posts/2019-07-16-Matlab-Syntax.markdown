@@ -162,12 +162,43 @@ ds.ID(1)
 
 ds.Properties.ObsNames = ds.id;
 ds.id = []
+
+
+%Access
+ds(:,2) %取第二列的数据
+ds(1,:) %取所有第一行的数据
+ds(1,2) %取所有第一行第二个的数据
+
+
+#Get Subset from dataset
+params(strcmpi(ds.Name, 'JOHN'),:); %取所有Name = "JOHN"的数据,  返回所有name = John所有行和列
+%strcmpi(ds.Name, 'JOHN') 是对比每个Name的column, 返回array size = ds.Name, if == John, 那个位置返回1,else, 该位置为0
+
+
 ```
 
 
 **Clean DataSet**
 
-TF = ismissing(A) returns a logical array (0 和 1) that indicates which elements of an array or table contain missing values. The size of TF is the same as the size of A. 比如dataset size是 5*8， 返回的也是5*8
+TF = ismissing(A, indicator) returns a logical array (0 和 1) that indicates missing values. TF size is the same as the size of A. 比如dataset size是 5\*8， 返回的也是5\*8. Indicator, missing value indicators. 如果A is array, then indicator 必须是vector. If A table, indicator 可以是cell arra with entires of multiple datatypes. 如果想add indicators while maintaining the list of standard indicators, must include all default indicators. 例如, A is table wtih categorical and numeric values, use ismissing(A,{-99,'<undefined>'}) to indicate -99 as a missing numeric value, but preserve <undefined> as a missing categorical value.
+    
+```matlab
+%{
+A=5×4 table
+    dblVar    int8Var    cellstrVar    charVar
+    ______    _______    __________    _______
+
+     NaN          1       'one'           A   
+       3          3       'three'         C   
+     Inf          5       ''              E   
+       7          7       'NA'                
+       9        -99       'nine'          I   
+%}
+
+id = {'NA' '' -99 NaN Inf};
+TF = ismissing(A,id)
+
+```
 
 ```matlab
 
@@ -183,13 +214,19 @@ idx = isnan(ds.ModelID);
 params(ds,:) =[]; 
 %params(ds,:) 只返回空行的, 然后让空行的为空
 
+%方法二
+id =ismissing(params,'NumericTreatAsMissing',-99,...
+                 'StringTreatAsMissing',{'NaN','.','NA'});
 
+
+%Determine if any array elements are nonzero, dim = 2 表示对每一行操作，dim = 1表示对列进行check
+params(any(ix,2),:) = []
 
 
 ```
 
 
-## char 
+#### char 
 
 ```matlab
 
@@ -199,6 +236,14 @@ Str = 'abc';
 
 ```
 
+
+#### Convert Data
+
+```matlab
+
+messyData.var2 = str2double(messyData.var2); %把table的str data convert to double
+
+```
 
 
 
