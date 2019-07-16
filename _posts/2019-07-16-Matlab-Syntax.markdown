@@ -252,6 +252,72 @@ export(ds,'XLSFile','Fun.xlsx')
 
 #### Struct
 
+A structure array is a data type that groups related data using data containers called fields. Each field can contain any type of data. 
+每一个field 相当与cell, type可以不一样
+
+s = struct(field,value) creates a structure array with the specified field and value. 
+- If value 不是 cell array, or if value is a scalar cell array, then s is a scalar structure(key-value形式，而不是key-column of values形式). For instance, ``` s = struct('a',\[1 2 3\]) ``` creates a 1-by-1 structure, where s.a = \[1 2 3\].
+- If value is a nonscalar cell array, then s is a structure array with the same dimensions as value(与value dim 一样). Each element of s contains the corresponding element of value. For example, s = struct('x',{'a','b'}) returns s(1).x = 'a' and s(2).x = 'b'.
+- If value is an empty cell array {}, then s is an empty (0-by-0) structure. e.g. ``` s = struct('a',{},'b',{},'c',{}) ```
+
+s = struct(field1,value1,...,fieldN,valueN) creates a structure array with multiple fields.
+- 如果value都不是cell array or all values 在cell array里是scaler, s 是 scaler 
+- If 任何value是 nonscalar cell array, then s 是cell array. 
+    - 保持scaler和不是scaller的dimension 一样 to insert content of value in that field for all element of s , E.g. s = struct('x',{'a','b'},'y','c') returns s(1).x = 'a', s(2).x = 'b', s(1).y = 'c', and s(2).y ='c'
+    - 两个不是scaler 的cell array dimension不能不一样, 比如```Params = struct('name', cell(3,1), 'sex', {0}, 'id', cell(2,1));``` 会报错, ``` Params = struct('name', cell(3,1), 'sex', {0}, 'id', cell(3,1));``` 这样才可以, 但是每个cell array可以放任意的东西
+    
+    
+
+
+```matlab
+
+%创建struct
+%方法一
+s.a = 1;
+s.b = {'A','B',2}
+
+%方法二 Structure with One Field
+field = 'f';
+value = {'some text';
+         [10, 20, 30];
+         magic(5)};  %value 需要时cell array的形式
+s = struct(field,value)
+s.f 
+
+%{
+ans = 
+'some text'
+ans = 1×3
+
+    10    20    30
+
+ans = 5×5
+
+    17    24     1     8    15
+    23     5     7    14    16
+     4     6    13    20    22
+    10    12    19    21     3
+    11    18    25     2     9
+%}
+
+
+%方法三 Structure with Multiple Fields
+Params = struct('name', cell(3,1), 'beta', cell(3,1), 'ref', cell(3,1));
+s = struct('a',{},'b',{},'c',{})
+
+
+%struct with Empty Field
+s = struct('f1','a','f2',[])
+%s = struct with fields:
+%    f1: 'a'
+%    f2: []
+
+%index 
+s(1) %返回第一行所有数据
+s(1).a %只要第一行a的数据
+
+
+```
 
 
 #### char 
@@ -273,11 +339,23 @@ messyData.var2 = str2double(messyData.var2); %把table的str data convert to dou
 
 ```
 
+## Save 
+
+```matlab
+%把variable ds save 进mat file
+save(['data.mat'],'ds'); %如果不加ds 会存入所有working directory的variable 
+```
 
 
 ## Write File 
 
 ```matlab
+
+fid = fopen(outputFileName, 'w');
+fprintf(fid, ',%.16f', ds(i).id);
+%比如ds(i).id是matrix/array, fprint 会打印所有的variable 用逗号隔开, like ,1,2,3,4,5
+
+fclose(fid);%关掉这在写的file
 
 
 ```
