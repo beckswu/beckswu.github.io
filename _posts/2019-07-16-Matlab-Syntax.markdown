@@ -14,6 +14,13 @@ tags:
 
 ## Container
 
+#### Categorical
+
+```matlab
+categoryVar = categorical({'red';'yellow';'blue';'violet';'';'ultraviolet';'orange'});
+
+```
+
 #### Cell
 
 ```matlab
@@ -150,8 +157,27 @@ ds.ID  %size 是 n * 1
 ds.ID(1)
 
 
+
+%改变unique identifier  Then, delete the variable id from the dataset array.
+
+ds.Properties.ObsNames = ds.id;
+ds.id = []
+```
+
+
+**Clean DataSet**
+
+TF = ismissing(A) returns a logical array (0 和 1) that indicates which elements of an array or table contain missing values. The size of TF is the same as the size of A. 比如dataset size是 5*8， 返回的也是5*8
+
+```matlab
+
+ds =  dataset('File',fullfile(matlabroot,'mysubfolder','myfile.csv'),'Delimiter',',')
+
+
 %去除空行的，比如有的行是nan的
 
+
+%方法1：
 idx = isnan(ds.ModelID);
 %isnan返回的是 array, size 是 ds 行数 * 1, 
 params(ds,:) =[]; 
@@ -159,10 +185,7 @@ params(ds,:) =[];
 
 
 
-%改变unique identifier  Then, delete the variable id from the dataset array.
 
-ds.Properties.ObsNames = ds.id;
-ds.id = []
 ```
 
 
