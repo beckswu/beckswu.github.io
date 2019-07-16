@@ -17,15 +17,27 @@ tags:
 code Unit-Test-Demo/
 
 ```
-如果code command 报错, go to VSCode, Ctrl+Shift+P, 输入shell, 点shell Command: Install code command in PATH
 
-## Theme
+## Cell
 
-#### File ICON THEME
+```matlab
+%intialize cell 
+models = {'a', 'b', 'c'};
 
-1. 到VSCode Extension 下载Ayu 然后Reload
-2. 然后Ctrl + Shift + P, Preference:File Icon Theme --> Ayu
+model(1) %print 'a'
 
+```
+
+
+## char 
+
+```matlab
+
+concatentate char array 
+
+
+
+```
 
 ![](/img/post/VSCode/File_Icon_Theme.png)
 
