@@ -423,9 +423,9 @@ const double *const pip = &pi; // pip is a const pointer (在pointer右边的con
 
 ## Include Guard
 
-n the C and C++, an **#include guard**, sometimes called a **macro guard**, **header guard** or **file guard**, is a particular construct used to avoid the problem of double inclusion when dealing with the include directive.避免double include 
+InC and C++, an **#include guard**, sometimes called a **macro guard**, **header guard** or **file guard**, is a particular construct used to avoid the problem of double inclusion when dealing with the include directive.避免double include 
 
-C preprocessor 把include 的file 复制its contents  into a copy of the source file known as translation unit. The files included in this regard are generally header files(), which typically contain declarations of functions and classes or structs. If certain C or C++ language constructs are defined twice, the resulting translation unit is invalid (如果被defined两次, translation unit invalid). #include guards prevent this erroneous construct from arising by the double inclusion mechanism.
+<span style="background-color:#FFFF00">C preprocessor 把include 的file 复制its contents  into a copy of the source file known as translation unit.</span> The files included in this regard are generally header files() 包括了 functions, classes, structs的declarations. If certain C or C++ language constructs are defined twice, the resulting translation unit is invalid (<span style="background-color:#FFFF00">如果被defined两次, translation unit invalid</span>). #include guards prevent this erroneous construct from arising by the double inclusion mechanism.
 
 
 
@@ -456,6 +456,7 @@ File "child.c"
 
 ```c++
 #include "grandparent.h"
+
 #include "parent.h"
 
 ```
@@ -504,6 +505,7 @@ File "child.c"
 
 ```c++
 #include "grandparent.h"
+
 #include "parent.h"
 
 ```
