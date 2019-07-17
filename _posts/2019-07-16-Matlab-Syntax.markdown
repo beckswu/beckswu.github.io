@@ -249,6 +249,39 @@ export(ds,'XLSFile','Fun.xlsx')
 
 ```
 
+#### Matrices
+
+Index
+    - 可以传入list of indexs 然后根据column的index, 返回数
+    - ```X(:,1)``` 获取所有第一列的数, ```X(1,:)```获取第一行的数, 不可以```x(:2,1)```
+    - X(1,2) 获取第二行第三个数
+
+```
+
+x = [1 2 3; 4 5 6; 7,8 9]
+
+%{ x =
+     1     2     3
+     4     5     6
+     7     8     9 %}
+     
+x([1,2,3,7,8])
+%{ ans = 
+    1     4     7     3     6     %}
+
+
+x([1;2;3;7;8])
+%{ans =
+
+     1
+     4
+     7
+     3
+     6 %}
+    
+    
+
+```
 
 #### Struct
 
@@ -412,6 +445,68 @@ A = zeros(1,4,5,2);
 
 
 
+
+```
+
+#### Built-in Method
+
+**find**
+
+```k = find(X)``` returns a vector containing the linear indices of each nonzero element in array X. 找X的非0 element. ```k2 = find(~X)``` to locate zeros in X
+- If X is a vector, then find returns a vector with the same orientation as X.
+- If X 是 multidimensional array, returns a column vector of the linear indices of the result.
+- If X contains a nonzero elements or is empty, return empty array()
+
+```matlab
+X = [1 0 2; 0 1 1; 0 0 4]
+
+%{
+X = 3×3
+
+     1     0     2
+     0     1     1
+     0     0     4
+%}
+
+k = find(X)
+%{  k = 5×1
+     1
+     5
+     7
+     8
+     9       %}
+   
+%Use the logical not operator on X to locate the zeros.
+k2 = find(~X)
+     
+```
+
+```k = find(X,n)``` returns the first n indices corresponding to the nonzero elements in X.
+
+```matlab
+X = magic(4)
+%{ X = 4×4
+    16     2     3    13
+     5    11    10     8
+     9     7     6    12
+     4    14    15     1 %}
+
+k = find(X<10,5)
+%{ k = 5×1
+     2
+     3
+     4
+     5
+     7 %}
+     
+X(k)
+%{ ans = 5×1
+     5
+     9
+     4
+     2
+     7
+%}
 
 ```
 
