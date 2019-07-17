@@ -252,19 +252,18 @@ export(ds,'XLSFile','Fun.xlsx')
 
 #### Struct
 
-A structure array is a data type that groups related data using data containers called fields. Each field can contain any type of data. 
-每一个field 相当与cell, type可以不一样
+A structure array is a data type that groups related data using data containers called **fields**. Each field can contain any type of data. 每一个field 相当与cell array, type可以不一样
 
 s = struct(field,value) creates a structure array with the specified field and value. 
-- If value 不是 cell array, or if value is a scalar cell array, then s is a scalar structure(key-value形式，而不是key-column of values形式). For instance, ``` s = struct('a',\[1 2 3\]) ``` creates a 1-by-1 structure, where s.a = \[1 2 3\].
-- If value is a nonscalar cell array, then s is a structure array with the same dimensions as value(与value dim 一样). Each element of s contains the corresponding element of value. For example, s = struct('x',{'a','b'}) returns s(1).x = 'a' and s(2).x = 'b'.
+- If value 不是 cell array, or if value is a scalar cell array(e.g. 一个数 or matrix), then s is a scalar structure, For instance, ``` s = struct('a',[1 2 3]) ``` creates a 1-by-1 structure, where ```s.a = [1 2 3]```.
+- If value is a nonscalar cell array, For example, s = struct('x',{'a','b'}) returns s(1).x = 'a' and s(2).x = 'b'.
 - If value is an empty cell array {}, then s is an empty (0-by-0) structure. e.g. ``` s = struct('a',{},'b',{},'c',{}) ```
 
 s = struct(field1,value1,...,fieldN,valueN) creates a structure array with multiple fields.
 - 如果value都不是cell array or all values 在cell array里是scaler, s 是 scaler 
 - If 任何value是 nonscalar cell array, then s 是cell array. 
-    - 保持scaler和不是scaller的dimension 一样 to insert content of value in that field for all element of s , E.g. s = struct('x',{'a','b'},'y','c') returns s(1).x = 'a', s(2).x = 'b', s(1).y = 'c', and s(2).y ='c'
-    - 两个不是scaler 的cell array dimension不能不一样, 比如```Params = struct('name', cell(3,1), 'sex', {0}, 'id', cell(2,1));``` 会报错, ``` Params = struct('name', cell(3,1), 'sex', {0}, 'id', cell(3,1));``` 这样才可以, 但是每个cell array可以放任意的东西
+    - Dimension 与nonscalar cell array 一样, 对于scaler 会 insert content of value in that field for all element of s , E.g. s = struct('x',{'a','b'},'y','c') returns s(1).x = 'a', s(2).x = 'b', s(1).y = 'c', and s(2).y ='c'
+    - 两个nonscaler 的cell array dimension 要一样, 比如```Params = struct('name', cell(3,1), 'sex', {0}, 'id', cell(2,1));``` 会报错, ``` Params = struct('name', cell(3,1), 'sex', {0}, 'id', cell(3,1));``` 这样才可以, 但是每个cell array可以放任意的东西
     
     
 
