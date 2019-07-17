@@ -166,7 +166,9 @@ cat list1.txt >> list2.txt #修改上面一行的error，append list1.txt 到lis
 mkdir image #生成image directory
 mkdir image/pic #生成pic directory inside image directory
 mkdir names/mark #当names 不在当前文件夹下，显示error, No such file or directory
-mkdir -p names/mark (mkdir --parents names/mark ) #-p means -- parents
+mkdir -p names/mark (mkdir --parents names/mark ) #-p means -- parents, 比如当names 不存在的时候，这样可以建立, 如果不加p, 会报错
+#-p is the same as --parents
+
 mkdir -p names/{john,tom,bob}  #creat several directory inside current directory, 建立三个文件夹,john, tom,bob
 # {john,tom,bob} 不能有空格，否则建立的文件夹是 {john,
 
