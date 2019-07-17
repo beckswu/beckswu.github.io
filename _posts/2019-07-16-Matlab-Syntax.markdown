@@ -339,6 +339,86 @@ messyData.var2 = str2double(messyData.var2); %把table的str data convert to dou
 
 ```
 
+
+## Function 
+
+- nargout 看有几个output, 如果返回负数表示第i个位置返回时varargout,
+- varargout:Variable-length output argument list. 用于function, 可以返回any number of output arguments, include varargout as function last  output after explicitly declared output 
+
+```matlab
+% -----------nargout ---------------
+
+%{
+比如有下面的function
+function [dif,absdif] = subtract(y,x)
+    dif = y-x;
+    if nargout > 1
+        disp('Calculating absolute value')
+        absdif = abs(dif);
+    end
+end
+%} 
+
+fun = @subtract;
+nargout(fun)
+% print ans = 2
+
+
+
+%nargout can determine how many outputs a function that uses varargout can return.
+%{
+function [sizeVector,varargout] = mySize(x)
+    sizeVector = size(x);
+    varargout = cell(1,nargout-1);
+    for k = 1:length(varargout)
+        varargout{k} = sizeVector(k);
+    end
+end
+%}
+
+fun = 'mySize';
+nargout(fun)
+%print ans = -2; 
+% The minus sign indicates that the second output is varargout. The mySize function can return an indeterminate number of additional outputs.
+
+
+
+% -----------varargout ---------------
+
+
+function [s,varargout] = returnVariableNumOutputs(x)
+    nout = max(nargout,1) - 1;
+    s = size(x);
+    for k = 1:nout
+        varargout{k} = s(k);
+    end
+end
+
+A = rand(4,5,2);
+[s,rows,cols] = returnVariableNumOutputs(A) %在function里 nargout是3
+% print s = 1×3
+%  4     5     2
+% rows = 4
+% cols = 5
+
+
+
+A = zeros(1,4,5,2);
+[s,dim1,dim2,dim3] = returnVariableNumOutputs(A) 在function里 nargout是4
+% print s = 1×4 
+%   1     4     5     2
+% dim1 = 1
+% dim2 = 4
+% dim3 = 5
+
+
+
+
+```
+
+
+
+
 ## Save 
 
 ```matlab
@@ -359,6 +439,7 @@ fclose(fid);%关掉这在写的file
 
 
 ```
+
 
 
 ![](/img/post/VSCode/File_Icon_Theme.png)
