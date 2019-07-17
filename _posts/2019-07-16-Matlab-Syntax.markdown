@@ -417,7 +417,62 @@ A = zeros(1,4,5,2);
 ```
 
 
+#### Function Handle 
 
+Function Handle is datatype 用于储存 an association to a function. 用于
+- pass a function into another function. e.g. pass function to integration / optimization functions
+- specifiy callback functions (UI)
+- Construct handles to function defined inline instead of stored in program file (anonymous functions)
+- Call local function from outside the main function 
+
+
+**Create Function Handle**
+
+```matlab 
+
+function y = computeSquare(x)
+y = x.^2;
+end
+
+f = @computeSquare;
+a = 4;
+b = f(a)
+
+% 如果function 不需要input, 用empty parentheses
+h = @ones;
+a = h(); %print a = 1
+
+%without parentheses, the assignment creates another function handles 
+a = h % print a = @ones
+
+```
+
+**Anonymous Functions**
+
+Anonymous Functions is one line expression which does not require a program file. 用comma separate list as the input arguments to the anoymous function. ```h = @(arglist)anonymous_function```
+
+```matlab
+
+sqr = @(n) n.^2
+x = sqr(3) % print x = 9
+
+sq = @(a,b,c) [a.*2,b.*2,c.*2]
+sq(1,2,3) % print ans =  2, 4, 6
+
+
+```
+
+
+**Arrays / Structure Array of Function Handles**
+
+```matlab
+C = {@sin, @cos, @tan};
+C{2}(pi) % print ans = -1
+
+S.a = @sin;  S.b = @cos;  S.c = @tan;
+S.a(pi/2) % print ans = 1
+
+```
 
 ## Save 
 
