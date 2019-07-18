@@ -15,18 +15,6 @@ tags:
 
 #### Abstract Class
 
-Class is Abstract classes if(满足任意一个,即是)
-- Abstract class attribute
-    - Concrete subclasses must redefine any properties or methods that are declared as abstract.
-    - The abstract class does not need to define any abstract methods or properties.
-    - 可以定义nonabstract method or class
-- has abstract method 
-    - do not define abstract method(<span style="color:red">no implementation</span>), use only method signature
-    - Concrete subclasses <span style="background-color:#FFFF00">are not required to have same number of input  output arguments and do not need to have same argument name. 只需the same signuature </span>
-- has abstract property 
-    - Concrete subclasses must redefine abstract properties without the Abstract attribute.
-    - Concrete subclasses must use the same values for the SetAccess and GetAccess attributes as abstract superclass.
-    - Abstract properties cannot define access methods and cannot specify initial values(不要定义取值method). The subclass can create access methods and specify initial values.
 
 
 Abstract classes 
