@@ -256,6 +256,9 @@ Index
     - ```X(:,1)``` 获取所有第一列的数, ```X(1,:)```获取第一行的数, 不可以```x(:2,1)```
     - X(1,2) 获取第二行第三个数
 
+Creat
+    - `x = 0:2:8`: 生成一个array, 从0开始到8, 每次跳2 ```0 2 4 5 6 8```
+
 ```
 
 x = [1 2 3; 4 5 6; 7,8 9]
@@ -373,9 +376,11 @@ messyData.var2 = str2double(messyData.var2); %把table的str data convert to dou
 
 
 ## Function 
-
-- nargout 看有几个output, 如果返回负数表示第i个位置返回时varargout,
-- varargout:Variable-length output argument list. 用于function, 可以返回any number of output arguments, include varargout as function last  output after explicitly declared output 
+- ```nargin```: function 有几个input, input 数量可能因为有```varargin```不同function call有变化
+- ```nargout```: 看有几个output, 如果返回负数表示第i个位置返回时varargout,
+- ```varargout```:Variable-length output argument list. 用于function, 可以返回any number of output arguments, include varargout as function last  output after explicitly declared output 
+- ```varargin```: 让function accept 任意number of input arguments, 放在function input最后面. varagin 是 1 by N cell array. N is number of input that function receives after explicitly declared inputs. 如果function recieves no input, varargin is empty cell array
+    - ```varargin{:}```: to get content of all varargin. 
 
 ```matlab
 % -----------nargout ---------------
@@ -508,6 +513,19 @@ X(k)
      7
 %}
 
+
+% -----------varargin --------------
+
+function varargout = redplot(varargin)
+    %disp(varargin);
+    %varargin{:}
+    [varargout{1:nargout}] = plot(varargin{:},'Color',[1,0,0]);
+end
+
+x = 0:pi/100:2*pi;
+y = sin(x);
+redplot(x,y)
+h = redplot(x,y,'Marker','o','MarkerEdgeColor','green'); 
 ```
 
 
@@ -576,9 +594,15 @@ save(['data.mat'],'ds'); %如果不加ds 会存入所有working directory的vari
 ```
 
 
-## Write File 
+## Print/ Write File 
 
 ```matlab
+
+
+formatSpec = "Size of varargin cell array: %dx%d";
+str = compose(formatSpec,size(varargin));
+disp(str)
+
 
 fid = fopen(outputFileName, 'w');
 fprintf(fid, ',%.16f', ds(i).id);
