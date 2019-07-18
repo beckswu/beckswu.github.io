@@ -647,6 +647,9 @@ redplot(x,y)
 h = redplot(x,y,'Marker','o','MarkerEdgeColor','green'); 
 ```
 
+**cd**
+
+```oldFolder = cd(newFolder)``` returns the existing current folder to oldFolder, and then it changes the current folder to newFolder.
 
 #### Function Handle 
 
