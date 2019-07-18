@@ -11,6 +11,122 @@ tags:
     - Learning Note
 ---
 
+## Class
+
+#### Abstract Class
+
+Class is Abstract classes if(满足任意一个,即是)
+    - Abstract class attribute
+        - Concrete subclasses must redefine any properties or methods that are declared as abstract.
+        - The abstract class does not need to define any abstract methods or properties.
+        - 可以定义nonabstract method / class
+    - has abstract method 
+        - do not define abstract method(<span "style=color:red">no implementation</span>), use only method signature
+        - Concrete subclasses <span "style=background-color:#FFFF00">are not required to have same number of input / output arguments and do not need to have same argument name. 只需the same signuature </span>
+    - has abstract property 
+        - Concrete subclasses must redefine abstract properties without the Abstract attribute.
+        - Concrete subclasses must use the same values for the SetAccess and GetAccess attributes as abstract superclass.
+        - Abstract properties cannot define access methods and cannot specify initial values(不要定义取值method). The subclass can create access methods and specify initial values.
+
+
+Abstract classes 
+    - can defeine properties and methods that are not abstract (可以定义非abstract properites, method 继承到subclass)
+    - Pass on their concrete members through inheritance
+    - Do not need to define any abstract members
+
+```matlab
+
+% abstract class attribute
+classdef (Abstract) AbsClass 
+   ...
+end
+
+classdef (Abstract) AbsClass 
+   methods (Abstract)
+     abstMethod(obj) %abstract method 
+   end
+   methods 
+     abstMethod(obj) %non abstract method 
+   end
+end
+
+
+
+% Abstract Methods
+
+methods (Abstract)
+   abstMethod(obj)
+end
+
+% abstract properties
+
+properties (Abstract)
+   AbsProp
+end
+
+```
+
+
+**Implementing a Concrete Subclass**
+
+A subclass <span style="background-color:#FFFF00">must implement all inherited abstract properties and methods</span> to become a **concrete class**, 否则the subclass is an abstract class. 
+
+Matlab does not force subclasses to implement concrete methods with the same signature or attributes
+
+
+Determine if a class is abstract 
+
+```matlab 
+
+classdef AbsClass
+   methods(Abstract)
+      result = absMethodOne(obj)
+      output = absMethodTwo(obj)
+   end
+end
+
+mc = ?AbsClass;
+if ~mc.Abstract
+   % not an abstract class
+end
+
+```
+
+Display Abstract Member Names
+```matlab 
+meta.abstractDetails('AbsClass');
+%print 
+Abstract methods for class AbsClass:
+   absMethodTwo   % defined in AbsClass
+   absMethodOne   % defined in AbsClass
+   
+ 
+ 
+classdef SubAbsClass < AbsClass
+% Does not implement absMethodOne
+% defined as abstract in AbsClass
+   methods
+      function out = absMethodTwo(obj)
+         ...
+      end
+   end
+end
+
+
+meta.abstractDetails(?SubAbsClass)
+Abstract methods for class SubAbsClass:
+   absMethodOne   % defined in AbsClass
+The SubAbsClass class is abstract because it has not implemented the absMethodOne method defined in AbsClass.
+
+msub = ?SubAbsClass;
+msub.Abstract
+ans =
+
+     1
+   
+```
+
+
 
 ## Container
 
