@@ -549,8 +549,47 @@ T=5×4 table
 
 - ```mean(T.ColumnName)```: to calculate mean for one column , ```meanHeight = mean(T.Height)```
 - Create new column/variable: ```T.BMI = (T.Weight*0.453592)./(T.Height*0.0254).^2``` BMI是new column
+- **Adding Row**
+	- by Concatenate: ```T =  [T;{50,60,70}]``` can directly concatenate from cell array
+	- by from struct 
+- **Omit Duplicate Rows**: ```Tnew = unique(Tnew); ```	
+- **Delete Rows**
+	- **by row number**: ```Tnew([18,20,21],:) = [];```
+	- **by Row Name**: ```Tnew('Smith',:) = [];```
+	- **Search Row to delete**: ```toDelete = Tnew.Age < 30; Tnew(toDelete,:) = [];```
+- **Number of Rows** : ```H = height(T)``
+- **Number of Columns**: ```H = width(T)``
 
 
+Adding row 
+```matlab
+
+LastName = {'Sanchez';'Johnson';'Lee';'Diaz';'Brown'};
+Age = [38;43;38;40;49];
+Height = [71;69;64;67;64];
+Weight = [176;163;131;133;119];
+T = table(Age,Weight,Height,'RowNames',LastName)
+
+struct.Age = 50;
+struct.Weight = 60;
+struct.Height = 70;
+T = [T;struct2table(struct)]
+
+
+```
+
+
+**Sort**
+- ```B = sortrows(A)``` sorts the rows of a matrix in ascending(由小到大) order based on the elements in the first column(是第一列不是index的column). 如果第一列有repeat elements, 会根据第二列再比较, 以此列推
+- ```B = sortrows(A,column)``` sorts A based on specified column. ```sortrows(A,4)``` 根据第四列sort,  ```sortrows(A,[4 6])```根据第四列sort, 有tie的话再根据第六列
+	- **sort based on column name**: ```sortrows(T,'Age')```, 根据age column 进行sort, ```sortrows(tblA,{'Height','Weight'},{'ascend','descend'})``` 先根据Height 由小到大排列, 再根据Weight 由大到小排列
+- ```B = sortrows(___,direction)```: - ```sortrows(A,[4 6],{'ascend' 'descend'})```, 先根据第四列由小到大排列, 再根据第6列由大到小排列,
+- ```B = sortrows(___,Name,Value)``` specifies additional parameters for sorting rows. For example, ```sortrows(A,'ComparisonMethod','abs')``` sorts the elements of A by magnitude.
+- ```[B,index] = sortrows(___)``` returns an index vector that describes the rearrangement of rows ```[E,index] = sortrows(A,4,'descend')``` 返回sort之后1到n行的 属于sort 之前的 index
+- ``` sortrows(T,'RowNames')``` sort table based on index column
+- ```tblB = sortrows(___,Name,Value)``` specifies additional parameters for sorting rows of a table or timetable. ```sortrows(tblA,'Var1','MissingPlacement','first')``` sorts based on the elements in Var1, ordering missing elements such as NaN at the beginning of the table. 把Missing element放最前面
+
+**issortedrows**
 
 **Properties**
 
