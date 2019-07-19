@@ -554,6 +554,159 @@ int (*const fcnPtr)();
 <span style="background-color#FFFF00">如果put const before int, 表示function being pointed to would return a const int</span>
 
 
+<span style="background-color#FFFF00">Function pointers can be initialized with a function (and non-const function pointers can be assigned a function) </span>
+
+```c++
+int foo()
+{
+    return 5;
+}
+ 
+int goo()
+{
+    return 6;
+}
+ 
+int main()
+{
+    int (*fcnPtr)() = foo; // fcnPtr points to function foo
+    
+    fcnPtr = goo; // fcnPtr now points to function goo
+ 
+ 
+    return 0;
+}
+```
+
+One common mistake is to do this: ```fcnPtr = goo();```. This would actually <span style="background-color#FFFF00">assign the return value from a call to function ```goo()``` to ```fcnPtr```<span>.  是assign funcion 返回的值
+    
+Note the type of the function pointer must match the type of the function    
+    
+```c++
+
+// function prototypes
+
+int foo();
+double goo();
+int hoo(int x);
+ 
+// function pointer assignments
+
+int (*fcnPtr1)() = foo; // okay
+
+int (*fcnPtr2)() = goo; // wrong -- return types don't match!
+
+double (*fcnPtr4)() = goo; // okay
+
+fcnPtr1 = hoo; // wrong -- fcnPtr1 has no parameters, but hoo() does
+
+int (*fcnPtr3)(int) = hoo; // okay
+
+```
+    
+**Calling a function using a function pointer**
+
+<span style="background-color:#FFFF00"> Explicit dereference </span>
+```c++
+int foo(int x)
+{
+    return x;
+}
+ 
+int main()
+{
+    int (*fcnPtr)(int) = foo; // assign fcnPtr to function foo
+    
+    (*fcnPtr)(5); // call function foo(5) through fcnPtr.
+ 
+    return 0;
+}
+```
+
+<span style="background-color:#FFFF00"> Implicit dereference </span>: 就像normal function call, since normal function names are pointers to functions anyway!
+```c++
+int foo(int x)
+{
+    return x;
+}
+ 
+int main()
+{
+    int (*fcnPtr)(int) = foo; // assign fcnPtr to function foo
+    
+    fcnPtr(5); // call function foo(5) through fcnPtr.
+ 
+    return 0;
+}
+```
+
+<span style="background-color:#FFFF00"> **Default parameters won't work for functions called through function pointers**: 因为default parameters are resolved at compiled time(意味着if you don't supply an argument for a defaulted parameter, the compiler substitues one when code is compiled), 但是function pointers are resolved at run-time</span>. Consequently, default parameters cannot be resolved when making a function call with a function pointer. 你不得不pass in vlaues for any defaulted parameteres.
 
 
 
+**Passing function as arguments to other functions**
+
+Functions used as arguments to another function are called **callback functions**
+
+比如让用户选择自己的sorting algorithm 在selection sort algorithm,
+```c++
+bool (*comparisonFcn)(int, int);//因为compare tow interters and return a boolean value
+
+
+``
+
+```c++
+#include <algorithm> // for std::swap, use <utility> instead if C++11
+#include <iostream>
+ 
+// Note our user-defined comparison is the third parameter
+void selectionSort(int *array, int size, bool (*comparisonFcn)(int, int))
+{
+    for (int startIndex = 0; startIndex < size; ++startIndex)
+    {
+        int bestIndex = startIndex;
+        for (int currentIndex = startIndex + 1; currentIndex < size; ++currentIndex)
+        {
+            if (comparisonFcn(array[bestIndex], array[currentIndex])) // COMPARISON DONE HERE
+
+                bestIndex = currentIndex;
+        }
+ 
+        // Swap our start element with our smallest/largest element
+        
+        std::swap(array[startIndex], array[bestIndex]);
+    }
+}
+ 
+// Here is a comparison function that sorts in ascending order
+
+bool ascending(int x, int y)
+{
+    return x > y; // swap if the first element is greater than the second
+    
+}
+ 
+// Here is a comparison function that sorts in descending order
+
+bool descending(int x, int y)
+{
+    return x < y; // swap if the second element is greater than the first
+    
+}
+ 
+ 
+int main()
+{
+    int array[9] = { 3, 7, 9, 5, 6, 1, 8, 2, 4 };
+ 
+    // Sort the array in descending order using the descending() function
+    selectionSort(array, 9, descending);
+    printArray(array, 9);
+ 
+    // Sort the array in ascending order using the ascending() function
+    selectionSort(array, 9, ascending);
+    printArray(array, 9);
+ 
+    return 0;
+}
+```
