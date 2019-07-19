@@ -186,11 +186,11 @@ mkdir -p names/{john,tom,bob}  #creat several directory inside current directory
 rmdir abc # remove abc的folder
 rmdir a/b/c/d/e #只remove 最后e的directory
 rmdir -p a/b/c/d/e  #remove 所有的directory structure
-rmdir -pv a/b/c/d/e #remove 所有directory structure，并显示(verb)remove的进程
+rmdir -p a/b/c/d/e #remove 所有directory structure，
 #如果a/b/c/d/e 每个并不是空的文件夹，会显示error, failed to remove directory a/b: Directory not empty
 
-rm -rv a/b 
-rm -rv a #与上面一行作用是一样的
+rm -rv a/b #并显示(verb)remove的进程
+rm -rv a #与上面一行作用是一样的,
 
 ```
 
