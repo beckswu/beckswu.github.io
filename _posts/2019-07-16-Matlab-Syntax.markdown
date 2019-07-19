@@ -234,6 +234,17 @@ nums = [C{2,:}]
 %    1     2   3
 ```
 
+
+#### char 
+
+```matlab
+
+%concatentate char array 
+Str = 'abc';
+['data/' abc '.mat']
+
+```
+
 #### Dataset
 
 Statistics and Machine Learning Toolbox has **Dataset arrays** for storing variables with heterogeneous data types. For example, you can combine numeric data, logical data, cell arrays of character vectors, and categorical arrays in one dataset array variable.Within a dataset array, 每一个列必须是同一数据类型, but 不同的列可以是不同的数据类型. A dataset array is usually interpreted as a set of variables measured on many units of observation. That is, 每一行是一个observation, 每一列是一种variable. In this sense, a dataset array organizes data like a typical spreadsheet.
@@ -379,6 +390,8 @@ Creat
     - `x = 0:2:8`: 生成一个array, 从0开始到8, 每次跳2 ```0 2 4 5 6 8```
 
 ```
+y = [1:4]
+% y = [1 2 3 4]
 
 x = [1 2 3; 4 5 6; 7,8 9]
 
@@ -474,13 +487,215 @@ s(1).a %只要第一行a的数据
 ```
 
 
-#### char 
+#### Table 
+
+Table array with named variable that contain different types 
+
+table arrays store column-oriented or tabular data, such as columns from a text file or spreadsheet. Table store each piece of column-oriented data in a *variable*. <span style="background-color:#FFFF00">Table varaibles can have different data type</span> 但是row 行数需要一样. Use ```summary``` function to get information about a table 
+
+Index: use smooth parentheses ```()``` to return a subtable or curly braces ```{}``` to extract the contents. <br/>
+- access column ```T.Age```
+	- access single value content from column ```T.Age(1)``` or ```T{1,1}```, 但不可以```T.Age{1}```, 因为T.Age已经是matrix了
+	- access single value in column ```T(1,1)```, 返回有header和row的名字
+- Get all data without header/row names ``` T{:,:}.``` is the same as ```T.Variables```
+- Get Row Data ```T({'Cook'},:)``` , ```T({'Smith','Williams'},:)```
+	- Get row data content and return in arrary/vector ```T{{'Cook'},:}```, ```T{{'Smith','Williams'},:}```
+
+**Creation**
+
+- ```T = table(var1,...,varN)``` Variables can be of different sizes and data types, but all variables must have the same number of rows. Example: ```table([1:3]',{'one';'two';'three'},categorical({'A';'B';'C'}))```, Common input variables are <span style="color:red">numeric arrays, logical arrays, character arrays, structure arrays, or cell arrays</span>
+- ```T = table('Size',sz,'VariableTypes',varTypes)``` preallocates space for the variables that have data types you specify. sz is a two-element numeric array, where ```sz[1]``` specifies *#rows* and ```sz[2]``` *# variables*. varTypes is a cell array of character vectors specifying data types. ``` T = table('Size',[50 3],'VariableTypes',{'string','double','datetime'})```
+- ```T = table(___,'VariableNames',varNames)``` specifies the names of the variables in the output table.  ```T = table(categorical({'M';'F';'M'}),[45;32;34], {'NY';'CA';'MA'},logical([1;0;0]), 'VariableNames',{'Gender','Age','State','Vote'})```
+- ```T = table(___,'RowNames',rowNames) ``` specifies names of the rows in table, ```T = table(Age,Weight,Height,'RowNames',LastName)``` ```T = table([10;20;30],{'M';'F';'F'},'VariableNames',{'Age','Gender'},'RowNames',{'P1','P2','P3'})```
 
 ```matlab
+sz = [4 3];
+varTypes = {'double','datetime','string'};
+varNames = {'Temperature','Time','Station'};
+T2 = table('Size',sz,'VariableTypes',varTypes,'VariableNames',varNames)
+T2=4×3 table
+    Temperature    Time     Station 
+    ___________    ____    _________
 
-%concatentate char array 
-Str = 'abc';
-['data/' abc '.mat']
+         0         NaT     <missing>
+         0         NaT     <missing>
+         0         NaT     <missing>
+         0         NaT     <missing>
+	 
+%Build Table by assigning variables individually	 
+Date = {'12/25/11','1/2/12','1/23/12','2/7/12','2/15/12'};
+location1 = [20 5 13 0 17];
+location2 = [18 9 21 5 12];
+location3 = [26 10 16 3 15];
+
+T = table;
+T.Date = Date';
+T.Natick = location1';
+T.Boston = location2';
+T.Worcester = location3'	
+
+T=5×4 table
+       Date       Natick    Boston    Worcester
+    __________    ______    ______    _________
+
+    '12/25/11'      20        18         26    
+    '1/2/12'         5         9         10    
+    '1/23/12'       13        21         16    
+    '2/7/12'         0         5          3    
+    '2/15/12'       17        12         15    
+```
+
+**Table Operation**
+
+- ```mean(T.ColumnName)```: to calculate mean for one column , ```meanHeight = mean(T.Height)```
+- Create new column/variable: ```T.BMI = (T.Weight*0.453592)./(T.Height*0.0254).^2``` BMI是new column
+
+
+
+**Properties**
+
+return a summary of all the metadata properties using the syntax ```tableName.Properties.```
+
+- **DimensionNames**: 1 by 2 cell array，default value是  ````{'Row'} {'Variables'}``` 更改会影响index, 比如Variable 改为Data, 那么直接access所有数据是```T.Variables``` 变成 ```T.Data```
+- **RowNames**: 相当于每行的index,  specified as a **cell array** of character vectors or a string array, whose <span style="color:red">elements are nonempty and distinct</span>. Matlab remove了 any leadning or trailing white space from the row names. Row names are visible when you view the table. 可以用T.Row access Row Index Value/Content
+- **Discription**: 更改Description, 会在**summary**中显示, <span style="background-color：#FFFF00">summary 显示每一列数的Min, Median, Max </span>
+- **VariableNames**: a cell array of char vectors or string array,  whose <span style="color:red">elements are nonempty and distinct</span>. 如果不specify variable name or specify invalid identifier, MATLAB 自动生成'Var1' ... 'VarN' Where N is #variables
+- **VariableDescription**：辅助信息，显示在当用```summary```时候, default an empty cell array. 如果不为空，size = #variables. 可以specifiy empty char vector or empty string 对于没有description的variable
+- **VariableUnits**: 辅助信息，显示在当用```summary```时候
+
+DimensionNames
+```matlab 
+
+load patients
+T = table(Age,Height,Weight,Systolic,Diastolic, ...
+          'RowNames',LastName);
+T.Properties.DimensionNames
+
+ans = 1x2 cell array
+    {'Row'}    {'Variables'}
+
+
+T.Properties.DimensionNames = {'Patient','Data'};
+T.Properties
+
+ans = 
+  TableProperties with properties:
+             Description: ''
+                UserData: []
+          DimensionNames: {'Patient'  'Data'}
+           VariableNames: {'Age'  'Height'  'Weight'  'Systolic'  'Diastolic'}
+    VariableDescriptions: {}
+           VariableUnits: {}
+      VariableContinuity: []
+                RowNames: {100x1 cell}
+        CustomProperties: No custom properties are set.
+      Use addprop and rmprop to modify CustomProperties.
+
+```
+
+RowNames
+```matlab
+
+load patients
+T = table(Gender,Age,Height,Weight,Smoker,Systolic,Diastolic);
+
+T.Properties.RowNames = LastName;
+head(T,4)
+ans=4×7 table
+                 Gender     Age    Height    Weight    Smoker    Systolic    Diastolic
+                ________    ___    ______    ______    ______    ________    _________
+    Smith       'Male'      38       71       176      true        124          93    
+    Johnson     'Male'      43       69       163      false       109          77    
+    Williams    'Female'    38       64       131      false       125          83    
+    Jones       'Female'    40       67       133      false       117          75 
+
+T.Properties.DimensionNames
+ans = 1x2 cell array
+    {'Row'}    {'Variables'}
+
+T.Row(1:5)
+ans = 5x1 cell array
+    {'Smith'   }
+    {'Johnson' }
+    {'Williams'}
+    {'Jones'   }
+    {'Brown'   }
+    
+T({'Smith','Williams'},:)
+ans=2×7 table
+                 Gender     Age    Height    Weight    Smoker    Systolic    Diastolic
+                ________    ___    ______    ______    ______    ________    _________
+
+    Smith       'Male'      38       71       176      true        124          93    
+    Williams    'Female'    38       64       131      false       125          83    
+    
+```
+
+Description/Summary
+
+```matlab 
+
+load patients
+T = table(Gender,Age,Height,Weight);
+T.Properties.Description = 'Simulated patient data';
+summary(T)
+
+Description:  Simulated patient data
+Variables:
+    Gender: 100x1 cell array of character vectors
+    Age: 100x1 double
+        Values:
+            Min        25  
+            Median     39  
+            Max        50  
+
+```
+
+VariableNames
+```matlab 
+
+T = table({'M';'M'},[38;43], [71;69],[176;163])
+T=5×4 table
+    Var1    Var2    Var3    Var4
+    ____    ____    ____    ____
+    'M'      38      71     176 
+    'M'      43      69     163 
+
+T.Properties.VariableNames = {'Gender','Age','Height','Weight'}
+T=5×4 table
+    Gender    Age    Height    Weight
+    ______    ___    ______    ______
+     'M'      38       71       176  
+     'M'      43       69       163  
+
+```
+VariableDescriptions / VariableUnits
+
+```matlab
+load patients
+T = table(Gender,Age,Height,Weight,Smoker,Systolic,Diastolic);
+T.Properties.VariableDescriptions = {'Male or Female','','','', ...
+                                     'Has the patient ever been a smoker', ...
+                                     'Systolic Pressure','Diastolic Pressure'};
+T.Properties.VariableUnits = {'','Yrs','In','Lbs','','mm Hg','mm Hg'};
+summary(T)
+Variables:
+    Gender: 100x1 cell array of character vectors
+    Age: 100x1 double
+    	Properties:
+            Description:  Male or Female
+        Values:
+            Min        25  
+            Median     39  
+            Max        50  
+
+    Height: 100x1 double
+   	Properties:
+            Units:  Yrs
+        Values:
+            Min          60   
+            Median       67   
+            Max          72   
 
 ```
 
@@ -650,6 +865,55 @@ h = redplot(x,y,'Marker','o','MarkerEdgeColor','green');
 **cd**
 
 ```oldFolder = cd(newFolder)``` returns the existing current folder to oldFolder, and then it changes the current folder to newFolder.
+
+
+
+**sprintf** 
+
+Format data into string or character vector
+
+```str = sprintf(formatSpec,A1,...,An)``` formats the adata in arrays A1,.... An usign the formatting formatrSpec and return into str/char arrray. Sprintf formats the values in A1,...,An in column ordered. 如果formatSpec是str, output is str. Otherwise, str is char array
+
+```[str,errmsg] = sprintf(formatSpec,A1,...,An)``` returns an error message as a character vector when the operation is unsuccessful. Otherwise, errmsg is empty
+
+```matlab
+
+A = 1/eps;
+str_e = sprintf('%0.5e',A)
+%print str_e =  '4.50360e+15'
+
+
+formatSpec = 'The array is %dx%d.';
+A1 = 2;
+A2 = 3;
+str = sprintf(formatSpec,A1,A2)
+%str = 'The array is 2x3.'
+
+%Specify the minimum width of the printed value.
+
+str = sprintf('%025d',[123456]) %str = sprintf('%025d',123456) 结果是一样的
+% str =  '0000000000000000000123456'
+
+
+%Reorder the input value 
+A1 = 'X';
+A2 = 'Y';
+A3 = 'Z';
+formatSpec = ' %3$s %2$s %1$s';
+str = sprintf(formatSpec,A1,A2,A3)
+%str =  ' Z Y X'
+
+%Create Character Vector from Values in Cell Array
+%一个column 一个column的打
+C = { 1,   2,   3 ;    'AA','BB','CC'};
+str = sprintf(' %d %s',C{:})
+% str = ' 1 AA 2 BB 3 CC'
+
+
+```
+
+
+
 
 #### Function Handle 
 
