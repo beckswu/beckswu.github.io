@@ -498,8 +498,8 @@ table arrays store column-oriented or tabular data, such as columns from a text 
 	- access single value content from column ```T.Age(1)``` or ```T{1,1}```, 但不可以```T.Age{1}```, 因为T.Age已经是matrix了
 	- access single value in column ```T(1,1)```, 返回有header和row的名字
 - Get all data without header/row names ``` T{:,:}.``` is the same as ```T.Variables```
-- Get Row Data ```T({'Cook'},:)``` , ```T({'Smith','Williams'},:)```
-	- Get row data content and return in arrary or vector ```T{{'Cook'},:}```, ```T{{'Smith','Williams'},:}```
+- Get Row Data  ```T({'Smith','Williams'},:)```
+	- Get row data content and return in arrary or vector ```T{{'Smith','Williams'},:}```
 
 **Creation**
 
@@ -583,13 +583,47 @@ T = [T;struct2table(struct)]
 - ```B = sortrows(A)``` sorts the rows of a matrix in ascending(由小到大) order based on the elements in the first column(是第一列不是index的column). 如果第一列有repeat elements, 会根据第二列再比较, 以此列推
 - ```B = sortrows(A,column)``` sorts A based on specified column. ```sortrows(A,4)``` 根据第四列sort,  ```sortrows(A,[4 6])```根据第四列sort, 有tie的话再根据第六列
 	- **sort based on column name**: ```sortrows(T,'Age')```, 根据age column 进行sort, ```sortrows(tblA,{'Height','Weight'},{'ascend','descend'})``` 先根据Height 由小到大排列, 再根据Weight 由大到小排列
-- ```B = sortrows(___,direction)```: - ```sortrows(A,[4 6],{'ascend' 'descend'})```, 先根据第四列由小到大排列, 再根据第6列由大到小排列,
+	- ```sortrows(A,[4 6],{'ascend' 'descend'})```, 先根据第四列由小到大排列, 再根据第6列由大到小排列,
 - ```B = sortrows(___,Name,Value)``` specifies additional parameters for sorting rows. For example, ```sortrows(A,'ComparisonMethod','abs')``` sorts the elements of A by magnitude.
 - ```[B,index] = sortrows(___)``` returns an index vector that describes the rearrangement of rows ```[E,index] = sortrows(A,4,'descend')``` 返回sort之后1到n行的 属于sort 之前的 index
 - ``` sortrows(T,'RowNames')``` sort table based on index column
 - ```tblB = sortrows(___,Name,Value)``` specifies additional parameters for sorting rows of a table or timetable. ```sortrows(tblA,'Var1','MissingPlacement','first')``` sorts based on the elements in Var1, ordering missing elements such as NaN at the beginning of the table. 把Missing element放最前面
 
-**issortedrows**
+
+**issortedrows** 跟sort syntax 类似, return 1(true) 满足sort 条件, otherwise return 0 (false)
+
+- ```TF = issortedrows(A)``` returns if first column of a matrix or table A are listed in ascending order, 
+- ```TF = issortedrows(A,column) ``` returns sorted based on 特定的columns, e.g. ```issortedrows(A,[4 6])```
+	- ```issortedrows(A,[2 3],{'ascend' 'descend'})```: check if A 是按照先第2列由小到大排列, 再按照第3列由大到小排列
+	- ```issortedrows(tblA,{'Age','Weight'})```: check if 先按照Age 再按照Weight sort的
+- ```TF = issortedrows(___,Name,Value)```: ```issortedrows(A,'ComparisonMethod','abs')``` checks if the elements in the first column of A are sorted by magnitude.
+- ```TF = issortedrows(tblA,'RowNames')``` TF = issortedrows(tblA,'RowNames') 是不是按照Table index row进行sort
+- ```TF = issortedrows(___,Name,Value)``` specifies additional parameters for sorting tables. ```issortedrows(tblA,'Var1','MissingPlacement','first') ```checks that missing elements in Var1, such as NaN or NaT, are placed at the beginning of the table.
+
+
+
+issortedrows的direction
+- 'ascend' (default) — 由小到大. Data can contain consecutive repeated elements.
+- 'descend' — 由大到小. Data can contain consecutive repeated elements.
+- 'monotonic' — 由小到大 or 由大到小 . Data can contain consecutive repeated elements.
+- 'strictascend' —  由小到大没有重复. Data cannot contain duplicate or missing elements.
+- 'strictdescend' — 由大到小没有重复. Data cannot contain duplicate or missing elements.
+- 'strictmonotonic' —由小到大没有重复 or 由大到小没有重复. Data cannot contain duplicate or missing elements.
+
+```matlab 
+%Complex Matrix
+
+A = [1+i 2i; 1+2i 3+4i]
+A = 2×2 complex
+   1.0000 + 1.0000i   0.0000 + 2.0000i
+   1.0000 + 2.0000i   3.0000 + 4.0000i
+
+TF = issortedrows(A,'ComparisonMethod','real')
+%F = logical
+%   1
+
+
+```
 
 **Properties**
 
