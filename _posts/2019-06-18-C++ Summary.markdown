@@ -524,7 +524,7 @@ File "child.c"
 
 Result
 
-``````c++
+```c++
 struct foo {
     int member;
 };
@@ -532,4 +532,28 @@ struct foo {
 
 
 Here, the first inclusion of "grandparent.h" causes the macro GRANDPARENT_H to be defined. 在parent 之后, when "child.c" includes "grandparent.h" the second time, the #ifndef test returns false, and the preprocessor skips down to the #endif(<span style="background-color:#FFFF00"> 当第二次include parent.h, ifndef返回false, preprocessor skips to endif </span>), thus avoiding the second definition of struct foo. The program compiles correctly.
+
+
+## Pointer 
+
+#### Function Pointer
+
+Pointers to functions
+```c++
+// fcnPtr is a pointer to a function that takes no arguments and returns an integer
+
+int (*fcnPtr)();
+```
+上面例子中, ```fcnPtr``` is a pointer to a function that has no parameters and returns an integer, <span style="background-color:#FFFF00">it can point to any function that matches this type</span>. 其中```()``` is necessary. as ```int *fcnPtr()```是<span style="color:red">a declaration for a function named fcnPtr that takes no parameters and retusn a point to an integer</span>
+
+**Const function pointer**
+```
+int (*const fcnPtr)();
+
+```
+<span style="background-color#FFFF00">如果put const before int, 表示function being pointed to would return a const int</span>
+
+
+
+
 
