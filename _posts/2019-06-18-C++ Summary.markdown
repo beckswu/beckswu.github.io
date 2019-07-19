@@ -653,13 +653,15 @@ Functions used as arguments to another function are called **callback functions*
 bool (*comparisonFcn)(int, int);//因为compare tow interters and return a boolean value
 
 
-``
+```
 
 ```c++
 #include <algorithm> // for std::swap, use <utility> instead if C++11
+
 #include <iostream>
  
 // Note our user-defined comparison is the third parameter
+
 void selectionSort(int *array, int size, bool (*comparisonFcn)(int, int))
 {
     for (int startIndex = 0; startIndex < size; ++startIndex)
@@ -685,6 +687,23 @@ bool ascending(int x, int y)
     return x > y; // swap if the first element is greater than the second
     
 }
+
+bool evensFirst(int x, int y)
+{
+	// if x is even and y is odd, x goes first (no swap needed)
+    
+	if ((x % 2 == 0) && !(y % 2 == 0))
+		return false;
+ 
+	// if x is odd and y is even, y goes first (swap needed)
+    
+	if (!(x % 2 == 0) && (y % 2 == 0))
+		return true;
+ 
+        // otherwise sort in ascending order
+        
+	return ascending(x, y);
+}
  
 // Here is a comparison function that sorts in descending order
 
@@ -700,13 +719,130 @@ int main()
     int array[9] = { 3, 7, 9, 5, 6, 1, 8, 2, 4 };
  
     // Sort the array in descending order using the descending() function
+    
     selectionSort(array, 9, descending);
     printArray(array, 9);
+    //9 8 7 6 5 4 3 2 1
+
  
     // Sort the array in ascending order using the ascending() function
+    
     selectionSort(array, 9, ascending);
+    printArray(array, 9); 
+    //1 2 3 4 5 6 7 8 9
+    
+    selectionSort(array, 9, evensFirst);
     printArray(array, 9);
+    //2 4 6 8 1 3 5 7 9
+    
+    return 0;
+}
+```
+
+<span style="background-color:#FFFF00"> Note: If a function parameter is of a function type, it will be converted to a pointer to the function type</span>. It means 
+```c++
+
+void selectionSort(int *array, int size, bool (*comparisonFcn)(int, int))
+
+```
+
+is equivalently written as 
+```c++
+void selectionSort(int *array, int size, bool comparisonFcn(int, int))
+
+```
+
+<span style="background-color:#FFFF00"> This only works for function parameters, not stand-alone function pointers </span>
+
+
+**Providing default functions**: 下面例子, as long as user calls selectionSort normally(不是通过function pointer), the comparisonFcn parameter will default to ascending. 
+
+```c++
+// Default the sort to ascending sort
+
+void selectionSort(int *array, int size, bool (*comparisonFcn)(int, int) = ascending);
+
+```
+
+**Making function pointers prettier with typedef or type aliases**: the syntax for pointers to functions is ugly. However, typedefs can be used to make pointers to functions look more like regular variables:
+
+```c++
+typedef bool (*validateFcn)(int, int);
+
+```
+This defines a typedef called “validateFcn” that is a pointer to a function that takes two ints and returns a bool.
+
+Now instead of doing this 
+
+```c++
+bool validate(int x, int y, bool (*fcnPtr)(int, int)); // ugly
+
+
+```
+
+You can do this 
+
+```c++
+bool validate(int x, int y, validateFcn pfcn) // clean
+
+
+```
+
+**Using std::function in C++11**: Introduced in C++11, an alternate method of defining and storing function pointers is to use std::function, which is part of the standard library <functional> header. *Both the return type and parameters* go inside angled brackets, with the parameters inside parenthesis. If there are no parameters, the parentheses can be left empty. 
+
+
+    
+```c++
+#include <functional>
+
+bool validate(int x, int y, std::function<bool(int, int)> fcn); 
+// std::function method that returns a bool and takes two int parameters
+
+#include <functional>
+#include <iostream>
+ 
+int foo()
+{
+    return 5;
+}
+ 
+int goo()
+{
+    return 6;
+}
+ 
+int main()
+{
+    std::function<int()> fcnPtr = foo; // declare function pointer that returns an int and takes no parameters
+    
+    fcnPtr = goo; // fcnPtr now points to function goo
+    
+    std::cout << fcnPtr(); // call the function just like normal
+ 
  
     return 0;
 }
 ```
+
+**Type inference for function pointers(Auto)**: the auto keyword can also infer the type of a function pointer.<span type="color:red">The downside is, of course, that all of the details about the function’s parameters types and return type are hidden(parameters types 和 return types 都是hidden), so it’s easier to make a mistake when making a call with the function, or using its return value</span>. Unfortunately, type inference won’t work for function parameters (even if they have default values(Auto 不能用于function parameters)
+
+```c++
+
+#include <iostream>
+ 
+int foo(int x)
+{
+	return x;
+}
+ 
+int main()
+{
+	auto fcnPtr = foo;
+	std::cout << fcnPtr(5);
+ 
+	return 0;
+}
+```
+
+<span type="background-color:#FFFF00">Because the native syntax to declare function pointers is ugly and error prone, we recommend you use typedefs (or in C++11, std::function).</span>
+
