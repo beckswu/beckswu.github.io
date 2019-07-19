@@ -498,8 +498,8 @@ table arrays store column-oriented or tabular data, such as columns from a text 
 	- access single value content from column ```T.Age(1)``` or ```T{1,1}```, 但不可以```T.Age{1}```, 因为T.Age已经是matrix了
 	- access single value in column ```T(1,1)```, 返回有header和row的名字
 - Get all data without header/row names ``` T{:,:}.``` is the same as ```T.Variables```
-- Get Row Data  ```T({'Smith','Williams'},:)```
-	- Get row data content and return in arrary or vector ```T{{'Smith','Williams'},:}```
+- Get Row Data 
+	- Get row data content and return in arrary or vector 
 
 **Creation**
 
