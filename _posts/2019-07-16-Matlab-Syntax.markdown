@@ -493,17 +493,17 @@ Table array with named variable that contain different types
 
 table arrays store column-oriented or tabular data, such as columns from a text file or spreadsheet. Table store each piece of column-oriented data in a *variable*. <span style="background-color:#FFFF00">Table varaibles can have different data type</span> 但是row 行数需要一样. Use ```summary``` function to get information about a table 
 
-Index: use smooth parentheses ```()``` to return a subtable or curly braces ```{}``` to extract the contents. <br/>
+**Index**: use smooth parentheses ```()``` to return a subtable or curly braces ```{}``` to extract the contents. <br/>
 - access column ```T.Age```
 	- access single value content from column ```T.Age(1)``` or ```T{1,1}```, 但不可以```T.Age{1}```, 因为T.Age已经是matrix了
 	- access single value in column ```T(1,1)```, 返回有header和row的名字
 - Get all data without header/row names ``` T{:,:}.``` is the same as ```T.Variables```
 - Get Row Data ```T({'Cook'},:)``` , ```T({'Smith','Williams'},:)```
-	- Get row data content and return in arrary/vector ```T{{'Cook'},:}```, ```T{{'Smith','Williams'},:}```
+	- Get row data content and return in arrary or vector ```T{{'Cook'},:}```, ```T{{'Smith','Williams'},:}```
 
 **Creation**
 
-- ```T = table(var1,...,varN)``` Variables can be of different sizes and data types, but all variables must have the same number of rows. Example: ```table([1:3]',{'one';'two';'three'},categorical({'A';'B';'C'}))```, Common input variables are <span style="color:red">numeric arrays, logical arrays, character arrays, structure arrays, or cell arrays</span>
+- ```T = table(var1,...,varN)``` Variables can be of different sizes and data types, but all variables 必须#rows 一样. Example: ```table([1:3]',{'one';'two';'three'},categorical({'A';'B';'C'}))```, Common input variables are <span style="color:red">numeric arrays, logical arrays, character arrays, structure arrays, or cell arrays</span>
 - ```T = table('Size',sz,'VariableTypes',varTypes)``` preallocates space for the variables that have data types you specify. sz is a two-element numeric array, where ```sz[1]``` specifies *#rows* and ```sz[2]``` *# variables*. varTypes is a cell array of character vectors specifying data types. ``` T = table('Size',[50 3],'VariableTypes',{'string','double','datetime'})```
 - ```T = table(___,'VariableNames',varNames)``` specifies the names of the variables in the output table.  ```T = table(categorical({'M';'F';'M'}),[45;32;34], {'NY';'CA';'MA'},logical([1;0;0]), 'VariableNames',{'Gender','Age','State','Vote'})```
 - ```T = table(___,'RowNames',rowNames) ``` specifies names of the rows in table, ```T = table(Age,Weight,Height,'RowNames',LastName)``` ```T = table([10;20;30],{'M';'F';'F'},'VariableNames',{'Age','Gender'},'RowNames',{'P1','P2','P3'})```
