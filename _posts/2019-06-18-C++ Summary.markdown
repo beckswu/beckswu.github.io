@@ -538,11 +538,11 @@ Here, the first inclusion of "grandparent.h" causes the macro GRANDPARENT_H to b
 
 #### Function Pointer
 
-1. Unlike normal pointers, <span style="background-color:#FFFF00">a function pointer points to code</span>, not data. <span style="background-color:#FFFF00"> Typicallya function pointer stores the start of executable code </span>
+1. Unlike normal pointers, <span style="background-color:#FFFF00">a function pointer points to code</span>, not data. <span style="background-color:#FFFF00"> Typically function pointer stores the start of executable code </span>
 2. Unlike normal pointers, <span style="background-color:#FFFF00"> we do not allocate de-allocate memory</span> using function pointers. 不用allocate de-allocate memory 
 3. A function's name can also be used to get functions' address. For example, we can use address operator ```&``` or without it. ```void (*fucPtr)() = fun```  or ```void (*fucPtr)() = &fun```, 用不用```&```一样的
 4. We can have array of function pointers. <span style="background-color:#FFFF00">必须function parameter 和 return type 都是一样的</span> 
-5. Function pointer can be passed an argument and can also be returned from a function
+5. Function pointer can be passed an **argument** and can also be **returned** from a function
 
 Pointers to functions
 ```c++
@@ -555,9 +555,8 @@ int (*fcnPtr)();
 **Const function pointer**
 ```
 int (*const fcnPtr)();
-
 ```
-<span style="background-color#FFFF00">如果put const before int, 表示function being pointed to would return a const int</span>
+<span style="background-color#FFFF00">如果put const before int ```const int (* fcnPtr)();```, 表示function being pointed to would return a const int</span>
 
 
 <span style="background-color#FFFF00">Function pointers can be initialized with a function (and non-const function pointers can be assigned a function) </span>
@@ -583,12 +582,11 @@ int main()
 }
 ```
 
-One common mistake is to do this: ```fcnPtr = goo();```. This would actually <span style="background-color#FFFF00">assign the return value from a call to function ```goo()``` to ```fcnPtr```<span>.  是assign funcion 返回的值
+One common mistake is to do this: ```fcnPtr = goo();```. This would actually <span style="background-color:#FFFF00">assign the return value from a call to function ```goo()``` to ```fcnPtr```</span>.  是assign funcion 返回的值
     
-Note the type of the function pointer must match the type of the function    
+<span style="color:red">Note the type of the function pointer must match the type of the function </span>   
     
 ```c++
-
 // function prototypes
 
 int foo();
@@ -683,16 +681,14 @@ int main()
     FucPtrArray[2](5,3);
     // It's the same as (*FucPtrArray[2])(5,3);
 
+}
 ```
 
 **Passing function as arguments to other functions**
 
-Functions used as arguments to another function are called **callback functions**
-
-比如让用户选择自己的sorting algorithm 在selection sort algorithm,
+Functions used as arguments to another function are called **callback functions** 比如让用户选择自己的sorting algorithm 在selection sort algorithm,
 ```c++
 bool (*comparisonFcn)(int, int);//因为compare tow interters and return a boolean value
-
 
 ```
 
@@ -784,13 +780,11 @@ int main()
 ```c++
 
 void selectionSort(int *array, int size, bool (*comparisonFcn)(int, int))
-
 ```
 
 is equivalently written as 
 ```c++
 void selectionSort(int *array, int size, bool comparisonFcn(int, int))
-
 ```
 
 <span style="background-color:#FFFF00"> This only works for function parameters, not stand-alone function pointers </span>
@@ -802,14 +796,12 @@ void selectionSort(int *array, int size, bool comparisonFcn(int, int))
 // Default the sort to ascending sort
 
 void selectionSort(int *array, int size, bool (*comparisonFcn)(int, int) = ascending);
-
 ```
 
 **Making function pointers prettier with typedef or type aliases**: the syntax for pointers to functions is ugly. However, typedefs can be used to make pointers to functions look more like regular variables:
 
 ```c++
 typedef bool (*validateFcn)(int, int);
-
 ```
 This defines a typedef called “validateFcn” that is a pointer to a function that takes two ints and returns a bool.
 
@@ -818,7 +810,6 @@ Now instead of doing this
 ```c++
 bool validate(int x, int y, bool (*fcnPtr)(int, int)); // ugly
 
-
 ```
 
 You can do this 
@@ -826,10 +817,9 @@ You can do this
 ```c++
 bool validate(int x, int y, validateFcn pfcn) // clean
 
-
 ```
 
-**Using std::function in C++11**: Introduced in C++11, an alternate method of defining and storing function pointers is to use std::function, which is part of the standard library <functional> header. *Both the return type and parameters* go inside angled brackets, with the parameters inside parenthesis. If there are no parameters, the parentheses can be left empty. 
+**Using std::function in C++11**: Introduced in C++11, an alternate method of defining and storing function pointers is to use ```std::function```, which is part of the standard library ```<functional>``` header. Both the return type and parameters go inside angled brackets, with the parameters inside parenthesis. If there are no parameters, the parentheses can be left empty. 
 
 
     
@@ -865,10 +855,9 @@ int main()
 }
 ```
 
-**Type inference for function pointers(Auto)**: the auto keyword can also infer the type of a function pointer.<span style="color:red">The downside is, of course, that all of the details about the function’s parameters types and return type are hidden(parameters types 和 return types 都是hidden), so it’s easier to make a mistake when making a call with the function, or using its return value</span>. Unfortunately, type inference won’t work for function parameters (even if they have default values(Auto 不能用于function parameters)
+**Type inference for function pointers(Auto)**: the auto keyword can also infer the type of a function pointer.<span style="color:red">The downside is, of course, that all of the details about the function’s parameters types and return type are hidden(**parameters types 和 return types 都是hidden**), so it’s easier to make a mistake when making a call with the function, or using its return value</span>. Unfortunately, type inference won’t work for function parameters (even if they have default values(Auto 不能传入用于function parameters)
 
 ```c++
-
 #include <iostream>
  
 int foo(int x)
