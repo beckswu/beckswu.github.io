@@ -538,13 +538,19 @@ Here, the first inclusion of "grandparent.h" causes the macro GRANDPARENT_H to b
 
 #### Function Pointer
 
+1. Unlike normal pointers, <span style="background-color:#FFFF00">a function pointer points to code</span>, not data. <span style="background-color:#FFFF00"> Typicallya function pointer stores the start of executable code </span>
+2. Unlike normal pointers, <span style="background-color:#FFFF00"> we do not allocate de-allocate memory</span> using function pointers. 不用allocate de-allocate memory 
+3. A function's name can also be used to get functions' address. For example, we can use address operator ```&``` or without it. ```void (*fucPtr)() = fun```  or ```void (*fucPtr)() = &fun```, 用不用```&```一样的
+4. We can have array of function pointers. <span style="background-color:#FFFF00">必须function parameter 和 return type 都是一样的</span> 
+5. Function pointer can be passed an argument and can also be returned from a function
+
 Pointers to functions
 ```c++
 // fcnPtr is a pointer to a function that takes no arguments and returns an integer
 
 int (*fcnPtr)();
 ```
-上面例子中, ```fcnPtr``` is a pointer to a function that has no parameters and returns an integer, <span style="background-color:#FFFF00">it can point to any function that matches this type</span>. 其中```()``` is necessary. as ```int *fcnPtr()```是<span style="color:red">a declaration for a function named fcnPtr that takes no parameters and retusn a point to an integer</span>
+上面例子中, ```fcnPtr``` is a pointer to a function that has no parameters and returns an integer, <span style="background-color:#FFFF00">it can point to any function that matches this type</span>. 其中```()``` is necessary. as ```int *fcnPtr()```是<span style="color:red">a declaration for a function named fcnPtr that takes no parameters and returns a point to an integer</span>
 
 **Const function pointer**
 ```
@@ -572,7 +578,6 @@ int main()
     int (*fcnPtr)() = foo; // fcnPtr points to function foo
     
     fcnPtr = goo; // fcnPtr now points to function goo
- 
  
     return 0;
 }
@@ -616,9 +621,22 @@ int foo(int x)
 int main()
 {
     int (*fcnPtr)(int) = foo; // assign fcnPtr to function foo
+
+    /* The above line is equivalent of following two 
+       int (*fcnPtr)(int); 
+       fun_ptr = &fun;  
+    */
     
     (*fcnPtr)(5); // call function foo(5) through fcnPtr.
- 
+
+    fcnPtr(5); // call function foo(5) through fcnPtr.
+    
+    int (*fcnPtr2)() = &foo;//assign pointer to function
+
+    (*fcnPtr2)(5); // call function foo(5) through fcnPtr.
+
+    fcnPtr2(5); // call function foo(5) through fcnPtr.
+
     return 0;
 }
 ```
@@ -640,9 +658,32 @@ int main()
 }
 ```
 
-<span style="background-color:#FFFF00"> **Default parameters won't work for functions called through function pointers**: 因为default parameters are resolved at compiled time(意味着if you don't supply an argument for a defaulted parameter, the compiler substitues one when code is compiled), 但是function pointers are resolved at run-time</span>. Consequently, default parameters cannot be resolved when making a function call with a function pointer. 你不得不pass in vlaues for any defaulted parameteres.
+<span style="background-color:#FFFF00">需要注意 **Default parameters won't work for functions called through function pointers**: 因为default parameters are resolved at compiled time(意味着if you don't supply an argument for a defaulted parameter, the compiler substitues one when code is compiled), 但是function pointers are resolved at run-time</span>. Consequently, default parameters cannot be resolved when making a function call with a function pointer. 你不得不pass in vlaues for any defaulted parameteres.
+
+Array of function pointers
+
+```c++
+void add(int a, int b){
+    cout << "a + b  = "<<a+b<<endl;
+}
+
+void subtract(int a, int b){
+    cout << "a - b = "<<a+b<<endl;
+}
+
+void multiply(int a, int b){
+    cout << "a * b = "<<a*b<<endl;
+}
 
 
+int main()
+{
+    const int r = 3;
+    void (* FucPtrArray[])(int, int) = {add, subtract, multiply};
+    FucPtrArray[2](5,3);
+    // It's the same as (*FucPtrArray[2])(5,3);
+
+```
 
 **Passing function as arguments to other functions**
 
@@ -824,7 +865,7 @@ int main()
 }
 ```
 
-**Type inference for function pointers(Auto)**: the auto keyword can also infer the type of a function pointer.<span type="color:red">The downside is, of course, that all of the details about the function’s parameters types and return type are hidden(parameters types 和 return types 都是hidden), so it’s easier to make a mistake when making a call with the function, or using its return value</span>. Unfortunately, type inference won’t work for function parameters (even if they have default values(Auto 不能用于function parameters)
+**Type inference for function pointers(Auto)**: the auto keyword can also infer the type of a function pointer.<span style="color:red">The downside is, of course, that all of the details about the function’s parameters types and return type are hidden(parameters types 和 return types 都是hidden), so it’s easier to make a mistake when making a call with the function, or using its return value</span>. Unfortunately, type inference won’t work for function parameters (even if they have default values(Auto 不能用于function parameters)
 
 ```c++
 
@@ -844,5 +885,5 @@ int main()
 }
 ```
 
-<span type="background-color:#FFFF00">Because the native syntax to declare function pointers is ugly and error prone, we recommend you use typedefs (or in C++11, std::function).</span>
+<span style="background-color:#FFFF00"> Because the native syntax to declare function pointers is ugly and error prone, we recommend you use typedefs (or in C++11, std::function).</span>
 
