@@ -13,6 +13,7 @@ tags:
 ---
 
 **aux_source_directory(. SRC_DIR)** 会查找指定目录下的所有源文件, 这里查找 . (current directory), 并查找结果存进SRC_DIR <br/>
+**file(glob variable_name file)**: Generate a list of files that match the globbing-expressions and store it into the variable.
 **option (USE_MATH "Use provided math implementation" ON)**: Provide an option for the user to select as ON or OFF. If no initial value is provided, OFF is used. "Use provided math implementation" 使用来help string describing option
 
 
@@ -150,6 +151,58 @@ ldd cmake-good
 cmake -D BUILD_SHARED_LIBS=TRUE .
 
 ```
+
+## Make library
+
+
+Set VERSION property (optional but it is a good practice):
+```cmake
+set_target_properties(mylib PROPERTIES VERSION ${PROJECT_VERSION})
+```
+
+You can also set SOVERSION to major number of VERSION. So libmylib.so.1 will be a symlink to libmylib.so.1.0.0.
+```
+set_target_properties(mylib PROPERTIES SOVERSION 1)
+
+```
+
+Declare public API of your library. This API will be installed for third-party application. It is a good practice to isolate it in your project tree (like placing it include/ directory). Notice that, private headers should not be installed and I strongly suggest to place them with the source files. 定义public header
+
+```
+set_target_properties(mylib PROPERTIES PUBLIC_HEADER include/mylib.h)
+```
+
+If you work with subdirectories, it is not very convenient to include relative path like "../include/mylib.h".(不希望让include header时候 加上relative path e.g. #include "../include/mylib.h") So, pass top directory in included directories: 
+
+
+```
+target_include_directories(mylib PRIVATE .)
+
+```
+
+## CMake Function
+
+#### File
+
+file(glob variable_name filelist\<globbing-expression\>): 产生一个list of files that match globbing-expression 类似 regular expression 并 store it into the variable
+
+<span style="background-color:#FFFF00">Note:</span> We do not recommend using GLOB to collect a list of source files. 因为如果CMakeLists.txt 没有更改时候，但是a source is added or removed then generated build system cannot know when to ask CMake to regenerate. 
+
+e.g. Developer A add new file ```x.c``` 但是A没有change ```CMakeLists.txt``` and commit after he finished implementing ```x.c```. Now Developer B ```git pull```, 因为没有modifications to the ```CMakeLists.txt```. CMake 不会run again and B causes linker errors when compiling. 因为```x.c``` 没有added to its source file list.
+
+如果加了```file(GLOB ...)```需要run 下面的 every time you add or delete a source file
+```
+cmake <your_source_dir> -G <your_build_generator>
+
+```
+
+Examples of globbing expression 包括
+
+```
+*.cxx      - match all files with extension cxx
+*.vt?      - match all files with extension vta,...,vtz
+f[3-5].txt - match files f3.txt, f4.txt, f5.txt
+```  
 
 
 
