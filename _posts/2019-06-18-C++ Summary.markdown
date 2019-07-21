@@ -369,12 +369,15 @@ cout<<i<< ", "<<r1<<", "<<r2<<endl; //print 0, 0 , 0
 1. Level Const
    - **low-level const**(object is const): const <span style="background-color: #FFFF00">在pointer 左面</span>表data is const, cannot change underlying data value. but can point to different underlying. <br/>
    - **top-level const**(pointer is const): const <span style="background-color: #FFFF00">在pointer 右面有pointer在时候表示 pointer is const (**a const pointer**), 如果没有pointer 在表示数据const (```const int a = 0```</span>, 不能改变指向对象，但可以改变the value of underlying object
-   - **top level const**可以变成**low level const**,  e,g. ```const int a = 0; const int * aptr = &a``` a表示top level const, 通过```&``` operator, 变成**low level const**
-   - <span style="background-color: #FFFF00">The distinction between **top-level** and **low-level** matters when we copy an object</span>. When we copy an object, **top-level consts can be ignored:** e.g. ```const * const int = const * int```,  <span style="background-color: #FFFF00">如果忽略Low Level const</span>, <span style="color:red">**Error**</span>
-       -  <span style="color:red">**Error**</span> e.g. ```int val = 42; const int * p3Low = p2;int * p3 = p3Low;//error```
-      -   <span style="color:red">**Error**</span> e.g. ```const double cstVal = 3.14; double *ptr = &cstVal; // //error```
-   - Non-const Value to Const Pointer ✔️ : ```int val = 1; int const * const pLowTop = & val;```
-2.  The types of a pointer and the object to which it points must match(等号左右两边类型必须match). 
+   - **top level const**可以变成**low level const**,  e,g. ```const int a = 0; const int * aptr = &a``` ```a```表示top level const, 通过```&``` operator, 变成**low level const(aptr)**
+2. <span style="background-color: #FFFF00">The distinction between **top-level** and **low-level** matters when we copy an object</span>. When we copy an object, **top-level consts can be ignored:** e.g. ```const * const int = const * int```, <span style="color:red">**Error**</span>, 
+    -  <span style="background-color: #FFFF00">对于pointe之间r的copy, 如果忽略Low Level const</span>, <span style="color:red">**Error**</span> 
+      - **Const Pointer -> Pointer**:  <span style="color:red">**Error**</span> e.g. ```int val = 42; const int * p3Low = val;int * p3 = p3Low;//error```
+      - **Pointer -> Const Pointer**  <span style="color:red">**Error**</span> e.g. ```const double cstVal = 3.14; double *ptr = &cstVal; // //error```
+    - 对于value 到 const pointer 的copy, 可以忽略```low-level const```
+       -  **Value -> Const Pointer** ✔️  e.g. ```int val = 1; int const * const pLowTop = & val;```
+       -  **Const Pointer -> Value** ✔️ ```int j = 0; const int * cstPtr = & j; int val = *cstPtr;```
+3.  The types of a pointer and the object to which it points must match(等号左右两边类型必须match). 
 
 
 ```c++
@@ -451,7 +454,7 @@ const int sz = get_size();
 //sz is not a constant expression
 
 constexpre int sz2 = get_size(); 
-//只有当get_size() is a constexpr function
+//只有当get_size() is a constexpr function, sz2才是constexpr function
 
 ```
 
@@ -476,14 +479,18 @@ p and q are quite different. The difference is ```constexpr``` imposes a ```top-
 constexpr int * pTop = nullptr; 
 //pTop is a constant pointer to int that is null
 
+const int tempInt = 10;
+pTop = & tempInt; //Error, cannot assign const int to int * const
+
+
 int j = 0;
 constexpr int i = 42; // i is const int
 
 constexpr const int * pLowTop = &i; 
-// p is const pointer to the const int i
+// pLowTop is const pointer to the const int i
 
 constexpr int * p1Top = & j
-//p is a const pointer to the int j
+//p1Top is a const pointer to the int j
 
 constexpr int * pTop2 = &i; 
 // error, fix it is const int * pLow = & i
@@ -494,7 +501,7 @@ constexpr int * pTop2 = &i;
 
 **Type Alias** is a name that is a synonym for another type 
 
-1. **typedef**: ```typedef double wages```, typedef can also include type modifiers (such as reference, pointer) that define compoun types 
+1. **typedef**: ```typedef double wages```, typedef can also include type modifiers (such as reference, pointer) that define compound types 
 2. **using**: ```using SI = Sales_item;```
 
 **Pointers, Const, and Type Aliases**
