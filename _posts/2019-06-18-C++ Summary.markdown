@@ -40,7 +40,7 @@ int units_sold {0};
 int units_sold(0);
 ```
 
-</span style="background-color: #FFFF00">List Initialization will throw error if the initializer might lead to the loss of information. (编译器将会报错，如果使用列表初始化且初始值存在丢失信息的风险).</span> 如果不用List Initialization 就不会, 会implicit convert
+<span style="background-color: #FFFF00">List Initialization will throw error if the initializer might lead to the loss of information. (编译器将会报错，如果使用列表初始化且初始值存在丢失信息的风险).</span> 如果不用List Initialization 就不会, 会implicit convert
 
 
 ```c++
@@ -51,19 +51,18 @@ int c(ld), d = ld; // 转化执行，但是丢失了部分值 (truncated)
 
 ```
 
-**Default Initialization**
+2. **Default Initialization**
 
-Most classess let us define objects without <span style="color: red">explict initializers</span>. Such classes supply an appropriate default value. e.g. std:string empty; //empty implicitly initialized to the empty string. 
+Most classess let us define objects without <span style="color: red">explict initializers</span>. Such classes supply an appropriate default value. e.g. std:string empty; empty implicitly initialized to the empty string. 
 
 Note: Uninitialized objects of built-in type defined inside a function body have undefined value. Objects of class type that we do not explicitly initialize have a value that is defined by the class.
 
-**Variable Declarations and Definitions**
+3. **Variable Declarations and Definitions**
 
- <span style="background-color: #FFFF00">**A declaration makes a name known to the program. A definition creates the associated entity.**</span>
-
-A variable **declaration**  <span style="background-color: #FFFF00"> specifies the type and name of a variable</span>. A variable definition is a declaration. In addition to specifying the name and type, a **definition** also <span style="background-color: #FFFF00"> allocates storage and may provide the variable with an initial value</span>. 变量声明规定了变量的类型和名字，在这一点上定义与之相同. 但除此之外, 定义还申请存储空间, 也可能会为变量赋一个初始值
-
-如果想声明一个变量而非定义它，在变量前添加extern
+ - <span style="background-color: #FFFF00">**A declaration makes a name known to the program. A definition creates the associated entity.**</span>
+- A variable **declaration**  <span style="background-color: #FFFF00"> specifies the type and name of a variable</span>. A variable definition is a declaration. In addition to specifying the name and type, a **definition** also <span style="background-color: #FFFF00"> allocates storage and may provide the variable with an initial value</span>. 变量声明规定了变量的类型和名字，在这一点上定义与之相同. 但除此之外, 定义还申请存储空间, 也可能会为变量赋一个初始值
+- <span style="background-color: #FFFF00"> Variable must be defined exactly once but can be declared many times</span> 变量只能被定义一次，但可以被声明多次
+- 如果想声明一个变量而非定义它，在变量前添加extern
 
 ```c++
 extern int i; //声明i而非定义i
@@ -76,8 +75,6 @@ int j; //声明并定义j
 ```c++
 extern int i = 5; //定义
 ```
-
-<span style="background-color: #FFFF00"> Variable must be defined exactly once but can be declared many times</span> 变量只能被定义一次，但可以被声明多次
 
 **Nested Scopes**
 
