@@ -174,6 +174,7 @@ pi = &dval; //error: assigning the address of a double to a pointer to int
 int dval;
 double *pi = &dval;//error: types of pi and pd differ, 一个int,一个double, 也是compile error
 
+
 ```
 
 <span style="background-color:#FFFF00">& 赋值是改变等号左侧 pointer指代对象, \* 不改变指代对象，改变的是指代对象的值 </span>
@@ -259,18 +260,20 @@ r = &i;// r refers to a pointer; assigning &i to r makes p point to i
     - **const -> non const**  const (reference or without reference)  initilize non const value; ```const int & cstRef = 3; int val = cstRef```.
 3. **Const Ref-Ref**:
     - **Const Ref -> Ref**  <span style="color:red">**Error**</span>  <span style="background-color:#FFFF00"> const reference 不能bind 到non-const reference，因为reference is not object </span> ```const int & ref = 3; int &i = ref; \\error```,
-    - - **Ref -> Const Ref** Okay ```int val = 3; int & ref = val; const int &cstRef = ref;```
+    - **Ref -> Const Ref** ✔️ ```int val = 3; int & ref = val; const int &cstRef = ref;```
 4. **Ref-Value**:
-    - **Ref -> Const Value** Ok, ```int val = 3; int & ref = val; const int cstRef = ref;```
+    - **Ref -> Const Value** ✔️, ```int val = 3; int & ref = val; const int cstRef = ref;```
     - **Const Value -> Ref** <span style="color:red">**Error**</span> ```const int cstRef = 3; int & ref = cstRef;```, 因为Referene 不是object, 这么做有更改Const 可能性
-    - **Const Ref -> Value** Ok, ```const int & cstRef = 3; int val = cstRef;```
-    - **Value-> Const Ref** Ok, ```int val = 3; const int & cstRef = val;```
+    - **Const Ref -> Value** ✔️, ```const int & cstRef = 3; int val = cstRef;```
+    - **Value-> Const Ref** ✔️, ```int val = 3; const int & cstRef = val;```
+    - **Const Ref -> Const Value** ✔️,```const int & cstRef = 5;const int val = cstRef;```
+    - **Const Value -> Const Ref** ✔️,```const int val = 5;const int & cstRef = val;```
 5. ```const reference```, 如果type 不匹配 or 用rvalue expression, 会生成一个**temporary object**, 这样如果改了原来的值, ```const reference```不会改 (因为```const reference```连得是temporary object) e.g. ```double val = 3.14; const int & cstRef = val; ```
     - 如果不是const reference, ```double val = 3.14; int & cstRef = val;  ``` 因为没有**中间值**生成, 改变```val```的值,有改变const reference 风险, <span style="color:red">**Error**</span>
 6. ```const refernce```生成后 <span style="background-color:#FFFF00">不能直接更改，但可能会被间接更改(没有temporary object生成)</span> ```int val = 3;const int & cstRef = val;val = 10;``` , ```val = cstRef = 10```
 
 
-1. Reference
+(1). Reference
 
 const value 必须initialize when define 
 
@@ -374,46 +377,48 @@ cout<<i<< ", "<<r1<<", "<<r2<<endl; //print 0, 0 , 0
 
 ```
 
-2. **Pointer and const**
+(2). **Pointer and const**
 
-**low-level const**(object is const): const <span style="background-color: #FFFF00">在pointer 左面</span>表data is const, cannot change underlying data value. but can point to different underlying. <br/>
-**top-level const**(pointer is const): const <span style="background-color: #FFFF00">在pointer 右面</span>表示 pointer is const (**a const pointer**), 不能改变指向对象，但可以改变the value of underlying object
+1. Level Const
+   - **low-level const**(object is const): const <span style="background-color: #FFFF00">在pointer 左面</span>表data is const, cannot change underlying data value. but can point to different underlying. <br/>
+   - **top-level const**(pointer is const): const <span style="background-color: #FFFF00">在pointer 右面</span>表示 pointer is const (**a const pointer**), 不能改变指向对象，但可以改变the value of underlying object
+   - <span style="background-color: #FFFF00">The distinction between **top-level** and **low-level** matters when we copy an object</span>. When we copy an object, **top-level consts can be ignored:** e.g. ```const * const int = const * int```, 如果忽略Low Level const, <span style="color:red">**Error**</span>
+       -  <span style="color:red">**Error**</span> e.g. ```int val = 42; const int * p3Low = p2;int * p3 = p3Low;//error```
+      -   <span style="color:red">**Error**</span> e.g. ```const double cstVal = 3.14; double *ptr = &cstVal; // //error```
+   - Non-const Value to Const Pointer ✔️ : ```int val = 1; int const * const pLowTop = & val;```
+2.  The types of a pointer and the object to which it points must match(等号左右两边类型必须match). 
 
-顶层const 可以表示任意对象是const, 这一点对任何数据类型都是用，比如built-in arithmetic types, a class type, or a pointer type. Low-level则与pointer, reference 有关, pointer既可以是low level const 也可以是top-level const 
 
 ```c++
-
 int i = 0;
-int *const p1Top = &i; // const is top-level; we can't change the value of p1Top; 
+int *const p1Top = &i; // const is top-level; we can't change the value of p1Top
 
-const int ci = 42; // we cannot change ci; const is top-level
+const int ci = 42; //  const is top-level; we cannot change ci
 
-const int *p2Low = &ci; //  const is low-level; we can change p2Low;
+const int *p2Low = &ci; //  const is low-level; we can change p2Low
 
 const int *const p3LowTop = p2; // right-most const is top-level, left-most is not
 
 const int &r = ci; // const in reference types is always low-level
 
-```
 
-<span style="background-color: #FFFF00">The distinction between top-level and low-level matters when we copy an object</span>. When we copy an object, **top-level consts can be ignored:**
+//top level constant can be ignored
 
-```c++
 i = ci; // ok: copying the value of ci; top-level const in ci is ignored 
 
-p2 = p3; // ok: pointed-to type matches; top-level const in p3 is ignored
+p2Low = p3LowTop; // ok: pointed-to type matches; top-level const in p3LowTop is ignored
+
 
 ```
 
 <span style="background-color: #FFFF00">On the other hand, low-level const is never ignored.(lower-level 从不会被忽略)</span>.  When we copy an object, both objects must have the same low-level const qualification or there must be a conversion between the types of the two objects(拷贝 输出对象必须具有相同的底层const 资格). In general, we can convert a nonconst to const but not the other way round:
 
 ```c++
+int *p = p3LowTop; // error: p3LowTop has a low-level const but p doesn't
 
-int *p = p3; // error: p3 has a low-level const but p doesn't
+p2Low = p3LowTop; // ok: p2Low has the same low-level const qualification as p3LowTop
 
-p2 = p3; // ok: p2 has the same low-level const qualification as p3
-
-p2 = &i; // ok: we can convert int* to const int*
+p2Low = &i; // ok: we can convert int* to const int*
 
 int &r = ci; // error: can't bind an ordinary int& to a const int object 
 
@@ -421,31 +426,28 @@ const int &r2 = i; // ok: can bind const int& to plain int
 
 ```
 
-The types of a pointer and the object to which it points must match(等号左右两边类型必须match). 
-
 The first exception is that we can use a pointer to const to point to a nonconst object: 可以用const pointer指向non-const object
 
 ```c++
+const double cstVal = 3.14; // pi is const; its value may not be changed
 
-const double pi = 3.14; // pi is const; its value may not be changed
+double *ptr = &cstVal; // error: ptr is a plain pointer
 
-double *ptr = &pi; // error: ptr is a plain pointer
+const double *cptrLow = &cstVal; // ok: cptr may point to a double that is 
 
-const double *cptr = &pi; // ok: cptr may point to a double that is 
-
-const *cptr = 42; // error: cannot assign to *cptr
+*cptrLow = 42; // error: cannot assign value to *cptr
 
 double dval = 3.14; // dval is a double; its value can be changed
  
-cptr = &dval; // ok: but can't change dval through cptr
+cptrLow = &dval; // ok: but can't change dval through cptr
 
 
 ```
 
 ```c++
-
 double pi = 3.14159;
 const double *const pip = &pi; // pip is a const pointer (在pointer右边的const) to a const object
+
 
 ```
 
