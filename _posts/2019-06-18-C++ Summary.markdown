@@ -253,14 +253,16 @@ r = &i;// r refers to a pointer; assigning &i to r makes p point to i
 
 - No pointer:
 1. ```const```value 必须initialize when define 
-2. **Const Value-Value**: 可以用non const initialze ```const```  value ```int val = 5; const int cst = val;```, 同样也可以用 ```const```(reference or without reference)  initilize non const value; ```const int & cstRef = 3; int val = cstRef```
-3. **Const Ref-Ref**: <span style="background-color"> const reference 不能bind 到non-const reference，因为reference is not object </span> ```const int & ref = 3; int &i = ref; \\error```, 反过来却可以 ```int val = 3; int & ref = val; const int &cstRef = ref;```
+2. **Const Value-Value**: 可以用non const initialze ```const```  value ```int val = 5; const int cst = val;```, 同样也可以用 ```const```(reference or without reference)  initilize non const value; ```const int & cstRef = 3; int val = cstRef```.<span style="background-color:#FFFF00"> 因为```const value```是通过复制生成，改变原来值，不会改变```const value```值</span> e.g. ```int val = 3; const int cstRef = val;val = 10;```, ```cstRef = 3``` , ```val = 10``` 
+3. **Const Ref-Ref**: <span style="background-color:#FFFF00"> const reference 不能bind 到non-const reference，因为reference is not object </span> ```const int & ref = 3; int &i = ref; \\error```, 反过来却可以 ```int val = 3; int & ref = val; const int &cstRef = ref;```
 4. **Ref-Value**:
     - **Ref -> Const Value** Ok, ```int val = 3; int & ref = val; const int cstRef = ref;```
     - **Const Value -> Ref** <span style="color:red">Error</span> ```const int cstRef = 3; int & ref = cstRef;```, 因为Referene 不是object, 这么做有更改Const 可能性
     - **Const Ref -> Value** Ok, ```const int & cstRef = 3; int val = cstRef;```
     - **Value-> Const Ref** Ok, ```int val = 3; const int & cstRef = val;```
-5. 生成```const reference```, 如果type 不匹配 or 用rvalue expression, 会生成一个temporary object, 这样如果改了原来的值, ```const reference```不会改 (因为```const reference```连得是temporary object)
+5. ```const reference```, 如果type 不匹配 or 用rvalue expression, 会生成一个temporary object, 这样如果改了原来的值, ```const reference```不会改 (因为```const reference```连得是temporary object) e.g. ```double val = 3.14; const int & cstRef = val; ```
+    - 如果不是const reference, ```double val = 3.14; int & cstRef = val;  ``` 因为没有中间值生成, 改变```val```的值,有改变const reference 风险, <span style="color:red">**Error**</span>
+6. ```const refernce```生成后 <span style="background-color:#FFFF00">不能直接更改，但可能会被间接更改(没有temporary object生成)</span> ```int val = 3;const int & cstRef = val;val = 10;``` , ```val = cstRef = 10```
 
 const value 必须initialize when define 
 
@@ -275,7 +277,6 @@ const int k; // error: k is uninitialized const
  
 const value 可以生成non const value (反之也可以), 但是const reference 不可以生成 nonconst reference (nonconst reference 可以生成const reference)
 ```c++
-
 int val = 42;
 const int cst = val; // ok: nonconst val -> const val
 
@@ -304,7 +305,6 @@ int i = 42;
 **One exception for const references**: initailize const from any expression that can be converted to the type of the reference. <span style="background-color: #FFFF00">当initilize const reference, 我们可以用任意表达式. </span>
 
 ```c++
-
 int i = 42;
 const int &r1 = i; // we can bind a const int& to a plain int object 
 
@@ -324,6 +324,7 @@ const int &ri = dval; //okay,
 dval = 6.28;
 cout<<ri << ","<<dval<<endl; //print 3, 6.14
 
+
 int Ival = 5;
 const int & ri2 = Ival; //okay,
 const int & ri3 = Ival*2; //okay,
@@ -333,7 +334,7 @@ cout<<ri2<<" ,"<<ri3 << ","<<Ival<<endl; //print 30, 10, 30
 
 ```
 
-上面例子中.To sure object to which ```ri``` is bound is an int, compiler transforms the code into something like (但不适用```ri2```, 因为initialize ```ri2```时, 没有生成temporary object)
+上面例子中.To sure object to which ```ri``` is bound is an int, compiler transforms the code into something like (但不适用```ri2```, 因为initialize ```ri2```时, 没有生成temporary object). In this case, ```ri``` is bound to a **temporary object**. A temporary object is an unnamed object created by the compiler when it needs a place to store a result from evaluating an expression. 
 
 ```c++
 const int temp = dval;//create a temporary const int from the double
@@ -346,12 +347,10 @@ const int &ri3 =temp2;//bind ri to that temporary
 
 ```
 
-In this case, ```ri``` is bound to a **temporary object**. A temporary object is an unnamed object created by the compiler when it needs a place to store a result from evaluating an expression. 而加入ri 不是const, if ri weren't const, we 允许ri赋值, 这样做would change the object to which ri is bound.（会改变ri 引用对象的值), 而对于ri, <span style="color: red">如果我们改变ri,想的是改变dval,但是绑定的不是dval, 而是一个temporary object</span>. C++ will make it illegal
-
 
 **A Reference to const May Refer to an Object That Is Not const**
 
-It is important to realize that a reference to ```const``` restricts only what we can do through that reference. Binding a reference to ```const``` to an object says nothing about whether the underlying object itself is const. Because the underlying object might be nonconst, it might be changed by other means. <span style="color: red">const reference 并没有说underlying object是const, underlying object可能不是const，也可以被修改</span>
+当```const refernce```initialized时, 并没有generate **temporary object**, 可能会被间接更改```const refernce```的value
 
 ```c++
 int i = 42;
