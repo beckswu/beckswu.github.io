@@ -97,11 +97,12 @@ int main(){
 
 #### Compound Types
 
+A **compount type** is a type that is defined in terms of another type, which is references and pointers
 
 1. reference, pointer:
     - <span style="background-color: #FFFF00">等号两边类型(type)必须相同 </span> type modifier 不一定相同
-        - 比如 double dval = 3.14;,int &refVal5 = dval;//error
-    - 对于同type modifier <span style="background-color: #FFFF00">拷贝对象时候底层const (low-level) 不能被忽略，顶层(top-level)可以忽略</span>, 详见Pointer and const) 比如 
+        - 比如 ```double dval = 3.14;,int &refVal5 = dval;//error```
+    - 对于同type modifier <span style="background-color: #FFFF00">拷贝对象时候底层const (low-level) 不能被忽略，顶层(top-level)可以忽略</span>,  比如 
         - int r = 3; int * const pi = &r(顶层const); int *ref = pi; 是okay的
         - int r = 3; const int * pi = &r(底层const); int *ref = pi; 不okay的
         - int r = 3; const int * pi = &r(底层const); const int *ref = pi; 底层const match
@@ -116,7 +117,6 @@ int main(){
 比如const double pi = 3.14; int p2 = pi;
 
 
-A **compount type** is a type that is defined in terms of another type, which is references and pointers
 
 **Reference** (At here, reference is only lvalue reference not rvalue reference)
 
@@ -151,15 +151,20 @@ int &r3 = i3, &r4 = i2; // both r3 and r4 are references
 
 **Pointer**
 
-assign pointer 需要assign 的类型和被assign 类型compatible. **Pointer is a object whereas reference is not object**
+- assign pointer <span style="color:red">需要assign 的类型和被assign 类型compatible</span>. 
+- <span style="background-color:#FFFF00">**Pointer is a object whereas reference is not object**</span>
+- <span style="background-color: #FFFF00">It is error to copy or try to access the value of an invalid pointer</span>. As when we use an uninitialized variable, <span style="color: red">this error is one that the compiler is unlikely to detect(编译器不会检查access invalid pointer)</span>. The result of accessing an invalid pointer is undefined. 
+-  Given two valid pointers of the same type, we can compare them use<span style="background-color: #FFFF00"> the equality(==) or inequality(!=) operator, Two pointers are equal if the yhold the same address (两个指针存放的地址相同) </span>
+- <span style="background-color: #FFFF00">修饰符 (type modifier \*)仅仅是修饰一个variable</span>,  而非修饰整行所有变量.  Each declarator can relate its variable to the base type differently from the other declarators in the same definition. </span>```int* p1, p2```, p1 是 int pointer, p2 是int, , 如果两个都是pointer 用```int* p1, *p2```
 
 ```c++
 double dval;
 double *pd = &dval; //ok: initializer is the address of a doub;e
 
-double *p2 = pd;//ok: initializer is a pointer to doub;e
+double *p2 = pd;//ok: initializer is a pointer to double
 
 int *pi = pd;//error: types of pi and pd differ, 一个int,一个double
+
 pi = &dval; //error: assigning the address of a double to a pointer to int
 
 //上面两个error 都会compile fail
@@ -168,39 +173,24 @@ pi = &dval; //error: assigning the address of a double to a pointer to int
 int dval;
 double *pi = &dval;//error: types of pi and pd differ, 一个int,一个double, 也是compile error
 
-
 ```
 
-<span style="background-color: #FFFF00">It is error to copy or try to access the value of an invalid pointer</span>. As when we use an uninitialized variable, <span style="color: red">this error is one that the compiler is unlikely to detect(编译器不会检查access invalid pointer)</span>. The result of accessing an invalid pointer is undefined. 
-
-
-& 赋值是改变等号左侧 pointer指代对象, \* 不改变指代对象，改变的是指代对象的值 
+<span style="background-color:#FFFF00">& 赋值是改变等号左侧 pointer指代对象, \* 不改变指代对象，改变的是指代对象的值 </span>
 ```c++
 int r = 1;
 int *p = &r;
 int *p2 = p;
     
 *p2 = 10; //change pointed value, aslo change value of the object pointer points to
+
 cout << *p <<" , "<<*p2  <<" , "<< r <<endl; //print 10 ,10, 10
 
 int c = 5;
 p = &c; //change object that pointer points to
+
 cout << *p  <<" , "<< r <<" , "<< c<<endl;//print 5, 10 , 5
 
 ```
-
-Given two valid pointers of the same type, we can compare them use<span style="background-color: #FFFF00"> the equality(==) or inequality(!=) operator, Two pointers are equal if the yhold the same address (两个指针存放的地址相同) </span>
-
-
-__ void \* __
-
-
-The type void\* is a special pointer type that can hold the address of any object. (可以存放任意对象).  Like any other pointer, a void* pointer holds an address, but the type of the object at that address is unknown: <span style="background-color: #FFFF00"> 不了解地址中是个什么类型的对象</span>. Generally,we use a void* pointer to deal with memory as memory, rather than using the pointer to access the object stored in that memory. 
-
-
-a variable definition consists of a base type and a list of declarators. Each declarator can relate its variable to the base type differently from the other declarators in the same definition. 
-
-int\* p1, 修饰符 (type modifier \*)仅仅是修饰一个variable, 而非修饰整行所有变量, prefer using int \*p1;
 
 ```c++
 int i = 1024, *p = &i, &r = i;// i is an int; p is a pointer to int; r is a reference to int
@@ -211,6 +201,14 @@ int* p1, p2;//p1 is a pointer to int; p2 is an int (not pointer),
 
 int *p1, *p2; // both p1 and p2 are pointers to int
 ```
+
+
+**void pointer**
+
+
+ <span style="background-color: #FFFF00">A void* pointer holds an address, but the type of the object at that address is unknown:  </span>. Generally,we use a void* pointer to deal with memory as memory, rather than using the pointer to access the object stored in that memory. 
+
+
 
 **Pointers to Pointers**
 
@@ -239,7 +237,8 @@ int i = 42;
 int *p; //p is a pointer to int
 
 int *&r = p;  // r is a reference to the pointer p
-//cannot write as  int &*r = p; because reference don't have pointer, but pointer has refernece
+
+//cannot write as  int &*r = p; because reference(not object) don't have pointer, but pointer has refernece
 
 r = &i;// r refers to a pointer; assigning &i to r makes p point to i
 
