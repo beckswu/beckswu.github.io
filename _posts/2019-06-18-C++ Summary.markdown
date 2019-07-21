@@ -13,7 +13,6 @@ tags:
 
 
 ```c++
-
 cout<<" File Name "<< __FILE__ << endl; //打印现在file name
 
 cout<<" Line Number "<<__LINE__<<endl; //打印现在现在的行数
@@ -25,34 +24,32 @@ cout<<" Line Number "<<__LINE__<<endl; //打印现在现在的行数
 
 ## Variable and Basic Types
 
-**Object**: an object is a region of memory that has a type. In the book, we will freely use the term *object* regardless of whether the object has built-in or class type, named or unnamed (命名的还是未命名的), or can be read or written.
-
-<span style="background-color: #FFFF00">**Initialization is not assignment**</span>. Initialization happens when a variable is given a value *when it is created*.(创建变量时 赋予它一个初始值). Assignment obliterates an object's current value and replaces that value with a new one (把对象当前值擦除，用一个新值代替)
+<span style="background-color: #FFFF00">**Initialization is not assignment**</span>. Initialization happens when a variable is given a value *when it is created*.(创建变量时 赋予它一个初始值). **Assignment** obliterates an object's current value and replaces that value with a new one (
+<span style="background-color: #FFFF00">把对象当前值擦除，用一个新值代替</span>)
 
 #### Initialization, Definition, Declaration, Scope
 
-**List Initialization**
-
-下面四种初始化都正确
+1. **List Initialization**
 
 ```c++
+//下面四种初始化都正确
+
 int units_sold = 0;
 int units_sold = {0};
 int units_sold {0};
 int units_sold(0);
 ```
 
-when used with variables of built-in type, List Initialization has one important property: The compiler will not let us initialize variables of built-in type if the initializer might lead to the loss of information. (编译器将会报错，如果使用列表初始化且初始值存在丢失信息的风险). 
+</span style="background-color: #FFFF00">List Initialization will throw error if the initializer might lead to the loss of information. (编译器将会报错，如果使用列表初始化且初始值存在丢失信息的风险).</span> 如果不用List Initialization 就不会, 会implicit convert
+
 
 ```c++
 long double id = 3.1415026536;
 int a{ld}, b = {ld}; //error: 存在丢失信息风险
 
 int c(ld), d = ld; // 转化执行，但是丢失了部分值 (truncated)
+
 ```
-
-The compiler rejects the initializations of a and b because using a long double to initialize an int is likely to lose data. the fractional part of ld will be truncated. (long double 初始化int 变量时可能丢失数据，所以编译器拒绝了a 和 b的初始请求. 至少ld 的小数部分丢失，而且int 也可能存不下ld的整数部分因为是long)
-
 
 **Default Initialization**
 
@@ -778,7 +775,6 @@ int main()
 
 <span style="background-color:#FFFF00"> Note: If a function parameter is of a function type, it will be converted to a pointer to the function type</span>. It means 
 ```c++
-
 void selectionSort(int *array, int size, bool (*comparisonFcn)(int, int))
 ```
 
