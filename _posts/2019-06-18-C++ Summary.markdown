@@ -251,7 +251,8 @@ r = &i;// r refers to a pointer; assigning &i to r makes p point to i
 
 #### Const Qualifier
 
-- No pointer:
+Reference:
+
 1. ```const```value 必须initialize when define 
 2. **Const Value-Value**: 可以用non const initialze ```const```  value ```int val = 5; const int cst = val;```, 同样也可以用 ```const```(reference or without reference)  initilize non const value; ```const int & cstRef = 3; int val = cstRef```.<span style="background-color:#FFFF00"> 因为```const value```是通过复制生成，改变原来值，不会改变```const value```值</span> e.g. ```int val = 3; const int cstRef = val;val = 10;```, ```cstRef = 3``` , ```val = 10``` 
 3. **Const Ref-Ref**: <span style="background-color:#FFFF00"> const reference 不能bind 到non-const reference，因为reference is not object </span> ```const int & ref = 3; int &i = ref; \\error```, 反过来却可以 ```int val = 3; int & ref = val; const int &cstRef = ref;```
