@@ -102,12 +102,11 @@ A **compount type** is a type that is defined in terms of another type, which is
 1. reference, pointer:
     - <span style="background-color: #FFFF00">等号两边类型(type)必须相同 </span> type modifier(&, \*) 不一定相同, <span style="background-color: #FFFF00">除了一个特殊情况 const reference</span>
          - 比如 ```double dval = 3.14;,int &refVal5 = dval;//error``` 
-    - 对于不同type, (NA -> Pointer, NA-> reference), 不能忽视底层
 2. 对于const非reference 非pointer, 等号左右两边等号类型可以不同. 
 3. **对于const reference 等号两边可以不同类型，compiler会做转换**  ```const double pi = 3.14; const int & i = pi;```
 
 
-- **Reference** At here, reference is only lvalue reference not rvalue reference
+**Reference** At here, reference is only lvalue reference not rvalue reference
 
 <span style="background-color: #FFFF00"> reference must be assigned at initlization </span>. 程序把引用和初始值绑定(bind)到一起，而不是将初始值拷给引用, 引用无法绑定到另一个对象. <span style="color: red"> **A reference is not an object**. Instead, a reference is just another name for an already existing object </span>
 
@@ -137,8 +136,7 @@ int &r3 = i3, &r4 = i2; // both r3 and r4 are references
 ```
 
 
-
-- **Pointer**
+**Pointer**
 
 - assign pointer <span style="color:red">需要assign 的类型和被assign 类型compatible</span>. 
 - <span style="background-color:#FFFF00">**Pointer is a object whereas reference is not object**</span>
@@ -193,11 +191,11 @@ int *p1, *p2; // both p1 and p2 are pointers to int
 ```
 
 
-- **void pointer**: <span style="background-color: #FFFF00">A void* pointer holds an address, but the type of the object at that address is unknown:  </span>. Generally,we use a void* pointer to deal with memory as memory, rather than using the pointer to access the object stored in that memory. 
+**void pointer**: <span style="background-color: #FFFF00">A void* pointer holds an address, but the type of the object at that address is unknown:  </span>. Generally,we use a void* pointer to deal with memory as memory, rather than using the pointer to access the object stored in that memory. 
 
 
 
-- **Pointers to Pointers**
+**Pointers to Pointers**
 
 ```c++
 int ival = 1024;
@@ -213,7 +211,7 @@ cout << "The value of ival\n"
 
 ```
 
--  **References to Pointers**: A reference is not an object. Hence, we may not have a pointer to a reference. However, because a pointer is an object, we can define a reference to a pointer:
+**References to Pointers**: A reference is not an object. Hence, we may not have a pointer to a reference. However, because a pointer is an object, we can define a reference to a pointer:
 
 
 ```c++
