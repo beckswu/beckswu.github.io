@@ -510,21 +510,21 @@ typedef char *pstring;
 const pstring cstr = 0; 
 //cstr is a constant pointer to char
 
-//是pointer 是const， 而不是数据类型是const 
+//是pointer const， 而不是数据类型data type是const 
 
 const pstring* ps; //ps is a pointer to a constant pointer to char
 
 ```
 
-```const pstring``` is constant pointer to char, not a pointer to ```const char```, 不等于 ```const char * ```, <span style="color:red">如果直接replace the alias with its correspoinding type 是错误的, **Error**</span>, 如果想要pointer to ```const char```, 需要重新定义```typedef const char * pstring```
+```const pstring```(不等于 ```const char * ```) is constant pointer to char, not a pointer to ```const char```, <span style="color:red">如果直接replace the alias with its correspoinding type 是错误的, **Error**</span>, 如果想要pointer to ```const char```, 需要重新定义```typedef const char * pstring```
 
 
 #### Auto 
 
 - **auto** tells the compiler to deduce the type from the initializer. By implication, a variable that uses **auto** as its type specifier must have an initializer.
-- **auto** can define multiple variables in single line, 但是initializers for all the variables in the declaration must have types that are consistent
+- **auto** can define multiple variables in single line, 但是initializers for all the variables in the declaration must <span style="background-color: #FFFF00">have types that are consistent</span>
 - **auto** is not always exactly the same as initializer types. 当用auto时候，<span style="background-color: #FFFF00">top level const通常会被忽略, low-level const 会被kept</span>, 
-- 用**auto &** to auto-deduced type, 会Keep top level, low-level const
+- 用**auto &** to auto-deduced type, <span style="background-color: #FFFF00">会keep top level, low-level const</span>
 
 可以定义多个variables in single line, 但是需要都是一个类型(type)的
 ```c++
@@ -545,7 +545,7 @@ auto a = ref; // a is an int
 const int cval = i, &cstRef = cval;
 auto b = cval; //b is an int (top-level const dropped)
 
-auto c = cstRef; //c is an int (cr is an alias for cval whose top-level const dropped)
+auto c = cstRef; //c is an int& (cr is an alias for cval whose top-level const dropped)
 
 auto d = & i; //d is an int*
 
