@@ -456,8 +456,8 @@ constexpre int sz2 = get_size();
 ```
 
 The type we can use in a **constexpr** declaration are known as **literal types**.
-- <span style="background-color: #FFFF00"> arithmetic, reference, pointer types are **literal types**, 
-- 自己定义的class, **string** types 不是**literal types**, 不能用于define varaibles as **constexpr**</span>. varaibles defined inside a function 因为没有fixed address, 不能用**constexpr**,
+- <span style="background-color: #FFFF00"> arithmetic, reference, pointer types are **literal types**</span>, 
+- <span style="background-color: #FFFF00"> 自己定义的class, **string** types 不是**literal types**, 不能用于define varaibles as **constexpr**</span>. varaibles defined inside a function 因为没有fixed address, 不能用**constexpr**,
 - The **address** of an object defined  <span style="color:red">outside</span> of any function is **constant expression**, and **some objects have fixed address** so may used to initialzie a **constexpr** pointer.
 
 - **Pointers and constexpr**
