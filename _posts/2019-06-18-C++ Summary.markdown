@@ -108,7 +108,7 @@ A **compount type** is a type that is defined in terms of another type, which is
 
 **Reference** At here, reference is only lvalue reference not rvalue reference
 
-<span style="background-color: #FFFF00"> reference must be assigned at initlization </span>. 程序把引用和初始值绑定(bind)到一起，而不是将初始值拷给引用, 引用无法绑定到另一个对象. <span style="color: red"> **A reference is not an object**. Instead, a reference is just another name for an already existing object </span>
+<span style="background-color: #FFFF00"> reference must be assigned at initlization, non-const reference 不能assign rvalue, must be lvalue </span>. 程序把引用和初始值绑定(bind)到一起，而不是将初始值拷给引用, 引用无法绑定到另一个对象. <span style="color: red"> **A reference is not an object**. Instead, a reference is just another name for an already existing object </span>
 
 
 ```c++
@@ -368,7 +368,8 @@ cout<<i<< ", "<<r1<<", "<<r2<<endl; //print 0, 0 , 0
 
 1. Level Const
    - **low-level const**(object is const): const <span style="background-color: #FFFF00">在pointer 左面</span>表data is const, cannot change underlying data value. but can point to different underlying. <br/>
-   - **top-level const**(pointer is const): const <span style="background-color: #FFFF00">在pointer 右面</span>表示 pointer is const (**a const pointer**), 不能改变指向对象，但可以改变the value of underlying object
+   - **top-level const**(pointer is const): const <span style="background-color: #FFFF00">在pointer 右面有pointer在时候表示 pointer is const (**a const pointer**), 如果没有pointer 在表示数据const (```const int a = 0```</span>, 不能改变指向对象，但可以改变the value of underlying object
+   - **top level const**可以变成**low level const**,  e,g. ```const int a = 0; const int * aptr = &a``` a表示top level const, 通过```&``` operator, 变成**low level const**
    - <span style="background-color: #FFFF00">The distinction between **top-level** and **low-level** matters when we copy an object</span>. When we copy an object, **top-level consts can be ignored:** e.g. ```const * const int = const * int```,  <span style="background-color: #FFFF00">如果忽略Low Level const</span>, <span style="color:red">**Error**</span>
        -  <span style="color:red">**Error**</span> e.g. ```int val = 42; const int * p3Low = p2;int * p3 = p3Low;//error```
       -   <span style="color:red">**Error**</span> e.g. ```const double cstVal = 3.14; double *ptr = &cstVal; // //error```
@@ -437,6 +438,182 @@ const double *const pip = &pi;
 
 ```
 
+#### Constexpr
+
+A **constant expression**: value cannot change and can be evaluated at compile time. A **literal** is a constant expression. By delcaring **constexpr**, we can ask compiler to verify that a variable is a constant expressinn. Variables 
+
+Const 的缺点, 有时候我们需要**constant expression**, 但用**const**, 生成却不是**constant expression**. 比如, 下面例子even though```sz``` is a ```const```, the value of its initializer is not known until <span style="color:red">run time</span>
+```
+const int limit = 20;
+//limit is a constant expression
+
+const int sz = get_size(); 
+//sz is not a constant expression
+
+constexpre int sz2 = get_size(); 
+//只有当get_size() is a constexpr function
+
+```
+
+The type we can use in a **constexpr** declaration are known as **literal types**.<span style="background-color: #FFFF00"> arithmetic, reference, pointer types are **literal types**, 自己定义的class, **string** types 不是**literal types**, 不能用于define varaibles as **constexpr**</span>. varaibles defined inside a function 因为没有fixed address, 不能用**constexpre**, The **address** of an object defined  <span style="color:red">outside</span> of any function is **constant expression**, and **some objects have fixed address** so may used to initialzie a **constexpr** pointer.
+
+- **Pointers and constexpr**
+
+```c++
+const int * p = nullptr; 
+//p is a pointer to a const int (low level)
+
+constexpr int * q = nullptr
+//q is a const pointer to int (top level)
+
+```
+p and q are quite different. The difference is ```constexpr``` imposes a top-level ```const```
+
+```c++
+constexpr int * pTop = nullptr; 
+//pTop is a constant pointer to int that is null
+
+int j = 0;
+constexpr int i = 42; // i is const int
+
+constexpr const int * pLowTop = &i; 
+// p is const pointer to the const int i
+
+constexpr int * p1Top = & j
+//p is a const pointer to the int j
+
+constexpr int * pTop2 = &i; 
+// error, fix it is const int * pLow = & i
+
+```
+
+#### Type Aliases
+
+**Type Alias** is a name that is a synonym for another type 
+
+1. **typedef**: ```typedef double wages```, typedef can also include type modifiers (such as reference, pointer) that define compoun types 
+2. **using**: ```using SI = Sales_item;```
+
+**Pointers, Const, and Type Aliases**
+
+```c++
+typedef char *pstring;
+const pstring cstr = 0; 
+//cstr is a constant pointer to char
+
+//是pointer 是const， 而不是数据类型是const 
+
+const pstring* ps; //ps is a pointer to a constant pointer to char
+
+```
+
+```const pstring``` is constant pointer to char, not a pointer to ```const char```, 不等于 ```const char * ```, <span style="color:red">如果直接replace the alias with its correspoinding type 是错误的, **Error**</span>, 如果想要pointer to ```const char```, 需要重新定义```typedef const char * pstring```
+
+
+#### Auto 
+
+- **auto** tells the compiler to deduce the type from the initializer. By implication, a variable that uses **auto** as its type specifier must have an initializer.
+- **auto** can define multiple variables in single line, 但是initializers for all the variables in the declaration must have types that are consistent
+- **auto** is not always exactly the same as initializer types. 当用auto时候，<span style="background-color: #FFFF00">top level const通常会被忽略, low-level const 会被kept</span>, 
+- 用**auto &** to auto-deduced type, 会Keep top level, low-level const
+
+可以定义多个variables in single line, 但是需要都是一个类型(type)的
+```c++
+auto i = 0, *p = &i;
+//okay i is int and p is pointer to int
+
+auto sz = 0, pi = 3.14; 
+//error: inconsistent type for sz and pi
+
+```
+
+忽略top-level const and keep lower-level const 
+```c++
+int i = 0, &ref = i;
+auto a = ref; // a is an int
+
+
+const int cval = i, &cstRef = cval;
+auto b = cval; //b is an int (top-level const dropped)
+
+auto c = cstRef; //c is an int (cr is an alias for cval whose top-level const dropped)
+
+auto d = & i; //d is an int*
+
+auto e = &cval; 
+//e is const int * (& of a const is low-level const)
+
+```
+
+auto + reference
+```c++
+auto & g = cval; // g is a const int & 
+
+auto & h = 42; //error, can't bind a plain reference to a literal
+
+const auto & j = 42; //const reference
+
+```
+
+Deduced 的type 必须consistent 
+```c++
+auto k = cval, &l = i; // k is int, l is int& 
+
+auto & m = cval, *p = & cval;
+//m is const int&, *p 是  const int * (a pointer to const int)
+
+auto &n = i, *p2 = & cval;
+//error, n is int&, p2 is const int * (not int*)
+
+```
+
+#### Decltype 
+
+- **decltype**: compiler analyzes the expression to determine its <span style="background-color: #FFFF00">type</span> but does <span style="background-color: #FFFF00">not evaulate the expression </span>
+- handles **top-level const** subtly different from **auto**
+    - **variables**: <span style="background-color: #FFFF00">include **top-level const** and reference</span>
+    - **expression**: we can get the type that expression yields. <span style="background-color: #FFFF00">注:Dereference operator(\*) yields type as reference</span>
+    - **decltype** and **auto** difference: deduction done by **decltype** depends on the form of its expression. 
+        - <span style="background-color: #FFFF00">切记```decltype((variable))```结果永远是引用，```decltype(variable)``` 只有当variable 本身是引用时, 结果才是引用</span>
+
+compiler 不会called ```f```, 但是uses the type that such a call would return as type of ```sum```. 
+
+```c++
+decltype(f()) sum = x; //sum has whatever type f returns 
+
+```
+
+use decltype for variable, returns type including **top-level const**
+
+```c++
+const int cval = 0, & cRef = cval;
+decltype(cval) x = 0; //x is const int
+
+decltype(cRef) y = x; //y is const int& 
+
+decltype(cRef) z;//error: z is const int& which must be initalized
+
+```
+
+use decltype for expression. ```decltype(r)``` is a reference type. but ```r+0``` is an expression that yieds a nonreference type. **Dereference operator** is an example of an expression for ```decltype``` returns a reference. When we deference a pointer, we get the object to which the pointer points  ```decltype(*p)``` is ```int&``` not ```int```.
+
+```c++
+int i = 42, *ptr = & i, &ref = i;
+decltype(r + 0) b; //addition yields an int, b is int (uninitialized)
+
+decltype(*p) c; //error: c is int& and must be initialized
+
+```
+
+当我们apply ```decltype``` wrap the variable's name in one ore more parentheses, compiler will evaluate the operand as an expression. A variable is an expression that can be the left-hand side of an assignment. As a result, ```decltype``` on such an expression yields a reference.
+
+
+```c++
+decltype((i)) d; //error: d is int& and must be initialized
+
+decltype(i) e;//ok: e is an int (uninitialized)
+
+```
 
 
 ## Include Guard
