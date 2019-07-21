@@ -251,16 +251,18 @@ r = &i;// r refers to a pointer; assigning &i to r makes p point to i
 
 #### Const Qualifier
 
-Reference:
+1. **Reference**
 
 1. ```const```value 必须initialize when define 
 2. **Const Value-Value**: 
     - **non const -> const**  value e.g.```int val = 5; const int cst = val;```, <span style="background-color:#FFFF00"> 因为const value是通过复制生成，改变原来值，不会改变const value值</span> e.g. ```int val = 3; const int cstRef = val;val = 10;```, ```cstRef = 3``` , ```val = 10``` 
-    - **const -> nonconst**  const (reference or without reference)  initilize non const value; ```const int & cstRef = 3; int val = cstRef```.
-3. **Const Ref-Ref**: <span style="background-color:#FFFF00"> const reference 不能bind 到non-const reference，因为reference is not object </span> ```const int & ref = 3; int &i = ref; \\error```, 反过来却可以 ```int val = 3; int & ref = val; const int &cstRef = ref;```
+    - **const -> non const**  const (reference or without reference)  initilize non const value; ```const int & cstRef = 3; int val = cstRef```.
+3. **Const Ref-Ref**:
+    - **Const Ref -> Ref**  <span style="color:red">**Error**</span>  <span style="background-color:#FFFF00"> const reference 不能bind 到non-const reference，因为reference is not object </span> ```const int & ref = 3; int &i = ref; \\error```,
+    - - **Ref -> Const Ref** Okay ```int val = 3; int & ref = val; const int &cstRef = ref;```
 4. **Ref-Value**:
     - **Ref -> Const Value** Ok, ```int val = 3; int & ref = val; const int cstRef = ref;```
-    - **Const Value -> Ref** <span style="color:red">Error</span> ```const int cstRef = 3; int & ref = cstRef;```, 因为Referene 不是object, 这么做有更改Const 可能性
+    - **Const Value -> Ref** <span style="color:red">**Error**</span> ```const int cstRef = 3; int & ref = cstRef;```, 因为Referene 不是object, 这么做有更改Const 可能性
     - **Const Ref -> Value** Ok, ```const int & cstRef = 3; int val = cstRef;```
     - **Value-> Const Ref** Ok, ```int val = 3; const int & cstRef = val;```
 5. ```const reference```, 如果type 不匹配 or 用rvalue expression, 会生成一个**temporary object**, 这样如果改了原来的值, ```const reference```不会改 (因为```const reference```连得是temporary object) e.g. ```double val = 3.14; const int & cstRef = val; ```
@@ -372,8 +374,7 @@ cout<<i<< ", "<<r1<<", "<<r2<<endl; //print 0, 0 , 0
 
 ```
 
-
-**Pointer and const**
+2. **Pointer and const**
 
 **low-level const**(object is const): const <span style="background-color: #FFFF00">在pointer 左面</span>表data is const, cannot change underlying data value. but can point to different underlying. <br/>
 **top-level const**(pointer is const): const <span style="background-color: #FFFF00">在pointer 右面</span>表示 pointer is const (**a const pointer**), 不能改变指向对象，但可以改变the value of underlying object
@@ -383,13 +384,13 @@ cout<<i<< ", "<<r1<<", "<<r2<<endl; //print 0, 0 , 0
 ```c++
 
 int i = 0;
-int *const p1 = &i; // we can't change the value of p1; const is top-level 
+int *const p1Top = &i; // const is top-level; we can't change the value of p1Top; 
 
 const int ci = 42; // we cannot change ci; const is top-level
 
-const int *p2 = &ci; // we can change p2; const is low-level
+const int *p2Low = &ci; //  const is low-level; we can change p2Low;
 
-const int *const p3 = p2; // right-most const is top-level, left-most is not
+const int *const p3LowTop = p2; // right-most const is top-level, left-most is not
 
 const int &r = ci; // const in reference types is always low-level
 
