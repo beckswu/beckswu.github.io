@@ -604,7 +604,7 @@ decltype(cRef) z;//error: z is const int& which must be initalized
 
 ```
 
-use decltype for expression. ```decltype(r)``` is a reference type. but ```r+0``` is an expression that yieds a nonreference type. **Dereference operator** is an example of an expression for ```decltype``` returns a reference. When we deference a pointer, we get the object to which the pointer points  ```decltype(*p)``` is ```int&``` not ```int```.
+use decltype for expression. ```decltype(r)``` is a reference type. but ```r+0``` is an expression that yieds a **nonreference type**. **Dereference operator** is an example of an expression for ```decltype``` returns a **reference**. When we deference a pointer, we get the object to which the pointer points  ```decltype(*p)``` is ```int&``` not ```int```.
 
 ```c++
 int i = 42, *ptr = & i, &ref = i;
