@@ -440,10 +440,10 @@ const double *const pip = &pi;
 
 #### Constexpr
 
-A **constant expression**: value cannot change and can be evaluated at compile time. A **literal** is a constant expression. By delcaring **constexpr**, we can ask compiler to verify that a variable is a constant expressinn. Variables 
+A **constant expression**: value cannot change and can be evaluated at compile time. A **literal** is a constant expression. By delcaring **constexpr**, we can ask compiler to verify that a variable is a constant expression.  
 
 Const 的缺点, 有时候我们需要**constant expression**, 但用**const**, 生成却不是**constant expression**. 比如, 下面例子even though```sz``` is a ```const```, the value of its initializer is not known until <span style="color:red">run time</span>
-```
+```c++
 const int limit = 20;
 //limit is a constant expression
 
@@ -455,7 +455,10 @@ constexpre int sz2 = get_size();
 
 ```
 
-The type we can use in a **constexpr** declaration are known as **literal types**.<span style="background-color: #FFFF00"> arithmetic, reference, pointer types are **literal types**, 自己定义的class, **string** types 不是**literal types**, 不能用于define varaibles as **constexpr**</span>. varaibles defined inside a function 因为没有fixed address, 不能用**constexpre**, The **address** of an object defined  <span style="color:red">outside</span> of any function is **constant expression**, and **some objects have fixed address** so may used to initialzie a **constexpr** pointer.
+The type we can use in a **constexpr** declaration are known as **literal types**.
+- <span style="background-color: #FFFF00"> arithmetic, reference, pointer types are **literal types**, 
+- 自己定义的class, **string** types 不是**literal types**, 不能用于define varaibles as **constexpr**</span>. varaibles defined inside a function 因为没有fixed address, 不能用**constexpr**,
+- The **address** of an object defined  <span style="color:red">outside</span> of any function is **constant expression**, and **some objects have fixed address** so may used to initialzie a **constexpr** pointer.
 
 - **Pointers and constexpr**
 
@@ -467,7 +470,7 @@ constexpr int * q = nullptr
 //q is a const pointer to int (top level)
 
 ```
-p and q are quite different. The difference is ```constexpr``` imposes a top-level ```const```
+p and q are quite different. The difference is ```constexpr``` imposes a ```top-level const``` on pointer
 
 ```c++
 constexpr int * pTop = nullptr; 
