@@ -625,6 +625,21 @@ decltype(i) e;//ok: e is an int (uninitialized)
 ```
 
 
+## Strings, Vectors, and Arrays
+
+#### Namespace using Declarations
+
+- ```std::cin``` use the **scope operator(::)** says want to use the name ```cin``` from the namespace ```std```
+- ```using namespace::name``` : A **using declaration** let us use a name from a namespace without qualifying the name with a ```namespace_name:: ```prefix
+- <span style="background-color: #FFFF00"> Headers should not not include using declarations</span>. 原因: the contents of a header are copied into the including program's text. If a header has a ```using``` declaraction. 那么every program that includes that header gets that same ```using``` declaraction. As a result, program didn't intend to use the specified library name <span style="color:red">might encounter unexpected name conflicts.</span>
+
+
+
+
+
+
+
+
 ## Include Guard
 
 InC and C++, an **#include guard**, sometimes called a **macro guard**, **header guard** or **file guard**, is a particular construct used to avoid the problem of double inclusion when dealing with the include directive.避免double include 
