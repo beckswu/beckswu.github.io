@@ -721,12 +721,11 @@ for (auto &c : s) // for every char in s (note: c is a reference)
 
     c = toupper(c); 
 cout << s << endl;
-
 ```
 
 #### Vector
 
-We can define ```vector`` to hold objects of most any type. Becauses <span style="background-color:#FFFF00"> references are not objects, **we cannot have a vector of references** </span>
+We can define ```vector``` to hold objects of most any type. Becauses <span style="background-color:#FFFF00"> references are not objects, **we cannot have a vector of references** </span>
 
 **(1). Initialization**
 
@@ -734,12 +733,12 @@ We can define ```vector`` to hold objects of most any type. Becauses <span style
 - ```vector<T>v2(v1)```: v2 has a copy of each element in v1
 - ```vector<T>v2 = v1```: v2 is copy of the each element in v1
 - ```vector<T>v3(n,val)```: v3 has n elements with value val
-- ```vector<T>v4(n)``: `v3 has n copies of a  <span style="color:red">value-initialized object</span>(e,g, int 默认是0, string 默认是空)
+- ```vector<T>v4(n)`1`: v3 has n copies of a  <span style="color:red">value-initialized object</span>(e,g, int 默认是0, string 默认是空)
 - ```vector<T>v5{a,,b,c...}```: v5 has as many elements as initializers;  <span style="color:red">elements are initialized by corresponding initializers</span>
 - ```vector<T>v5 = {a,b,c}```; 与上面一样
 
  
-当我们提供两个数, 两个数可以表示size and value, 也可以表示size 为2的两个intial value, 用花括号或者方括号会有歧义. we specify which meaning by using ```()``` or ```{}```.<span style="background-color:#FFFF00"> 比如 对于```vector<int>```, ```()```are used to construct object whereas ```{}``` is use to initialize the object,</span> . 对于```{}```,如果compiler find not way to use the initilizers to list initialize object, then those values will be used to construct the object. <span style="background-color:#FFFF00"> 如果compiler 发现```{}``` 不能initialize object, 会尝试去```()```来代替```{}```initialize</span> 
+当我们提供两个数, 比如 对于```vector<int>```, 两个数可以表示size and value, 也可以表示size 为2的两个intial values, 用花括号或者方括号会有歧义. 这时<span style="background-color:#FFFF00">  ```()```are used to construct object whereas ```{}``` is use to initialize the object,</span> . 对于```vector<string>```, ```{}```,<span style="background-color:#FFFF00"> 如果compiler 发现```{}``` 不能initialize object, 会尝试去```()```来代替```{}```initialize</span> 
 
 ```c++
 vector<int>v1(10,1); //initialize vector 10 个 1
@@ -762,7 +761,7 @@ vector<string>v5{10, "hi"}; //有10个"hi"
 
 
 如果用copy constructor, 需要type consistent,
-```
+```c++
 vector<int>ivec;
 vector<string>svec(ivec); //error
 
@@ -778,7 +777,7 @@ vector::size_type; //错误
 
 **(2) Vector Grow Efficiently***
 
-**Key Concept: Vector Grow Efficiently**: <span style="background-color:#FFFF00">It is ofen unnecessary- can result in poorer performance—to define a vector of a specific size (例外是all elements actually need the same value).</span> It is more **efficient** to define an empty vector and add elements as the values we need become known at run time.
+**Key Concept: Vector Grow Efficiently**: 定义空的vector 更有效<span style="background-color:#FFFF00">It is ofen unnecessary- can result in poorer performance—to define a vector of a specific size (例外是all elements actually need the same value).</span> It is more **efficient** to define an empty vector and add elements as the values we need become known at run time.
 
 for loop vector 不能改变vector的大小(size) (add, delete)
 
