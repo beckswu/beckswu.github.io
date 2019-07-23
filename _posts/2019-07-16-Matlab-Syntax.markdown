@@ -561,7 +561,7 @@ T=5×4 table
 - **Number of Columns**: ```H = width(T)``
 
 
-Adding row 
+**Add row** 
 ```matlab
 
 LastName = {'Sanchez';'Johnson';'Lee';'Diaz';'Brown'};
@@ -576,6 +576,158 @@ struct.Height = 70;
 T = [T;struct2table(struct)]
 
 
+```
+
+
+**Add /Rename column**: ```addvars```
+- ```T2 = addvars(T1,var1,...,varN)```: add variables 在T1的最右侧, all input argumetns must have the same number of rows. e.g. ```T2 = addvars(T1,Gender,Smoker);```, ```Gender``` and ```smoker```是array
+- ```T2 = addvars(T1,var1,...,varN,'Before',location)```:inserts the variables to the left  of lpocation. <span style="color:red"> location can be a variable name, or a numeric or logical index</span>. e.g.  
+- ```T2 = addvars(T1,var1,...,varN,'After',location)```  inserts the variables to the right of the table variable indicated by location. <span style="color:red"> location can be a variable name, or a numeric or logical index</span>.
+- ```T2 = T2 = addvars(___,'NewVariableNames',newNames) ```  renames the added variables in T2 using the names specified by newNames. e.g. ``` T2 = addvars(T1,lat,lon,'NewVariableNames',{'Latitude','Longitude'}) ``` rename lat -> Latitude, lon -> Longtitude
+
+
+```matlab
+load patients
+T1 = table(LastName,Age,Gender,Smoker);
+head(T1,3)
+ans=3×4 table
+     LastName     Age     Gender     Smoker
+    __________    ___    ________    ______
+    'Smith'       38     'Male'      true  
+    'Johnson'     43     'Male'      false 
+    'Williams'    38     'Female'    false 
+    
+T3 = addvars(T2,Height,Weight,'Before','Smoker','NewVariableNames',{'Inches','Pounds'});
+ans=3×7 table
+     LastName     Age     Gender     Inches    Pounds    Smoker 
+    __________    ___    ________    ______    ______    ______   
+    'Smith'       38     'Male'        71       176      true 
+    'Johnson'     43     'Male'        69       163      false 
+    'Williams'    38     'Female'      64       131      false   
+```
+
+**movevars**:
+-```T2 = movevars(T1,vars,'Before',location)``` 把vars 移动到location的前一列. variables and location by name, by position, or using logical indices. ```T2 = movevars(T1,{'Loss','Customers','Cause'},'Before',1);``` 把Loss, Customers, Causes都移动到第一列的前面
+-```T2 = movevars(T1,vars,'After',location)``` 把vars 移动到location的后一列. variables and location by name, by position, or using logical indices. e.g. ```T3 = movevars(T2,4,'After',1);``` 把第四列移动到第一列后面变成第二列, 其他的column 后移. ```T3 = movevars(T2,[1:4],'After','RestorationTime');```
+
+**removevars**: 删除一个列 
+```T2 = removevars(T1,vars)```deletes the table variables specified by vars and copies the remaining variables to T2. You can specify variables by name, by position, or using logical indices.```T3 = removevars(T2,4);```删去T2的第四列, ```T2 = removevars(T1,{'Loss','Customers'});```, ```T3 = removevars(T2,[1 4]);```
+
+**convertars**: 转化一列的类型
+```T2 = convertvars(T1,vars,dataType)``` converts the specified variables to the specified data type. e.g. ```T2 = convertvars(T1,{'Region','Cause'},'categorical');``` 把Region 和 Cause column 转化成categorical的
+
+**splitvars**: 把所有multicolumn variable 变成single column variables
+
+- ``T2 = splitvars(T1)``` splits all multicolumn variables in T1 so that they are single-column variables in T2
+- ```T2 = splitvars(T1,vars)``` splits only the table variables specified by vars. vars时T1的column, 同时自己也是table 
+- ```T2 = splitvars(___,'NewVariableNames',newNames)``` specifies newNames as the names of the variables that are split and copied to T2.
+
+```matlab
+A = (1:3)';
+B = [5 11 12; 20 30 50; 0.1 3.4 5.9]';
+C = {'a','XX';'b','YY';'c','ZZ'};
+D = [128 256 512]';
+T1 = table(A,B,C,D)
+T1=3×4 table
+    A           B                 C          D 
+    _    ________________    ___________    ___
+    1     5     20    0.1    'a'    'XX'    128
+    2    11     30    3.4    'b'    'YY'    256
+    3    12     50    5.9    'c'    'ZZ'    512
+
+T2 = splitvars(T1)
+T2=3×7 table
+    A    B_1    B_2    B_3    C_1    C_2      D 
+    _    ___    ___    ___    ___    ____    ___
+    1     5     20     0.1    'a'    'XX'    128
+    2    11     30     3.4    'b'    'YY'    256
+    3    12     50     5.9    'c'    'ZZ'    512
+    
+    
+ans=3×4 table
+     LastName      Gender      Personal_Data      BloodPressure
+    __________    ________    ________________    _____________
+    'Smith'       'Male'      38     71    176     124     93  
+    'Johnson'     'Male'      43     69    163     109     77  
+    'Williams'    'Female'    38     64    131     125     83  
+
+T2 = splitvars(T1,'BloodPressure','NewVariableNames',{'Systolic','Diastolic'});
+head(T2,3)
+ans=3×5 table
+     LastName      Gender      Personal_Data      Systolic    Diastolic
+    __________    ________    ________________    ________    _________
+
+    'Smith'       'Male'      38     71    176      124          93    
+    'Johnson'     'Male'      43     69    163      109          77    
+    'Williams'    'Female'    38     64    131      125          83    
+```
+
+**mergevars** 把多个column merge 成一个column, 同时这个column 是table or multi-dimensional array
+- ```T2 = mergevars(T1,vars)``` combines the table variables specified by vars to create one multicolumn variable in T2. All other variables from T1 are unaltered. 
+- ``T2 = mergevars(T1,vars,'NewVariableName',newName)``` specifies a name for the multicolumn variable.
+- ```T2 = mergevars(___,'MergeAsTable',true)``` merges the specified variables <span style="color:red">into a table, instead of an array. </span>
+
+```matlab
+T1=3×4 table
+    A    B      C       D 
+    _    __    ____    ___
+
+    1     5    3.14    'a'
+    2    11    2.72    'b'
+    3    12    1.37    'c'
+    
+T2 = mergevars(T1,[2 3])
+T2=3×3 table
+    A       Var2        D 
+    _    __________    ___
+
+    1     5    3.14    'a'
+    2    11    2.72    'b'
+    3    12    1.37    'c'
+    
+  3x6 table
+      Region          OutageTime        Loss     Customers     RestorationTime         Cause     
+    ___________    ________________    ______    __________    ________________    ______________
+    'SouthWest'    2002-02-01 12:18    458.98    1.8202e+06    2002-02-07 16:50    'winter storm'
+    'SouthEast'    2003-01-23 00:49    530.14    2.1204e+05                 NaT    'winter storm'
+    'SouthEast'    2003-02-07 21:15     289.4    1.4294e+05    2003-02-17 08:14    'winter storm'    
+    
+ T2 = mergevars(T1,{'Cause','Loss','RestorationTime'},...
+ 	'NewVariableName','LossData','MergeAsTable',true);
+ans =
+  3x4 table
+      Region          OutageTime       Customers                       LossData                  
+                                                         Cause          Loss     RestorationTime 
+    ___________    ________________    __________    ____________________________________________
+    'SouthWest'    2002-02-01 12:18    1.8202e+06    'winter storm'    458.98    2002-02-07 16:50
+    'SouthEast'    2003-01-23 00:49    2.1204e+05    'winter storm'    530.14                 NaT
+    'SouthEast'    2003-02-07 21:15    1.4294e+05    'winter storm'     289.4    2003-02-17 08:14
+    
+```    
+
+**stack**: Stack data from multiple variables into single variable
+
+- ```S = stack(U,vars)``` converts the table or timetable, U, into an equivalent table that is stacked. 把所有variable stack up变成single variable. 一行一行的stack up
+
+```matlab
+U=4×3 table
+    Test1    Test2    Test3
+    _____    _____    _____
+
+     93       89       95  
+     57       77       62  
+
+S = stack(U,1:3)
+S=12×2 table
+    Test1_Test2_Test3_Indicator    Test1_Test2_Test3
+    ___________________________    _________________
+
+               Test1                      93        
+               Test2                      89        
+               Test3                      95        
+               Test1                      57        
+               Test2                      77        
+               Test3                      62        	       
 ```
 
 
