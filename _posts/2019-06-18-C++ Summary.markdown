@@ -452,7 +452,7 @@ const int limit = 20;
 const int sz = get_size(); 
 //sz is not a constant expression
 
-constexpre int sz2 = get_size(); 
+constexpr int sz2 = get_size(); 
 //只有当get_size() is a constexpr function, sz2才是constexpr function
 
 ```
@@ -726,9 +726,102 @@ cout << s << endl;
 
 #### Vector
 
+We can define ```vector`` to hold objects of most any type. Becauses <span style="background-color:#FFFF00"> references are not objects, **we cannot have a vector of references** </span>
+
+**(1). Initialization**
+
+- ```vector<T>v1```: vector hold objects of type T and v1 is empty 
+- ```vector<T>v2(v1)```: v2 has a copy of each element in v1
+- ```vector<T>v2 = v1```: v2 is copy of the each element in v1
+- ```vector<T>v3(n,val)```: v3 has n elements with value val
+- ```vector<T>v4(n)``: `v3 has n copies of a  <span style="color:red">value-initialized object</span>(e,g, int 默认是0, string 默认是空)
+- ```vector<T>v5{a,,b,c...}```: v5 has as many elements as initializers;  <span style="color:red">elements are initialized by corresponding initializers</span>
+- ```vector<T>v5 = {a,b,c}```; 与上面一样
+
+ 
+当我们提供两个数, 两个数可以表示size and value, 也可以表示size 为2的两个intial value, 用花括号或者方括号会有歧义. we specify which meaning by using ```()``` or ```{}```.<span style="background-color:#FFFF00"> 比如 对于```vector<int>```, ```()```are used to construct object whereas ```{}``` is use to initialize the object,</span> . 对于```{}```,如果compiler find not way to use the initilizers to list initialize object, then those values will be used to construct the object. <span style="background-color:#FFFF00"> 如果compiler 发现```{}``` 不能initialize object, 会尝试去```()```来代替```{}```initialize</span> 
+
+```c++
+vector<int>v1(10,1); //initialize vector 10 个 1
+
+vector<int>v2{10, 1}; //initialize vector 包括 10 和 1
+
+vector<string>v3("hi"); //error
+
+
+vector<string>v4{10}; //有10个默认的string
+
+vector<string>v5{10, "hi"}; //有10个"hi"
+
+//v4 and v5 the initializers can't be element initializers. 
+
+//compiler looks for other ways to initialize the object from given values
+
+```
 
 
 
+如果用copy constructor, 需要type consistent,
+```
+vector<int>ivec;
+vector<string>svec(ivec); //error
+
+```
+
+要使用```size_type```, 需要注明类型
+```c++
+vector<int>::size_type; //正确
+
+vector::size_type; //错误
+
+```
+
+**(2) Vector Grow Efficiently***
+
+**Key Concept: Vector Grow Efficiently**: <span style="background-color:#FFFF00">It is ofen unnecessary- can result in poorer performance—to define a vector of a specific size (例外是all elements actually need the same value).</span> It is more **efficient** to define an empty vector and add elements as the values we need become known at run time.
+
+for loop vector 不能改变vector的大小(size) (add, delete)
+
+
+#### Iterators
+
+All of library **containers** have **iterators**. but only a few of them support the subscript operator 
+
+- ```begin``` returns an iterator that deontes the first element. <span style="background-color:#FFFF00">如果object是const, 返回的是```const_iterator```,如果object不是const, 返回的是```iterator```</span>
+- ```end``` position **one past the end** (尾元素的下一个位置), does not denote an element, 所以 <span style="color:red">it may not be incremented or deferenced</span>
+- if a vector of string is const, we may use only ```const_iterator```type. Within a non const vector or string, we can use either ```iterator``` or ```const_iterator```
+- ```>, >=, <, <=``` Iterator 比较, 如果Iterator refere的element 另一个iterator 值得element 在前面出现, 就是小于
+
+```c++
+vector<int>::iterator it;
+string::iterator it2;//it can read and write
+
+vector<int>::const_iterator it3; //it3 can read but not writer
+
+
+const vector<int>cv;
+auto it1 = cv.begin(); //return vector<int>::const_iterator
+
+auto it3 = v.cbegin(); // eturn vector<int>::const_iterator
+
+```
+
+
+**(1). Dereference and Member Access**
+
+```(*it)->member``` is a synonym as ```it->member```
+
+```c++
+(*it).empty() //dereference it and calls the member empty on object
+
+*it.empty // error: attempts to fech the the member empty from iterator 
+
+//but iterator has no member named empty
+
+```
+**(2). Some vector Operations Invalidate Iterators**
+
+比如vector insert 也许会invalidate iterators: It is import to realize 当用iterator loop 不要add remove elements to the container which iterator refer. 
 
 
 
