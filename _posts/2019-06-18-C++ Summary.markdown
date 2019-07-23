@@ -624,6 +624,7 @@ decltype(i) e;//ok: e is an int (uninitialized)
 
 ```
 
+<br/>
 
 ## Strings, Vectors, and Arrays
 
