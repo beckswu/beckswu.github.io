@@ -28,8 +28,8 @@ cout<<" Line Number "<<__LINE__<<endl; //打印现在现在的行数
 <span style="background-color: #FFFF00">把对象当前值擦除，用一个新值代替</span>)
 
 #### Initialization, Definition, Declaration, Scope
-
-1. **List Initialization**
+ 
+**(1). List Initialization**
 
 ```c++
 //下面四种初始化都正确
@@ -51,13 +51,13 @@ int c(ld), d = ld; // 转化执行，但是丢失了部分值 (truncated)
 
 ```
 
-2. **Default Initialization**
+**(2). Default Initialization**
 
 Most classess let us define objects without <span style="color: red">explict initializers</span>. Such classes supply an appropriate default value. e.g. std:string empty; empty implicitly initialized to the empty string. 
 
 Note: Uninitialized objects of built-in type defined inside a function body have undefined value. Objects of class type that we do not explicitly initialize have a value that is defined by the class.
 
-3. **Variable Declarations and Definitions**
+**(3). Variable Declarations and Definitions**
 
  - <span style="background-color: #FFFF00">**A declaration makes a name known to the program. A definition creates the associated entity.**</span>
 - A variable **declaration**  <span style="background-color: #FFFF00"> specifies the type and name of a variable</span>. A variable definition is a declaration. In addition to specifying the name and type, a **definition** also <span style="background-color: #FFFF00"> allocates storage and may provide the variable with an initial value</span>. 变量声明规定了变量的类型和名字，在这一点上定义与之相同. 但除此之外, 定义还申请存储空间, 也可能会为变量赋一个初始值
@@ -76,7 +76,7 @@ int j; //声明并定义j
 extern int i = 5; //定义
 ```
 
-**Nested Scopes**
+**(4). Nested Scopes**
 
 <span style="background-color: #FFFF00"> 用 :: 访问global variable (explicitly request global variable) </span>
 
@@ -637,10 +637,10 @@ decltype(i) e;//ok: e is an int (uninitialized)
 
 **(1). Initialization**
 
--```string s2(s1)``` ```s2``` is a copy of ```s1``` 
--```string s2 = s1``` 与```s2(s1)``` 作用一眼
+- ```string s2(s1)``` ```s2``` is a copy of ```s1``` 
+- ```string s2 = s1``` 与```s2(s1)``` 作用一眼
 - ```string s3("value")``` ```s3``` is a copy of **string literal**， not including the null(null在const char\*的结尾处)
-- ``````string s3 = "value"```, 与```string s3("value")```一样, copy of **string literal**
+- ```string s3 = "value"```, 与```string s3("value")```一样, copy of **string literal**
 - ```string s4(n,'c')```, initialize ```s4``` with n copies of character ```c```
 
 用```=``` 初始化叫做**copy initialization**, 忽略等号的初始化 是**direct initialization**
@@ -723,6 +723,14 @@ for (auto &c : s) // for every char in s (note: c is a reference)
 cout << s << endl;
 
 ```
+
+#### Vector
+
+
+
+
+
+
 
 
 
