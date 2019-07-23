@@ -789,7 +789,7 @@ All of library **containers** have **iterators**. but only a few of them support
 
 - ```begin``` returns an iterator that deontes the first element. <span style="background-color:#FFFF00">如果object是const, 返回的是```const_iterator```,如果object不是const, 返回的是```iterator```</span>
 - ```end``` position **one past the end** (尾元素的下一个位置), does not denote an element, 所以 <span style="color:red">it may not be incremented or deferenced</span>
-- if a vector of string is const, we may use only ```const_iterator```type. Within a non const vector or string, we can use either ```iterator``` or ```const_iterator```
+- if a vector is const, 只能使用 ```const_iterator```type. Within a non const vector , we can use either ```iterator``` or ```const_iterator```
 - ```>, >=, <, <=``` Iterator 比较, 如果Iterator refere的element 另一个iterator 值得element 在前面出现, 就是小于
 
 ```c++
