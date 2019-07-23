@@ -633,10 +633,96 @@ decltype(i) e;//ok: e is an int (uninitialized)
 - ```using namespace::name``` : A **using declaration** let us use a name from a namespace without qualifying the name with a ```namespace_name:: ```prefix
 - <span style="background-color: #FFFF00"> Headers should not not include using declarations</span>. 原因: the contents of a header are copied into the including program's text. If a header has a ```using``` declaraction. 那么every program that includes that header gets that same ```using``` declaraction. As a result, program didn't intend to use the specified library name <span style="color:red">might encounter unexpected name conflicts.</span>
 
+#### String 
 
+**(1). Initialization**
 
+-```string s2(s1)``` ```s2``` is a copy of ```s1``` 
+-```string s2 = s1``` 与```s2(s1)``` 作用一眼
+- ```string s3("value")``` ```s3``` is a copy of **string literal**， not including the null(null在const char\*的结尾处)
+- ``````string s3 = "value"```, 与```string s3("value")```一样, copy of **string literal**
+- ```string s4(n,'c')```, initialize ```s4``` with n copies of character ```c```
 
+用```=``` 初始化叫做**copy initialization**, 忽略等号的初始化 是**direct initialization**
 
+```c++
+string s5 = "hiya"; //copy initilization 
+
+string s6("hiya"); //direct initialization
+
+string s7(10, 'c'); //direct initialization
+
+```
+**(2). Getline**
+
+we can use ```getline``` function instead of ```>>``` operator. This function reads the given stream up to the end of the line (*not including the newline*) to store in string.  
+
+```c++
+string line 
+//read input a line at a time untile end-of-file
+
+while(getline(cin,line)) // or use while(cin >> line)
+    
+    if(!line.empty())
+        cout << line << endl;
+```
+
+**(3). compare**
+
+1. 如果两个strings 长度不一样 且 每个位置char都一样, 那么较短的string ```< ``` 较长的
+2. 如果有位置不一样, 那么对比那个位置两个char, 根据字母表，靠前的char的string 更小
+
+```c++
+string str = "Hello";
+string phrase = "Hello World";
+string slang = "Hiya";
+//str < phrase, phrase < slang 
+
+```
+
+**(4). Adding Literals and strings**
+
+当我们用string + character literals时,<span style = "background-color:#FFFF00"> 必须保证```+```号左右两侧至少有一个是string type </span>
+
+```c++
+string s1 = "hello";
+string s4 = s1 + ", "; // ok: adding a string and a literal 
+
+string s5 = "hello" + ", "; // error: no string operand string
+
+s6 = s1 + ", " + "world"; // ok: each + has a string operand string
+
+s7 = "hello" + ", " + s2; // error: can't add string literals
+
+//因为 s7 = ("hello" + "), " + s2; ("hello" + ") no strings
+
+```
+
+**(5). Dealing with char in string**
+
+- ```isalnum(c)```: true if c is a letter or digit
+- ```isalpha(c)```: true if c is a letter
+- ```iscntrl(c)```: true if c is a control character. <span style="color:red">A control character is a character that does not occupy a printing position on a display. 比如换行 ```\n``` </span>
+- ```isdigit(c)```: true if c is a digit
+- ```isgraph(c)```: true if c is not a space but is printable, <span style="color:red">A graph character是可以用来打印的character, 除了空格</span>
+- ```islower(c)```, ```isupper(c)```: true if c is a lowercase/upper letter 
+- ```isprint(c)```: true if c is a printable character. <span style="color:red">printable character =  space + graph character </span>
+- ```ispunct(c)```: true if c is punctuation character (不是control character, a digit, a letter or a printable whitespace)
+- ```isspace(c)```: true if c is whitespace(i.e. a space, tab, vertical tab, return(回车符), newline(换行符), or formfeed)
+- ```isxdigit(c)```: true if c is 十六进制(hexadecimal digit)
+- ```tolower(c)```, ```toupper(c)```: 如果c是大/小写字母, 变小/大写, 否则不变
+
+**(6). Change char in string**
+
+use for loop and reference 
+```c++
+string s("Hello World!!!");
+for (auto &c : s) // for every char in s (note: c is a reference)
+
+    c = toupper(c); 
+cout << s << endl;
+
+```
 
 
 
