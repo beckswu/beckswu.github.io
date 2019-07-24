@@ -903,7 +903,7 @@ a2 = a; // error: cannot assign one array to another
 - ```int (&arrRef)[10];```, 是reference, refer size 为10 的 int array
 - ```int *(&arry)[10] = ptrs```, 是reference, refer size 为10的array, array hold pointer to int
 
-```
+```c++
 int *arrayPtr[10]; //arrayPtr is an array of 10 个 pointers to int 
 
 int &refs[10] = ...; //error: no arrays of references
@@ -959,8 +959,7 @@ auto ia3(&ia[0]); //now it's clear that ia3 has type int*
 decltype(array) is array
 
 ```c++
-
-decltype(ia) ia3 = {0,1,2,3,4,5,6,7,8,9};
+decltype(ia) ia3 = {0,1,2,3,4,5,6,7,8,9}; // decltype(ia)  is array not pointer
 
 int i = 0, *p = &i;
 ia3 = p; // error: can't assign an int* to array 
@@ -989,7 +988,7 @@ int *last = end(arr); // pointer one past the last element in arr
 **(6). Pointer Arithmetic**
 
 - 当add an integer to a pointer(array), the result is a new pointer, the new pointer points to the element the given number ahead of (or behind ) the original pointer. 当用两个pointers 相减, 得到the distance between those pointers. The pointers must point to elements in the same array 
-- span style="background-color:#FFFF00">我们可以比较两个指针, 当这两个指针来自于同一个数组</span> ```int * b = arr, *e = arr + 5; if(s<e)...```, 如果不来自同一个数组, 不能比较, 因为比较毫无意义
+- <span style="background-color:#FFFF00">我们可以比较两个指针, 当这两个指针来自于同一个数组</span> ```int * b = arr, *e = arr + 5; if(s<e)...```, 如果不来自同一个数组, 不能比较, 因为比较毫无意义
 - 指针运算. The result of subtracting two pointers a library type named ```ptrdiff_t```, like ```size_t```, the ```ptrdiff_t``` type is a machine-specific type and is defined in the cstddef header, 因为相间可能有negative distance, <span style="background-color:#FFFF00">```ptrdiff_t``` is a signed integral type.</span> 
 - 可以用pointer +/- 整数, 再deference resulting pointer, ```int last = *(arr + 4); ``` 括号是必须的当deference from pointer arithmetic
 - <span style="background-color:#FFFF00">`**we can use subscript operator on any pointer as long as thet pointer points to  an element (or one past the last element) in an array, 可以用+/- number 用作subscript**</span>
@@ -1045,8 +1044,6 @@ int *p = arr+2; //p points to the third element in arr
 int j = p[1]; // p[1] = *(p+1); = arr[3] = 6;
 
 int k = p[-2]; // p[1] = *(p-2); = arr[0] = 0;
-
-
 ```
  
 **(7). C-Style Character Strings**
