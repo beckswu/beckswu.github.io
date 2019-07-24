@@ -525,6 +525,7 @@ const pstring* ps; //ps is a pointer to a constant pointer to char
 - **auto** can define multiple variables in single line, 但是initializers for all the variables in the declaration must <span style="background-color: #FFFF00">have types that are consistent</span>
 - **auto** is not always exactly the same as initializer types. 当用auto时候，<span style="background-color: #FFFF00">top level const通常会被忽略, low-level const 会被kept</span>, 
 - 用**auto &** to auto-deduced type, <span style="background-color: #FFFF00">会keep top level, low-level const</span>
+- 不能用**auto** to deduce from the type from a list of initializer ```auto a = {1,2,3}; \\error```
 
 可以定义多个variables in single line, 但是需要都是一个类型(type)的
 ```c++
@@ -829,6 +830,49 @@ auto it3 = v.cbegin(); // eturn vector<int>::const_iterator
 - Unlike **vector**, <span style="background-color:#FFFF00">**array** have fixed size; we cannot add elements to an array. </span>
 - 因为arrays have fixed size, they sometimes offer better run-time performance for specialized applications, 但是相应也损失了一些灵活性(flexibility)
 - array size是part of array's type. The dimension must be known at compile time, which is [**constant expression**](#Constexpr)
+- 默认值初始化会令数组含有未定义的值 (a default-initialized array of )
+- As with vector, arrays hold objects. <span style="background-color:#FFFF00">Thus **there are no array of references**</span>.
+- <span style="background-color:#FFFF00">When define an array, we must specify a type. We cannot use **auto** to deduce the type from a list of initializers</span>
+
+```c++
+unsigned cnt = 42; //not constant expression
+
+constexpr unsigned sz = 42; //constant expression
+
+int arr[10]; // array of 10 ints
+
+int *parr[sz]; // array of 42个 pointers to int 
+
+string bad[cnt]; //error: cnt is not constant expression
+
+string strs[get_size()]; //okay if get_size is constexpr, error otherwise
+
+```
+
+**(1). Initializaing Array Element**
+
+- 如果用list initialize the elements in array, 可以忽略维度. 
+    - <span style="background-color:#FFFF00">If we omit the dimension, the compiler infers dimension from the number of initializers, </span>
+    - <span style="background-color:#FFFF00"> 如果specify a dimension, the number of initializers 不能超过 the specified size.</span>
+- char arrays are special to have an additonal form. <span style="background-color:#FFFF00">can initialize from a string literal and string literals end with a **null character** </span>. That null character is copied into the array along with the characters in the literal
+
+```c++
+const unsigned sz = 3;
+int ia1[sz] = {0,1,2}; //array of 3 inits with invalue 0, 1, 2
+
+int a2[] = {0, 1, 2};  //array of 3 dimension3
+
+int a3[5] = {0, 1, 2}; // equivalent to a[3] = {0,1,2,0,0}
+
+string a4[3] = {"hi", "bye"}; // same as a4[] = {"hi", "bye", ""}
+
+int a5[2] = {0,1,2}; // error: too many initializers
+
+```
+
+
+
+
 
 
 
