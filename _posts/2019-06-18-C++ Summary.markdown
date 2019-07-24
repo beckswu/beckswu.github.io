@@ -829,7 +829,7 @@ auto it3 = v.cbegin(); // eturn vector<int>::const_iterator
 
 - Unlike **vector**, <span style="background-color:#FFFF00">**array** have fixed size; we cannot add elements to an array. </span>
 - 因为arrays have fixed size, they sometimes offer better run-time performance for specialized applications, 但是相应也损失了一些灵活性(flexibility)
-- array size是part of array's type. The dimension must be known at compile time, which is [**constant expression**](#Constexpr)
+- array size是part of array's type. The dimension must be known at compile time, which is [**constant expression**](####Constexpr)
 - 默认值初始化会令数组含有未定义的值 (a default-initialized array of )
 - As with vector, arrays hold objects. <span style="background-color:#FFFF00">Thus **there are no array of references**</span>.
 - <span style="background-color:#FFFF00">When define an array, we must specify a type. We cannot use **auto** to deduce the type from a list of initializers</span>
@@ -854,7 +854,9 @@ string strs[get_size()]; //okay if get_size is constexpr, error otherwise
 - 如果用list initialize the elements in array, 可以忽略维度. 
     - <span style="background-color:#FFFF00">If we omit the dimension, the compiler infers dimension from the number of initializers, </span>
     - <span style="background-color:#FFFF00"> 如果specify a dimension, the number of initializers 不能超过 the specified size.</span>
-- char arrays are special to have an additonal form. <span style="background-color:#FFFF00">can initialize from a string literal and string literals end with a **null character** </span>. That null character is copied into the array along with the characters in the literal
+- char arrays are special to have an additonal form. <span style="background-color:#FFFF00">can initialize from a string literal and string literals end with a **null character** </span>. That null character is copied into the array along with the characters in the literal. <span style="background-color:#FFFF00">用list initialization， 需要声明```\0```否则不会加上, 如果不用string literal, 会自动加上```\0``` </span>
+- <span style="background-color:#FFFF00"> cannot initialize an array as copy of another array. 也不能assign one array to another </span> 有一些compiler 允许array assignment as a compiler extension. 但是最好不要用这种nonstandard方法
+
 
 ```c++
 const unsigned sz = 3;
@@ -870,6 +872,47 @@ int a5[2] = {0,1,2}; // error: too many initializers
 
 ```
 
+char array initialization
+```c++
+char a1[] = {'C', '+', '+'}; // list initialization, no null
+
+char a2[] = {'C', '+', '+', '\0'}; // list initialization, explicit null 
+
+char a3[] = "C++"; // null terminator added automatically
+
+const char a4[6] = "Daniel"; // error: no space for the null!
+
+```
+
+不能用copy initialize, 也不能assign array to another 
+```c++
+int a[] = {0, 1, 2}; // array of three ints
+
+int a2[] = a; // error: cannot initialize one array with another 
+
+a2 = a; // error: cannot assign one array to another
+
+```
+
+**(2). Understanding complicated Array Declarations**
+
+因为an array is an object, we can define both pointers and references to arrays. Define arrays that hold pointer 比较直接, defining a pointer or reference to an array 稍微复杂. <span style="color:red">简单方法是从inside括号 from outside 再从右向左度，离变量近的类型对变量有直接影响</span>
+
+- ```int *arrayPtr[10];```,  是array, size 为10, 有10个 pointer to int
+- ```int (*Parray)[10];```, 是pointer, 指向 size 为10 的 int array
+- ```int (&arrRef)[10];```, 是reference, refer size 为10 的 int array
+- ```int *(&arry)[10] = ptrs```, 是reference, refer size 为10的array, array hold pointer to int
+
+```
+int *arrayPtr[10]; //arrayPtr is an array of 10 个 pointers to int 
+
+int &refs[10] = ...; //error: no arrays of references
+
+int (*Parray)[10] = & arr; //Parray 是pointer points to an array of 10个 int
+
+int (&arrRef)[10] = arr; //arrRef refers to an array of 10 个 ints
+
+```
 
 
 
