@@ -914,7 +914,142 @@ int (&arrRef)[10] = arr; //arrRef refers to an array of 10 个 ints
 
 ```
 
+**(3). Access the Elements**
 
+当我们use a variable to subscript an array, we should define variable to have type ```size_t```, it defined in the ```cstddef```header, which is the c++ version of ```stddef.h``` header from C library. The difference between array and vector subscript 是 subscript operator used in vector 只能applies to operands of vector and 而array subscript operator 是C++ 语言自己定义的
+
+```c++
+unsigned scores[11] = {};
+
+for(auot i: scores)
+    cout<<i<<endl;
+```
+
+**(4). Pointers and Arrays**
+
+- <span style="background-color:#FFFF00">when we use an array, compiler 通常converts the array to a pointer</span>
+-  We can obtain a pointer to an array element by taking the address of that element using address-of operator(```&```); e.g. ```int nums[] = {1,2,3}; int * p = &nums[0];```
+- <span style="background-color:#FFFF00">when we use an object of array type, we are really using a pointer to the first element in that array</span>, array实际上是指向第一个element的pointer, operations on pointer.
+    - <span style="background-color:#FFFF00">当我们用array as an initializer, defined using auto, the deduced type is a pointer, not an array </span>
+    - <span style="background-color:#FFFF00">但是用到```decltype```, 还是会deduced 出array, 不会是pointer</span>
+
+
+```c++
+string nums[] = {"one", "two", "three"}; // array of strings 
+
+string *p = &nums[0]; // p points to the first element in nums
+
+string *p2 = nums; // equivalent to p2 = &nums[0]
+
+```
+
+用array as intializer for **auto**, deduced type是pointer, not array 
+
+```c++
+int ia[] = {0,1,2,3,4,5}; // ia is an array of ten ints
+
+auto ia2(ia); //ia2 is an int* that points to the first element in oa
+
+ia2 = 42; // error : ia2 is a pointer, can't assign an int 
+
+auto ia3(&ia[0]); //now it's clear that ia3 has type int*
+
+```
+
+decltype(array) is array
+
+```c++
+
+decltype(ia) ia3 = {0,1,2,3,4,5,6,7,8,9};
+
+int i = 0, *p = &i;
+ia3 = p; // error: can't assign an int* to array 
+
+ia3[4] = i; // ok: assigns the value of i
+
+```
+
+**(5). Pointers Are Iterators**
+
+Pointers to array elements (array) support the same operations as **iterators** on vector and string. We can use pointers to traverse the elements in an array.
+
+
+```c++
+int arr[] = {0,1,2,3,4,5};
+int *p = arr; // p points to the first element in arr
+
+++p; // p points to arr[1]
+
+int *begin = begin(arr);//pointer to the first element in arr
+
+int *last = end(arr); // pointer one past the last element in arr
+
+```
+
+**(6). Pointer Arithmetic**
+
+- 当add an integer to a pointer(array), the result is a new pointer, the new pointer points to the element the given number ahead of (or behind ) the original pointer. 当用两个pointers 相减, 得到the distance between those pointers. The pointers must point to elements in the same array 
+- span style="background-color:#FFFF00">我们可以比较两个指针, 当这两个指针来自于同一个数组</span> ```int * b = arr, *e = arr + 5; if(s<e)...```, 如果不来自同一个数组, 不能比较, 因为比较毫无意义
+- 指针运算. The result of subtracting two pointers a library type named ```ptrdiff_t```, like ```size_t```, the ```ptrdiff_t``` type is a machine-specific type and is defined in the cstddef header, 因为相间可能有negative distance, <span style="background-color:#FFFF00">```ptrdiff_t``` is a signed integral type.</span> 
+- 可以用pointer +/- 整数, 再deference resulting pointer, ```int last = *(arr + 4); ``` 括号是必须的当deference from pointer arithmetic
+- <span style="background-color:#FFFF00">`**we can use subscript operator on any pointer as long as thet pointer points to  an element (or one past the last element) in an array, 可以用+/- number 用作subscript**</span>
+    - Array 和 vector/string subscript operators 不同是, <span style="color:red">`the library types(vector/string) force the index with **unsigned**, 但是built-in subscript operator 可以是negative value(is not an unsigned type)</span>
+
+```c++
+constexpr size_t  sz = 5;
+int arr[sz] = {1,2,3,4,5};
+int *ip=arr; //equivalent to int *ip = &arr[0];
+
+int *ip2 = ip + 4;//ip2 points to arr[4], the last element in arr
+
+int *ip3 = ip + 10;//error : arr has only 5 elements
+
+auto n = end(arr) - begin(arr); // n is 5, the number of elements in arr
+
+```
+
+比较指针
+
+```c++
+int *b = arr, *e = arr + sz; 
+while (b < e) {
+    // use *b ++b;
+
+}
+
+int i = 0, sz = 42;
+int *p = &i, *e = &sz;
+while (p < e)
+    // undefined: p and e are unrelated; comparison is meaningless! 
+
+```
+
+上面的也同样适用于null pointer and for pointers that point to an object that is not an array(两个指针必须指向同一个对象or 该对象下一个位置). if ```p``` is null pointer, 可以加减integral constant expression whose value is 0 to p. 我们也可以用null pointer 减去null pointer = 0
+
+Deference
+```c++
+int ia[] = {0,2,4,6,8}; // array with 5 elements of type int
+
+int last = *(ia + 4); // ok: initializes last to 8, the value of ia[4]
+
+//括号是必须的
+
+int last2 = *ia + 4; // = 0(ia[0]) + 4 = 4
+```
+
+subscript operator
+```c++
+int arr[] = {0,2,4,6,8};
+int *p = arr+2; //p points to the third element in arr
+
+int j = p[1]; // p[1] = *(p+1); = arr[3] = 6;
+
+int k = p[-2]; // p[1] = *(p-2); = arr[0] = 0;
+
+
+```
+ 
+**(7). C-Style Character Strings**
 
 
 
