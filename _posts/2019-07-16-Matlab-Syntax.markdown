@@ -707,9 +707,22 @@ ans =
 
 **stack**: Stack data from multiple variables into single variable
 
-- ```S = stack(U,vars)``` converts the table or timetable, U, into an equivalent table that is stacked. 把所有variable stack up变成single variable. 一行一行的stack up
+- ```S = stack(U,vars)``` converts the table or timetable, U, into an equivalent table that is stacked. 把所有variable stack up变成single variable. 一行一行的stack up; vars 可以是cell 
+- ```S = stack(U,vars,Name,Value)``` converts the table, U, 把vars column stack, with additional options specified by one or more Name,Value pair arguments.
+- ```[S,iu] = stack(___)``` 同时可以返回两个variables, returns an index vector, iu, indicating the correspondence between rows in S and rows in U. You can use any of the previous input arguments.
+
+
+
 
 ```matlab
+Storm = [1;2;3;4;5];
+Date = {'12/25/11';'1/2/12';'1/23/12';'2/7/12';'2/15/12'};
+Natick = [20;5;13;0;17];
+Boston = [18;9;21;5;12];
+Worcester = [26;10;16;3;15];
+
+U = table(Storm,Date,Natick,Boston,Worcester)
+
 U=4×3 table
     Test1    Test2    Test3
     _____    _____    _____
@@ -727,8 +740,79 @@ S=12×2 table
                Test3                      95        
                Test1                      57        
                Test2                      77        
-               Test3                      62        	       
+               Test3                      62        	      
+	       
+U=5×5 table
+    Storm       Date       Natick    Boston    Worcester
+    _____    __________    ______    ______    _________
+      1      '12/25/11'      20        18         26    
+      2      '1/2/12'         5         9         10    
+      3      '1/23/12'       13        21         16    
+ 	      
+	      
+S = stack(U,{'Natick','Boston','Worcester'},...
+    'NewDataVariableName','Snowfall',...
+    'IndexVariableName','Town')
+S=15×4 table
+    Storm       Date         Town       Snowfall
+    _____    __________    _________    ________
+
+      1      '12/25/11'    Natick          20   
+      1      '12/25/11'    Boston          18   
+      1      '12/25/11'    Worcester       26   
+      2      '1/2/12'      Natick           5   
+      2      '1/2/12'      Boston           9   
+      2      '1/2/12'      Worcester       10   
+      3      '1/23/12'     Natick          13   
+      3      '1/23/12'     Boston          21   
+      3      '1/23/12'     Worcester       16   
+      
+      
+Month = {'October';'November';'December';...
+    'January';'February';'March'};
+Year = [2005*ones(3,1); 2006*ones(3,1)];
+NE = [1.1902; 1.3610; 1.5003; 1.7772; 2.1350; 2.2345];
+MidAtl = [1.1865; 1.4120; 1.6043; 1.8830; 2.1227; 1.9920];
+SAtl = [1.2730; 1.5820; 1.8625; 1.9540; 2.4803; 2.0203]
+fluU = table(Month,Year,NE,MidAtl,SAtl)
+fluU=6×5 table
+      Month       Year      NE      MidAtl     SAtl 
+    __________    ____    ______    ______    ______
+    'October'     2005    1.1902    1.1865     1.273
+    'November'    2005     1.361     1.412     1.582
+    'December'    2005    1.5003    1.6043    1.8625
+    'January'     2006    1.7772     1.883     1.954
+    'February'    2006     2.135    2.1227    2.4803
+    'March'       2006    2.2345     1.992    2.0203
+    
+[fluS,ifluU] = stack(fluU,3:5,...
+    'NewDataVariableName','FluRate',...
+    'IndexVariableName','Region')
+fluS=6×4 table
+      Month       Year    Region    FluRate
+    __________    ____    ______    _______
+
+    'October'     2005    NE        1.1902 
+    'October'     2005    MidAtl    1.1865 
+    'October'     2005    SAtl       1.273 
+    'November'    2005    NE         1.361 
+    'November'    2005    MidAtl     1.412 
+    'November'    2005    SAtl       1.582 
+    '
+      ⋮
+
+ifluU = 6×1
+
+     1
+     1
+     1
+     2
+     2
+     2 
 ```
+
+
+
 
 
 **Sort**
