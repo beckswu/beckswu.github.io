@@ -368,14 +368,16 @@ cout<<i<< ", "<<r1<<", "<<r2<<endl; //print 0, 0 , 0
 
 1. Level Const
    - **low-level const**(object is const): const <span style="background-color: #FFFF00">在pointer 左面</span>表data is const, cannot change underlying data value. but can point to different underlying. <br/>
-   - **top-level const**(pointer is const): const <span style="background-color: #FFFF00">在pointer 右面有pointer在时候表示 pointer is const (**a const pointer**), 如果没有pointer 在表示数据const (```const int a = 0```</span>, 不能改变指向对象，但可以改变the value of underlying object
+   - **top-level const**(pointer is const): const <span style="background-color: #FFFF00">在pointer 右面有pointer在时候表示 pointer is const (**a const pointer**), 如果没有pointer 在表示数据const (```const int a = 0```</span>, 不能改变指向对象，但可以改变the value of underlying object)
 2. <span style="background-color: #FFFF00">The distinction between **top-level** and **low-level** matters when we copy an object</span>. When we copy an object, **top-level consts can be ignored:** e.g. ```const * const int = const * int```
     -  <span style="background-color: #FFFF00">对于pointer之间的copy, 如果忽略Low Level const</span>, <span style="color:red">**Error**</span> 
-       - **Const Pointer -> Pointer**:  <span style="color:red">**Error**</span> e.g. ```int val = 42; const int * p3Low = val;int * p3 = p3Low;//error```
-       - **Pointer -> Const Pointer**  <span style="color:red">**Error**</span> e.g. ```const double cstVal = 3.14; double *ptr = &cstVal; // //error```
+       - **Pointer of Const -> Pointer**:  <span style="color:red">**Error**</span> e.g. ```int val = 42; const int * p3Low = val;int * p3 = p3Low;//error```
+       - **Const Value -> Pointer**  <span style="color:red">**Error**</span> e.g. ```const double cstVal = 3.14; double *ptr = &cstVal; //error```
+       - **Const Pointer -> Pointer**:✔️ 因为可以忽略top-level constant <span style="color:red">**Error**</span> e.g. ```int i = 0; int * const p = &i; int *a = p;```
     - 对于value 到 const pointer 的copy, 可以忽略low-level const
        -  **Value -> Const Pointer** ✔️  e.g. ```int val = 1; int const * const pLowTop = & val;```
        -  **Const Pointer -> Value** ✔️ ```int j = 0; const int * cstPtr = & j; int val = *cstPtr;```
+       -  **Pointer -> Const Pointer** ✔️ ```int i = 0, *a = & i; const int * const p = a;```
 3.  The types of a pointer and the object to which it points must match(等号左右两边类型必须match). 
 
 
@@ -779,7 +781,7 @@ vector::size_type; //错误
 
 **(2) Vector Grow Efficiently***
 
-**Key Concept: Vector Grow Efficiently**: 定义空的vector 更有效. <span style="background-color:#FFFF00">It is ofen unnecessary- can result in poorer performance—to define a vector of a specific size (例外是all elements actually need the same value).</span> It is more **efficient** to define an empty vector and add elements as the values we need become known at run time.
+**Key Concept: Vector Grow Efficiently**: 定义空的vector 更有效. <span style="background-color:#FFFF00">It is often unnecessary- can result in poorer performance—to define a vector of a specific size (例外是all elements actually need the same value).</span> It is more **efficient** to define an <span style="background-color:#FFFF00">**empty vector and add elements**</span> as the values we need become known at run time.
 
 for loop vector 不能改变vector的大小(size) (add, delete)
 
@@ -791,7 +793,7 @@ All of library **containers** have **iterators**. but only a few of them support
 - ```begin``` returns an iterator that deontes the first element. <span style="background-color:#FFFF00">如果object是const, 返回的是```const_iterator```,如果object不是const, 返回的是```iterator```</span>
 - ```end``` position **one past the end** (尾元素的下一个位置), does not denote an element, 所以 <span style="color:red">it may not be incremented or deferenced</span>
 - if a vector is const, 只能使用 ```const_iterator```type. Within a non const vector , we can use either ```iterator``` or ```const_iterator```
-- ```>, >=, <, <=``` Iterator 比较, 如果Iterator refere的element 另一个iterator 值得element 在前面出现, 就是小于
+- ```>, >=, <, <=``` Iterator 比较, 如果Iterator refer的element 另一个iterator 指得element 在前面出现, 就是小于
 
 ```c++
 vector<int>::iterator it;
@@ -829,9 +831,9 @@ auto it3 = v.cbegin(); // eturn vector<int>::const_iterator
 
 - Unlike **vector**, <span style="background-color:#FFFF00">**array** have fixed size; we cannot add elements to an array. </span>
 - 因为arrays have fixed size, they sometimes offer better run-time performance for specialized applications, 但是相应也损失了一些灵活性(flexibility)
-- array size是part of array's type. The dimension must be known at compile time, which is [**constant expression**](####Constexpr)
+- array size是part of array's type. The dimension must be known at compile time, which is [**constant expression**](#Constexpr)
 - 默认值初始化会令数组含有未定义的值 (a default-initialized array of )
-- As with vector, arrays hold objects. <span style="background-color:#FFFF00">Thus **there are no array of references**</span>.
+- As with vector, arrays hold objects. <span style="background-color:#FFFF00">Thus **there are no array of references**, 但可以有reference to array</span>.
 - <span style="background-color:#FFFF00">When define an array, we must specify a type. We cannot use **auto** to deduce the type from a list of initializers</span>
 
 ```c++
@@ -854,7 +856,7 @@ string strs[get_size()]; //okay if get_size is constexpr, error otherwise
 - 如果用list initialize the elements in array, 可以忽略维度. 
     - <span style="background-color:#FFFF00">If we omit the dimension, the compiler infers dimension from the number of initializers, </span>
     - <span style="background-color:#FFFF00"> 如果specify a dimension, the number of initializers 不能超过 the specified size.</span>
-- char arrays are special to have an additonal form. <span style="background-color:#FFFF00">can initialize from a string literal and string literals end with a **null character** </span>. That null character is copied into the array along with the characters in the literal. <span style="background-color:#FFFF00">用list initialization， 需要声明```\0```否则不会加上, 如果不用string literal, 会自动加上```\0``` </span>
+- ```char arrays``` are special to have an additonal form. <span style="background-color:#FFFF00">can initialize from a string literal and string literals end with a **null character** </span>. That null character is copied into the array along with the characters in the literal. <span style="background-color:#FFFF00">用list initialization， 需要声明```\0```否则不会加上, 如果不用string literal, 会自动加上```\0``` </span>
 - <span style="background-color:#FFFF00"> cannot initialize an array as copy of another array. 也不能assign one array to another </span> 有一些compiler 允许array assignment as a compiler extension. 但是最好不要用这种nonstandard方法
 
 
@@ -916,11 +918,10 @@ int (&arrRef)[10] = arr; //arrRef refers to an array of 10 个 ints
 
 **(3). Access the Elements**
 
-当我们use a variable to subscript an array, we should define variable to have type ```size_t```, it defined in the ```cstddef```header, which is the c++ version of ```stddef.h``` header from C library. The difference between array and vector subscript 是 subscript operator used in vector 只能applies to operands of vector and 而array subscript operator 是C++ 语言自己定义的
+当我们use a variable to subscript an array, we should define variable to have type ```size_t```, it defined in the ```cstddef```header, which is the c++ version of ```stddef.h``` header from C library. The difference between array and vector subscript 是 subscript operator```[]```` used in vector 只能applies to operands of vector, 而array subscript operator 是C++ 语言自己定义的
 
 ```c++
 unsigned scores[11] = {};
-
 for(auot i: scores)
     cout<<i<<endl;
 ```
@@ -970,7 +971,7 @@ ia3[4] = i; // ok: assigns the value of i
 
 **(5). Pointers Are Iterators**
 
-Pointers to array elements (array) support the same operations as **iterators** on vector and string. We can use pointers to traverse the elements in an array.
+Pointers to array elements (array) support the same operations as **iterators** on vector and string. We can use pointers to traverse the elements in an array.Array的```begin``` 和 ```end``` 返回的是pointer of object
 
 
 ```c++
