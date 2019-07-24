@@ -778,7 +778,7 @@ vector::size_type; //错误
 
 **(2) Vector Grow Efficiently***
 
-**Key Concept: Vector Grow Efficiently**: 定义空的vector 更有效<span style="background-color:#FFFF00">It is ofen unnecessary- can result in poorer performance—to define a vector of a specific size (例外是all elements actually need the same value).</span> It is more **efficient** to define an empty vector and add elements as the values we need become known at run time.
+**Key Concept: Vector Grow Efficiently**: 定义空的vector 更有效. <span style="background-color:#FFFF00">It is ofen unnecessary- can result in poorer performance—to define a vector of a specific size (例外是all elements actually need the same value).</span> It is more **efficient** to define an empty vector and add elements as the values we need become known at run time.
 
 for loop vector 不能改变vector的大小(size) (add, delete)
 
@@ -823,6 +823,12 @@ auto it3 = v.cbegin(); // eturn vector<int>::const_iterator
 
 比如vector insert 也许会invalidate iterators: It is import to realize 当用iterator loop 不要add remove elements to the container which iterator refer. 
 
+
+#### Arrays
+
+- Unlike **vector**, <span style="background-color:#FFFF00">**array** have fixed size; we cannot add elements to an array. </span>
+- 因为arrays have fixed size, they sometimes offer better run-time performance for specialized applications, 但是相应也损失了一些灵活性(flexibility)
+- array size是part of array's type. The dimension must be known at compile time, which is [**constant expression**](#Constexpr)
 
 
 
