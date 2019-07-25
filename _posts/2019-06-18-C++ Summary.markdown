@@ -1110,6 +1110,32 @@ cout<<p[1]<<endl; //print y
 
 严格讲, no multidimensional arrays in C++, 实际上是refered to arrays of arrays. 
 
+**(1).Initialization **
+
+```c++
+int ia[3][4];
+
+// array of size 10; each element is a 20-element array whose elements are arrays of 30 ints
+
+int arr[10][20][30] = {0}; //initialize all elements to 0
+
+int ia[3][4] = { {0, 1, 2, 3},  // three elements; each element is an array of size 4 
+    {4, 5, 6, 7},   {8, 9, 10, 11} };
+//The nested braces are optional , 等于下面的
+
+int ia[3][4] = {0,1,2,3,4,5,6,7,8,9,10,11};
+
+// explicitly initialize only element 0 in each row, 只初始化每行第一个元素，剩下是0
+int ia[3][4] = {{ 0 }, { 4 }, { 8 }};
+
+// explicitly initialize row 0; the remaining elements are value initialized 
+
+// explicitly initialize row 0; the remaining elements are value initialized
+int ix[3][4] = {0, 3, 6, 9}; 
+
+int (&row)[4] = ia[1]; // binds row to the second 4-element array in ia
+
+```
 
 **(2). loop through array**
 
@@ -1191,7 +1217,6 @@ typedef int int_array[4];
 for(int_array * p = ia; p!= ia + 3; ++p)
     for(int * q = *p; q!=*p + 4; ++q)
         oout << *q <<endl;
-
 ```
 
 
