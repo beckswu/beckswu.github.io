@@ -1112,8 +1112,8 @@ cout<<p[1]<<endl; //print y
 
 **(1).Initialization**
 - initialize all elements to 0 ```int arr[10][20][30] = {0}; ``` 只能初始化0，不能初始化别的数
-- initialize whole array ```int ia[2][2] = {%{0, 1},  {2,3}%};``` or ```int ia[2][2] = { 0,1,2,3};```
-
+- initialize whole array ```int ia[2][2] = {\{0, 1},  {2,3}};``` or ```int ia[2][2] = { 0,1,2,3};```
+- initialize 第一列的数 ```int ia[3][4] = {\{0}, {4}, {8}};```, 只有```ia[0][0] = 0```, ```ia[1][0] = 4```, ```ia[2][0] = 8```, 其他数都是0.
 - initialize 第一行的数 ```int ix[3][4] = {0,3,6,9};``` 只初始化第一行，剩下都是0
 
 
