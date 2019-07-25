@@ -933,6 +933,7 @@ for(auot i: scores)
 - <span style="background-color:#FFFF00">when we use an object of array type, we are really using a pointer to the first element in that array</span>, array实际上是指向第一个element的pointer, operations on pointer.
     - <span style="background-color:#FFFF00">当我们用array as an initializer, defined using auto, the deduced type is a pointer, not an array </span>
     - <span style="background-color:#FFFF00">但是用到```decltype```, 还是会deduced 出array, 不会是pointer</span>
+- 可以用 pointer initialize vector ```int arr[] = {0,1,2,3,4,5}; vector<int>iv(begin(arr), end(arr)); vector<int>iv2(arr + 1, arr+4);```, ```iv2```的vector分别来自```arr[1], arr[2],arr[3]```
 
 
 ```c++
@@ -1049,7 +1050,180 @@ int k = p[-2]; // p[1] = *(p-2); = arr[0] = 0;
  
 **(7). C-Style Character Strings**
 
+- C-style strings are not a type, 而是convention to use character strings. Strings that follow this convention 储存在character arrays and **null terminated \0** 
+- C library string.h provides a set of functions 在C++中 functions 被定义在 cstring header
+    - ```strlen(p)```: 返回p的长度, <span style="color:red">not counting the null</span>
+    - ```strcmp(p1,p2)```: compares p1 and p2 for equality. Returns 0 if p1 == p2, a positive value if p1 > p2, a negative value if p1 < p2
+    - ```strcat(p1,p1)``` : Appends p2 to p1. Returns p1. <span style="color:red">p1必须large enough to hold result </span>
+    - ```strcpy(p1,p2)``` : copies p2 into p1. Returns p1. <span style="color:red">p1必须large enough to hold result</span>
 
+
+用strlen 必须有```\0``` terminate. 如果没有 null terminated, the result is undefined. The most likely effect of  this is that ```strlen``` will keep looking through the memory taht follows ```ca``` until it encounter a null character
+```c++
+char ca[] = {'C', '+', '+'}; // not null terminated
+
+cout << strlen(ca) << endl; // disaster: ca isn't null terminated
+
+```
+
+Compare string: when we use an array, we really use a pointer to the first element in the array. 下面例子因为pointer do not address the same object, so the comparison is undefined. 我们可以用 ```strcp```对比const char array的content
+```c++
+const char ca1[] = "A string example";
+const char ca2[] = "A different string";
+if (ca1 < ca2) // undefined: compares two unrelated addresses
+
+
+if (strcmp(ca1, ca2) < 0) // same effect as string comparison s1 < s2
+
+```
+
+concat： 对于string, 可以直接用加号, 但是<span style="color:red">doing the same with two arrays would be an error.</span>. 因为expression tries to add two pointers which is illegal and meaningless.  如果largeStr不足够大, 很有可能引发error.如果我们更改largeStr, 又要重新检查它的size. Programs with suck ecode are **error-prone**
+```c++
+//对于string, 可以直接
+string largeStr = s1 + " " + s2;
+
+// disastrous if we miscalculated the size of largeStr
+strcpy(largeStr, ca1); // copies ca1 into largeStr
+
+strcat(largeStr, " ");  // adds a space at the end of largeStr
+
+strcat(largeStr, ca2); // concatenates ca2 onto largeStr
+
+```
+
+**(8). Mixing Library strings and C-Style Strings**
+
+- initialize string from a string literal  ```string s("Hello World")```
+- **string -> const char pointer: c_str()** returns a a pointer to the beginning of a null-terminated character array that holds the same data in string```const char *str = s.c_str()```. It is not guaranteed to be valid indefinitely.  任何s的subsequent use 也许改变 s value 从而invalidate this array. <span style="background-color:#FFFF00"> 所以最好是先copy string 再call c_str(), 或者call c_str() copy 一份</span>
+
+
+```c++
+string s = "abc";
+const char* p = s.c_str();s
+s = "xyz";
+cout<<p[1]<<endl; //print y
+
+```
+
+
+#### Multidimensional Arrays
+
+严格讲, no multidimensional arrays in C++, 实际上是refered to arrays of arrays. 
+
+**(1).Initialization **
+
+- initialize all elements to 0 ```int arr[10][20][30] = {0}; ``` 只能初始化0，不能初始化别的数
+- initialize whole array ```int ia[2][2] = { {0, 1,},  {2,3}};``` or ```int ia[2][2] = { 0,1,2,3};```
+- initialize 第一列的数 ```int ia[3][4] = {{ 0 }, { 4 }, { 8 }};```, 只有```ia[0][0] = 0```, ```ia[1][0] = 4```, ```ia[2][0] = 8```, 其他数都是0
+- initialize 第一行的数 ```int ix[3][4] = {0,3,6,9};``` 只初始化第一行，剩下都是0
+
+```c++
+int ia[3][4];
+
+// array of size 10; each element is a 20-element array whose elements are arrays of 30 ints
+
+int arr[10][20][30] = {0}; //initialize all elements to 0
+
+int ia[3][4] = { {0, 1, 2, 3},  // three elements; each element is an array of size 4 
+    {4, 5, 6, 7},   {8, 9, 10, 11} };
+//The nested braces are optional , 等于下面的
+
+int ia[3][4] = {0,1,2,3,4,5,6,7,8,9,10,11};
+
+// explicitly initialize only element 0 in each row, 只初始化每行第一个元素，剩下是0
+int ia[3][4] = {{ 0 }, { 4 }, { 8 }};
+
+// explicitly initialize row 0; the remaining elements are value initialized 
+
+// explicitly initialize row 0; the remaining elements are value initialized
+int ix[3][4] = {0, 3, 6, 9}; 
+
+int (&row)[4] = ia[1]; // binds row to the second 4-element array in ia
+
+```
+
+**(2). loop through array**
+
+注意外层for loop, 我们用了reference, 因为我们避免 normal array to pointer conversion.因为<span style="background-color:#FFFF00"> auto deduced array type是pointer(指向该数组首元素的指针)</span>, 比如下面最后的例子不用reference, deduced to pointer, 无法compiled 
+
+```c++
+size_t cnt = 0;
+for (auto &row : ia) // for every element in the outer array
+
+    for (auto &col : row) { // for every element in the inner array 
+           ++cnt; 
+    }
+
+for (const auto &row : ia) // for every element in the outer array
+
+     for (auto col : row) // for every element in the inner array
+
+        cout << col << endl;
+
+//上面的array 如果不用reference, auto deduced type是pointer 
+
+for (auto row : ia) //
+
+     for (auto col : row) // 
+
+        cout << col << endl;
+```
+
+
+**(3). Pointers and Multidimensional Arrays**
+
+- 当程序使用多维数组名字时, <span style="background-color:#FFFF00">会自动将其转化成a pointer to the first element in the array</span>
+- when you define a pointer to a multidimensional array, remember that a multidimensional array is a an array of arrays
+- iterate 时候可以用auto 去deduced array type, deduced 的是一个pointer to 最外层的指针
+
+```c++
+int ia[3][4]; //有三行, 每行有4个
+
+int (*p)[4] = ia; //p is a pointer 指向array of 4 ints 
+
+//上面（）不能省去, int *p[4], 是array of size 4, hold int pointer
+
+//ia指向的是第一行的array (size of 4)
+
+p = &ia[2]; //p points to the last element in ia
+
+
+//iterate
+for(auto p = ia; p != ia + 3; ++p){
+    //q points to the first element of an array of 4 ints, q points to an int
+
+    //use auto to deduced array is pointer
+
+    for (auto q = *p; q != *p+4; ++q)
+        cout << * q << " ";
+    cout<<endl;
+}
+
+for(auto p = begin(ia); p != end(ia); ++p){
+    //q points to the first element of an array of 4 ints, q points to an int
+
+    //use auto to deduced array is pointer
+
+    for (auto q = begin(*p); q != end(p); ++q)
+        cout << * q << " ";
+    cout<<endl;
+}
+
+```
+
+**(4). Type Aliases Simplify**
+
+- ```using int_array = int[4];``` 
+- ```typedef int int_array[4];```
+
+
+```c++
+typedef int int_array[4];
+for(int_array * p = ia; p!= ia + 3; ++p)
+    for(int * q = *p; q!=*p + 4; ++q)
+        oout << *q <<endl;
+
+```
 
 
 
