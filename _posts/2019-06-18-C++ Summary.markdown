@@ -1231,20 +1231,20 @@ for(int_array * p = ia; p!= ia + 3; ++p)
 ## Expressions
 
 
-**Overloading Operators**: the type of operands(运算对象的类型) and the result 取决于h how the opeartor is defined. 但是the number of operands and ther precedence(优先级) and the associativity (结合律) of the operator cannot be changed (运算对象个数, 优先级, 结合律不能改变)
+**Overloading Operators**: the type of operands(运算对象的类型) and the result 取决于 how the opeartor is defined. 但是the number of operands and ther precedence(优先级) and the associativity (结合律) of the operator cannot be changed (运算对象个数, 优先级, 结合律不能改变)
 
 #### lvalue / rvalue 
 
-- When use an object as **rvalue**, <span style="background-color:#FFFF00"> We use an object value(its contents)</span>. 当we use an object as **lvalue**,  <span style="background-color:#FFFF00">we use the object's identity (its location in memory). </span>
+- When use an object as **rvalue**, <span style="background-color:#FFFF00"> We use an object value(**its contents**)</span>. 当we use an object as **lvalue**,  <span style="background-color:#FFFF00">we use the object's identity (**its location in memory**). </span>
 - **lvalue expression** yields an object or function. However, some lvalues such as ```const``` objects may not be left-hand operand of an assignment  
 - We can use lvalue when rvalue is required, but we cannot use rvalue when an lvalue is required ( <span style="background-color:#FFFF00">在需要rvalue时, 可以用lvalue替代; 但是当一个lvalue使用, 不能用rvalue来替代</span>). When we use lvalue in place of an rvalue, the object's contents(its value) are used 
-- <span style="background-color:#FFFF00">用```decltype```时候, 当我们apply ```decltype```时候, 假如```p```是 ```int*```, deference yields a lvalue```decltype(*p)``` is ```int&```. Address-of operator yields an rvalue, ```decltype(&p)``` is ```int**```
 - 具体使用: 
-  - Assignment 等号左面需要(nonconst) lvalue as its left-hand operand nad yields its left-hand operand as lvalue 
+  - Assignment 等号左面需要(nonconst) lvalue as its left-hand operand and yields its left-hand operand as lvalue 
   - <span style="color:red">The address-of operator(&) requires an lvalue operand (运算对象), and returns a pointer to its operand as rvalue</span>
-  - Built-in dereference and subscript operators(vector, string), iterator derference all yield lvalue 
+  - Built-in dereference and subscript operators(vector, string), iterator dereference all yield lvalue 
   - Built-in 和 iterator 的 increment, decrement operators 也需要lvalue as operands
-    - prefix operators (```++i```) return the object itself as lvalue, postfix```i++``` return a copy of the object's original value as rvalue
+    - <span style="background-color:#FFFF00">prefix operators (```++i```) return the object itself as **lvalue**, postfix```i++``` return a copy of the object's original value as **rvalue</span>
+**  - <span style="background-color:#FFFF00">用```decltype```时候, 当我们apply ```decltype```时候, 假如```p```是 ```int*```, deference yields a lvalue```decltype(*p)``` is ```int&```. Address-of operator yields an rvalue, ```decltype(&p)``` is ```int**```
 
 #### Precedence and Associativity 
 
