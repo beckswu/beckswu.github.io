@@ -1226,7 +1226,187 @@ for(int_array * p = ia; p!= ia + 3; ++p)
         oout << *q <<endl;
 ```
 
+<br/>
 
+## Expressions
+
+
+**Overloading Operators**: the type of operands(运算对象的类型) and the result 取决于h how the opeartor is defined. 但是the number of operands and ther precedence(优先级) and the associativity (结合律) of the operator cannot be changed (运算对象个数, 优先级, 结合律不能改变)
+
+#### lvalue / rvalue 
+
+- When use an object as **rvalue**, <span style="background-color:#FFFF00"> We use an object value(its contents)</span>. 当we use an object as **lvalue**,  <span style="background-color:#FFFF00">we use the object's identity (its location in memory). </span>
+- **lvalue expression** yields an object or function. However, some lvalues such as ```const``` objects may not be left-hand operand of an assignment  
+- We can use lvalue when rvalue is required, but we cannot use rvalue when an lvalue is required ( <span style="background-color:#FFFF00">在需要rvalue时, 可以用lvalue替代; 但是当一个lvalue使用, 不能用rvalue来替代</span>). When we use lvalue in place of an rvalue, the object's contents(its value) are used 
+- <span style="background-color:#FFFF00">用```decltype```时候, 当我们apply ```decltype```时候, 假如```p```是 ```int*```, deference yields a lvalue```decltype(*p)``` is ```int&```. Address-of operator yields an rvalue, ```decltype(&p)``` is ```int**```
+- 具体使用: 
+  - Assignment 等号左面需要(nonconst) lvalue as its left-hand operand nad yields its left-hand operand as lvalue 
+  - <span style="color:red">The address-of operator(&) requires an lvalue operand (运算对象), and returns a pointer to its operand as rvalue</span>
+  - Built-in dereference and subscript operators(vector, string), iterator derference all yield lvalue 
+  - Built-in 和 iterator 的 increment, decrement operators 也需要lvalue as operands
+    - prefix operators (```++i```) return the object itself as lvalue, postfix```i++``` return a copy of the object's original value as rvalue
+
+#### Precedence and Associativity 
+
+when Precedence and associativity matter
+
+```c++
+int ia[] = {0, 2,4,6,8}; 
+
+int last = *(ia + 4); //6 + 4 = 10
+
+last = *ia + 4; //0 + 4 = 4
+
+```
+
+**Order of Evaluation**
+
+Precedencesspecifies how the operands are grouped 但是 <span style="background-color:#FFFF00">say nothing about the order in which the operands are evaluated.</span>  比如: ```int i = f1() * f2(); ``` 我们知道```f1``` and ```f2``` must be called before 乘法. 但是no way of knowing whether ```f1``` 先执行还是 ```f2``` 先执行
+
+**准侧**: 1. 当不确定时, 用括号, 2. if you change the value of an operand, don't use that operand elsewhere in the same expression. (Exception for rule2: when the subexpression that changes the operand is itself the operand of another subexpression, 当更改是在本身做的更改, ```*++iter```, ```++iter``` 更改了```iter```本身, 再用deference operator, no issue. The increment must be evaluated before dereference)
+
+For operators that do not specify evaluation order, <span style="color:red">it is an error for an expression to refer to and change te same object.</span> Expression that do so have undefined behavior 比如
+
+```c++
+int i = 0;
+cout << i << ", " << ++i <<endl;// undefined 
+
+//因为可能打印0, 1 or 1, 1
+
+```
+
+The compiler might evaluate ++i before evaluate i (1,1) or compiler might evaluate i then evaluate ++1 (0,1)
+
+比如下面的, no guarantees which functin are called first. 如果下面的function 是独立的 and do not affect the state of the same objects or perform IO, then it is okay. 如果functions do affect the same object. then expression in error and has undefined behavior.
+```c++
+f() + g() * h() + j()
+```
+
+#### Arithmetic Operators
+
+**overflow** happens when a value is computed that is outside the range of values. 比如shorts are 16 bits. maximum short is 32767. 比如下面例子, the value wrapped around. The sign bit which had been 0 is set to 1, resultng in a negative value. 在其他system, the result might be different(也许会crash entirely).  On many systems, there is no compile-time or run-time warning when an overflow occurs. 
+
+```c++
+short val = 32767; //max value if shorts are 16 biys
+
+val += 1; //this calculation overflows
+
+cout << val; //print -32769
+
+```
+
+对于除法, C++11 新标准是商一律向0取整(truncate toward 0), ```(m/n)*n + m%n = m```, 比如m,n是正数,```(-m)/n``` 和 ```m/(-n)``` 都等于```-(m/n)```,  ```(-m)%n``` 和 ```m%(-n)``` 都等于```-(m%n)```, 
+
+```c++
+21%6;    /* resultis3 */    21/6; /* resultis3 */
+21%7; /* resultis0 */       21/7; /* resultis3 */ 
+-21%-8; /* resultis -5 */   -21/-8; /* resultis2 */ 
+21%-5; /* resultis1 */      21/-5; /* resultis -4 */
+```
+
+**Logical Operator**
+
+不可以写成 ```if(i<j<k)``` 因为```i<j```产生是true or false, 就变成```true/false < k```
+
+#### Assignment Operators
+
+- Assignment is **right associative**. 
+- Assignment has low precedence, 所以想要先赋值, 用括号
+- <span style="background-color:#FFFF00">prefix operators (```++i```) return the object itself as lvalue, postfix```i++``` return a copy of the object's original value as rvalue</span>,  <span style="color:red">postfix may be costly. 因为要储存一个copy 再做increment/decrement</span>
+- <span style="background-color:#FFFF00">Operands can be evaluated at any order</span> .e.g when one subexpression changes the value of an operand that is used in another subexpression. 
+
+```c++
+int ival, jval;
+ival = jval = 0;
+
+int ival, *pval;
+ival = pval = 0; //error: they are different type, 
+
+//and no conversion from int * to int  
+
+```
+因为assignment 是right associative, the right-most assignment ```jval = 0```  the result of the right-most  assignment ```jval``` is assigned to ```ival```， multiple assignment must have the same type. 
+
+Assignment has low precedence, 下面例子如果不用括号, the operands to ```!=``` would be evaluate first, then true/false assign to i
+```c++
+int i;
+while ((i = get_value()) != 42) {
+    // do something ... 
+    
+}
+```
+
+对于compound assignment, the left-hand operand is evaluated only once. 对于谱图的the operand is evaludated twice: 第一次是右侧的expression, 第二次是赋值给左侧
+
+```c++
++=  -=  *=  /=  %= // arithmetic operators
+
+<<=  >>=  &=  ^= |= // bitwise operators
+
+a = a op b;//等同于
+
+```
+
+The problem is both left- and right-hand operands use beg and right-hand operand changes beg. The assignment is undefined
+
+```c++
+while (beg != s.end() && !isspace(*beg))
+    *beg = toupper(*beg++); // error: this assignment is undefined
+
+
+//可能会这样处理 or it may evaluate in some other way
+
+*beg = toupper(*beg); // execution if left-hand side is evaluated first 
+
+*(beg + 1) = toupper(*beg); // execution if right-hand side is evaluated first
+
+```
+
+#### Precedence 
+
+The precedence of postfix increment 高于deference ```*pbeg++``` is equlalen to ```*(pbeg++)```, ```pbeg++``` increment ```pbeg``` and return a copy of previous value as rvalue 
+
+```c++
+auto pbeg = v.begin();
+// print elements up to the first negative value 
+
+while (pbeg != v.end() && *beg >= 0)
+cout<<*pbeg++<<endl;//printthecurrentvalueandadvance pbeg
+
+```
+
+derference has a lower precedence than dot, 如果我们忽略了括号, ```*p.size()``` error 因为pointer doesn't have member size. <span style="background-color:#FFFF00">The arrow operator yields an lvalue. The dot operator yields an lvalue if the object from which the member is fetched is an lvalue; otherwise the result is an rvalue. </span>
+
+```c++
+string s1 = "a string", *p = &s1;
+auto n = s1.size(); // run the size member of the string s1
+
+n = (*p).size(); // run size on the object to which p points
+
+n = p->size(); // equivalent to (*p).size()
+
+```
+
+The conditional operator has fairly low precedence. When we embed a conditional expression in a larger expression, 通常需要parathesize 
+
+```c++
+cout << ((grade < 60) ? "fail" : "pass");  // prints pass or fail
+
+cout << (grade < 60) ? "fail" : "pass"; // prints 1 or 0!  取决于grade < 60 is true or false
+
+//cout << (grade < 60); // prints 1 or 0 
+
+//cout ? "fail" : "pass"; // test cout and then yield one of the two literals // depending on whether cout is true or false
+
+
+cout << grade < 60 ? "fail" : "pass"; // error: compares cout to 60
+
+//cout << grade; // less-than has lower precedence than shift, so print grade first
+
+
+//cout < 60 ? "fail" : "pass"; // then compare cout to 60!
+
+```
 
 ## Include Guard
 
