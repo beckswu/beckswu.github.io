@@ -1403,7 +1403,99 @@ while (beg != s.end() && !isspace(*beg))
 
 ```
 
+#### Bitwise Operators
 
+- There are no guarantees for how sign bit is handled, we strongly recommend using unsigned types with bitwise operators (对于unsigned 没有要求, 建议使用signed)
+-  Bitwise Shift operators yield a value that is copy of left-hand operand 但是 <span style="color:red"> right-hand operand must not be negative. </span> e.g. ```5<<-3``` <span style="color:red"> **Error**</span>
+-  left shift operator ```<<``` insert 0-valued bit on the right. 而 right shift operator ```>>``` depends on the type of left-hand operand: 如果operand is unsigned, then operator insert 0 bits 在左侧, 如果signed, insert copies of sign bit or 0 bits 在左侧 
+- Shift Operators (aka IO Operators) Are Left Associative ```cout << "hi" << " there" << endl;``` 等同于 ```( (cout << "hi") << " there" ) << endl;```
+- The shift operators have midlevel precedence: lower than the arithmetic operators but higher than the relational, assignment, and conditional operators. <span style="background-color:#FFFF00"> (位移低于算数，高于比较), 意味着我们经常需要括号去正确 group operators </span>
+
+Example. 用每一个bit 表示学生通过or fail 测验, 看第27名同学
+
+```c++
+unsign long quiz1 = 0;
+quiz1 |= 1 << 27 //记录第27名同学通过测验
+
+quiz1 &= ~(1 << 27) //记录第27名同学fail测验
+
+bool status = quiz1 & (1<<27) //学生27是否通过测验
+
+```
+#### Sizeof Operators
+
+- ```sizeof``` 返回一个类型大小 /表达式结果类型(return type)大小 所占字符数, returns the size  in bytes of an expression or a type name. ```sizeof (type)``` or  ```sizeof expr```
+- ```sizeof``` is a constant expression of type ```size_t```. 
+- The operator is right associative. 
+- ```sizeof *p```, p可以是invalid, 
+- result applying sizeof  
+  - ```sizeof char``` = 1 guaranteed 
+  - sizeof reference returns the size of 被引用对象
+  - sizeof pointer 得到指针本身空间大小 (the size neeed hold a pointer)
+  - sizeof a deferenceed pointer, 返回指针所指对象的所占空间小, 指针不需要有效
+  - sizeof an array is the size of the entire array (整个数组的size of entire array). 等于 sizeof element 乘以 the number of elements. <span style="background-color:#FFFF00">注意sizeof does not conver the array to a pointer.</span>
+  - sizeof a string or vector<span style="background-color:#FFFF00">该类型固定部分的小小(the size of fixed part of these types)，不会计算对象中元素占用了多少空间 (does not return the size used by the object's element)</span> 
+
+```sizeof *p;``` <span style="background-color:#FFFF00">```sizeof``` 满足右结合律 并且与 ```*```优先级一样 </span>, 从右向左顺序组合， 等价于 ```sizeof(*p)```, 其次sizeof 不会求运算对象(operands)的值, 即使是无效(invalid, 即uninitialized)也没有任何影响, <span style="background-color:#FFFF00">在```sizeof``` 中, deferenence is safe , 因为指针实际上没有真正使用, ```sizeof``` 不需要真的deference 指针，也能只能它所指向的对象类型 </span> . 
+
+在C++11中，<span style="background-color:#FFFF00">可以用**scope operator** to ask the size of memeber of a class type. </span>, 因为sizeof 运算无须提供一个具体对象,
+```c++
+Sales_data data, *p;
+sizeof(Sales_data); // 存储Sales_data 类型所占空间大小
+
+sizeof data; // size of data's type, i.e., sizeof(Sales_data)
+
+sizeof p; // size of a pointer
+
+sizeof *p; // size of the type to which p points, 即 sizeof(Sales_data) 
+
+sizeof data.revenue; // size of the type of Sales_data's revenue member 
+
+sizeof Sales_data::revenue; // alternative way to get the size of revenue
+
+```
+
+```c++
+constexpr size_t sz = sizeof(ia)/sizeof(*ia);
+int arr2[sz]; // ok sizeof returns a constant expression
+
+```
+
+#### Comma Operators
+
+- comma operator 含有两个运算对象(operands), 从左向右顺序依次求值
+- <span style="background-color:#FFFF00">guarantees the order of evaluation</span>
+- <span style="color:red">从左向右计算依次求值,先求左侧的表达式的值，然后将结果丢弃掉</span>，the result of comma expression 是右侧的表达值. The result is an lvalue if the right-hand operand is an lvalue 
+
+```c++
+vector<int>::size_type cnt = ivec.size(); 
+for (vector<int>::size_type ix = 0; ix != ivec.size(); ++ix, --cnt) 
+    ivec[ix] = cnt;
+```
+
+#### Type Conversions
+
+**(1). Implicit Conversion**
+
+The compiler 自动转化运算对象
+- In most expression, 比int 类型小的整形(short) 首先提升为较大的整形(integral type)
+- In condition, non bool expression convert to bool
+- In initializations, the initializer is converted to the ype of the variable; In assignments, 右侧运算被convert to 左侧运算
+- 如果算数运算或者关系运算对象有多种类型，需要准换成统一类型
+- 算数转化： 把类型转化成最宽的类型, 比如 一个类型是long double, 无关其他是什么类型，都被转化成long double. 如果有float, 那么整数型会被转化成float
+- **Integral promotions(整型提升)**: convert  small integral types to a larger integral type. The types ```bool```, ```char```, ```signed char```, ```unsigned char```, ```short```, and ```unsigned short``` are promoted to ```int``` if all possible values of that type fit in an int. Otherwise, the value is promoted to ```unsigned int```.
+- 较大的char(```wchar_t,char16_t, char32_t```)提升成```int, unsigned int, long, unsigned long, long long, unsigned long long```, 前提是转化类型能容纳原来类型所有可能的值
+- 如果某个运算符运算对象不一致， 这些运算对象将转化成同一类型, 但是如果某个运算对象是unsigned, 结果就依赖于机器中各个整数类型相对大小了， 转化类型要么都是unsigned, 要么都是signed的
+- 一个signed, 一个unsigned 
+    - when unsigned type 大于等于signed type ， signed -> unsigned. 如果signed 是负数, 有副作用(比如 -1 会变成255)
+    - when unsigned type  小于signed type , 结果依赖于机器, 如果unsigned的值都可以存入signed, 则 unsigned -> signed, 如果不能, signed -> unsigned e.g. long, unsigned int, 如果int 和long 大小相同, 则long -> unsigned int. 如果long 类型占用空间大于int, unsigned int -> long 
+
+```c++
+int ival = 3.541 + 3; //the compiler migh warn loss of precision
+```
+
+
+<br/> <br/>
 
 ## Include Guard
 
