@@ -1243,8 +1243,8 @@ for(int_array * p = ia; p!= ia + 3; ++p)
   - <span style="color:red">The address-of operator(&) requires an lvalue operand (运算对象), and returns a pointer to its operand as rvalue</span>
   - Built-in dereference and subscript operators(vector, string), iterator dereference all yield lvalue 
   - Built-in 和 iterator 的 increment, decrement operators 也需要lvalue as operands
-    - <span style="background-color:#FFFF00">prefix operators (```++i```) return the object itself as **lvalue**, postfix```i++``` return a copy of the object's original value as **rvalue</span>
-**  - <span style="background-color:#FFFF00">用```decltype```时候, 当我们apply ```decltype```时候, 假如```p```是 ```int*```, deference yields a lvalue```decltype(*p)``` is ```int&```. Address-of operator yields an rvalue, ```decltype(&p)``` is ```int**```
+    - <span style="background-color:#FFFF00">prefix operators (```++i```) return the object itself as **lvalue**, postfix```i++``` return a copy of the object's original value as **rvalue**</span>
+    - <span style="background-color:#FFFF00">用```decltype```时候, 当我们apply ```decltype```时候, 假如```p```是 ```int*```, deference yields a lvalue```decltype(*p)``` is ```int&```. Address-of operator yields an rvalue, ```decltype(&p)``` is ```int**```
 
 #### Precedence and Associativity 
 
@@ -1387,7 +1387,7 @@ n = p->size(); // equivalent to (*p).size()
 
 ```
 
-The conditional operator has fairly low precedence. When we embed a conditional expression in a larger expression, 通常需要parathesize 
+The conditional operator has fairly low precedence. When we embed a conditional expression in a larger expression, 通常需要parathesize, 第二个语句 ```cout << grade;``` 返回的是coun
 
 ```c++
 cout << ((grade < 60) ? "fail" : "pass");  // prints pass or fail
