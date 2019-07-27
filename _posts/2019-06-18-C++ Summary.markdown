@@ -1512,6 +1512,87 @@ ui + l;//根据unsigned int 和 long 所占空间大小比较
 
 ```
 
+- Array -> Pointer ```int ia[10]; int * ip = ia;```
+    - <span style="background-color:#FFFF00">当Array 用在```decltype```, ```&```, ```sizeof``` 以及 ```typeid```中不会发转化, </span>, 或者当引用初始化数组也不会 ```int (&arrRef)[10] = &ia```
+- Pointer Conversion:  <span style="background-color:#FFFF00">a pointer to any nonconst type can be converted to ```void*```, any a pointer to any type can be converted to a ```const void *```</span> 
+- Pointer -> Bool: If pointer value is zero, the conversion yield false, otherwise true  ```char * cp = get_string(); if(cp)```
+- to Const: 允许pointer to a non const type to a pointer o the const type and reference. e.g. T is the type, 可以convert a pointer / reference to T into a pointer or reference to const T 
+- Conversion defined by Class Types: Class types 可以定义conversions that the compiler will aplly automatically. The compiler apply only one class-type conversion at a time. e.g. ```string s; while(cin >> s); ``` while 把 cin 转化成bool  
+
+
+```c++
+int i;
+const int &j = i; // convert a nonconst to a reference to const int
+const int *p = &i; // convert address of a nonconst to the address of a const 
+int &r = j, *q = p; // error: conversion from const to nonconst 
+
+```
+
+**(2). Explicit Conversion**
+
+Use **cast** to request explicit conversion. (有时候不得不用cast, 但是cast 这种方法本质上是非常危险的)
+
+**static_cast**
+
+**static_cast** is often use when a large arithmetic type is assigned to a smaller type. 一般来说 如果compiler 发现一个较大的类型试图赋值给较小的类型, 会generate warning. 但是当我们do a explicit cast, the warning message is turned off. 
+
+static cast is useful when perform a version that compiler不会自动转换的. 例如, we can use static_cast to retrieve pointer value that was stored in a ```void*```pointer
+
+```c++
+void* p = &d; // ok: address of any nonconst object can be stored in a void*
+
+ // ok: converts void* back to the original pointer type
+
+double *dp = static_cast<double*>(p);
+```
+
+用```static_cast```强制转换原来类型时, 我们应该确保指针的值保持不变, 也就是说强制转化的结果与原始的地址相等. We must certain  that the type to which we cast the pointer is the actual type of that pointer. <span style="background-color:#FFFF00">If the types not match, the result is undefined  </span>
+
+
+**const_cast** : change only a low-level const in operand. cast away the const. 一旦cast away const, the compiler不会发出警告when writing to that object. If object is orginally not a const, using cast to obtain write access is legal. However using a const_cast in order to write to a const object is undefined.
+
+
+```c++
+const char *pc;
+char *p = const_cast<char*>pc; //okay but writing through p is undefined, 因为pc是const
+
+const char *cp;
+// error: static_cast can't cast away const
+
+char *q = static_cast<char*>(cp);
+string txt = static_cast<string>(cp); // ok: converts string literal to string 
+
+string txt = const_cast<string>(cp); // error: const_cast only changes constness
+
+```
+
+**reinterpret_cast** 
+
+A reinterpret_cast generally performs a low-level reinterpretation of the bit pattern of its operands. 为运算对象的位模式提供较低层次上的重新解释
+
+```c++
+int *ip;
+char *pc = reinterpret_cast<char*>(ip);
+string str(pc); //result in bizarre run-time behavior.
+
+//pc指的真实对象是int 而非char. 如果把pc当成普通char指针，就会发生running error
+
+```
+
+上面例子提供了使用reinterpret_cast非常危险, 类型改变了，但compiler没有任何警告或者错误的信息提示. 比如上面中```pc```实际指向```int *```, 但使用```pc```时候, 会认定它是```char*```类型. compiler没法知道它存放是指向int 的指针
+
+**old style cast**
+
+```c++
+type (expr); // function-style cast notation 
+
+(type) expr; // C-language-style cast notation
+
+char *pc = (char*) ip; // ip是指向整数的指针
+
+//效果与使用reinterpret_cast一样
+
+```
 
 
 
