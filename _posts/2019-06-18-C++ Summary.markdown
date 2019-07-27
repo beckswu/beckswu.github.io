@@ -1488,11 +1488,32 @@ The compiler 自动转化运算对象
 - 如果某个运算符运算对象不一致， 这些运算对象将转化成同一类型, 但是如果某个运算对象是unsigned, 结果就依赖于机器中各个整数类型相对大小了， 转化类型要么都是unsigned, 要么都是signed的
 - 一个signed, 一个unsigned 
     - when unsigned type 大于等于signed type ， signed -> unsigned. 如果signed 是负数, 有副作用(比如 -1 会变成255)
-    - when unsigned type  小于signed type , 结果依赖于机器, 如果unsigned的值都可以存入signed, 则 unsigned -> signed, 如果不能, signed -> unsigned e.g. long, unsigned int, 如果int 和long 大小相同, 则long -> unsigned int. 如果long 类型占用空间大于int, unsigned int -> long 
+    - when unsigned type  小于signed type , 结果依赖于机器, 如果unsigned的值都可以存入signed, 则 unsigned -> signed, 如果不能, signed -> unsigned 
+    - e.g. long, unsigned int, 如果int 和long 大小相同, 则long -> unsigned int. 如果long 类型占用空间大于int, unsigned int -> long 
 
 ```c++
 int ival = 3.541 + 3; //the compiler migh warn loss of precision
+
+3.1415159L + 'a' // 'a' -> int(97) -> long double 
+
+float f; char c; short s;
+f + c; //c -> int -> floatt
+
+s + c; //s -> int, c-> int 
+
+
+int i; unsigned int ui; unsigned short us;
+long l;  unsigned long ul; 
+i + ul; //i -> unsigned long 
+
+us + i; //根据unsigned short 和int 所占空间大小比较
+
+ui + l;//根据unsigned int 和 long 所占空间大小比较
+
 ```
+
+
+
 
 
 <br/> <br/>
