@@ -2164,12 +2164,120 @@ decltype(odd) *arrPtr(int i)
 
 注: ```decltype``` 并不负责把array 转化成pointer type. The type returned by ```decltype``` is an array type, 我们必须加上```*``` to indicate taht ```arrPtr``` returns a pointer
 
+#### (d). Overloaded Functions
+
+- Functions有一样的名字但是parameter lists different and appear in the same scope are overloaded. <span style="color:red">When call these functions, compiler can deduce which function</span> we want based on argument type we pass
+- <span style="color:red">main function 不能被overloaded</span>
+- <span style="color:red">It is an error for two functions only return types different</span>(如果只有返回类型不同,error)
+- <span style="color:red">It is an error for two functions only parameter top level const different</span>(如果一个function 有顶层const, 另一个没有顶层const, 两个function 是一样的)
+
+```c++
+Record lookup(const Account&);
+bool lookup(const Account&);//error: only return type is different
+
+```
+
+Determine whether two paraeter types differ
+```c++
+// each pair declares the same function 每一组function 都是一样的
+Record lookup(const Account &acct);
+Record lookup(const Account&); // parameter names are ignored
 
 
+typedef Phone Telno;
+Record lookup(const Phone&);
+Record lookup(const Telno&); // Telno and Phone are the same type
+
+```
+
+顶层const 不影响传入函数的对象, 一个拥有顶层const和一个没有top level const的function 无法区分, 下面每组的function 第一个和第二个声明是一样的
+```c++
+Record lookup(Phone);
+Record lookup(const Phone); // redeclares Record lookup(Phone)
 
 
+Record lookup(Phone*);
+Record lookup(Phone* const); // redeclares Record lookup(Phone*)
+
+```
+
+但如果const时候底层的, we can overload 如果指针or 引用 指向const or non const object. 下面的例子, <span style="background-color:#FFFF00">compiler can use the constness of the argument to distinguish which function to call</span> 因为const 不能转化类型, 所以只pass 给含有const 的function. <span style="background-color:#FFFF00">但是nonconst 可以转化成const,所以下面四个function 都可以被nonconst function call. 但是compiler prefer the nonconst version when we pass a nonconst object or pointer to nonconst</span>
+
+```c++
+// functions taking const and nonconst references or pointers have different parameters
+
+// declarations for four independent, overloaded functions
+
+Record lookup(Account&); // function that takes a reference to Account
+
+Record lookup(const Account&); // new function that takes a const reference
+
+//当Account是const call 第二个,当Account 不是const call
 
 
+Record lookup(Account*); // new function, takes a pointer to Account
+
+Record lookup(const Account*); // new function, takes a pointer to const
+
+```
+
+**const_cast**
+
+```c++
+//需要返回一个引用, 如果直接定义 string& shorterString(const string &s1, const string &s2)
+
+//会报错，不可以把 const reference assign 给 reference, 需要const_cast 
+
+const string &shorterString(const string &s1, const string &s2) {
+    return s1.size() <= s2.size() ? s1 : s2;
+}
+
+string &shorterString(string &s1, string &s2)
+{
+    auto &r = shorterString(const_cast<const string&>(s1), const_cast<const string&>(s2));
+    return const_cast<string&>(r);
+}
+```   
+首先cast argument to references to const. function returns a reference to const string, 再cast ```const string &``` back to plain string&
+
+**calling an overloaded function**
+
+当call overload function, 有三种可能的结果: 
+- The compiler finds exactly one function that is a <span style="background-color:#FFFF00">best match</span> for the actual arguments and generate code to call that function 
+- 找不到任何一个函数match the arguments in the call, 此时compiler <span style="color:red">发出error message no match</span>
+- 如果有大于一个function matches and none of the matches is clearly best, 也发发生错误 <span style="color:red">ambiguous call</span>.
+
+**Overloading and Scope**: <span style="background-color:#FFFF00">In C++ name lookup happens before type checking </span>. 当declare a name in an inner scope, that name hides use of that name declared in outer scope. 
+
+下面例子, when call print, the compiler 首先 look for declaration of print, once the name is found. Compiler 会忽略掉外层scope 一样的命名的function, Instead, the copiler assumes that 在当前作用域中找到的就是the one for the name we are using 
+
+```c++
+string read();
+void print(const string &);
+void print(double); // overloads the print function 
+
+void fooBar(int ival)
+{
+bool read = false; // new scope: hides the outer declaration of read 
+
+string s = read(); // error: read is a bool variable, not a function 
+
+// bad practice: usually it's a bad idea to declare functions at local scope
+
+void print(int); // new scope: hides previous instances of print 
+
+print("Value: "); // error: print(const string &) is hidden 
+
+print(ival); // ok: print(int) is visible
+
+print(3.14); // ok: calls print(int); print(double) is hidden
+
+}
+
+```
+
+
+#### (e.) Features for Specialized Uses
 
 <br/> <br/>
 
