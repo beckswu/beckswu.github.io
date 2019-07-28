@@ -1593,6 +1593,189 @@ char *pc = (char*) ip; // ip是指向整数的指针
 //效果与使用reinterpret_cast一样
 
 ```
+<br/> <br/>
+
+## 5. Statements
+
+The **null statement** is a empty statment ```;```
+
+```c++
+while(iter != svc.end()); //while 循环主体
+
+    ++iter; //iter is not part of the loop
+```
+
+**Dangling(悬垂) else**: 规定了else与最近的if匹配, 比如下面的if else 从初衷来看是为了跟外层的if 匹配, 但是不管怎么锁紧都是跟内层if 比配的. 如果想让与外层if 匹配，需要花括号
+
+```c++
+if (grade > 6)
+    if (grade  > 10 )
+        cout <<" excellent";
+else //与  if (grade  > 10 ) 匹配，实际上是6 < grade < 10进入这个else
+
+//而不是grade < 6进入else
+
+    cout << "fail"
+```
+
+**Do while**: 不要在条件部分定义变量, 然后在while 中判断
+```c++
+do{
+    int i = 1;
+}while( i != 1) // error: declaration in a do condition
+
+```
+
+**Break/continue** 只作用于最近的for, while, switch 
+```c++
+switch(buf[0]) { 
+    case '-':
+        for (auto it = buf.begin()+1; it != buf.end(); ++it)
+        {
+            if (*it == ' ')
+                break;//作用于for, 不会break case
+
+        } 
+
+```
+
+**Goto**:
+-  与switch 类似, 不可以定义初始化的值 然后带出scope (cannot transfter control of initialized varaibl 从初始化的scope到variable被用的scope)
+- A jump backward over an already executed definition is okay(跳回一个已经执行的定义是ok). Jumping back to a point before a variable is defined destroys the variable and constructs it again
+
+```c++
+    goto end;
+    int ix = 10; // error: goto bypasses an initialized variable definition
+
+end: 
+    // error: code here could use ix but the goto bypassed its declaration 
+
+    ix = 42;
+
+```
+```c++
+begin:
+    int sz = get_size(); 
+    if (sz <= 0) {
+        goto begin;
+    }
+// Here sz is destroyed when the goto executes. 
+
+//It is defined and initialized 一个新的sz when jump back to begin
+
+```
+
+#### (a). switch 
+
+- switch 中的case, switch 必须是[integral constant expression](#constexpr) (整型常量表达式), 所以不能用string, double 作为switch 或者case 条件, 可以用simple char(not char*, not char array), int, enum, string\[index] (it's char)
+- 任何两个case 不能相同
+- <span style="background-color:#FFFF00">当一个case match， 会执行接下来所有的case until program explicitly interrupts it</span>, 但是最后一个case 不一定加break, 但为了安全最好加上, 如果有新的case, 如果有新的case, 不用担心前面break
+- 有时候想两个或多个case 值共享一组操作(common set of actions), we ommit a break, allowing program to fall through multiple case labels
+- **default**: 如果没有任意match上, 进入default, 如果default 是空的, 加上default 也是有用的，因为告诉读者我们考虑了全部情况
+- Variable Definitions inside the Body of a switch: 
+    - <span style="color:red">如果定义并初始化的值, it is illegal to bring to outscope</span>
+    - <span style="color:red">如果定义没有初始化，是可以的; </span>
+
+
+```c++
+int ival = 42;
+char ch = getVal();
+switch (ch){
+    case 3.14: //error noninteger as case label
+
+    case ival: // error nonconstant as case label
+
+}
+
+string a = "123";
+switch(a) // error not integral constant expression
+
+```
+
+stack several case together with no break.只要ch是元音，都执行相同代码
+```c++
+unsigned vowelCnt = 0; 
+switch (ch) {
+    // any occurrence of a, e, i, o, or u increments vowelCnt
+
+    case 'a':
+    case 'e':
+    case 'i':
+    case 'o':
+    case 'u':
+        ++vowelCnt;
+        break;
+}
+
+//因为case 之后不一定要换换换行
+
+/ alternative legal syntax
+
+switch (ch)
+{
+    case 'a': case 'e': case 'i': case 'o': case 'u':
+        ++vowelCnt;
+        break;
+}
+
+```
+当omit break时候, 会执行所有的case, 比如```ch = 'e'```,  ```eCnt```, ```iCnt```, ```oCnt```, ```uCnt```, ```d```, 都会加1
+
+```c++
+switch (ch) {
+    case 'a':
+        ++aCnt; // oops: should have a break statement
+
+    case 'e':
+        ++eCnt; // oops: should have a break statement
+
+    case 'i':
+        ++iCnt; // oops: should have a break statement
+
+    case 'o':
+        ++oCnt; // oops: should have a break statement
+
+    case 'u': 
+        ++uCnt;
+
+    default:
+        d++;
+}
+```
+
+可以在别的case 中定义variable, 在别的case中使用; 但是不可以在别的case中 定义并初始化值, 然后在别的scope 使用
+```c++
+case true:
+// this switch statement is illegal because these initializations might be  bypassed
+
+    string file_name; // error: implicit初始化, file_name = ""
+
+    int ival = 0;// error: control bypasses an explicitly initialized variable
+
+    int jval; // ok: because jval is not initialized
+    
+    break; 
+
+case false:
+    // ok: jval is in scope but is uninitialized
+    jval = next_num(); // ok: assign a value to jval
+
+    if (file_name.empty()) // file_name is in scope but wasn't initialized
+
+
+```
+
+
+#### (b). Range for statment  
+
+```c++
+for (declaration : expression)
+     statement
+```
+
+expression must represent a sequence(必须是一个序列), such as a braced initializer list({1,2,3}), an array, or an object such as vector or string (has iterator)
+
+
 
 
 
