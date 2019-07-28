@@ -2044,6 +2044,131 @@ void foo(parm_list, ...);
 void foo(...);
 ```
 
+#### (c). Return Types 
+
+Failing to provide a return after a loop that contains a return is an error(for loop 中有if 然后return, 但是程序fail 进入那个if，所以程序最后到达end of function without return). <span style="color:red">However, many compilers will not detect such errors</span>.
+
+**(1). How Values Are Returned**: The return value is used to initialize a temporary at the call site(调用点), and that temporary is the result of the function call.
+- 如果return是value (<span style="background-color:#FFFF00">returns are **rvalue**</span>), return value is copied to the call site. The function returns a copy of he return value. 
+- 如果return是reference(<span style="background-color:#FFFF00">returns are **lvalue**</span>), reference is just another name for the object to which it refers
+
+当function return 是 list initializing the return value, <span style="color:red">element inside brace list cannot have larger type which require narrowning conversion</span> 
+```c++
+vector<int>get(){
+    return {3.14,5};//3.14->int illegal, 
+
+}
+```
+
+
+**(2). Never Return a Reference or Pointer to a Local Object**: <span style="color:red">after a terminate, reference to local objects refer to memory that is no longer valid.</span>
+
+```c++
+const string &manip()
+{
+    string ret;
+    if (!ret.empty()) return ret; 
+    // WRONG: returning a reference to a local object! 
+
+    else return "Empty";
+    //WRONG: "Empty" is a local temporary string
+
+}
+```
+
+<span style="background-color:#FFFF00">因为function reference 返回时lvalue, we can assign to the result of a function that returns a reference to nonconst </span>
+```c++
+char &get_val(string &str, string::size_type ix)
+{ 
+    return str[ix];
+}
+string s("a value");
+get_val(s, 0) = 'A'; // changes s[0] to A 
+
+cout << s << endl; // prints A value return 0;
+
+```
+
+**(3).Functions That Return Class Types and the Call Operator**: <span style="background-color:#FFFF00">call operator(call function() )的优先级和 dot and arrow operator 一样</span>, call operator is <span style="background-color:#FFFF00">left associative(assignment 是right associative)</span>. 所以if function returns a pointer, reference or object of class type, we can use the result to call a member of the resulting object
+
+```c++
+auto sz = shorterString(s1, s2).size();
+```
+
+**(4). Return from main**: The main function is allowed to terminate without a return. 如果control reaches the end of main and there is no return, compiler implicitly inserts a return of 0. main的返回值看做状态指示器, 返回0表示执行成功, 返回其他值表示执行失败. 非0值得含义由机器俄日定, 为了使返回值与机器无关, ```cstdlib``` header中定义了连个预处理(preprocessor)变量 that we can use to indicate success or failure, <span style="background-color:#FFFF00">因为是预处理变量, 不能加上```std::```, 也不能```using``` 声明中出现.</span> <span style="color:red">注: main function may not call itself</span>
+
+```c++
+int main()
+{
+    if(some_failure)
+        return EXIT_FAILURE; // defined in cstdlib
+
+    else  
+        return EXIT_SUCCESS; // defined in cstdlib
+         
+}
+```
+
+**(5). Return a Pointer to an Array**: <span style="background-color:#FFFF00">因为不能copy an array, a function cannot return an array. However, a function can return a pointer or reference to a array</span>
+
+
+**方法一**: 为了straightforward, 可以用type alias
+
+```c++
+typedef int arrT[10]; //arrT is a synonym for the type array of 10 ints
+
+using arrtT = int[10]; //跟上面一样的
+
+arrT* func(int i); //returns a pointer to an array of 10 ints
+
+```
+
+without type alias,想定义一个函数 that returns a pointer to an array, <span style="background-color:#FFFF00"> dimension(维度)必须跟在函数名字之后, However, function parameter list which also follows the name. Parameter list 在dimension 前面. function 两端的括号必须在, 如果没有括号表示returns an array of pointers 但是array不能被copy</span>
+
+```c++
+Type (*function(parameter_list))[dimension]
+//Dimension 表示数组的大小
+
+//function 两端的括号必须在
+
+int (*func(int i)) [10]; 
+//function take a integer 
+
+//返回a pointer to array of 10 ints
+
+```
+
+**方法二: Using a Trailing Return Type**: 在C++11中, 另一种简化function returns a pointer to array 是 using a **trailing return type**. <span style="background-color:#FFFF00">A trailing return types可以用于任何function, but are most useful for functions with complicated return types(such as pointers to array)</span>. Parameter list 在->左侧, 为了表示函数真的返回类型跟在parameter list 之后, we use ```auto``` for return type
+
+```c++
+// fcn takes an int argument and returns a pointer to an array of ten ints
+
+auto func(int i) -> int(*)[10];
+
+auto func(int i) -> string{
+    return "val";
+}
+```
+
+**方法三: Using decltype**: 
+
+```c++
+int odd[] = {1,3,5,7,9};
+int even[] = {0,2,4,6,8};
+decltype(odd) *arrPtr(int i)
+{
+    return (i % 2) ? &odd : &even; // returns a pointer to the array 
+    
+}
+```
+
+注: ```decltype``` 并不负责把array 转化成pointer type. The type returned by ```decltype``` is an array type, 我们必须加上```*``` to indicate taht ```arrPtr``` returns a pointer
+
+
+
+
+
+
 
 
 <br/> <br/>
