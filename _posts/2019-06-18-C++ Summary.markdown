@@ -2004,15 +2004,45 @@ argv[0] = "prog"; argv[1] = "-d"; argv[2] = "-o";
 argv[3] = "ofile"; argv[4] = "data0"; argv[5] = 0;
 ```
 
-**(9). Functions with Varying Parameters**: 处理不同数量argument: 如果argument类型相同, we can pass **initializer_list**的标准库, 如果函数类型不同, we need to a spec
+**(9). Functions with Varying Parameters**: 处理不同数量argument: <span style="background-color:#FFFF00">如果argument类型相同, we can pass **initializer_list**的标准库, 如果函数类型不同, we need to a special kind of function (variadic template)</span>. 还有一个parameter type (ellipsis) 可以用于传入varying number of arguments. (注意ellipsis should be only used in programs that need to interface to C functions)
 
 
+An **initializer_list** is a library type that represents an array of values of the specified type. This type is defined in the initializer_list header. 
+- <span style="background-color:#FFFF00">unlike vector, element in **initializer_list**  are always ```const``` values, we cannot change the elements in **initializer_list** </span>
+- When we pass a sequence of values to an initializer_list parameter, we must <span style="background-color:#FFFF00">enclose the sequence in curly braces</span>
+
+| Syntax      | Description |
+| :---        | :---    |  
+| ```initializer_list<T>lst``` | Default initialization, an empty list of elements of type T |
+| ```initializer_list<T>lst{a,b,c}``` | elements are copied of correspoding initializers. <span style="color:red"> elements in the list are const </span> | 
+| ```lst2(lst)``` | copy or assigning an initailizer_list 但不会一一拷贝列表中元素. After the copy, the original and the copy share he elements. <span style="color:red">  sallow copy</span>| 
+| ```lst.size()``` | number of elements in list | 
+| ```lst.begin() / lst.end9)``` | returns a pointer to the first / one past the last element in lst|
+
+```c++
+initializer_list<string> ls; // initializer_list of strings 
+
+initializer_list<int> li; // initializer_list of ints
+
+void error_msg(ErrCode e, initializer_list<string> il)
+{
+    cout << e.msg() << ": ";
+    for (auto beg = il.begin(); beg != il.end(); ++beg) 
+        cout << *beg << " " ;
+}
+
+error_msg(ErrCode(42), {"functionX", expected, actual});
+
+```
 
 
+**Ellipsis Parameters(省略符形参)**: Ellipsis parameters are in C++ to allow programs to interface to C code that uses a C library facility named ```varargs```. 不能被用于其他目的. <span style="color:red">Ellipsis只能用于types ftht are common to both C and C++</span>(object of most class types are not copied properly when passd to an ellipsis parameter)
 
-
-
-
+An ellipsis parameter 只能出现在parameter最后一个, and may take either of two forms
+```c++
+void foo(parm_list, ...);
+void foo(...);
+```
 
 
 
