@@ -1776,7 +1776,26 @@ for (declaration : expression)
 expression must represent a sequence(必须是一个序列), such as a braced initializer list({1,2,3}), an array, or an object such as vector or string (has iterator)
 
 
+#### (c). Exception Handling
 
+- when throw error, need to initialize error by give a string or c-style character style
+- Each exception classes define a member function named ```what```, function takes no arguments and return c-style character style (即 ```const char*```), 返回的对象是copy of string used to initialize the object; 对于没有初始值的exception,```what``` returns 由compiler 决定 
+- If no appropriate catch is found, execution is transferred to a library function ```termiante```. 该函数行为与系统有关 but is guaranteed to stop further execution of the program
+
+```c++
+try{
+    throw runtime_error("Data must refer to same object");
+}catch(runtime_error err){
+    cout <<err.what(); //print Data must refer to same objec
+
+}
+```
+
+- ```exception``` header defines 最通用的 exception class, 它只报告exception occur 但没有额外信息
+- ```stdexcept``` header files 几个general-purpose exception classes ```exception ```, ```runtime_error```,```range_error```, ```overflow_error```, ```underflow_error```, ```logical_error```, ```domain_error```, ```invalid_argument```, ```length_error```(试图建立一个超出该类型最大长度的对象), ```out_of_range```
+- ```new``` header defines the ```bad_alloc``` exception type
+- ```type_info``` header defines the ```bad_cast``` exception type 
+- 只能用default initialization ```exception```,  ```bad_alloc```, ```bad_cast```  不允许提供initializer for these exception types
 
 
 
