@@ -141,7 +141,7 @@ int &r3 = i3, &r4 = i2; // both r3 and r4 are references
 - assign pointer <span style="color:red">需要assign 的类型和被assign 类型compatible</span>. 
 - <span style="background-color:#FFFF00">**Pointer is a object whereas reference is not object**</span>
 - <span style="background-color: #FFFF00">It is error to copy or try to access the value of an invalid pointer</span>. As when we use an uninitialized variable, <span style="color: red">this error is one that the compiler is unlikely to detect(编译器不会检查access invalid pointer)</span>. The result of accessing an invalid pointer is undefined. 
--  Given two valid pointers of the same type, we can compare them use<span style="background-color: #FFFF00"> the equality(==) or inequality(!=) operator, Two pointers are equal if the yhold the same address (两个指针存放的地址相同) </span>
+-  Given two valid pointers of the same type, we can compare them use<span style="background-color: #FFFF00"> the equality(==) or inequality(!=) operator, Two pointers are equal if they hold the same address (两个指针存放的地址相同) </span>
 - <span style="background-color: #FFFF00">修饰符 (type modifier \*)仅仅是修饰一个variable</span>,  而非修饰整行所有变量.  Each declarator can relate its variable to the base type differently from the other declarators in the same definition.```int* p1, p2```, p1 是 int pointer, p2 是int, , 如果两个都是pointer 用```int* p1, *p2```
 - deference ```*``` 返回类型是reference,
 
@@ -158,8 +158,8 @@ pi = &dval; //error: assigning the address of a double to a pointer to int
 //上面两个error 都会compile fail
 
 
-int dval;
-double *pi = &dval;//error: types of pi and pd differ, 一个int,一个double, 也是compile error
+int Ival;
+double *dpi = &Ival;//error: types of pi and pd differ, 一个int,一个double, 也是compile error
 
 
 ```
@@ -246,12 +246,12 @@ r = &i;// r refers to a pointer; assigning &i to r makes p point to i
 
 **(1). Reference**
 
-1. ```const```value 必须initialize when define 
+1. ```const```value 必须<span style="color:red">initialize when define</span> 
 2. **Const Value-Value**: 
     - **non const -> const**  value e.g.```int val = 5; const int cst = val;```, <span style="background-color:#FFFF00"> 因为const value是通过复制生成，改变原来值，不会改变const value值</span> e.g. ```int val = 3; const int cstRef = val;val = 10;```, ```cstRef = 3``` , ```val = 10``` 
     - **const -> non const**  const (reference or without reference)  initilize non const value; ```const int & cstRef = 3; int val = cstRef```.
 3. **Const Ref-Ref**:
-    - **Const Ref -> Ref**  <span style="color:red">**Error**</span>  <span style="background-color:#FFFF00"> const reference 不能bind 到non-const reference，因为reference is not object </span> ```const int & ref = 3; int &i = ref; \\error```,
+    - **Const Ref -> Ref**  <span style="color:red">**Error**</span>  <span style="background-color:#FFFF00"> const reference 不能bind 到non-const reference，因为reference is not object </span> ```const int & ref = 3; int &i = ref; //error```,
     - **Ref -> Const Ref** ✔️ ```int val = 3; int & ref = val; const int &cstRef = ref;```
 4. **Ref-Value**:
     - **Ref -> Const Value** ✔️, ```int val = 3; int & ref = val; const int cstRef = ref;```
@@ -352,7 +352,7 @@ const int &ri3 =temp2;//bind ri to that temporary
 **A Reference to const May Refer to an Object That Is Not const**: 当```const reference```initialized时, 并没有generate **temporary object**, 可能会被间接更改```const refernce```的value
 
 ```c++
-int i = 42;
+int i = 60;
 int&r1=i; //r1 boundto i
 
 const int &r2 = i; //r2 also bound to i; but cannot be used to change i
@@ -374,7 +374,7 @@ cout<<i<< ", "<<r1<<", "<<r2<<endl; //print 0, 0 , 0
     -  <span style="background-color: #FFFF00">对于pointer之间的copy, 如果忽略Low Level const</span>, <span style="color:red">**Error**</span> 
        - **Pointer of Const -> Pointer**:  <span style="color:red">**Error**</span> e.g. ```int val = 42; const int * p3Low = val;int * p3 = p3Low;//error```
        - **Const Value -> Pointer**  <span style="color:red">**Error**</span> e.g. ```const double cstVal = 3.14; double *ptr = &cstVal; //error```
-       - **Const Pointer -> Pointer**:✔️ 因为可以忽略top-level constant <span style="color:red">**Error**</span> e.g. ```int i = 0; int * const p = &i; int *a = p;```
+       - **Const Pointer -> Pointer**:✔️ 因为可以忽略top-level constant e.g. ```int i = 0; int * const p = &i; int *a = p;```
     - 对于value 到 const pointer 的copy, 可以忽略low-level const
        -  **Value -> Const Pointer** ✔️  e.g. ```int val = 1; int const * const pLowTop = & val;```
        -  **Const Pointer -> Value** ✔️ ```int j = 0; const int * cstPtr = & j; int val = *cstPtr;```
@@ -445,7 +445,7 @@ const double *const pip = &pi;
 
 #### (d). Constexpr
 
-A **constant expression**: value cannot change and can be evaluated at compile time. A **literal** is a constant expression. By delcaring **constexpr**, we can ask compiler to verify that a variable is a constant expression.  
+A **constant expression**: value cannot change and can be evaluated at compile time. A **literal** is a constant expression. By declaring **constexpr**, we can ask compiler to verify that a variable is a constant expression.  
 
 Const 的缺点, 有时候我们需要**constant expression**, 但用**const**, 生成却不是**constant expression**. 比如, 下面例子even though```sz``` is a ```const```, the value of its initializer is not known until <span style="color:red">run time</span>
 ```c++
@@ -524,11 +524,12 @@ const pstring* ps; //ps is a pointer to a constant pointer to char
 
 #### (f). Auto 
 
-- **auto** tells the compiler to deduce the type from the initializer. By implication, a variable that uses **auto** as its type specifier must have an initializer.
+- **auto** tells the compiler to deduce the type from the initializer. By implication, a variable that uses **auto** as its type specifier <span style="background-color: #FFFF00">must have an initializer</span>.
 - **auto** can define multiple variables in single line, 但是initializers for all the variables in the declaration must <span style="background-color: #FFFF00">have types that are consistent</span>
-- **auto** is not always exactly the same as initializer types. 当用auto时候，<span style="background-color: #FFFF00">top level const通常会被忽略, low-level const 会被kept</span>, 
-- 用**```auto &``` or ```auto*``` ** to auto-deduced type, <span style="background-color: #FFFF00">会keep top level, low-level const</span>
-- 不能用**auto** to deduce from the type from a list of initializer ```auto a = {1,2,3}; \\error```
+- **auto** is not always exactly the same as initializer types. 当用auto时候，<span style="background-color: #FFFF00">top level const通常会被忽略, low-level const 会被kept</span>, <span style="color:red"> 用``auto``` deduced ```int&``` is int, deduce ```const int&```是```int&```</span> 
+- 用```auto &``` or ```auto*``` to auto-deduced type, <span style="background-color: #FFFF00">会keep top level, low-level const</span>
+- 不能用**auto** to deduce the type from a list of initializer ```auto a = {1,2,3}; //error```
+- <span style="background-color: #FFFF00">用```auto``` deduced array 是pointer type</span>
 
 可以定义多个variables in single line, 但是需要都是一个类型(type)的
 ```c++
