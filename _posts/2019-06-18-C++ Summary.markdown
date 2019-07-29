@@ -1261,8 +1261,8 @@ last = *ia + 4; //0 + 4 = 4
 ```
 
 - The precedence of postfix / prefix increment 高于deference 
-    - ```*pbeg++``` is equlalen to ```*(pbeg++)```, ```pbeg++``` increment ```pbeg``` and return a copy of previous value as rvalue 
-    - ```*++pbeg``` is equlalen to ```*(++pbeg)``` increment value and return as **lvalue** and dereference
+    - ```*pbeg++``` is equivalent to ```*(pbeg++)```, ```pbeg++``` increment ```pbeg``` and return a copy of previous value as rvalue 
+    - ```*++pbeg``` is equivalent to ```*(++pbeg)``` increment value and return as **lvalue** and dereference
 - dereference has a lower precedence than dot,
     -   ```(*p).size()```如果我们忽略了括号, ```*p.size()``` error 因为pointer doesn't have member size. ```p->size()```<span style="background-color:#FFFF00"> yields an **lvalue**. The dot operator yields an lvalue if the object from which the member(成员所属对象) is fetched is an lvalue; otherwise the result is an rvalue. </span>
 - The conditional operator has fairly low precedence (比较对象优先级低). When we embed a conditional expression in a larger expression, 通常需要parathesize 
@@ -1389,7 +1389,7 @@ a = a op b;//等同于
 
 ```
 
-The problem is both left- and right-hand operands use beg and right-hand operand changes beg. The assignment is undefined, 不知道是赋值时候是 ```*beg = ``` 还是 ```*(beg+1) = ```, 因为```beg++ = ```返回时rvalue, 但是increment的是lvalue变成```beg+1```;
+The problem is both left- and right-hand operands use beg and right-hand operand changes beg. The assignment is undefined, 不知道是赋值时候是 ```*beg = ``` 还是 ```*(beg+1) = ```, 因为不知道是赋值先```*beg=toupper()``` 还是 ```*beg = *beg++```先
 
 ```c++
 while (beg != s.end() && !isspace(*beg))
@@ -1409,7 +1409,7 @@ while (beg != s.end() && !isspace(*beg))
 - There are no guarantees for how sign bit is handled, we strongly recommend using unsigned types with bitwise operators (对于unsigned 没有要求, 建议使用signed)
 -  Bitwise Shift operators yield a value that is copy of left-hand operand 但是 <span style="color:red"> right-hand operand must not be negative. </span> e.g. ```5<<-3``` <span style="color:red"> **Error**</span>
 -  left shift operator ```<<``` insert 0-valued bit on the right. 而 right shift operator ```>>``` depends on the type of left-hand operand: 如果operand is unsigned, then operator insert 0 bits 在左侧, 如果signed, insert copies of sign bit or 0 bits 在左侧 
-- Shift Operators (aka IO Operators) Are Left Associative ```cout << "hi" << " there" << endl;``` 等同于 ```( (cout << "hi") << " there" ) << endl;```
+- <span style="color:red">Shift Operators (aka IO Operators) are **Left Associative**</span> ```cout << "hi" << " there" << endl;``` 等同于 ```( (cout << "hi") << " there" ) << endl;```
 - The shift operators have midlevel precedence: lower than the arithmetic operators but higher than the relational, assignment, and conditional operators. <span style="background-color:#FFFF00"> (位移低于算数，高于比较), 意味着我们经常需要括号去正确 group operators </span>
 
 Example. 用每一个bit 表示学生通过or fail 测验, 看第27名同学
@@ -1433,9 +1433,9 @@ bool status = quiz1 & (1<<27) //学生27是否通过测验
   - ```sizeof char``` = 1 guaranteed 
   - sizeof reference returns the size of 被引用对象
   - sizeof pointer 得到指针本身空间大小 (the size neeed hold a pointer)
-  - sizeof a deferenceed pointer, 返回指针所指对象的所占空间小, 指针不需要有效
+  - sizeof a deferenced pointer, 返回指针所指对象的所占空间小, 指针不需要有效
   - sizeof an array is the size of the entire array (整个数组的size of entire array). 等于 sizeof element 乘以 the number of elements. <span style="background-color:#FFFF00">注意sizeof does not conver the array to a pointer.</span>
-  - sizeof a string or vector<span style="background-color:#FFFF00">该类型固定部分的小小(the size of fixed part of these types)，不会计算对象中元素占用了多少空间 (does not return the size used by the object's element)</span> 
+  - sizeof a string or vector<span style="background-color:#FFFF00">该类型固定部分的大小(the size of fixed part of these types)，不会计算对象中元素占用了多少空间 (does not return the size used by the object's element)</span> 
 
 ```sizeof *p;``` <span style="background-color:#FFFF00">```sizeof``` 满足右结合律 并且与 ```*```优先级一样 </span>, 从右向左顺序组合， 等价于 ```sizeof(*p)```, 其次sizeof 不会求运算对象(operands)的值, 即使是无效(invalid, 即uninitialized)也没有任何影响, <span style="background-color:#FFFF00">在```sizeof``` 中, deferenence is safe , 因为指针实际上没有真正使用, ```sizeof``` 不需要真的deference 指针，也能只能它所指向的对象类型 </span> . 
 
@@ -1517,7 +1517,7 @@ ui + l;//根据unsigned int 和 long 所占空间大小比较
     - <span style="background-color:#FFFF00">当Array 用在```decltype```, ```&```, ```sizeof``` 以及 ```typeid```中不会发转化, </span>, 或者当引用初始化数组也不会 ```int (&arrRef)[10] = &ia```
 - Pointer Conversion:  <span style="background-color:#FFFF00">a pointer to any nonconst type can be converted to ```void*```, any a pointer to any type can be converted to a ```const void *```</span> 
 - Pointer -> Bool: If pointer value is zero, the conversion yield false, otherwise true  ```char * cp = get_string(); if(cp)```
-- to Const: 允许pointer to a non const type to a pointer o the const type and reference. e.g. T is the type, 可以convert a pointer / reference to T into a pointer or reference to const T 
+- to Const: 允许pointer to a non const type to a pointer to the const type and reference. e.g. T is the type, 可以convert a pointer / reference to T into a pointer or reference to <span style="color:red"> const</span> T 
 - Conversion defined by Class Types: Class types 可以定义conversions that the compiler will aplly automatically. The compiler apply only one class-type conversion at a time. e.g. ```string s; while(cin >> s); ``` while 把 cin 转化成bool  
 
 
@@ -1552,7 +1552,7 @@ cout<< cp <<" , " << newp<<" , "<< newp2<<endl; //20, 20, 30
 
 ```
 
-**static_cast** is often use when a large arithmetic type is assigned to a smaller type. 一般来说 如果compiler 发现一个较大的类型试图赋值给较小的类型, 会generate warning. 但是当我们do a explicit cast, the warning message is turned off. 
+**static_cast** is often use when a large arithmetic type is assigned to a smaller type. 一般来说 如果compiler 发现一个较大的类型试图赋值给较小的类型, 会generate warning.  <span style="color:red">但是当我们do a explicit cast, the warning message is turned off.</span> 
 
 static cast is useful when perform a version that compiler不会自动转换的. 例如, <span style="background-color:#FFFF00">we can use static_cast to retrieve pointer value that was stored in a ```void*```pointer</span>
 
@@ -1686,7 +1686,7 @@ begin:
 
 - switch 中的case, switch 必须是[integral constant expression](#constexpr) (整型常量表达式),<span style="background-color:#FFFF00"> 所以不能用string, double 作为switch 或者case 条件, 可以用simple char(not char*, not char array), int, enum, string\[index] (it's char)</span>
 - 任何两个case 不能相同
-- <span style="background-color:#FFFF00">当一个case match， 会执行接下来所有的case until program explicitly interrupts it</span>, 但是最后一个case 不一定加break, 但为了安全最好加上, 如果有新的case, 这样不用担心前面break
+- <span style="background-color:#FFFF00">如果没有break, 当一个case match， 会执行接下来所有的case until program explicitly interrupts it</span>, 但是最后一个case 不一定加break, 但为了安全最好加上, 如果有新的case, 这样不用担心前面break
 - 有时候想两个或多个case 值共享一组操作(common set of actions), we omit a break, allowing program to fall through multiple case labels
 - **default**: 如果没有任意match上, 进入default, 如果default 是空的, 加上default 也是有用的，因为告诉读者我们考虑了全部情况
 - Variable Definitions inside the Body of a switch: 
@@ -1933,7 +1933,7 @@ print(j); // ok: j is converted to an int* that points to j[0],
 
 ```
 
-<span style="background-color:#FFFF00">function parameter 是 array, size doesn't matter</span>
+<span style="background-color:#FFFF00">function parameter 是 array, **size doesn't matter**</span>
 ```c++
 void print(int arr[3]){
    cout << arr[0]<<endl;
@@ -1986,7 +1986,7 @@ intj[]={0,1};
 print(j, end(j) - begin(j));
 ```
 
-**(6).Array Reference Parameters** 只有需要change the value, 采用Array reference, 如果不改变value, 用 pointer to const, 当有引用时, <span style="background-color:#FFFF00">只能传入与引用size 一样维度的array,size matters</span>, 比如下面的function, 只能传入size = 10的  
+**(6).Array Reference Parameters** 只有需要change the value, 采用Array reference, 如果不改变value, 用 pointer to const, 当有引用时, <span style="background-color:#FFFF00">只能传入与引用size 一样维度的array,**size matters**</span>, 比如下面的function, 只能传入size = 10的  
 
 ```c++
 void print(int (&arr)[10])
@@ -2009,7 +2009,7 @@ print(k); // ok: argument is an array of ten ints
 
 ```
 
-**(7). Passing a Multidimensional Array**: 实际上没有真正的多维数组. Multidimensional array is passed as a pointer to its first element (因为时多维数组, the first element 还是 a pointer to the first element). <span style="background-color:#FFFF00">The size of the second (and any subsequent) dimension is part of the element type and must be specified (second dimension matters)</span>
+**(7). Passing a Multidimensional Array**: 实际上没有真正的多维数组. Multidimensional array is passed as a pointer to its first element (因为时多维数组, the first element 还是 a pointer to the first element). <span style="background-color:#FFFF00">The size of the second (and any subsequent) dimension is part of the element type and must be specified (**second dimension size matters**)</span>
 
 ```c++
 void print(int (*matrix)[10], int rowSize) { /* . . . */ }
