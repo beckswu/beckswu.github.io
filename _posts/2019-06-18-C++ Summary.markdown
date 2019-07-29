@@ -584,6 +584,7 @@ auto &n = i, *p2 = & cval;
 #### (g). Decltype 
 
 - **decltype**: compiler analyzes the expression to determine its <span style="background-color: #FFFF00">type</span> but does <span style="background-color: #FFFF00">not evaulate the expression </span>
+- <span style="color:red">**decltype** array 是array type, 而不是pointer type</span>
 - handles **top-level const** subtly different from **auto**
     - **variables**: <span style="background-color: #FFFF00">include **top-level const** and reference</span>
     - **expression**: we can get the type that expression yields. <span style="background-color: #FFFF00">注:Dereference operator(\*) yields type as reference</span>
