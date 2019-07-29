@@ -1821,7 +1821,7 @@ try{
 
 #### (a). Function Basic
 
-**Calling a Function**. A function does 2 things. 1. <span style="color:red"> Initializes the function's parameter</span> from corresponding argument, and it <span style="color:red">transfter control</span> to function. 2. Execution of <span style="color:red">the *calling* function(主调函数) is suspended</span> and execution of <span style="color:red">the *called* function begins</span(被调函数, 函数主题)
+**Calling a Function**. A function does 2 things. 1. <span style="color:red"> Initializes the function's parameter</span> from corresponding argument, and it <span style="color:red">transfer control</span> to function. 2. Execution of <span style="color:red">the *calling* function(主调函数) is suspended</span> and execution of <span style="color:red">the *called* function begins</span>(被调函数, 函数主题)
 
 当function 执行完成: the return statment does 2 things. 1. return the value in the return 2. <span style="color:red">transfers control out of the *called* function back to the *calling function*</span>
 
