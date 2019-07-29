@@ -22,12 +22,12 @@ cout<<" Line Number "<<__LINE__<<endl; //打印现在现在的行数
 - function return reference 可以用non-reference 去接, non-reference 接的话借的是copy 
 - namespace 中function 不是在class 但是声明了 static 是  give **internal linkage**, meaning that it is only accessible within the translation unit that contains the definition. Without static, it has external linkage, and is accessible in any translation unit. So you'd use static (or, alternatively, an unnamed namespace) when writing a function that's only intended for use within this unit; the internal linkage means that other units can define different functions with the same name without causing naming conflicts.
 
-## Variable and Basic Types
+## 2. Variable and Basic Types
 
 <span style="background-color: #FFFF00">**Initialization is not assignment**</span>. Initialization happens when a variable is given a value *when it is created*.(创建变量时 赋予它一个初始值). **Assignment** obliterates an object's current value and replaces that value with a new one (
 <span style="background-color: #FFFF00">把对象当前值擦除，用一个新值代替</span>)
 
-#### Initialization, Definition, Declaration, Scope
+#### (a). Initialization, Definition, Declaration, Scope
  
 **(1). List Initialization**
 
@@ -95,7 +95,7 @@ int main(){
 
 
 
-#### Compound Types
+#### (b). Compound Types
 
 A **compount type** is a type that is defined in terms of another type, which is references and pointers
 
@@ -237,7 +237,7 @@ r = &i;// r refers to a pointer; assigning &i to r makes p point to i
 
 <span style="background-color: #FFFF00"> **离变量名最近的符号(symbol， 上面例子 &r 的符号& ) 对变量类型有最直接的影响, 因此r是一个引用;**</span>
 
-#### Const Qualifier
+#### (c). Const Qualifier
 
 1. 非reference, 非 pointer,Const Initialize时候 等号两边type可以不一样, e.g. 
     - ```int a = 0; const double b = a;```
@@ -443,7 +443,7 @@ const double *const pip = &pi;
 
 ```
 
-#### Constexpr
+#### (d). Constexpr
 
 A **constant expression**: value cannot change and can be evaluated at compile time. A **literal** is a constant expression. By delcaring **constexpr**, we can ask compiler to verify that a variable is a constant expression.  
 
@@ -499,7 +499,7 @@ constexpr int * pTop2 = &i;
 
 ```
 
-#### Type Aliases
+#### (e). Type Aliases
 
 **Type Alias** is a name that is a synonym for another type 
 
@@ -522,7 +522,7 @@ const pstring* ps; //ps is a pointer to a constant pointer to char
 ```const pstring```(不等于 ```const char * ```) is constant pointer to char, not a pointer to ```const char```, <span style="color:red">如果直接replace the alias with its correspoinding type 是错误的, **Error**</span>, 如果想要pointer to ```const char```, 需要重新定义```typedef const char * pstring```
 
 
-#### Auto 
+#### (f). Auto 
 
 - **auto** tells the compiler to deduce the type from the initializer. By implication, a variable that uses **auto** as its type specifier must have an initializer.
 - **auto** can define multiple variables in single line, 但是initializers for all the variables in the declaration must <span style="background-color: #FFFF00">have types that are consistent</span>
@@ -580,7 +580,7 @@ auto &n = i, *p2 = & cval;
 
 ```
 
-#### Decltype 
+#### (g). Decltype 
 
 - **decltype**: compiler analyzes the expression to determine its <span style="background-color: #FFFF00">type</span> but does <span style="background-color: #FFFF00">not evaulate the expression </span>
 - handles **top-level const** subtly different from **auto**
@@ -630,15 +630,15 @@ decltype(i) e;//ok: e is an int (uninitialized)
 
 <br/>
 
-## Strings, Vectors, and Arrays
+## 3. Strings, Vectors, and Arrays
 
-#### Namespace using Declarations
+#### (a). Namespace using Declarations
 
 - ```std::cin``` use the **scope operator(::)** says want to use the name ```cin``` from the namespace ```std```
 - ```using namespace::name``` : A **using declaration** let us use a name from a namespace without qualifying the name with a ```namespace_name:: ```prefix
 - <span style="background-color: #FFFF00"> Headers should not not include using declarations</span>. 原因: the contents of a header are copied into the including program's text. If a header has a ```using``` declaraction. 那么every program that includes that header gets that same ```using``` declaraction. As a result, program didn't intend to use the specified library name <span style="color:red">might encounter unexpected name conflicts.</span>
 
-#### String 
+#### (b). String 
 
 **(1). Initialization**
 
@@ -728,7 +728,7 @@ for (auto &c : s) // for every char in s (note: c is a reference)
 cout << s << endl;
 ```
 
-#### Vector
+#### (c). Vector
 
 We can define ```vector``` to hold objects of most any type. Becauses <span style="background-color:#FFFF00"> references are not objects, **we cannot have a vector of references** </span>
 
@@ -787,7 +787,7 @@ vector::size_type; //错误
 for loop vector 不能改变vector的大小(size) (add, delete)
 
 
-#### Iterators
+#### (d). Iterators
 
 All of library **containers** have **iterators**. but only a few of them support the subscript operator 
 
@@ -828,7 +828,7 @@ auto it3 = v.cbegin(); // eturn vector<int>::const_iterator
 比如vector insert 也许会invalidate iterators: It is import to realize 当用iterator loop 不要add remove elements to the container which iterator refer. 
 
 
-#### Arrays
+#### (e). Arrays
 
 - Unlike **vector**, <span style="background-color:#FFFF00">**array** have fixed size; we cannot add elements to an array. </span>
 - 因为arrays have fixed size, they sometimes offer better run-time performance for specialized applications, 但是相应也损失了一些灵活性(flexibility)
