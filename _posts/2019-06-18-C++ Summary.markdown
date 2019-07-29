@@ -143,7 +143,7 @@ int &r3 = i3, &r4 = i2; // both r3 and r4 are references
 - <span style="background-color: #FFFF00">It is error to copy or try to access the value of an invalid pointer</span>. As when we use an uninitialized variable, <span style="color: red">this error is one that the compiler is unlikely to detect(编译器不会检查access invalid pointer)</span>. The result of accessing an invalid pointer is undefined. 
 -  Given two valid pointers of the same type, we can compare them use<span style="background-color: #FFFF00"> the equality(==) or inequality(!=) operator, Two pointers are equal if they hold the same address (两个指针存放的地址相同) </span>
 - <span style="background-color: #FFFF00">修饰符 (type modifier \*)仅仅是修饰一个variable</span>,  而非修饰整行所有变量.  Each declarator can relate its variable to the base type differently from the other declarators in the same definition.```int* p1, p2```, p1 是 int pointer, p2 是int, , 如果两个都是pointer 用```int* p1, *p2```
-- deference ```*``` 返回类型是reference,
+- deference ```*``` 返回类型是reference,所以可以用```int *p = &i; *p = 5;//change object```
 
 ```c++
 double dval;
