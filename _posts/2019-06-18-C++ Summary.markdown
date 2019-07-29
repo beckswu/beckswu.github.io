@@ -526,7 +526,7 @@ const pstring* ps; //ps is a pointer to a constant pointer to char
 
 - **auto** tells the compiler to deduce the type from the initializer. By implication, a variable that uses **auto** as its type specifier <span style="background-color: #FFFF00">must have an initializer</span>.
 - **auto** can define multiple variables in single line, 但是initializers for all the variables in the declaration must <span style="background-color: #FFFF00">have types that are consistent</span>
-- **auto** is not always exactly the same as initializer types. 当用auto时候，<span style="background-color: #FFFF00">top level const通常会被忽略, low-level const 会被kept</span>, <span style="color:red"> 用``auto``` deduced ```int&``` is int, deduce ```const int&```是```int&```</span> 
+- **auto** is not always exactly the same as initializer types. 当用auto时候，<span style="background-color: #FFFF00">top level const通常会被忽略, low-level const 会被kept</span>, <span style="color:red"> 用```auto``` deduced ```int&``` is int, deduce ```const int&```是```int&```</span> 
 - 用```auto &``` or ```auto*``` to auto-deduced type, <span style="background-color: #FFFF00">会keep top level, low-level const</span>
 - 不能用**auto** to deduce the type from a list of initializer ```auto a = {1,2,3}; //error```
 - <span style="background-color: #FFFF00">用```auto``` deduced array 是pointer type</span>
