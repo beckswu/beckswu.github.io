@@ -1823,7 +1823,7 @@ try{
 
 **Calling a Function**. A function does 2 things. 1. <span style="color:red"> Initializes the function's parameter</span> from corresponding argument, and it <span style="color:red">transfer control</span> to function. 2. Execution of <span style="color:red">the *calling* function(主调函数) is suspended</span> and execution of <span style="color:red">the *called* function begins</span>(被调函数, 函数主题)
 
-当function 执行完成: the return statment does 2 things. 1. return the value in the return 2. <span style="color:red">transfers control out of the *called* function back to the *calling function*</span>
+当function 执行完成: the return statement does 2 things. 1. return the value in the return 2. <span style="color:red">transfers control out of the *called* function back to the *calling function*</span>
 
 **Parameters and Arguments(形参和实参)**<span style="color:red">Arguments are the initializers for a function’s parameters.</span> e.g. **int fact(int val); fact(5)**, 5 是argument and ```val```是parameter
 
@@ -1835,14 +1835,14 @@ void f2(void){ /* ... */ } // explicit void parameter list
 
 ```
 
-**Function Return Type**: return type can be void. <span style="background-color:#FFFF00">但是不能使array type or function type.</span>, 但是可以return a pointer to array or a function. 
+**Function Return Type**: return type can be void. <span style="background-color:#FFFF00">但是不能是array type or function type.</span>, 但是可以return a pointer to array or a function. 
 
 **local variable**: 如果局部变量和外面变量名字一样, <span style="color:red">
 局部变量会hide declarations of the same name made in outer scope</span>
 
 **automatic objects**: object exist only while a block is executing. 在执行完block, value of automatic objects 被销毁, the values of automatic objects are undefined.
 
-**local static objects**: is intialized when the first time execution pass through object definitions. 知道program terminate destoryed. 如果不提供初始值, 将执行value initailized 意味着local statics of built-in type are initialized to 0 (内置类型的静态 被初始化为0) 
+**local static objects**: is intialized when the first time execution pass through object definitions. 直到program terminate destoryed. 如果不提供初始值, 将执行value initailized 意味着local statics of built-in type are initialized to 0 (内置类型的静态 被初始化为0) 
 
 ```c++
 size_t count_calls(){
@@ -1851,16 +1851,17 @@ size_t count_calls(){
     return ++ctr;
 } 
 ```
-**Function Declarations**: 可以被declared (声明)多次, 但只能定义一次. 声明不需要函数主题, 用一个分号代替即可(也可以省略parameter的名字) ```void pint(vector<int>&li);```
+**Function Declarations**: 可以被declared (声明)多次, 但只能定义一次. 声明不需要函数主体, 用一个分号代替即可(也可以省略parameter的名字) ```void pint(vector<int>&li);```
 
 These 3 elements—return type, function name, and parameter types—describe the function’s interface. They specify all the information we need to call the function. Function declarations are also known as the function **prototype**.
 
 #### (b). Argument Passing
 
-**(1). Pointer Parameter**: nonreference type, <span style="background-color:#FFFF00">when we copy pointer, the value of the pointer is copied. After the copy, two pointers are distinct(pointer地址不同的, 但指向相同的对象). </span>, 因为pointer give indirect access the object, 所以可以通过指针修改object的值
+**(1). Pointer Parameter**: nonreference type, <span style="background-color:#FFFF00">when we copy pointer, the value of the pointer is copied. After the copy, two pointers are distinct(pointer地址不同的, 但指向相同的对象, which means 如果更改function 内部的pointer 指代对象不会影响外面的pointer). </span>, 因为pointer give indirect access the object, 所以可以通过指针修改object的值
 
 ```c++
 //case 1: pointer is different 
+
 void reset(int *ip){
     int j = 10;
     ip = &j;
@@ -1872,6 +1873,7 @@ cout << *p << " , "<<i<<endl; //print 0, 0
 
 
 //case 2: 可以改变object的值
+
 void reset(int *ip){
     *ip = 10;
 }
@@ -1881,11 +1883,11 @@ cout << *p << " , "<<i<<endl; //print 10, 10
 
 ```
 
-**(2) Reference Parameter**: Using Reference Parameters to Return Additional Information
+**(2) Reference Parameter**: Can use Reference Parameters to return additional information
 
 **(3). const Parameters and Arguments**: <span style="background-color:#FFFF00">when we copy an argument to initialize a parameter. top-level const are ignored. 顶层const被ignore</span> We can pass either a const or a nonconst object to a parameter that has a top-level const:
 
-因为顶层const 被忽略掉, 所以两个fun是一样的function
+因为顶层const 被忽略掉, 所以两个fun, 两个reset function是一样的function
 ```c++
 void fcn(const int i) // 可以pass int or const int 
 
@@ -1907,16 +1909,16 @@ void isSentence(const string & s){
     return find_char(s, 'a'); //error 因为不能pass const reference to reference 
 
 }
-
 ```
 
 **(5). Array Parameters**
 
 数组有两个性质: 1. cannot copy an array 2. when use array, it convert to a pointer. <span style="background-color:#FFFF00"> 因为不能拷贝, cannot pass by value. 因为array convert to pointer, 当pass array, we actutally pass a pointer to the array's first element.</span>. <span style="background-color:#FFFF00">当call function时, array size is irrelevant</span>
 
-下面是哪个函数declarations are qquivalent; 每一个function 都是有一个parameter of type ```const int*```, 如果都在一个程序中写出下面三个function, compiler会显示redefintion error. 
+下面是几个函数declarations are equivalent; 每一个function 都是有一个parameter of type ```const int*```, 如果都在一个程序中写出下面三个function, compiler会显示<span style="color:red">redefintion error.</span> 
 ```c++
 // each function has a single parameter of type const int*
+
 void print(const int*);
 void print(const int[]); //可以看出来, 函数意图是作用于数组
 
@@ -1931,9 +1933,21 @@ print(j); // ok: j is converted to an int* that points to j[0],
 
 ```
 
+<span style="background-color:#FFFF00">function parameter 是 array, size doesn't matter</span>
+```c++
+void print(int arr[3]){
+   cout << arr[0]<<endl;
+}
+
+int a [6] = {0,1,2,3,4,5};
+print(a); //print 0
+
+```	
+	
+
 因为arrays are passed as pointer, functions 通常不知道size of the array, caller必须提供额外的信息
 
-方法一：Using a Marker to Specify the Extent of an Array. e.g. C-style character strings 有null character at the end. <span style="color:red">**缺点是**: not work well that don't have end-marker like ```int```</span>
+方法一：Using a Marker to specify the extent of an Array. e.g. C-style character strings 有null character at the end. <span style="color:red">**缺点是**: not work well that don't have end-marker like ```int```</span>
 ```c++
 void print(const char *cp)
 {
@@ -1972,7 +1986,7 @@ intj[]={0,1};
 print(j, end(j) - begin(j));
 ```
 
-**(6).Array Reference Parameters** 只有需要change the value, 采用Array reference, 如果不改变value, 用 pointer to const, 当有引用时, <span style="background-color:#FFFF00">只能传入与引用size 一样维度的array</span>, 比如下面的function, 只能传入size = 10的  
+**(6).Array Reference Parameters** 只有需要change the value, 采用Array reference, 如果不改变value, 用 pointer to const, 当有引用时, <span style="background-color:#FFFF00">只能传入与引用size 一样维度的array,size matters</span>, 比如下面的function, 只能传入size = 10的  
 
 ```c++
 void print(int (&arr)[10])
@@ -1995,7 +2009,7 @@ print(k); // ok: argument is an array of ten ints
 
 ```
 
-**(7). Passing a Multidimensional Array**: 实际上没有真正的多维数组. Multidimensional array is passed as a pointer to its first element (因为时多维数组, the first element 还是 a pointer to the first element). <span style="background-color:#FFFF00">The size of the second (and any subsequent) dimension is part of the element type and must be specified</span>
+**(7). Passing a Multidimensional Array**: 实际上没有真正的多维数组. Multidimensional array is passed as a pointer to its first element (因为时多维数组, the first element 还是 a pointer to the first element). <span style="background-color:#FFFF00">The size of the second (and any subsequent) dimension is part of the element type and must be specified (second dimension matters)</span>
 
 ```c++
 void print(int (*matrix)[10], int rowSize) { /* . . . */ }
@@ -2023,7 +2037,7 @@ argv[3] = "ofile"; argv[4] = "data0"; argv[5] = 0;
 
 An **initializer_list** is a library type that represents an array of values of the specified type. This type is defined in the initializer_list header. 
 - <span style="background-color:#FFFF00">unlike vector, element in **initializer_list**  are always ```const``` values, we cannot change the elements in **initializer_list** </span>
-- When we pass a sequence of values to an initializer_list parameter, we must <span style="background-color:#FFFF00">enclose the sequence in curly braces</span>
+- When we pass a sequence of values to an initializer_list parameter, we must <span style="background-color:#FFFF00">enclose the sequence in curly braces```{}```</span>
 
 | Syntax      | Description |
 | :---        | :---    |  
@@ -2109,7 +2123,7 @@ cout << s << endl; // prints A value return 0;
 auto sz = shorterString(s1, s2).size();
 ```
 
-**(4). Return from main**: The main function is allowed to terminate without a return. 如果control reaches the end of main and there is no return, compiler implicitly inserts a return of 0. main的返回值看做状态指示器, 返回0表示执行成功, 返回其他值表示执行失败. 非0值得含义由机器俄日定, 为了使返回值与机器无关, ```cstdlib``` header中定义了连个预处理(preprocessor)变量 that we can use to indicate success or failure, <span style="background-color:#FFFF00">因为是预处理变量, 不能加上```std::```, 也不能```using``` 声明中出现.</span> <span style="color:red">注: main function may not call itself</span>
+**(4). Return from main**: The main function is allowed to terminate without a return. 如果control reaches the end of main and there is no return, compiler implicitly inserts a return of 0. main的返回值看做状态指示器, 返回0表示执行成功, 返回其他值表示执行失败. 非0值得含义由机器而定. 为了使返回值与机器无关, ```cstdlib``` header中定义了连个预处理(preprocessor)变量 that we can use to indicate success or failure, <span style="background-color:#FFFF00">因为是预处理变量, 不能加上```std::```, 也不能```using``` 声明中出现.</span> <span style="color:red">注: main function may not call itself</span>
 
 ```c++
 int main()
@@ -2176,7 +2190,7 @@ decltype(odd) *arrPtr(int i)
 }
 ```
 
-注: ```decltype``` 并不负责把array 转化成pointer type. The type returned by ```decltype``` is an array type, 我们必须加上```*``` to indicate taht ```arrPtr``` returns a pointer
+注: ```decltype``` 并不负责把array 转化成pointer type. The type returned by ```decltype``` is an array type, 我们必须加上```*``` to indicate that ```arrPtr``` returns a pointer
 
 #### (d). Overloaded Functions
 
@@ -2191,9 +2205,10 @@ bool lookup(const Account&);//error: only return type is different
 
 ```
 
-Determine whether two paraeter types differ
+Determine whether two parameter types differ
 ```c++
 // each pair declares the same function 每一组function 都是一样的
+
 Record lookup(const Account &acct);
 Record lookup(const Account&); // parameter names are ignored
 
