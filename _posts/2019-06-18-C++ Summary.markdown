@@ -143,6 +143,7 @@ int &r3 = i3, &r4 = i2; // both r3 and r4 are references
 - <span style="background-color: #FFFF00">It is error to copy or try to access the value of an invalid pointer</span>. As when we use an uninitialized variable, <span style="color: red">this error is one that the compiler is unlikely to detect(编译器不会检查access invalid pointer)</span>. The result of accessing an invalid pointer is undefined. 
 -  Given two valid pointers of the same type, we can compare them use<span style="background-color: #FFFF00"> the equality(==) or inequality(!=) operator, Two pointers are equal if the yhold the same address (两个指针存放的地址相同) </span>
 - <span style="background-color: #FFFF00">修饰符 (type modifier \*)仅仅是修饰一个variable</span>,  而非修饰整行所有变量.  Each declarator can relate its variable to the base type differently from the other declarators in the same definition.```int* p1, p2```, p1 是 int pointer, p2 是int, , 如果两个都是pointer 用```int* p1, *p2```
+- deference ```*``` 返回类型是reference,
 
 ```c++
 double dval;
@@ -1233,7 +1234,7 @@ for(int_array * p = ia; p!= ia + 3; ++p)
 
 **Overloading Operators**: the type of operands(运算对象的类型) and the result 取决于 how the opeartor is defined. 但是the number of operands and ther precedence(优先级) and the associativity (结合律) of the operator cannot be changed (运算对象个数, 优先级, 结合律不能改变)
 
-#### lvalue / rvalue 
+#### (a). lvalue / rvalue 
 
 - When use an object as **rvalue**, <span style="background-color:#FFFF00"> We use an object value(**its contents**)</span>. 当we use an object as **lvalue**,  <span style="background-color:#FFFF00">we use the object's identity (**its location in memory**). </span>
 - **lvalue expression** yields an object or function. However, some lvalues such as ```const``` objects may not be left-hand operand of an assignment  
@@ -1246,7 +1247,7 @@ for(int_array * p = ia; p!= ia + 3; ++p)
     - <span style="background-color:#FFFF00">prefix operators (```++i```) return the object itself as **lvalue**, postfix```i++``` return a copy of the object's original value as **rvalue**</span>
     - <span style="background-color:#FFFF00">用```decltype```时候, 当我们apply ```decltype```时候, 假如```p```是 ```int*```, deference yields a lvalue```decltype(*p)``` is ```int&```. Address-of operator yields an rvalue, ```decltype(&p)``` is ```int**```
 
-#### Precedence and Associativity 
+#### (b). Precedence and Associativity 
 
 when Precedence and associativity matter
 
@@ -1330,7 +1331,7 @@ cout << i << ", " << ++i <<endl;// undefined
 f() + g() * h() + j()
 ```
 
-#### Arithmetic Operators
+#### (c). Arithmetic Operators
 
 **overflow** happens when a value is computed that is <span style="color:red">outside the range of values</span>. 比如下面例子,shorts are 16 bits. maximum short is 32767. the value wrapped around. The sign bit which had been 0 is set to 1, resultung in a negative value. 在其他system, the result might be different(也许会crash entirely).  On many systems, there is no compile-time or run-time warning when an overflow occurs. 
 
@@ -1356,7 +1357,7 @@ cout << val; //print -32769
 
 不可以写成 ```if(i<j<k)``` 因为```i<j```产生是true or false, 就变成```true/false < k```
 
-#### Assignment Operators
+#### (d). Assignment Operators
 
 - Assignment is **right associative**. 
 - <span style="background-color:#FFFF00">prefix operators (```++i```) return the object itself as **lvalue**, postfix```i++``` return a copy of the object's original value as **rvalue**</span>,  <span style="color:red">postfix may be costly. 因为要储存一个copy 再做increment/decrement</span>
@@ -1403,7 +1404,7 @@ while (beg != s.end() && !isspace(*beg))
 
 ```
 
-#### Bitwise Operators
+#### (e). Bitwise Operators
 
 - There are no guarantees for how sign bit is handled, we strongly recommend using unsigned types with bitwise operators (对于unsigned 没有要求, 建议使用signed)
 -  Bitwise Shift operators yield a value that is copy of left-hand operand 但是 <span style="color:red"> right-hand operand must not be negative. </span> e.g. ```5<<-3``` <span style="color:red"> **Error**</span>
@@ -1422,12 +1423,12 @@ quiz1 &= ~(1 << 27) //记录第27名同学fail测验
 bool status = quiz1 & (1<<27) //学生27是否通过测验
 
 ```
-#### Sizeof Operators
+#### (f). Sizeof Operators
 
 - ```sizeof``` 返回一个类型大小 /表达式结果类型(return type)大小 所占字符数, returns the size  in bytes of an expression or a type name. ```sizeof (type)``` or  ```sizeof expr```
 - ```sizeof``` is a constant expression of type ```size_t```. 
 - The operator is right associative. 
-- ```sizeof *p```, p可以是invalid, 
+- ```sizeof *p```, <span style="background-color:#FFFF00">p可以是invalid</span>
 - result applying sizeof  
   - ```sizeof char``` = 1 guaranteed 
   - sizeof reference returns the size of 被引用对象
@@ -1461,7 +1462,7 @@ int arr2[sz]; // ok sizeof returns a constant expression
 
 ```
 
-#### Comma Operators
+#### (g). Comma Operators
 
 - comma operator 含有两个运算对象(operands), 从左向右顺序依次求值
 - <span style="background-color:#FFFF00">guarantees the order of evaluation</span>
@@ -1473,19 +1474,19 @@ for (vector<int>::size_type ix = 0; ix != ivec.size(); ++ix, --cnt)
     ivec[ix] = cnt;
 ```
 
-#### Type Conversions
+#### (h). Type Conversions
 
 **(1). Implicit Conversion**
 
 The compiler 自动转化运算对象
-- In most expression, 比int 类型小的整形(short) 首先提升为较大的整形(integral type)
-- In condition, non bool expression convert to bool
-- In initializations, the initializer is converted to the ype of the variable; In assignments, 右侧运算被convert to 左侧运算
 - 如果算数运算或者关系运算对象有多种类型，需要准换成统一类型
-- 算数转化： 把类型转化成最宽的类型, 比如 一个类型是long double, 无关其他是什么类型，都被转化成long double. 如果有float, 那么整数型会被转化成float
+    - 算数转化： 把类型转化成最宽的类型, 比如 一个类型是long double, 无关其他是什么类型，都被转化成long double. 如果有float, 那么整数型会被转化成float
+    - In most expression, 比int 类型小的整形(short) 首先提升为较大的整形(integral type)
+    - In condition, non-bool expression convert to bool
+    - In initializations, the initializer is converted to the ype of the variable; In assignments, 右侧运算被convert to 左侧运算
+    - 如果某个运算符运算对象不一致， 这些运算对象将转化成同一类型, 但是如果某个运算对象是unsigned, 结果就依赖于机器中各个整数类型相对大小了， 转化类型要么都是unsigned, 要么都是signed的
 - **Integral promotions(整型提升)**: convert  small integral types to a larger integral type. The types ```bool```, ```char```, ```signed char```, ```unsigned char```, ```short```, and ```unsigned short``` are promoted to ```int``` if all possible values of that type fit in an int. Otherwise, the value is promoted to ```unsigned int```.
 - 较大的char(```wchar_t,char16_t, char32_t```)提升成```int, unsigned int, long, unsigned long, long long, unsigned long long```, 前提是转化类型能容纳原来类型所有可能的值
-- 如果某个运算符运算对象不一致， 这些运算对象将转化成同一类型, 但是如果某个运算对象是unsigned, 结果就依赖于机器中各个整数类型相对大小了， 转化类型要么都是unsigned, 要么都是signed的
 - 一个signed, 一个unsigned 
     - when unsigned type 大于等于signed type ， signed -> unsigned. 如果signed 是负数, 有副作用(比如 -1 会变成255)
     - when unsigned type  小于signed type , 结果依赖于机器, 如果unsigned的值都可以存入signed, 则 unsigned -> signed, 如果不能, signed -> unsigned 
@@ -1532,13 +1533,28 @@ int &r = j, *q = p; // error: conversion from const to nonconst
 
 **(2). Explicit Conversion**
 
-Use **cast** to request explicit conversion. (有时候不得不用cast, 但是cast 这种方法本质上是非常危险的)
+Use **cast** to request explicit conversion. (有时候不得不用cast, 但是cast 这种方法本质上是非常危险的), cast 只有cast reference 不是copy, pointer, value都是copy
 
-**static_cast**
+```c++
+//const cast pointer 是copy value 
+const char* cp = "123";
+char * newp = const_cast<char*>(cp);
+newp = "abc";
+cout<< cp <<" , " << newp<<endl; //print 123, abc
+
+
+double cp = 10;
+double& newp = static_cast<double&>(cp);
+double newp2 = static_cast<double&>(cp);
+newp = 20;
+newp2 = 30;
+cout<< cp <<" , " << newp<<" , "<< newp2<<endl; //20, 20, 30 
+
+```
 
 **static_cast** is often use when a large arithmetic type is assigned to a smaller type. 一般来说 如果compiler 发现一个较大的类型试图赋值给较小的类型, 会generate warning. 但是当我们do a explicit cast, the warning message is turned off. 
 
-static cast is useful when perform a version that compiler不会自动转换的. 例如, we can use static_cast to retrieve pointer value that was stored in a ```void*```pointer
+static cast is useful when perform a version that compiler不会自动转换的. 例如, <span style="background-color:#FFFF00">we can use static_cast to retrieve pointer value that was stored in a ```void*```pointer</span>
 
 ```c++
 void* p = &d; // ok: address of any nonconst object can be stored in a void*
@@ -1548,10 +1564,10 @@ void* p = &d; // ok: address of any nonconst object can be stored in a void*
 double *dp = static_cast<double*>(p);
 ```
 
-用```static_cast```强制转换原来类型时, 我们应该确保指针的值保持不变, 也就是说强制转化的结果与原始的地址相等. We must certain  that the type to which we cast the pointer is the actual type of that pointer. <span style="background-color:#FFFF00">If the types not match, the result is undefined  </span>
+用```static_cast```强制转换原来类型时, 我们应该确保指针的值保持不变, 也就是说强制转化的结果与原始的地址相等. We must certain  that the type to which we cast the pointer is the actual type of that pointer. <span style="color:red">If the types not match, the result is undefined  </span>
 
 
-**const_cast** : change only a low-level const in operand. cast away the const. 一旦cast away const, the compiler不会发出警告when writing to that object. If object is orginally not a const, using cast to obtain write access is legal. However using a const_cast in order to write to a const object is undefined.
+**const_cast** : change only a  <span style="background-color:#FFFF00"low-level const</span> in operand. cast away the const. 一旦cast away const, the compiler不会发出警告when writing to that object. If object is orginally not a const, using cast to obtain write access is legal. However using a const_cast in order to write to a const object is undefined.
 
 
 ```c++
@@ -1568,9 +1584,9 @@ string txt = const_cast<string>(cp); // error: const_cast only changes constness
 
 ```
 
-**reinterpret_cast** 
 
-A reinterpret_cast generally performs a low-level reinterpretation of the bit pattern of its operands. 为运算对象的位模式提供较低层次上的重新解释
+
+**reinterpret_cast**: generally performs a low-level reinterpretation of the bit pattern of its operands. 为运算对象的位模式提供较低层次上的重新解释
 
 ```c++
 int *ip;
