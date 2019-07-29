@@ -740,7 +740,7 @@ We can define ```vector``` to hold objects of most any type. Becauses <span styl
 - ```vector<T>v2(v1)```: v2 has a copy of each element in v1
 - ```vector<T>v2 = v1```: v2 is copy of the each element in v1
 - ```vector<T>v3(n,val)```: v3 has n elements with value val
-- ```vector<T>v4(n)`1`: v3 has n copies of a  <span style="color:red">value-initialized object</span>(e,g, int 默认是0, string 默认是空)
+- ```vector<T>v4(n)```: v3 has n copies of a  <span style="color:red">value-initialized object</span>(e,g, int 默认是0, string 默认是空)
 - ```vector<T>v5{a,,b,c...}```: v5 has as many elements as initializers;  <span style="color:red">elements are initialized by corresponding initializers</span>
 - ```vector<T>v5 = {a,b,c}```; 与上面一样
 
