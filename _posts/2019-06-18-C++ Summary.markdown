@@ -1107,7 +1107,7 @@ cout<<p[1]<<endl; //print y
 ```
 
 
-#### Multidimensional Arrays
+#### (f). Multidimensional Arrays
 
 严格讲, no multidimensional arrays in C++, 实际上是refered to arrays of arrays. 
 
