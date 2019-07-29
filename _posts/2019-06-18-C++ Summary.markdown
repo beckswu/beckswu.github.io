@@ -2016,6 +2016,7 @@ void print(int (*matrix)[10], int rowSize) { /* . . . */ }
 //declares matrix as a pointer to an array of ten ints.
 
 // equivalent definition
+
 void print(int matrix[][10], int rowSize) { /* . . . */ }
 ```
 
@@ -2028,6 +2029,7 @@ int main(int argc, char *argv[])
 int main(int argc, char **argv) 
 
 //如果传入 prog -d -o ofile data0
+
 argv[0] = "prog"; argv[1] = "-d"; argv[2] = "-o";
 argv[3] = "ofile"; argv[4] = "data0"; argv[5] = 0;
 ```
@@ -2230,7 +2232,7 @@ Record lookup(Phone* const); // redeclares Record lookup(Phone*)
 
 ```
 
-但如果const时候底层的, we can overload 如果指针or 引用 指向const or non const object. 下面的例子, <span style="background-color:#FFFF00">compiler can use the constness of the argument to distinguish which function to call</span> 因为const 不能转化类型, 所以只pass 给含有const 的function. <span style="background-color:#FFFF00">但是nonconst 可以转化成const,所以下面四个function 都可以被nonconst function call. 但是compiler prefer the nonconst version when we pass a nonconst object or pointer to nonconst</span>
+但如果const时候底层的, we can overload 如果指针or 引用 指向const or non const object. 下面的例子, <span style="background-color:#FFFF00">compiler can use the constness of the argument to distinguish which function to call</span> 因为const 不能转化类型, 所以只pass 给含有const 的function. <span style="background-color:#FFFF00">但是nonconst 可以转化成const,所以下面四个function 都可以被nonconst function call. 但是compiler **prefer the nonconst version** when we pass a **nonconst object** or pointer to nonconst</span>
 
 ```c++
 // functions taking const and nonconst references or pointers have different parameters
