@@ -2017,7 +2017,7 @@ An **initializer_list** is a library type that represents an array of values of 
 | ```initializer_list<T>lst{a,b,c}``` | elements are copied of correspoding initializers. <span style="color:red"> elements in the list are const </span> | 
 | ```lst2(lst)``` | copy or assigning an initailizer_list 但不会一一拷贝列表中元素. After the copy, the original and the copy share he elements. <span style="color:red">  sallow copy</span>| 
 | ```lst.size()``` | number of elements in list | 
-| ```lst.begin() / lst.end9)``` | returns a pointer to the first / one past the last element in lst|
+| ```lst.begin() / lst.end())``` | returns a pointer to the first / one past the last element in lst|
 
 ```c++
 initializer_list<string> ls; // initializer_list of strings 
