@@ -1567,7 +1567,7 @@ double *dp = static_cast<double*>(p);
 用```static_cast```强制转换原来类型时, 我们应该确保指针的值保持不变, 也就是说强制转化的结果与原始的地址相等. We must certain  that the type to which we cast the pointer is the actual type of that pointer. <span style="color:red">If the types not match, the result is undefined  </span>
 
 
-**const_cast** : change only a  <span style="background-color:#FFFF00"low-level const</span> in operand. cast away the const. 一旦cast away const, the compiler不会发出警告when writing to that object. If object is orginally not a const, using cast to obtain write access is legal. However using a const_cast in order to write to a const object is undefined.
+**const_cast** : change only a  <span style="background-color:#FFFF00">low-level const</span> in operand. cast away the const. 一旦cast away const, the compiler不会发出警告when writing to that object. If object is orginally not a const, using cast to obtain write access is legal. However using a const_cast in order to write to a const object is undefined.
 
 
 ```c++
@@ -1620,7 +1620,7 @@ The **null statement** is a empty statment ```;```
 ```c++
 while(iter != svc.end()); //while 循环主体
 
-    ++iter; //iter is not part of the loop
+    ++iter; //iter is not part of the loop, run after while
 ```
 
 **Dangling(悬垂) else**: 规定了else与最近的if匹配, 比如下面的if else 从初衷来看是为了跟外层的if 匹配, 但是不管怎么锁紧都是跟内层if 比配的. 如果想让与外层if 匹配，需要花括号
@@ -1654,11 +1654,10 @@ switch(buf[0]) {
                 break;//作用于for, 不会break case
 
         } 
-
 ```
 
 **Goto**:
--  与switch 类似, 不可以定义初始化的值 然后带出scope (cannot transfter control of initialized varaibl 从初始化的scope到variable被用的scope)
+-  与switch 类似, 不可以定义初始化的值 然后带出scope (cannot transfter control of initialized varaible 从初始化的scope到variable被用的scope)
 - A jump backward over an already executed definition is okay(跳回一个已经执行的定义是ok). Jumping back to a point before a variable is defined destroys the variable and constructs it again
 
 ```c++
@@ -1685,10 +1684,10 @@ begin:
 
 #### (a). switch 
 
-- switch 中的case, switch 必须是[integral constant expression](#constexpr) (整型常量表达式), 所以不能用string, double 作为switch 或者case 条件, 可以用simple char(not char*, not char array), int, enum, string\[index] (it's char)
+- switch 中的case, switch 必须是[integral constant expression](#constexpr) (整型常量表达式),<span style="background-color:#FFFF00"> 所以不能用string, double 作为switch 或者case 条件, 可以用simple char(not char*, not char array), int, enum, string\[index] (it's char)</span>
 - 任何两个case 不能相同
-- <span style="background-color:#FFFF00">当一个case match， 会执行接下来所有的case until program explicitly interrupts it</span>, 但是最后一个case 不一定加break, 但为了安全最好加上, 如果有新的case, 如果有新的case, 不用担心前面break
-- 有时候想两个或多个case 值共享一组操作(common set of actions), we ommit a break, allowing program to fall through multiple case labels
+- <span style="background-color:#FFFF00">当一个case match， 会执行接下来所有的case until program explicitly interrupts it</span>, 但是最后一个case 不一定加break, 但为了安全最好加上, 如果有新的case, 这样不用担心前面break
+- 有时候想两个或多个case 值共享一组操作(common set of actions), we omit a break, allowing program to fall through multiple case labels
 - **default**: 如果没有任意match上, 进入default, 如果default 是空的, 加上default 也是有用的，因为告诉读者我们考虑了全部情况
 - Variable Definitions inside the Body of a switch: 
     - <span style="color:red">如果定义并初始化的值, it is illegal to bring to outscope</span>
@@ -1727,7 +1726,7 @@ switch (ch) {
 
 //因为case 之后不一定要换换换行
 
-/ alternative legal syntax
+// alternative legal syntax
 
 switch (ch)
 {
@@ -1735,7 +1734,6 @@ switch (ch)
         ++vowelCnt;
         break;
 }
-
 ```
 当omit break时候, 会执行所有的case, 比如```ch = 'e'```,  ```eCnt```, ```iCnt```, ```oCnt```, ```uCnt```, ```d```, 都会加1
 
@@ -1776,10 +1774,10 @@ case true:
 
 case false:
     // ok: jval is in scope but is uninitialized
+    
     jval = next_num(); // ok: assign a value to jval
 
     if (file_name.empty()) // file_name is in scope but wasn't initialized
-
 
 ```
 
@@ -1791,14 +1789,14 @@ for (declaration : expression)
      statement
 ```
 
-expression must represent a sequence(必须是一个序列), such as a braced initializer list({1,2,3}), an array, or an object such as vector or string (has iterator)
+expression must represent a sequence(必须是一个序列), 例如 a braced initializer list({1,2,3}), an array, or an object such as vector or string (has iterator)
 
 
 #### (c). Exception Handling
 
 - when throw error, need to initialize error by give a string or c-style character style
 - Each exception classes define a member function named ```what```, function takes no arguments and return c-style character style (即 ```const char*```), 返回的对象是copy of string used to initialize the object; 对于没有初始值的exception,```what``` returns 由compiler 决定 
-- If no appropriate catch is found, execution is transferred to a library function ```termiante```. 该函数行为与系统有关 but is guaranteed to stop further execution of the program
+- If no appropriate catch is found, execution is transferred to a library function ```terminate```. 该函数行为与系统有关 but is guaranteed to stop further execution of the program
 
 ```c++
 try{
