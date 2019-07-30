@@ -2480,7 +2480,7 @@ f(5.6); // calls void f(double, double)
 ```
 
 **当有多个函数比配**: compiler以此检查argument by argument， 如果有一个function 满足下列条件，则比配成功: 
-- 每个argument的比配不劣与其他可行函数需要的匹配 (The match for each argument is no worse than the match required by any ohter viable function)
+- 每个argument的匹配不劣与其他可行函数需要的匹配 (The match for each argument is no worse than the match required by any ohter viable function)
 - 至少有一个arugment的match 优于其他的viable functions的匹配(There is at least one argument for which the match is better than the match provided by any other viable function)
 - <span style="color:red">如果没有任何一个函数脱颖而出, 则call is error, the compiler will complain that the call is ambiguous</span>
     - 比如```f(42,2.56)```, ```f(int, int);``` 和 ```f(double, double);```是一样的, ambigous call. 
