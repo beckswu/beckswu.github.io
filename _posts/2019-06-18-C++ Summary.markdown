@@ -588,6 +588,7 @@ auto &n = i, *p2 = & cval;
 - handles **top-level const** subtly different from **auto**
     - **variables**: <span style="background-color: #FFFF00">include **top-level const** and reference</span>
     - **expression**: we can get the type that expression yields. <span style="background-color: #FFFF00">注:Dereference operator(\*) yields type as reference</span>
+    - **function**, ```decltype(functionName)``` 返回的是function type, not a pointer to function type.
     - **decltype** and **auto** difference: deduction done by **decltype** depends on the form of its expression. 
         - <span style="background-color: #FFFF00">切记```decltype((variable))```结果永远是引用，```decltype(variable)``` 只有当variable 本身是引用时, 结果才是引用</span>
 
@@ -2475,6 +2476,173 @@ f(5.6); // calls void f(double, double)
 3. Match through a promotion (通过类型提升实现, e.g. ```short->int```)
 4. Match through an arithmetic or pointer conversion (通过算数或者指针转换 (e.g. pointer -> bool ```if(*cp)``` ))
 5. Match through a class-type conversion. 
+
+注:好的desgin 一般不会有functions with parameters 类似下面例子的
+
+<span style="background-color:#FFFF00">small integral types always promote to int or to a larger integral type</span> e.g1: 一个function take parameter ```int```, 另一个take ```short```. Short 只有argument 是short的时候会被call, 即使有时是很小的整数值, 也会被promote to ```int```. whereas calling the ```short``` version would require a conversion. 
+
+<span style="background-color:#FFFF00">所有arithmetic conversion 都是一个级别的, 从int 到unsigned int 转换不比从int 到double 转换级别高
+
+```c++
+void ff(int); 
+void ff(short);
+ff('a'); // char promotes to int; calls f(int)
+
+
+void manip(long);
+void manip(float); 
+manip(3.14); // error: ambiguous cal
+
+```
+
+**Function Matching and const Arguments**: 
+
+the compiler uses the <span style="background-color:#FFFF00">constness of the argument</span> to decide which function to call: 下面第二个例子, b to initialize a reference to either const or nonconst type.但是initializing a reference to ```const``` from a nonconst object <span style="color:red">require a conversion</span>. 但是<span style="background-color:#FFFF00">convert to const的级别低于exact match</span>, 因为non-const version is prefer
+
+pointer works in similar ways, 如果argument is a pointer to const, the call will match function that takes ```const *```, otherwise, 如果argument is a pointer to nonconst, the function 有 a plain pointer is called
+
+
+```c++
+Record lookup(Account&); // function that takes a reference to Account
+
+Record lookup(const Account&); // new function that takes a const reference
+
+
+const Account a;
+Account b;
+lookup(a); // calls lookup(const Account&)
+
+lookup(b); // calls lookup(Account&)
+
+```
+
+#### (g). Pointers to Functions
+
+- a pointer that <span style="color:red">denotes a function rather than an object</span>. Like any other pointer, a function pointer points to a particular type.
+- <span style="background-color:#FFFF00">函数类型(type) is determined by its return type and the types of it  parameters. 与函数名无关(function name is not part of its type)</span>
+- we can directly use function pointer without dereference operator
+- There is no conversion between pointers to one function type and pointers to another function type.(<span style="background-color:#FFFF00">不同的函数指针之间没有转换规则</span>)
+- 可以assign ```nullptr``` or ```zero``` valued integer constant expression to a function pointer 表示function pointer 没有指向任何的function
+- when we use an overloaded function, the context must make it clear which version is being used. 当使用overloaded function上下文必须指出选用哪个函数
+- <span style="background-color:#FFFF00">function parameter can convert function to function pointer, 但是function return cannot convert function to function pointer</span>
+
+function pointer 括号```(*pf)``` 必不可少, 否则的话是 function returns bool pointer
+
+```c++
+bool lengthCompare(const string &, const string &);
+// pf points to a function returning bool that takes two const string references 
+
+bool (*pf)(const string &, const string &); // uninitialized
+
+
+pf = lengthCompare; // pf now points to the function named lengthCompare 
+
+pf = &lengthCompare; // equivalent assignment: address-of operator is optional
+
+pf = 0; // ok: pf points to no function
+
+
+//三个等价调用
+bool b1 = pf("hello", "goodbye"); // calls lengthCompare 
+
+bool b2 = (*pf)("hello", "goodbye"); // equivalent call
+
+bool b3 = lengthCompare("hello", "goodbye"); // equivalent call
+
+
+string::size_type sumLength(const string&, const string&); 
+bool cstringCompare(const char*, const char*);
+pf = cstringCompare; // error: parameter types differ 返回类型不匹配
+
+pf = lengthCompare; // ok: function and pointer types match exactly
+
+```
+
+对于overloaded function,上下文必须指出选用哪个函数
+```c++
+void ff(int*);
+void ff(unsigned int);
+void (*pf1)(unsigned int) = ff; // pf1 points to ff(unsigned)
+
+double (*pf3)(int*) = ff; // error: return type of ff and pf3 don't match
+
+```
+
+**Function Pointer Parameters**: we can write parameter that looks like a function, 但实际上是被treated as pointer.当pass a function as an argument, 它将自动convert to a pointer
+```c++
+// third parameter is a function type and is automatically treated as a pointer to function
+
+void useBigger(const string &s1, const string &s2,
+    bool pf(const string &, const string &));//it is a pointer
+
+    
+// equivalent declaration: explicitly define the parameter as a pointer to function
+
+void useBigger(const string &s1, const string &s2,
+    bool (*pf)(const string &, const string &));
+
+```
+
+可以用```typedef``` 来避免冗长(tedious), ```Func``` 和```Func2```是函数类型,  ```FuncP``` 和```FuncP2```是pointer类型,注 <span style="background-color:#FFFF00">```decltype``` returns the function type; 不会自动转换成指针类型</span>,如果我们想要pointer, 必须加上```*```
+```c++
+// Func and Func2 have function type, 是函数类型
+
+typedef bool Func(const string&, const string&); 
+
+typedef decltype(lengthCompare) Func2; // equivalent type
+
+
+typedef bool(*FuncP)(const string&, const string&);
+
+typedef decltype(lengthCompare) *FuncP2; // equivalent type
+
+
+// equivalent declarations of useBigger using type aliases
+
+void useBigger(const string&, const string&, Func); 
+void useBigger(const string&, const string&, FuncP2);
+
+```
+
+**Returning a Pointer to Function**: 和数组类似，虽然不能返回函数, 但可以返回函数的指针, <span style="background-color:#FFFF00">we must write the return type as a pointer type, compiler will not 自动treat a function return type as pointer type(和function parameter 不一样) </span>
+
+```int (*f1(int))(int*, int);``` <span style="background-color:#FFFF00">f1 is a function 返回的是pointer,返回的有parameter list, so pointer points to a function and that function returns an int</span>
+
+```auto f1 (int) -> int(*)(int*, int);``` 可以用trailing return to make it clear
+
+```c++
+using F = int(int*, int); // F is a function type, not a pointer 
+
+using PF = int(*)(int*, int); // PF is a pointer type
+
+PF f1(int); // ok: PF is a pointer to function; f1 returns a pointer to function 
+
+F f1(int); // error: F is a function type; f1 can't return a function
+
+F *f1(int); // ok: explicitly specify that the return type is a pointer to function
+
+```
+
+**Using auto or decltype for Function Pointer Types**
+
+如果我们知道函数返回是哪个一个, 可以用```decltype```简化书写. 需要注意的是,  when we apply decltype to a function, it returns a function type, not a pointer to function type. 需要add ```*``` to indicate that we are returning a pointer not a function
+
+```c++
+string::size_type sumLength(const string&, const string&); 
+string::size_type largerLength(const string&, const string&);
+
+//根据parameter, getFcn返回是pointer to largerLength or sumLength
+decltype(sumLength) *getFcn(const string &);
+
+```
+
+
+
+
+
+
+
+
 
 
 
