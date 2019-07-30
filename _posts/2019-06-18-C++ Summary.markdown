@@ -12,12 +12,6 @@ tags:
 ---
 
 
-```c++
-cout<<" File Name "<< __FILE__ << endl; //打印现在file name
-
-cout<<" Line Number "<<__LINE__<<endl; //打印现在现在的行数
-
-```
 
 - function return reference 可以用non-reference 去接, non-reference 接的话借的是copy 
 - namespace 中function 不是在class 但是声明了 static 是  give **internal linkage**, meaning that it is only accessible within the translation unit that contains the definition. Without static, it has external linkage, and is accessible in any translation unit. So you'd use static (or, alternatively, an unnamed namespace) when writing a function that's only intended for use within this unit; the internal linkage means that other units can define different functions with the same name without causing naming conflicts.
@@ -2313,7 +2307,7 @@ print(3.14); // ok: calls print(int); print(double) is hidden
 
 #### (e.) Features for Specialized Uses
 
-**(1). default Arguments**: are used for the right-most(trailing) argument of a call. <span style="background-color:#FFFF00"> 设计时让不怎么用default放前面, likely to use a default value appear first</span>
+**(1). default Arguments**: are used for the right-most(trailing) argument of a call. <span style="background-color:#FFFF00"> 设计时让不怎么可能用default放前面, likely to use a default value appear first</span>
 ```c++
 string screen(int ht = 24, int wid = 80, char backgrnd = ' ');
 window = screen(, , '?'); // error: can omit only trailing arguments
@@ -2334,12 +2328,13 @@ void f(){
     int wd = 100; //hides the outer definition of wd but does not change the default
 
     string window = screen(); // calls screen(ht(), 80, '*')
+    
 }
 ```
 
 **(2). Inline and constexpr Functions**
 
-比如我们有个比较string 大小的function, 好处是如果我们修改比较方法,直接修改function, 而不用找比较表达式所有出现的地方. 潜在缺点是: slower than evaluating the equivalent expression.  因为call function does a lot of work: 调用前先保存寄存器(registers) , 返回时恢复. 可能需要copy argument and program branches to a new location(程序转向一个新的位置继续执行)
+比如我们有个比较string 大小的function, 好处是如果我们修改比较方法,直接修改function, 而不用找比较表达式所有出现的地方修改conditon. 潜在缺点是: slower than evaluating the equivalent expression.  因为call function does a lot of work: 调用前先保存寄存器(registers) , 返回时恢复. 可能需要copy argument and program branches to a new location(程序转向一个新的位置继续执行)
 
 **inline function** 在每个调用点上"内联"的展开 (expanded "in line" at each call) 比如下面函数, would expand during compilation into something in line, <span style="color:red">消除了函数运行时的开销(The run-time overhead of making shortString a function is removed)</span>
 ```c++
@@ -2354,11 +2349,11 @@ cout << (s1.size() < s2.size() ? s1 : s2 )<<endl;
 <span style="background-color:#FFFF00">inline meachanism 用于规模小的, 流程直接, 频繁调用的函数, 不支持recursion</span>(optimize small, straight-line functions that are called frequently. Many compilers will not inline a recursive function.)<span style="background-color:#FFFF00"> 也不支持很多行的函数</span>(比如一个75行的函数很难被inline expanded)
 
 **constexpr function**: 
-- <span style="background-color:#FFFF00">return type must be literal type</span> (int, char, enum 不能是string, char array, char pointer)
-- <span style="background-color:#FFFF00">函数主体只能有一个return statement</span>(function body must contain exactly one return statement)
-- compiler will replace a call to t constexpr funcion with its resulting value.(compiler 把constexpr 函数的调用换成其结果值)
+- <span style="background-color:#FFFF00">return type must be literal type</span> (int, char, enum 不能是string, double, char array, char pointer)
+- <span style="background-color:#FFFF00">函数主体只能有一个return statement</span>(function body must contain exactly one return statement, 不能有通过if 判断的多个statement)
+- compiler will replace a call to constexpr funcion with its resulting value.(compiler 把constexpr 函数的调用换成其结果值)
 - <span style="color:red">constexpr functions are implicitly inline </span>
-- <span style="color:red">A constexpr function body 可以含有other statements 只要这个statement generat no actions at run time</span> (e.g. null statment, type aliases, and using declaractions)
+- <span style="color:red">A constexpr function body 可以含有other statements 只要这个statement generate no actions at run time</span> (e.g. null statment, type aliases, and using declaractions)
 - <span style="color:red">A constexpr function is not required to return a constant expression.</span>
 
 ```c++
