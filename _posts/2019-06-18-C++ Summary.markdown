@@ -2540,6 +2540,7 @@ pf = 0; // ok: pf points to no function
 
 
 //三个等价调用
+
 bool b1 = pf("hello", "goodbye"); // calls lengthCompare 
 
 bool b2 = (*pf)("hello", "goodbye"); // equivalent call
