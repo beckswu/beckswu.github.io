@@ -2355,6 +2355,7 @@ cout << (s1.size() < s2.size() ? s1 : s2 )<<endl;
 - <span style="color:red">constexpr functions are implicitly inline </span>
 - <span style="color:red">A constexpr function body 可以含有other statements 只要这个statement generate no actions at run time</span> (e.g. null statment, type aliases, and using declaractions)
 - <span style="color:red">A constexpr function is not required to return a constant expression.</span>
+- 如果需要constexpr function 返回constant expression, 需要function argument也是constant expression
 
 ```c++
 constexpr int new_sz() { return 42; }
@@ -2364,7 +2365,7 @@ constexpr int foo = new_sz(); // ok: foo is a constant expression
 
 ```
 
-只要argument(cnt) 是constant expression, ```scale(arg) is a constant expression, 2 是constant expression, 所以compiler 会把所有的```scale(2)``` 用constexpr function resulting value 代替. 如果返回不是constant expression, compiler 会有error message
+只要argument(cnt) 是constant expression, ```scale(arg)``` is a constant expression, 2 是constant expression, 所以compiler 会把所有的```scale(2)``` 用constexpr function resulting value 代替. 如果返回不是constant expression, compiler 会有error message
 ```c++
 constexpr size_t scale(size_t cnt) { return new_sz() * cnt; }
 
@@ -2381,8 +2382,8 @@ int a2[scale(i)]; // error: scale(i) is not a constant expression
 **assert** is a **preprocessor macro(预处理器)**. 
 - **assert** 是 **preprocessor macro**.
   - <span style="color:red">A preprocessor macro is a preprocessor variable that acts like inline function. </span>
-  - 预处理器名字 由预处理器(preprocessor) 管理而不是compiler, 所以使用preprocessor name directly and do not provide a using declaration or ```std::``` for them.
-  - 和preprocessor variable 一样, **macro** names must be unique within the program. <span style="color:red">Program that include ```cassert``` header 不能一定variable, function, or other entity named assert.</span>. 很多header 都包含了```cassert``` header, 所以即使没有include 它,也很有可能直接用
+  - 预处理器名字 由预处理器(preprocessor) 管理而不是compiler, 所以当使用preprocessor name directly, do not provide a using declaration or ```std::``` for them.
+  - 和preprocessor variable 一样, **macro** names must be unique within the program. <span style="color:red">Program that include ```cassert``` header 不能有variable, function, or other entity named assert.</span>. 很多header 都包含了```cassert``` header, 所以即使没有include 它,也很有可能直接用
 - ```assert(expr);``` in ```cassert``` header 中: evaluates ```expr``` and if expression is false, 输出信息并终止程序的执行, 如果表达式正确 什么也不做, 
   - assert 常用来检查不能发生的情况， ```assert(word.size() > threshold);```
 - <span style="color:red">```assert``` 用来当做调试程序的辅助手段(aid) 而不能用作真正的run-time logic checks or error checking</span>
@@ -2415,7 +2416,7 @@ if (word.size() < threshold)
 **NDEBUG Preprocessor Variable**
 - assert的行为depends on the status of a **preprocessor variable** 名为 **NDEBUG**, <span style="color:red">如果**NDEBUG** is defined, ```assert``` does nothing.</span> By default, **NDEBUG** is not defined. <span style="color:red">So by default, ```assert``` performs a run-time check</span>
 - We can turn off debugging by providing a ```#define``` to define ```NDEBUG```. 
-  - 也有个compiler provide a command-line option that lets us deine preprocessor variable ```CC -D NDEBUG main.cpp``` or ```/D``` with microsoft compiler has the same effect as writing ```define NDEBUG``` at the beginning of main.cpp
+  - 也有个compiler provide a command-line option that lets us define preprocessor variable ```CC -D NDEBUG main.cpp``` or ```/D``` with microsoft compiler has the same effect as writing ```define NDEBUG``` at the beginning of main.cpp
 - 定义了```NDEBUG``` <span style="color:red">能避免各种条件所需的runtime 开销</span> (avoid run-time overhead involved in checking various conditions). <span style="color:red">no run-time check</span>
 - 如果```NDEBUG``` is not defined, the code between the ```ifndef NDBUG``` and ```endif``` is executed. 如果```NDEBUG``` is defined, code is ignored. 
 
@@ -2423,6 +2424,7 @@ if (word.size() < threshold)
 void print(const int ia[], size_t size)
 {
 #ifndef NDEBUG
+
 // _ _func_ _ is a local static defined by the compiler that holds the function's name
 
 // _ _func_ _  是局部静态变量,显示函数名字
@@ -2492,7 +2494,7 @@ manip(3.14); // error: ambiguous cal
 
 **Function Matching and const Arguments**: 
 
-the compiler uses the <span style="background-color:#FFFF00">constness of the argument</span> to decide which function to call: 下面第二个例子, b to initialize a reference to either const or nonconst type.但是initializing a reference to ```const``` from a nonconst object <span style="color:red">require a conversion</span>. 但是<span style="background-color:#FFFF00">convert to const的级别低于exact match</span>, 因为non-const version is prefer
+the compiler uses the <span style="background-color:#FFFF00">constness of the argument</span> to decide which function to call: 下面第二个例子, b to initialize a reference to either const or nonconst type.但是initializing a reference to ```const``` from a nonconst object <span style="color:red">require a conversion</span>. 但是<span style="background-color:#FFFF00">convert to const的级别低于exact match</span>, 因此non-const version is prefer
 
 pointer works in similar ways, 如果argument is a pointer to const, the call will match function that takes ```const *```, otherwise, 如果argument is a pointer to nonconst, the function 有 a plain pointer is called
 
@@ -2627,6 +2629,7 @@ string::size_type sumLength(const string&, const string&);
 string::size_type largerLength(const string&, const string&);
 
 //根据parameter, getFcn返回是pointer to largerLength or sumLength
+
 decltype(sumLength) *getFcn(const string &);
 
 ```
