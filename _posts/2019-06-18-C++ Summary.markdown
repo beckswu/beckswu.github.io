@@ -16,7 +16,7 @@ tags:
 - function return reference 可以用non-reference 去接, non-reference 接的话借的是copy 
 - namespace 中function 不是在class 但是声明了 static 是  give **internal linkage**, meaning that it is only accessible within the translation unit that contains the definition. Without static, it has external linkage, and is accessible in any translation unit. So you'd use static (or, alternatively, an unnamed namespace) when writing a function that's only intended for use within this unit; the internal linkage means that other units can define different functions with the same name without causing naming conflicts.
 
-**iteral type**: (int, int pointer, int reference, double, enum, char, char array char pointer) scalar type, reference type, an array of literal type;
+**iteral type**: (int, int pointer, int reference, double, enum, char, char array char pointer) scalar type, reference type, an array of literal type; <span style="color:red">注:string 不是literal type</span>
 
 A class is a literal type
 - has a trivial destructor(自己没有定义destructor 并且 non-static member object 也没有定义destructor )
@@ -2373,7 +2373,7 @@ cout << (s1.size() < s2.size() ? s1 : s2 )<<endl;
 <span style="background-color:#FFFF00">inline meachanism 用于规模小的, 流程直接, 频繁调用的函数, 不支持recursion</span>(optimize small, straight-line functions that are called frequently. Many compilers will not inline a recursive function.)<span style="background-color:#FFFF00"> 也不支持很多行的函数</span>(比如一个75行的函数很难被inline expanded)
 
 **constexpr function**: 
-- <span style="background-color:#FFFF00">return type must be literal type</span> (int, char)
+- <span style="background-color:#FFFF00">return type must be literal type</span> (int(reference, pointer), double, enum, char, char pointer, 但string 不是)
 - <span style="background-color:#FFFF00">函数主体只能有一个return statement</span>(function body must contain exactly one return statement, 不能有通过if 判断的多个statement)
 - compiler will replace a call to constexpr funcion with its resulting value.(compiler 把constexpr 函数的调用换成其结果值)
 - <span style="color:red">constexpr functions are implicitly inline </span>
