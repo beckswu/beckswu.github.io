@@ -2576,8 +2576,6 @@ string::size_type sumLength(const string&, const string&);
 bool cstringCompare(const char*, const char*);
 pf = cstringCompare; // error: parameter types differ 返回类型不匹配
 
-pf = lengthCompare; // ok: function and pointer types match exactly
-
 ```
 
 对于overloaded function,上下文必须指出选用哪个函数
@@ -2602,7 +2600,6 @@ void useBigger(const string &s1, const string &s2,
 
 void useBigger(const string &s1, const string &s2,
     bool (*pf)(const string &, const string &));
-
 ```
 
 可以用```typedef``` 来避免冗长(tedious), ```Func``` 和```Func2```是函数类型,  ```FuncP``` 和```FuncP2```是pointer类型,注 <span style="background-color:#FFFF00">```decltype``` returns the function type; 不会自动转换成指针类型</span>,如果我们想要pointer, 必须加上```*```
@@ -2623,7 +2620,6 @@ typedef decltype(lengthCompare) *FuncP2; // equivalent type
 
 void useBigger(const string&, const string&, Func); 
 void useBigger(const string&, const string&, FuncP2);
-
 ```
 
 **Returning a Pointer to Function**: 和数组类似，虽然不能返回函数, 但可以返回函数的指针, <span style="background-color:#FFFF00">we must write the return type as a pointer type, compiler will not 自动treat a function return type as pointer type(和function parameter 不一样) </span>
@@ -2656,7 +2652,6 @@ string::size_type largerLength(const string&, const string&);
 //根据parameter, getFcn返回是pointer to largerLength or sumLength
 
 decltype(sumLength) *getFcn(const string &);
-
 ```
 
 
