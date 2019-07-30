@@ -2312,6 +2312,183 @@ print(3.14); // ok: calls print(int); print(double) is hidden
 
 #### (e.) Features for Specialized Uses
 
+**(1). default Arguments**: are used for the right-most(trailing) argument of a call. <span style="background-color:#FFFF00"> 设计时让不怎么用default放前面, likely to use a default value appear first</span>
+```c++
+string screen(int ht = 24, int wid = 80, char backgrnd = ' ');
+window = screen(, , '?'); // error: can omit only trailing arguments
+
+```
+
+另一种用default parameter的形式, names used as default arguments are resolved in the scope of function delcaration(<span style="color:red">名字在函数声明所在作用域内解析</span>), The value that those names represent is evaluated at the time of the call.(<span style="color:red">求值过程发生在函数调用时</span>)
+
+```c++
+int wd = 80;
+char def = ' ';
+size_t ht();
+string screen(int = ht(), int = wd, char = def);
+
+void f(){
+    def = '*';  //change value of default argument
+
+    int wd = 100; //hides the outer definition of wd but does not change the default
+
+    string window = screen(); // calls screen(ht(), 80, '*')
+}
+```
+
+**(2). Inline and constexpr Functions**
+
+比如我们有个比较string 大小的function, 好处是如果我们修改比较方法,直接修改function, 而不用找比较表达式所有出现的地方. 潜在缺点是: slower than evaluating the equivalent expression.  因为call function does a lot of work: 调用前先保存寄存器(registers) , 返回时恢复. 可能需要copy argument and program branches to a new location(程序转向一个新的位置继续执行)
+
+**inline function** 在每个调用点上"内联"的展开 (expanded "in line" at each call) 比如下面函数, would expand during compilation into something in line, <span style="color:red">消除了函数运行时的开销(The run-time overhead of making shortString a function is removed)</span>
+```c++
+cout << shortString(s1,s2)<<endl;
+//在编译过程中展开成类似于下面的形式
+
+cout << (s1.size() < s2.size() ? s1 : s2 )<<endl;
+```
+
+<span style="background-color:#FFFF00">The inline specification is only a request to the compiler. The compiler may choose to ignore this request.(inline 是向compiler 发送请求, compiler可以选择忽略这个请求)</span>
+
+<span style="background-color:#FFFF00">inline meachanism 用于规模小的, 流程直接, 频繁调用的函数, 不支持recursion</span>(optimize small, straight-line functions that are called frequently. Many compilers will not inline a recursive function.)<span style="background-color:#FFFF00"> 也不支持很多行的函数</span>(比如一个75行的函数很难被inline expanded)
+
+**constexpr function**: 
+- <span style="background-color:#FFFF00">return type must be literal type</span> (int, char, enum 不能是string, char array, char pointer)
+- <span style="background-color:#FFFF00">函数主体只能有一个return statement</span>(function body must contain exactly one return statement)
+- compiler will replace a call to t constexpr funcion with its resulting value.(compiler 把constexpr 函数的调用换成其结果值)
+- <span style="color:red">constexpr functions are implicitly inline </span>
+- <span style="color:red">A constexpr function body 可以含有other statements 只要这个statement generat no actions at run time</span> (e.g. null statment, type aliases, and using declaractions)
+- <span style="color:red">A constexpr function is not required to return a constant expression.</span>
+
+```c++
+constexpr int new_sz() { return 42; }
+constexpr int foo = new_sz(); // ok: foo is a constant expression
+
+//compiler can verify new_sz return a constant expression at compile time
+
+```
+
+只要argument(cnt) 是constant expression, ```scale(arg) is a constant expression, 2 是constant expression, 所以compiler 会把所有的```scale(2)``` 用constexpr function resulting value 代替. 如果返回不是constant expression, compiler 会有error message
+```c++
+constexpr size_t scale(size_t cnt) { return new_sz() * cnt; }
+
+int arr[scale(2)]; // ok: scale(2) is a constant expression
+
+int i = 2; // i is not a constant expression
+
+int a2[scale(i)]; // error: scale(i) is not a constant expression
+
+```
+
+**(3). Aids for Debugging**
+
+**assert** is a **preprocessor macro(预处理器)**. 
+- **assert** 是 **preprocessor macro**.
+  - <span style="color:red">A preprocessor macro is a preprocessor variable that acts like inline function. </span>
+  - 预处理器名字 由预处理器(preprocessor) 管理而不是compiler, 所以使用preprocessor name directly and do not provide a using declaration or ```std::``` for them.
+  - 和preprocessor variable 一样, **macro** names must be unique within the program. <span style="color:red">Program that include ```cassert``` header 不能一定variable, function, or other entity named assert.</span>. 很多header 都包含了```cassert``` header, 所以即使没有include 它,也很有可能直接用
+- ```assert(expr);``` in ```cassert``` header 中: evaluates ```expr``` and if expression is false, 输出信息并终止程序的执行, 如果表达式正确 什么也不做, 
+  - assert 常用来检查不能发生的情况， ```assert(word.size() > threshold);```
+- <span style="color:red">```assert``` 用来当做调试程序的辅助手段(aid) 而不能用作真正的run-time logic checks or error checking</span>
+
+the preprocessor defines four other names that can be useful in debugging:
+
+|  Preprocessor variables      | Description |
+| :---        | :---    |  
+| _ _FILE_ _ |  string literal containing the name of the file | 
+| _ _LINE_ _ |  integer literal containing the current line number | 
+| _ _TIME_ _ |  string literal containing the time the file was compiled | 
+| _ _DATE_ _ |  string literal containing the date the file was compiled | 
+
+```c++
+if (word.size() < threshold)
+    cerr << "Error: " << _ _FILE_ _
+    << " : in function " << _ _func_ _
+    << " at line " << _ _LINE_ _ << endl << " Compiled on " 
+    << _ _DATE_ _ << " at " << _ _TIME_ _ << endl
+
+// print 
+
+// Error: wdebug.cc : in function main at line 27 
+
+//    Compiled on Jul 11 2012 at 20:50:03
+
+```
+
+
+**NDEBUG Preprocessor Variable**
+- assert的行为depends on the status of a **preprocessor variable** 名为 **NDEBUG**, <span style="color:red">如果**NDEBUG** is defined, ```assert``` does nothing.</span> By default, **NDEBUG** is not defined. <span style="color:red">So by default, ```assert``` performs a run-time check</span>
+- We can turn off debugging by providing a ```#define``` to define ```NDEBUG```. 
+  - 也有个compiler provide a command-line option that lets us deine preprocessor variable ```CC -D NDEBUG main.cpp``` or ```/D``` with microsoft compiler has the same effect as writing ```define NDEBUG``` at the beginning of main.cpp
+- 定义了```NDEBUG``` <span style="color:red">能避免各种条件所需的runtime 开销</span> (avoid run-time overhead involved in checking various conditions). <span style="color:red">no run-time check</span>
+- 如果```NDEBUG``` is not defined, the code between the ```ifndef NDBUG``` and ```endif``` is executed. 如果```NDEBUG``` is defined, code is ignored. 
+
+```c++
+void print(const int ia[], size_t size)
+{
+#ifndef NDEBUG
+// _ _func_ _ is a local static defined by the compiler that holds the function's name
+
+// _ _func_ _  是局部静态变量,显示函数名字
+
+cerr << _ _func_ _ << ": array size is " << size << endl; 
+
+#endif
+
+```
+
+#### (f). Function Matching
+
+- step 1: 选定a set of overloaded functions considered for the call. The function in this set are the **candidate functions**
+  - candidate functions 是 function has the same named as the called function and declaraction is visibe at the point of the call 下面例子中有4个候选的function 
+- step 2: 根据arguments,从candidate function 中选出可以被arguments调用的函数, 这些新选出的函数称为**viable function**. 下面例子有两个viable functions. To be viable function,: 
+  - must have the same number of parameters as there are arguments int the call (parameter 数量必须跟调用的函数提供argument 数量一样)
+  - 每个argument must match or be convertible to corresponding parameter 
+  - If there are no viable functions, the compiler will complain that there is no matching function.如果没有找到可行函数, compiler 会报错
+- step 3: find the best match: 这一过程是逐一检查argument in the call and 选择function parameter 与argument best match的viable function, 下面例子中当 call ```f(int)``` 需要```double -> int```, 而call ```f(double, double)```不用convert
+
+
+```c++
+void f();
+void f(int);
+void f(int, int);
+void f(double, double = 3.14); 
+f(5.6); // calls void f(double, double)
+
+```
+
+**当有多个函数比配**: compiler以此检查argument by argument， 如果有一个function 满足下列条件，则比配成功: 
+- 每个argument的比配不劣与其他可行函数需要的匹配 (The match for each argument is no worse than the match required by any ohter viable function)
+- 至少有一个arugment的match 优于其他的viable functions的匹配(There is at least one argument for which the match is better than the match provided by any other viable function)
+- <span style="color:red">如果没有任何一个函数脱颖而出, 则call is error, the compiler will complain that the call is ambiguous</span>
+    - 比如```f(42,2.56)```, ```f(int, int);``` 和 ```f(double, double);```是一样的, ambigous call. 
+- 如果需要cast 才能找到最匹配的call, 是poorly design. Casts should not be needed to call an overloaded function. The need for a cast suggests that the parameter sets are designed poorly.
+
+
+**compiler ranks the conversions thatconver each argument to the type of parameters**:
+
+1. 精准匹配(exact match). An exact match happens when:
+    - argument and parameter types sre identical
+    - The argument is converted from an array or function type to the corresponding pointer type.
+    - top-level const is added or discarded from the argument (<span style="background-color:#FFFF00">添加或去掉top-level const</span>)
+2. Match through a const conversion (通过const 转化实现)
+3. Match through a promotion (通过类型提升实现, e.g. ```short->int```)
+4. Match through an arithmetic or pointer conversion (通过算数或者指针转换 (e.g. pointer -> bool ```if(*cp)``` ))
+5. Match through a class-type conversion. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <br/> <br/>
 
 ## Include Guard
