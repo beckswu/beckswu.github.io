@@ -2670,7 +2670,7 @@ Benefit of Encapsulation:
 #### (a). Abstract Data Types
 
 
-Functions defined in the classes are <span style="background-color:#FFFF00">implicitly inline</span>定义在class 内部的函数都是inline的. Although every member must be declared inside its class(必须在函数内部声明), we can define a member function’s body either inside or outside of the class body.
+Functions defined in the classes are <span style="background-color:#FFFF00">implicitly inline</span>. 定义在class 内部的函数都是inline的. Although every member must be declared inside its class(必须在函数内部声明), we can define a member function’s body either inside or outside of the class body.
 
 Ordinarily, nonmember functions that are part of the interface of a class should be declared in the same header as the class itself. (<span style="color:red">比如下面的print, read 不是class member 也应该与class 放入一个header</span>)
 
@@ -2679,6 +2679,7 @@ struct Sales_data {
     std::string isbn() const { return bookNo; }//定义声明在内部 
 
     //下面两个function, 声明在struct内部, 但是定义在外部
+    
     Sales_data& combine(const Sales_data&); 
     double avg_price() const;
 
