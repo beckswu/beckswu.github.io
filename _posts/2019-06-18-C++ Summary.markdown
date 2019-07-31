@@ -2705,9 +2705,9 @@ std::istream &read(std::istream&, Sales_data&);
     - ```bookNo``` It is as if we write ```this->bookNo```
 
 **const Member Functions**
-- ```const``` is to modify the type of the implicit ```this``` pointer, 放在parameter list之后表示 ```this``` is a pointer to ```const```. member function that use ```const```被称为<span style="color:red">const member functions</span>
+- ```const``` is to modify the type of the implicit ```this``` pointer, ```const```keyword放在parameter list之后表示 ```this``` is a pointer to ```const```. member function that use ```const```被称为<span style="color:red">const member functions</span>
 -  by default, the type of ```this``` is ```const``` pointer<span style="color:red"> to the non const version of the class type</span>(指针const, class 不是const).
-- 尽管```this``` is implicit, 但是follow initialization rules, which means cannot bind ```this```（this 没有low level const） to a ```const``` object(比如 pointer to const value).  因为我们cannot call an ordinary member function on a const object; 
+- 尽管```this``` is implicit, 但是follow initialization rules, which means cannot bind ```this```（this 没有low level const） to a ```const``` object(比如 pointer to const value, , 因为const 通过function call, this is a cont pointer to const object, 而non-const functio的this 是const pointer to nonconst obejct).  因为我们cannot call an ordinary member function on a const object; 
     - 比如```const A a; a.get();//error when get is not const function``` 
     - 所以把不改变object 的<span style="background-color:#FFFF00">function 设置成const, 可以提高函数灵活性</span>
 - ```this``` is a pointer to ```const``` 表示 <span style="background-color:#FFFF00">const member functions cannot change the object on which they are called</span>. 因此const function 不能write to data members of the objects 只能write
@@ -2731,13 +2731,13 @@ total.combine(trans);
 ```
 
 **Constructors** 
-- constructor is run whenever an object of a class type is created.只要class的对象被创建, 就会执行constructor
+- constructor  run whenever an object of a class type is created.只要class的对象被创建, 就会执行constructor
 - Unlike other member functions, <span style="background-color:#FFFF00">constructor 不能被declared as const</span>. <span style="color:red">When we create a **const** object of a class type, the object 直到constructure completes the object's initialization 才获得constness 属性 </span>. constructors can write to const objects during their construction.
 - Classes control default initialization by defining a special constructor, known as the **default constructor**.  <span style="background-color:#FFFF00">constructor 不能被declared as const. The default constructor is one that takes no arguments.</span> default constructor 是constructor work without any parameter; 错误的概念是constructor with no parameter; 比如```dog(string name = “Bob”); ```属于can work without any parameter
   - 如果我们explicitly define any constructors, <span style="color:red">compiler will implicitly define the default constructor</span>
   - <span style="background-color:#FFFF00">The compiler-generated constructor is known as the **synthesized default constructor**</span>, 对于大多数class, this synthesized constructor initializes each data member as folows: 
     - 如果there is an in-class initializer, 用它initialize member(如果存在class的初始值,用初始值初始化成员)
-    - Otherwise, default-initialze the member(否则, 默认初始化成员)
+    - Otherwise, default-initialize the member(否则, 默认初始化成员)
   - ```Sales_data() = default;``` we need to provide default constructor as well as default constructor, <span style="color:red">The = default can appear with the declaration inside the class body or on the definition outside the class body(既可以和声明出现在class 内部, 也可以作为定义出现在class 外部)</span>. <span style="background-color:#FFFF00">如果用```=default``` inside class double, the default constructor will be inlined. 如果出现在definition outside the class, the member will not be inlined by default </span>
   - 如果compiler 支持in-class initializer (在class 内部```int a = 1;```) 我们可以用default constructor without parameters, 如果不支持, your default constructor should use the **constructor initailizer list** to initialize every member of the class (e.g. ```sale(): a(0) {}```, 函数体是空的, 因为目的是为了数据成员赋值, 一旦没有其他成员, 函数体就是空)
 - constructor 不应该override in-class initializers except to use a different initial value.
@@ -2765,7 +2765,7 @@ The only difference between using class and using struct to define a class is th
 **friend**: 
 - A class can allow another class or function to <span style="background-color:#FFFF00">access its nonpublic members</span> by making that class or function a friend. 
 - Friend declarations may appear only inside a class definition. 友元定义只能在class 内部 (好的编程习惯是: 集中在程序开始或者结尾集中定义友元)
-- <span style="background-color:#FFFF00">friend declaraction 仅仅specifies access, 而不是general declaration of the function</span>, <span style="color:red">如果我们想要users able to call friend function, 需要declare the function separately from the friend declaration</span>. 让firend visible to users, we usually declare each friend (outside the class) in the same header as the class itself. 
+- <span style="background-color:#FFFF00">friend declaraction 仅仅specifies access, 而不是general declaration of the function</span>, <span style="color:red">如果我们想要users able to call friend function, 需要declare the function separately from the friend declaration</span>. 让friend visible to users, we usually declare each friend (outside the class) in the same header as the class itself. 
 
 #### (c). Additional Class Features
 
@@ -2863,7 +2863,7 @@ void do_display(std::ostream &os) const {os << contents;} //inline implicitly
 - 声明class object, 可以直接用class or struct name as type, 或者把name 放在keyword class or type的后面
 - 也可以只声明class 而不定义class, like ```class Screen;```, 这种声明叫做**forward declaration**, 但在它声明之后 定义之前是一个**imcomplete type**, 因为不清楚它包含哪些成员
   - **imcomplete type** can bed used in limited ways: define pointers or references to such types, 也可以定义functions that use an imcomplete type as a parameter or return type 
-- A class 必须被defined 而不仅仅是声明before we write code that creats objects of that type. 以你为compiler 需要know how much storage such objects need. 同理, a class 必须被定义before a reference or pointer is used to access a member of the type. 如果不定义, compiler cannot know 它有什么member
+- A class 必须被defined 而不仅仅是声明before we write code that creats objects of that type. 因为compiler 需要know how much storage such objects need. 同理, a class 必须被定义before a reference or pointer is used to access a member of the type. 如果不定义, compiler cannot know 它有什么member
 - <span style="background-color:#FFFF00">A class member 可以有pointers or references of its own type. 因为class is considered declared (not yet defined) as soon as its class name has been seen</span>. 但是compiler 需要知道how much storage the data memeber requires, 因为class is not defined until its class body is complete, <span style="color:red">a class cannot have members ot is own type</span>
 
 ```c++
@@ -2883,7 +2883,7 @@ Second obj2 = obj1; // error: obj1 and obj2 have different types
 ```c++
 Sales_data item1; // default-initialized object of type Sales_data class 
 
-Sales_data item1; // equivalent declaration
+class Sales_data item1; // equivalent declaration
 
 ```
 
