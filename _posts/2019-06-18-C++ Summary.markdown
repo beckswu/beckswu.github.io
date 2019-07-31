@@ -12,7 +12,7 @@ tags:
 ---
 
 
-
+- IO 类是不能被copy的类型,所以overload <<, >>, 带入ostream, istream reference
 - function return reference 可以用non-reference 去接, non-reference 接的话借的是copy 
 - namespace 中function 不是在class 但是声明了 static 是  give **internal linkage**, meaning that it is only accessible within the translation unit that contains the definition. Without static, it has external linkage, and is accessible in any translation unit. So you'd use static (or, alternatively, an unnamed namespace) when writing a function that's only intended for use within this unit; the internal linkage means that other units can define different functions with the same name without causing naming conflicts.
 
@@ -652,6 +652,8 @@ decltype(i) e;//ok: e is an int (uninitialized)
 <br/>
 
 ## 3. Strings, Vectors, and Arrays
+
+很多需要dynamic memory can use a vector or a string to manage the necessary storage. <span style="background-color: #FFFF00">vectors and strings avoid the complexities involved in allocating and deallocating memory.</span>
 
 #### (a). Namespace using Declarations
 
@@ -2654,12 +2656,235 @@ string::size_type largerLength(const string&, const string&);
 decltype(sumLength) *getFcn(const string &);
 ```
 
+<br/> <br/>
 
 
+## 7. Classes
+
+The fundamental ideas behind classes are **data abstraction** and **encapsulation***(数据抽象和封装). Data abstraction is a programming (and design) technique that relies on the separation of interface and implementation. **Encapsulation** enforces the separation of a class’ interface and implementation, A class that is encapsulated hides its implementation. 一个user只能看见interface, 不能看见implementation
+
+Benefit of Encapsulation: 
+1. User code cannot inadvertently corrupt the state of an encapsulated object.用户不会无意间破坏封装对象
+2.  The implementation of an encapsulated class can change over time without requiring changes in user-level code. 可以随时改变implementation without 影响用户
+
+#### (a). Abstract Data Types
 
 
+Functions defined in the classes are <span style="background-color:#FFFF00">implicitly inline</span>定义在class 内部的函数都是inline的. Although every member must be declared inside its class(必须在函数内部声明), we can define a member function’s body either inside or outside of the class body.
+
+Ordinarily, nonmember functions that are part of the interface of a class should be declared in the same header as the class itself. (<span style="color:red">比如下面的print, read 不是class member 也应该与class 放入一个header</span>)
+
+```c++
+struct Sales_data {
+    std::string isbn() const { return bookNo; }//定义声明在内部 
+
+    //下面两个function, 声明在struct内部, 但是定义在外部
+    Sales_data& combine(const Sales_data&); 
+    double avg_price() const;
+
+    std::string bookNo;
+    unsigned units_sold = 0; 
+    double revenue = 0.0;
+  };
+
+// nonmember Sales_data interface functions, 定义声明都在外部
+
+Sales_data add(const Sales_data&, const Sales_data&);
+std::ostream &print(std::ostream&, const Sales_data&); 
+std::istream &read(std::istream&, Sales_data&);
+```
+
+**this**: 
+- Member functions access the object through extra, implicit parameter named **this**(通过this额外的隐式参数来访问调用的对象). 
+- 当call member function, **this** is initialized with<span style="color:red"> the address of the object</span> which the function was invoked.
+    -  比如 ```total.isbn()``` compiler passes the address of ```total``` to the implicit ```this``` parameter. compiler 会等价的rewrite 为 ```Sales_data::isbn(&total)```(调用Sales_data的isbn的成员时传入total 的地址)
+- It's illegal to define a parameter or variable named ```this```.
+- ```this``` is a <span style="background-color:#FFFF00">const pointer</span>, we cannot change the address that ```this``` holds
+- 在class 函数内部的直接access member of the object, <span style="background-color:#FFFF00">因为any direct use of a member of the class is assumed to be an implicit reference through ```this```</span>(任何对类成员直接访问都被看作this的隐式引用)
+    - ```bookNo``` It is as if we write ```this->bookNo```
+
+**const Member Functions**
+- ```const``` is to modify the type of the implicit ```this``` pointer, 放在parameter list之后表示 ```this``` is a pointer to ```const```. member function that use ```const```被称为<span style="color:red">const member functions</span>
+-  by default, the type of ```this``` is ```const``` pointer<span style="color:red"> to the non const version of the class type</span>(指针const, class 不是const).
+- 尽管```this``` is implicit, 但是follow initialization rules, which means cannot bind ```this```（this 没有low level const） to a ```const``` object(比如 pointer to const value).  因为我们cannot call an ordinary member function on a const object; 
+    - 比如```const A a; a.get();//error when get is not const function``` 
+    - 所以把不改变object 的<span style="background-color:#FFFF00">function 设置成const, 可以提高函数灵活性</span>
+- ```this``` is a pointer to ```const``` 表示 <span style="background-color:#FFFF00">const member functions cannot change the object on which they are called</span>. 因此const function 不能write to data members of the objects 只能write
+- <span style="background-color:#FFFF00">Objects that are const, and references or pointers to const objects, may call only const member functions.</span> (因为const pointer to const object, or const ref call 不是const function，有潜在改变object的风险, 所以不能call)
+
+**Defining a Function to Return “This” Object**: 下面例子```total``` 被绑定到```this```, ```rhs``` 被绑定到```trans```上, 
 
 
+```c++
+Sales_data& Sales_data::combine(const Sales_data &rhs)
+{
+units_sold += rhs.units_sold; 
+revenue += rhs.revenue; 
+ return *this; // return the object on which the function was called
+
+//use this to access the object as a whole
+
+}
+
+total.combine(trans); 
+```
+
+**Constructors** 
+- constructor is run whenever an object of a class type is created.只要class的对象被创建, 就会执行constructor
+- Unlike other member functions, <span style="background-color:#FFFF00">constructor 不能被declared as const</span>. <span style="color:red">When we create a **const** object of a class type, the object 直到constructure completes the object's initialization 才获得constness 属性 </span>. constructors can write to const objects during their construction.
+- Classes control default initialization by defining a special constructor, known as the **default constructor**.  <span style="background-color:#FFFF00">constructor 不能被declared as const. The default constructor is one that takes no arguments.</span> default constructor 是constructor work without any parameter; 错误的概念是constructor with no parameter; 比如```dog(string name = “Bob”); ```属于can work without any parameter
+  - 如果我们explicitly define any constructors, <span style="color:red">compiler will implicitly define the default constructor</span>
+  - <span style="background-color:#FFFF00">The compiler-generated constructor is known as the **synthesized default constructor**</span>, 对于大多数class, this synthesized constructor initializes each data member as folows: 
+    - 如果there is an in-class initializer, 用它initialize member(如果存在class的初始值,用初始值初始化成员)
+    - Otherwise, default-initialze the member(否则, 默认初始化成员)
+  - ```Sales_data() = default;``` we need to provide default constructor as well as default constructor, <span style="color:red">The = default can appear with the declaration inside the class body or on the definition outside the class body(既可以和声明出现在class 内部, 也可以作为定义出现在class 外部)</span>. <span style="background-color:#FFFF00">如果用```=default``` inside class double, the default constructor will be inlined. 如果出现在definition outside the class, the member will not be inlined by default </span>
+  - 如果compiler 支持in-class initializer (在class 内部```int a = 1;```) 我们可以用default constructor without parameters, 如果不支持, your default constructor should use the **constructor initailizer list** to initialize every member of the class (e.g. ```sale(): a(0) {}```, 函数体是空的, 因为目的是为了数据成员赋值, 一旦没有其他成员, 函数体就是空)
+- constructor 不应该override in-class initializers except to use a different initial value.
+
+**Some Classes Cannot Rely on the Synthesized Default Constructor**
+- <span style="color:red">The compiler generates a default constructor automatically only if a class declares no constructors</span>. 只有我们没有定义任何的constructor，才会生成**synthesized default constructor**, 如果有自己定义constructor， 除非自己定义default constructor, 否则不会生成
+- 第二原因是: synthesized default constructor does the wrong thing, 比如数组或者指针对象被默认初始化, 他们值是未定义的. 所以当class has compound type (pointer or array) or built-in 应该有自己定义的constructor, or user create objects with memebers that have undefined value 
+  - <span style="color:red">Classes that have members of built-in or compound type usually should rely on the synthesized default constructor only if all such members have in-class initializers.</span>
+- 第三个原因是: some classes must define their own default constructor <span style="color:red">是因为有时候compiler is unable to systhesize one</span>. 比如一个class has member which is class type, and that class doesn't have a default constructor, then compiler can't initialize that memeber, 对于这个种情况, 必须定义自己的constructor
+
+如果我们不定义Copy, Assignment, and Destruction, compiler也许会synthesize them for us. <span style="color:red">对于class的vector or string, compiler generated 的 copy, assignment, destructor works correctly</span>, 因为we copy or assign an object that has a vector member, the vector class takes care of copying or assigning the element. 当object is destroyed, the vector member is destroyed which 反过来destroys the elements in vector.
+
+
+#### (b), Access Control and Encapsulation
+
+A class may contain zero or more access specifiers(private, public), and there are no restrictions on how often an access specifier may appear.
+
+The only difference between using class and using struct to define a class is the default access level and 继承是public and private. 
+
+定义private encapsulation 的优点:
+- 通过定义data private, 作用可以自由修改数据,只要nterface 不变，用户代码不变，但是如果the data are public, then any code that used the old data members 也许brokern. 需要rewrite any code that relied on old representation 后才能使用
+- 另一个定义private 优点.data are protected from mistakes that users might introduce, 防止因为用户原因数据被破坏, 如果发现bug corrupt object state, 发现bug位置是本地, 就去implementation差错, 而不用看用户的code, 降低了维护的难度
+
+
+**friend**: 
+- A class can allow another class or function to <span style="background-color:#FFFF00">access its nonpublic members</span> by making that class or function a friend. 
+- Friend declarations may appear only inside a class definition. 友元定义只能在class 内部 (好的编程习惯是: 集中在程序开始或者结尾集中定义友元)
+- <span style="background-color:#FFFF00">friend declaraction 仅仅specifies access, 而不是general declaration of the function</span>, <span style="color:red">如果我们想要users able to call friend function, 需要declare the function separately from the friend declaration</span>. 让firend visible to users, we usually declare each friend (outside the class) in the same header as the class itself. 
+
+#### (c). Additional Class Features
+
+- inline member functions should be defined in the same header as the corresponding class definition
+- **mutable Data Members**: <span style="background-color:#FFFF00">a mutable data member is never const even when it is a member of a const object(即使是const 对象成员,也不是const), a const member function of class may change a mutable member </span>
+- <span style="color:red">When we provide an in-class initializer, we must do so following an = sign or inside braces.</span>
+- <span style="background-color:#FFFF00">A const member function that returns *this as a reference should have a return type that is a reference to const.</span>一个const 成员函数如果return type 是 class reference 形式返回```*this```, 则return type 是 ```const class & ```
+- <span style="background-color:#FFFF00">可以overload function 基于是不是const </span> (match rule 跟function overloading match rule 类似)
+  - <span style="color:red">const object 只能call const function, 可能call nonconst function</span>
+  - <span style="color:red">nonconst obeject 可以call non-const 也可以call const version， 但是nonconst version 是better match</span>
+
+下面初始化Screen, class 内部初始化要么使用```=``` 在class内部初始化, or the direct form of initialization using ```{}```
+```c++
+class Screen{
+public: 
+    typedef std::string::size_type pos;
+    Screen() = default; // needed because Screen has another constructor 
+    
+    // cursor initialized to 0 by its in-class initializer
+
+    Screen(pos ht, pos wd, char c): height(ht), width(wd), contents(ht * wd, c) { }
+    //定义在class内部函数, inline, we don't need to specify inline, 但也可以specify
+
+
+    char get() const // implicitly inline 定义在class 内部都是inline (implictly)
+
+        { return contents[cursor]; } 
+
+    inline char get(pos ht, pos wd) const; // explicitly inline
+
+    Screen &move(pos r, pos c); // can be made inline later
+
+private:
+    pos cursor = 0;
+    pos height = 0, width = 0; std::string contents;
+    mutable size_t access_ctr; // may change even in a const object / const member function
+
+}
+
+std::vector<Screen> screens{Screen(24, 80, ' ') };
+
+```
+
+如果```move``` 和 ```set``` 返回都是class的reference(```*this```),
+```c++
+inline Screen &Screen::set(char c)
+{
+    contents[cursor] = c; 
+    return *this;
+} 
+
+//则可以用
+
+myScreen.move(4,0).set('#');
+```
+如果```move``` 和 ```set``` 返回都是class, 而不是reference
+```
+Screen temp = myScreen.move(4,0)
+temp =  temp.set('#');
+
+```
+
+Returning *this from a const Member Function: 如果有一个新的function ```display``` return type 是 ```Screen &```, 但是<span style="color:red">const function</span>, 则下面是错误的. If ```display``` is a ```const``` member, then ```this``` is a pointer to ```const``` and ```*this``` is a ```const``` object. Hence, the return type of ```display``` must be const ```Screen&```. 即使```myScreen``` is non const, 原因是```display``` 的返回时const reference, we cannot call ```set ``` on a ```const``` object
+```c++
+Screen myScreen;
+// if display returns a const reference, the call to set is an error 
+
+myScreen.display(cout).set('*');
+```
+
+Const function overload, <span style="background-color:#FFFF00">object 是不是const, 决定call 哪个display function.</span>  <span style="color:red">```*this``` pointer is passed implicitly</span>. when ```display```calls ```do_display```, ```*this``` pointer is implicitly passed to ```do_display```. 当nonconst version of ```display``` calls ```do_display```, <span style="background-color:#FFFF00">```*this``` pointer is implicitly convert from a pointer to nonconst to a pointer to const </span>, 当```do_display```完成后，```display```函数各自返回解引用```this```所得的对象, nonconst version, ```*this``` points to a nonconst object, ```display``` 函数返回一个ordinary(普通的, non-const) reference, the const member returns a reference to const.
+
+```c++
+class Screen { 
+public:
+// display overloaded on whether the object is const or not 
+
+Screen &display(std::ostream &os)
+    { do_display(os); return *this; } 
+const Screen &display(std::ostream &os) const
+    { do_display(os); return *this; }
+
+private:
+// function to do the work of displaying a Screen
+
+void do_display(std::ostream &os) const {os << contents;} //inline implicitly 
+
+//call这个function, 不会带来额外的开销(no run-time overhead)
+
+};
+```
+
+**Class Types**: 
+- Every class deines a unique type, <span style="color:red">即使两个different types define the same members 他们也是不同类型的</span>. Even if two classes have exactly the same member list, they are different types. The members of each class are distinct from the members of any other class (or any other scope).
+- 声明class object, 可以直接用class or struct name as type, 或者把name 放在keyword class or type的后面
+- 也可以只声明class 而不定义class, like ```class Screen;```, 这种声明叫做**forward declaration**, 但在它声明之后 定义之前是一个**imcomplete type**, 因为不清楚它包含哪些成员
+  - **imcomplete type** can bed used in limited ways: define pointers or references to such types, 也可以定义functions that use an imcomplete type as a parameter or return type 
+- A class 必须被defined 而不仅仅是声明before we write code that creats objects of that type. 以你为compiler 需要know how much storage such objects need. 同理, a class 必须被定义before a reference or pointer is used to access a member of the type. 如果不定义, compiler cannot know 它有什么member
+- <span style="background-color:#FFFF00">A class member 可以有pointers or references of its own type. 因为class is considered declared (not yet defined) as soon as its class name has been seen</span>. 但是compiler 需要知道how much storage the data memeber requires, 因为class is not defined until its class body is complete, <span style="color:red">a class cannot have members ot is own type</span>
+
+```c++
+struct First { int memi;
+int getMem();
+};
+struct Second {
+int memi;
+int getMem();
+};
+
+First obj1;
+Second obj2 = obj1; // error: obj1 and obj2 have different types
+
+```
+
+```c++
+Sales_data item1; // default-initialized object of type Sales_data class 
+
+Sales_data item1; // equivalent declaration
+
+```
 
 
 
