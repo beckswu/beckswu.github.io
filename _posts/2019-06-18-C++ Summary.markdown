@@ -2733,7 +2733,7 @@ total.combine(trans);
 - constructor  run whenever an object of a class type is created.只要class的对象被创建, 就会执行constructor
 - Unlike other member functions, <span style="background-color:#FFFF00">constructor 不能被declared as const</span>. <span style="color:red">When we create a **const** object of a class type, the object 直到constructure completes the object's initialization 才获得constness 属性 </span>. constructors initialize const objects during their construction.
 - Classes control default initialization by defining a special constructor, known as the **default constructor**: is one that takes no arguments.
-  - default constructor 是constructor work without any argument; 错误的概念是constructor with no parameters (either no parameters, or all parameters have default values); 比如```dog(string name = “Bob”); ```属于can work without any argument, 但有default parameter
+  - <span style="background-color:#FFFF00">**default constructor** 是constructor work without any argument(either no parameters, or all parameters have default values)</span>; 错误的概念是constructor with no parameters; 比如```dog(string name = “Bob”); ```属于can work without any argument, 但有default parameter
   - 如果没有explicitly define any constructors, <span style="color:red">compiler will implicitly define and generate the default constructor</span> known as the <span style="background-color:#FFFF00">**synthesized default constructor**</span>, 对于大多数class, this synthesized constructor initializes each data member as follows: 
     - 如果there is an in-class initializer, 用default constructor without parameters initialize member(如果存在class的初始值,用初始值初始化成员) 比如class 中```string a = "dog";```
     - Otherwise, default-initialize the member(否则, 默认初始化成员),比如class 中```string a;``` 默认初始化为空
@@ -2742,8 +2742,8 @@ total.combine(trans);
 - constructor 不应该override in-class initializers except to use a different initial value.
 
 **Some Classes Cannot Rely on the Synthesized Default Constructor**
-- <span style="color:red">The compiler generates a default constructor automatically only if a class declares no constructors</span>. 只有我们没有定义任何的constructor，才会生成**synthesized default constructor**, 如果有自己定义constructor， 除非自己定义default constructor, 否则不会生成
-- 第二原因是: synthesized default constructor does the wrong thing, 比如数组或者指针对象被默认初始化, 他们值是未定义的. 所以当class has compound type (pointer or array) or built-in 应该有自己定义的constructor, or user create objects with memebers that have undefined value 
+- <span style="color:red">只有我们没有声明任何的constructor，compiler 才会generates **synthesized default constructor**, 如果有自己定义constructor， 除非自己定义default constructor, 否则不会生成
+- 第二原因是: synthesized default constructor does the wrong thing, 比如数组或者指针对象被默认初始化, 他们值是未定义的. 所以当class has compound type (pointer or array) or built-in 应该有自己定义的constructor, 否则有 undefined value 
   - <span style="color:red">Classes that have members of built-in or compound type usually should rely on the synthesized default constructor only if all such members have in-class initializers.</span>
 - 第三个原因是: some classes must define their own default constructor <span style="color:red">是因为有时候compiler is unable to systhesize one</span>. 比如一个class has member which is class type, and that class doesn't have a default constructor, then compiler can't initialize that memeber, 对于这个种情况, 必须定义自己的constructor
 
