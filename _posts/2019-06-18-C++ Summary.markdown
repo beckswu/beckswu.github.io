@@ -2705,8 +2705,8 @@ std::istream &read(std::istream&, Sales_data&);
 - It's illegal to define a parameter or variable named ```this```.
 
 **const Member Functions**
-- ```const``` is to modify the type of the implicit ```this``` pointer 表示 ```this``` is a pointer to ```const```. member function that use ```const```被称为<span style="color:red">const member functions</span>
-- <span style="background-color:#FFFF00">Cannot bind ```this```（this 没有low level const） to a ```const``` object, 同时 const object cannot call an ordinary member function  </span>(因为const 通过function call, ```this``` is a const pointer to const object, 而non-const function的```this``` 是const pointer to nonconst obejct). ; 
+- ```const``` is to modify the type of the implicit ```this``` pointer, 表示 ```this``` is a pointer to ```const```. Member function that use ```const```被称为<span style="color:red">const member functions</span>
+- <span style="background-color:#FFFF00">Cannot bind ```this```（this 没有low level const） to a ```const``` object, 同时 const object (```this```有lower const) cannot call an ordinary member function (```this```没有lower const) </span>(lower const ->no lower const的 不可以, const function call ```this``` is a const pointer to const object, 而non-const function的```this``` 是const pointer to nonconst obejct). ; 
     - 比如```const A a; a.get();//error when get is not const function``` 
     - 所以把不改变object 的<span style="background-color:#FFFF00">function 设置成const, 可以提高函数灵活性</span>
 - const function 表示```this``` is a pointer to ```const```, <span style="background-color:#FFFF00">const member functions cannot change the object on which they are called</span>. 因此const function 不能write to data members of the objects 只能read
