@@ -2670,7 +2670,7 @@ Benefit of Encapsulation:
 #### (a). Abstract Data Types
 
 
-Functions defined in the classes are <span style="background-color:#FFFF00">implicitly inline</span>. 定义在class 内部的函数都是inline的. Although every member must be declared inside its class(必须在函数内部声明), we can define a member function’s body either inside or outside of the class body.
+Functions defined in the classes are <span style="background-color:#FFFF00">implicitly inline</span>. 定义在class 内部的函数都是inline的. function声明必须在函数内部声明, we can define a member function’s body either inside or outside of the class body.
 
 Ordinarily, nonmember functions that are part of the interface of a class should be declared in the same header as the class itself. (<span style="color:red">比如下面的print, read 不是class member 也应该与class 放入一个header</span>)
 
@@ -2696,17 +2696,16 @@ std::istream &read(std::istream&, Sales_data&);
 ```
 
 **this**: 
-- Member functions access the object through extra, implicit parameter named **this**(通过this额外的隐式参数来访问调用的对象). 
-- 当call member function, **this** is initialized with<span style="color:red"> the address of the object</span> which the function was invoked.
+- ```this``` is a <span style="background-color:#FFFF00">const pointer</span>, we cannot change the address that ```this``` holds. It is a constant pointer that holds the memory address of current object. <span style="color:red">this is not available in static member function </span> 
+- Member functions access the object through extra, implicit parameter named **this**. **this** is initialized with<span style="color:red"> the address of the object</span> which the function (只限于nonstatic) was invoked.
     -  比如 ```total.isbn()``` compiler passes the address of ```total``` to the implicit ```this``` parameter. compiler 会等价的rewrite 为 ```Sales_data::isbn(&total)```(调用Sales_data的isbn的成员时传入total 的地址)
-- It's illegal to define a parameter or variable named ```this```.
-- ```this``` is a <span style="background-color:#FFFF00">const pointer</span>, we cannot change the address that ```this``` holds
-- 在class 函数内部的直接access member of the object, <span style="background-color:#FFFF00">因为any direct use of a member of the class is assumed to be an implicit reference through ```this```</span>(任何对类成员直接访问都被看作this的隐式引用)
+- 在class 函数内部的直接access member of the object, 因为any direct use of a member of the class is assumed to be an implicit reference through ```this```(任何对类成员直接访问都被看作this的隐式引用)
     - ```bookNo``` It is as if we write ```this->bookNo```
+- It's illegal to define a parameter or variable named ```this```.
 
 **const Member Functions**
-- ```const``` is to modify the type of the implicit ```this``` pointer, ```const```keyword放在parameter list之后表示 ```this``` is a pointer to ```const```. member function that use ```const```被称为<span style="color:red">const member functions</span>
--  by default, the type of ```this``` is ```const``` pointer<span style="color:red"> to the non const version of the class type</span>(指针const, class 不是const).
+- ```const``` is to modify the type of the implicit ```this``` pointer 表示 ```this``` is a pointer to ```const```. member function that use ```const```被称为<span style="color:red">const member functions</span>
+-  by default, the type of ```this``` is ```const``` pointer<span style="color:red"> to the non const version of the class type</span>(top level const, lower level nonconst).
 - 尽管```this``` is implicit, 但是follow initialization rules, which means cannot bind ```this```（this 没有low level const） to a ```const``` object(比如 pointer to const value, , 因为const 通过function call, this is a const pointer to const object, 而non-const functio的this 是const pointer to nonconst obejct).  因为我们cannot call an ordinary member function on a const object; 
     - 比如```const A a; a.get();//error when get is not const function``` 
     - 所以把不改变object 的<span style="background-color:#FFFF00">function 设置成const, 可以提高函数灵活性</span>
