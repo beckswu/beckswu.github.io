@@ -2696,8 +2696,9 @@ std::istream &read(std::istream&, Sales_data&);
 ```
 
 **this**: 
-- ```this``` is a <span style="background-color:#FFFF00">const pointer</span>, we cannot change the address that ```this``` holds. It is a constant pointer that holds the memory address of current object. <span style="color:red">this is not available in static member function </span> 
-- Member functions access the object through extra, implicit parameter named **this**. **this** is initialized with<span style="color:red"> the address of the object</span> which the function (只限于nonstatic) was invoked.
+- ```this``` is a <span style="background-color:#FFFF00">const pointer</span>, we cannot change the address that ```this``` holds. <span style="color:red">```this``` is a constant pointer that holds the memory address of current object. this is not available in static member function </span> 
+-  By default, the type of ```this``` is ```const``` pointer<span style="color:red"> to the non const version of the class type</span>(top level const, lower level nonconst).
+- Member functions access the object through extra, <span style="color:red">implicit</span> parameter named **this**. **this** is initialized with<span style="color:red"> the address of the object</span> which the function (只限于nonstatic) was invoked.
     -  比如 ```total.isbn()``` compiler passes the address of ```total``` to the implicit ```this``` parameter. compiler 会等价的rewrite 为 ```Sales_data::isbn(&total)```(调用Sales_data的isbn的成员时传入total 的地址)
 - 在class 函数内部的直接access member of the object, 因为any direct use of a member of the class is assumed to be an implicit reference through ```this```(任何对类成员直接访问都被看作this的隐式引用)
     - ```bookNo``` It is as if we write ```this->bookNo```
@@ -2705,12 +2706,11 @@ std::istream &read(std::istream&, Sales_data&);
 
 **const Member Functions**
 - ```const``` is to modify the type of the implicit ```this``` pointer 表示 ```this``` is a pointer to ```const```. member function that use ```const```被称为<span style="color:red">const member functions</span>
--  by default, the type of ```this``` is ```const``` pointer<span style="color:red"> to the non const version of the class type</span>(top level const, lower level nonconst).
-- 尽管```this``` is implicit, 但是follow initialization rules, which means cannot bind ```this```（this 没有low level const） to a ```const``` object(比如 pointer to const value, , 因为const 通过function call, this is a const pointer to const object, 而non-const functio的this 是const pointer to nonconst obejct).  因为我们cannot call an ordinary member function on a const object; 
+- <span style="background-color:#FFFF00">Cannot bind ```this```（this 没有low level const） to a ```const``` object, 同时 const object cannot call an ordinary member function  </span>(因为const 通过function call, ```this``` is a const pointer to const object, 而non-const function的```this``` 是const pointer to nonconst obejct). ; 
     - 比如```const A a; a.get();//error when get is not const function``` 
     - 所以把不改变object 的<span style="background-color:#FFFF00">function 设置成const, 可以提高函数灵活性</span>
-- ```this``` is a pointer to ```const``` 表示 <span style="background-color:#FFFF00">const member functions cannot change the object on which they are called</span>. 因此const function 不能write to data members of the objects 只能write
-- <span style="background-color:#FFFF00">Objects that are const, and references or pointers to const objects, may call only const member functions.</span> (因为const pointer to const object, or const ref call 不是const function，有潜在改变object的风险, 所以不能call)
+- const function 表示```this``` is a pointer to ```const```, <span style="background-color:#FFFF00">const member functions cannot change the object on which they are called</span>. 因此const function 不能write to data members of the objects 只能read
+- <span style="background-color:#FFFF00">Objects that are const, and references or pointers to const objects, may call only const member functions.</span> 
 
 **Defining a Function to Return “This” Object**: 下面例子```total``` 被绑定到```this```, ```rhs``` 被绑定到```trans```上, 
 
