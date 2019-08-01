@@ -2764,7 +2764,8 @@ The only difference between using class and using struct to define a class is th
 
 **friend**: 
 - A class can allow another class or function to <span style="background-color:#FFFF00">access its nonpublic members</span> by making that class or function a friend. 
-- Friend declarations may appear only inside a class definition. 友元定义只能在class 内部 (好的编程习惯是: 集中在程序开始或者结尾集中定义友元)
+- Friend declarations may appear only inside a class definition. 友元声明只能在class 内部 (好的编程习惯是: 集中在程序开始或者结尾集中定义友元)
+- <span style="color:red">如果Friend function定义在class 内部是inline function</span>
 - <span style="background-color:#FFFF00">friend declaraction 仅仅specifies access, 而不是general declaration of the function</span>, <span style="color:red">如果我们想要users able to call friend function, 需要declare the function separately from the friend declaration</span>. 让friend visible to users, we usually declare each friend (outside the class) in the same header as the class itself. 
 
 #### (c). Additional Class Features
@@ -2889,6 +2890,357 @@ class Sales_data item1; // equivalent declaration
 
 
 
+**Friend Class**: 
+- <span style="background-color:#FFFF00">friendship is not transitive</span>, 比如下面例子中 ```Window_mgr```有自己的friends, those friends 没有access to ```Screen```
+- 还用只声明一个class 的function 有friend 权限, Making a member function a friend 需要仔细设计程序, 下面例子中
+  - 首先定义class ```Window_mgr```. 其中声明但不定义```clear``` functinon，
+  - 再定义class ```Screen```, including a friend declaration for ```clear```
+  - 最后define ```clear``` 此时才可以使用```Screen```的成员
+- friend / nonmember function 不需要在 用到他们的friend declaraction 声明之前, 当一个<span style="background-color:#FFFF00">名字appear in a friend declaration</span>, 这个名字是<span style="background-color:#FFFF00">implicitly assumed to be part of the surrounding scope</span>(在友元中出现的名字,是被假设可见的); 但反过来不行, friend 即使define in the class,<span style="background-color:#FFFF00"> 我们也必须提供一个declaration outside the class</span> itself to make that function visible. <span style="color:red">一个友元的outside declaration 必须在call 友元function 前的member function前面</span>, 所以用到友元的function 最好放在class 外面定义 (some compilers do not enforce the lookup rules for friends）
+
+```c++
+class Screen{
+    friend class Window_mrg; 
+    //Window_mrg可以access Screen Class的所有数据
+
+
+    friend void Window_mgr::clear(ScreenIndex); 
+    //只声明class 一个clear function 有friend 权限, 但是clear需要declare before Class Screen 
+
+}
+```
+
+下面函数
+```c++
+extern std::ostream& storeOn(std::ostream &, Screen &);//声明成友元
+
+extern BitMap& storeOn(BitMap &, Screen &); 
+//接受BitMap & 的storeOn, 对Screen 没有访问权限对private / public
+
+class Screen {
+// ostream version of storeOn may access the private parts of Screen objects
+
+friend std::ostream& storeOn(std::ostream &, Screen &); // . . .
+};
+```
+
+friend function scope
+```c++
+struct X {
+    friend void f() { /* friend function can be defined in the class */ }
+    
+    X() { f(); } // error: no declaration for f void g();
+
+    void h();
+};
+void X::g() { return f(); } // error: f hasn't been declared
+
+void f(); // declares the function defined inside X 
+
+void X::h() { return f(); } // ok: declaration for f is now in scope
+
+```
+
+#### (d). Class Scope
+- class 外部访问public data/function，只能通过object, reference, pointer; type members(typedef) from the class 可以访问 using the scope operator .
+- 在class 外部定义function, 需要provide class name + function name. 当class name 被看见 知道function 属于class, function定义就可以随便用class member without using class name (因为everyname is seen in class scope)
+- class 返回值声明在 class name 前, 因为any named in return type is outside scope 当定义function outside class. 因此<span style="color:red">return type需要specify class name, 如果返回类型是在class 内部定义的</span>
+
+```c++
+class Window_mgr { 
+public:
+    // add a Screen to the window and returns its index 
+
+    ScreenIndex addScreen(const Screen&); 
+};
+// return type is seen before we're in the scope of Window_mgr
+
+Window_mgr::ScreenIndex Window_mgr::addScreen(const Screen &s)
+```
+
+**(1).name lookup**: the process of finding which declarations match the use of a name
+1. Look for declaration of the name in the block (before use of name) which the name was used. 只在名字现在块中(使用之前的)查找
+2. 如果名字没有发现, look in the enclosing scope（继续查找外层作用域)
+3. if no declaration found, program is error
+
+class defintion are processed into: 
+1. memeber declarations are compiled (编译成员声明)
+2. function bodies/definitions are processed and compiled only after the entire class has been seen (<span style="background-color:#FFFF00">直到class全部可见后,编译函数体</span>)
+
+- 因为函数体直到class 可见后 才processed. 所以function 可以用任何name defined inside the class. 假如function definition 和member declaration 同时进行, 比如order memeber functions 这样才能用已经被看见的名字
+- <span style="color:red">上面的two-step process 只适用于member function bodies</span>, Names used in declarations, 包括了<span style="background-color:#FFFF00">return type and types in parameter list 必须被看见before they are used</span>. 否则会报错
+- <span style="color:red">tips:</span>: 定义type names 通常在class beginning, 这样any member that uses that type will be seen after the type name has been already been defined
+
+看到```balance``` function, 寻找```Money```的声明,先看在Account class中是否声明, 没有. 然后需要declaration in enclosing scope(外层作用域). 找到typedef 对象return type; 另一方面, <span style="color:red">因为balance 函数的在class is seen之后才看见, 所以返回的bal 是class 的</span>, 而不是外层作用域的string
+```c++
+typedef double Money; 
+string bal;
+class Account { 
+    public:
+        Money balance() { return bal; }
+    private:
+        Money bal; 
+};
+```
+
+**(2).Type Names Are Special**: 一般来说, inner scope can redefine a name from an outer scope even if that name has already been used in the inner scope. 但是class 不行, <span style="color:red">if a member uses a name from an outer scope and that name is a type, then class 不能重新定义它</span> class 不能重新定义type, 如果这个type 被member function parameter/return 使用
+
+```c++
+typedef double Money;
+class Account {
+public:
+    scope Money balance() { return bal; } 
+    // uses Money from the outer
+
+private:
+    typedef double Money; // error: cannot redefine Money
+
+    Moeny bal;
+};
+```
+
+**(3). Normal Block-Scope Name Lookup inside Member Definitions**
+
+A name used in the body of a member function is resolved as follows:(一般不建议use the name of another member as the name for function parameter, 不建议使用成员的名字用作函数参数)
+1. 首先在member function内部寻找 在name 被使用之前)
+2. 如果没有找到, 再到class 内部继续寻找declaration. All the members of the class are considered (class所有成员都被考虑)3. 如果没有找打, look for a declaration that is in scope before the member function defintiion. (在函数定义前的作用域, 因为函数可能定义在class外部(in file) ) 
+
+当compiler 处理dummy_fcn 的乘法时， 首先寻找 ```height```  in the scope of that function. function parameter in function scope 所以使用的是parameter 的```height```
+```c++
+// note: this code is for illustration purposes only and reflects bad practice
+
+// it is generally a bad idea to use the same name for a parameter and a member
+
+int height; // defines a name subsequently used inside Screen
+
+class Screen {
+public:
+    typedef std::string::size_type pos; 
+    void dummy_fcn(pos height) {
+        cursor = width * height; // which height? the parameter 
+        
+    }
+private:
+    pos cursor = 0;
+    pos height = 0, width = 0;
+};
+
+```
+
+上面例子中```height``` 隐藏了member named ```height```. 如果我们想override the normal lookup rules, 可以如下, 如果想使用outer class 外层作用域的, 可以用scope operator ```::```
+
+```c++
+// bad practice: names local to member functions shouldn't hide member names 
+
+void Screen::dummy_fcn(pos height) 
+{
+cursor = width * this->height; // member height 
+
+// alternative way to indicate the member
+
+cursor = width * Screen::height; // member height
+
+}
+
+// good practice: don't use a member name for a parameter or other local variable 
+
+//即使height 出现在dummy_fcn 后面, 根据lookup rule会使用class member height (而不用外面的height)
+
+void Screen::dummy_fcn(pos ht) {
+cursor = width * height; // member height 
+
+}
+
+//outer scope 的height
+
+// bad practice: don't hide names that are needed from surrounding scopes 
+
+void Screen::dummy_fcn(pos height) {
+cursor = width * ::height;// which height? the global one 
+
+}
+```
+
+注意 ```verify``` is not visible before the definition of the class screen. 但是第三步lookup includes the scope where member definition befores. 因为```verify```在```setHeight```前定义,因此可以使用 
+```c++
+int height; // defines a name subsequently used inside Screen 
+
+class Screen {
+public:
+    typedef std::string::size_type pos;
+    void setHeight(pos);
+    pos height = 0; // hides the declaration of height in the outer scope
+
+};
+Screen::pos verify(Screen::pos); 
+
+void Screen::setHeight(pos var) {
+// var: refers to the parameter
+
+// height: refers to the class member
+
+// verify: refers to the global function 
+
+    height = verify(var);
+}
+
+```
+
+
+
+
+#### (e). Constructors Revisited
+
+**(1). Constructor Initializer List**
+
+
+Assignment 和 initialization 是不同的: <span style="background-color:#FFFF00">在class 中, Assignment是先初始化 再赋值， initializatin是直接初始化</span>, 比如下面例子, How significant the distinction between initialization and assignment 由data member 类型决定
+
+```c++
+//is Initialization
+
+class data{
+    double revenue = 0.0; 
+    string bookNo; 
+};
+
+//Is Assignment
+class data{
+    double revenue; 
+    string bookNo;
+
+    data(const string & a, double price){
+        bookNo = a;
+        revenue = price;
+    } 
+};
+```
+
+- <span style="color:red">必须用**constructor initializer** list to privide values for members that are const, reference, or a class type that does have a default constructor</span>,const, reference 是必须initialized的
+  - <span style="background-color:#FFFF00"> 如果member 有 const or reference, 不会有default constructor, 必须要Initialized </span>
+  -  **constructor initializer list** specifies only the values used to initialize the members, not the order in which those initializations are performed. **constructor initializer list**没有说明初始化的order
+-  <span style="background-color:#FFFF00">class members are initialized 与他们在class 出现的顺序一致, 因为 **constructor initializer list** order 不会影响他们实际初始化的顺序</span>
+   -  一般顺序不matter, 但是如果一个成员用另一个成员初始化后的值, order 就matter了 (有些compiler 会有warning)
+   -  最好write **constructor initializer** in the same order as members are declared. 其次避免using members to initialize other members
+ 
+```c++
+class ConstRef { 
+public:
+    ConstRef(int ii); 
+private:
+    int i, &ri;
+    const int ci;
+};
+
+// error: ci and ri must be initialized 
+
+ConstRef::ConstRef(int ii)
+{   // assignments:
+
+i=ii; //ok
+
+ci = ii; // error: cannot assign to a const 
+
+ri = i; // error: ri was never initialized
+
+}
+
+// ok: explicitly initialize reference and const members 
+
+ConstRef::ConstRef(int ii): i(ii), ci(ii), ri(i) { }
+
+```
+
+Order of Initialization, 下边例子中, **constructor initializer** 让 j is initialized then i. <span style="color:red">但实际上是i先initialized, 但是当initialized 时 with the undefined value of j</span>
+```c++
+class X{
+    int i;
+    int j;
+public: 
+    // undefined: i is initialized before j
+
+    X(int val): j(val), i(j){}
+};
+
+```
+
+
+**Default Arguments and Constructors**: the only difference between default constructor and takes a default parameter constructor: default constructor 用string的default constructor to initialize bookNo. constructor with a single argument 用argument to initialize ```bokNo```
+
+<span style="background-color:#FFFF00">**A constructor that supplies default arguments for all its parameters also defines the default constructor**</span>
+
+```c++
+class Sales_data { 
+public:
+    // defines the default constructor as well as one that takes a string argument 
+    Sales_data(std::string s = ""): bookNo(s) { }
+}
+```
+
+**(2) Delegating Constructor(委托构造函数)**: 
+
+- <span style="background-color:#FFFF00">A delegating constructor uses another constructor from its own class to perform its initialization</span>
+- In a delegating constructor, the member initializer list 有single entry call class another constructor. 
+- When a constructor delegates to another constructor, 先run delegated-to constructor 之后才把control returned to the function body of delegating constructor(叫别的delegatted constructor的函数的主体)
+
+```c++
+class Sales_data {
+public:
+    // nondelegating constructor initializes members from corresponding arguments 
+    
+    Sales_data(std::string s, unsigned cnt, double price):
+            bookNo(s), units_sold(cnt), revenue(cnt*price) {}
+
+// remaining constructors all delegate to another constructor
+
+Sales_data(): Sales_data("", 0, 0) {} 
+Sales_data(std::string s): Sales_data(s, 0,0) {} 
+Sales_data(std::istream &is): Sales_data() {read(is, *this); }
+};
+```
+
+**(2) Role of Default Constructor**: 
+
+<span style="background-color:#FFFF00">The default constructor is used automatically whenever an object is default or value initialized</span>. Default initialization happens: 
+1. when we define nonstatic varaibles or array without initializers
+2. When a class that itself has members of class type uses the **synthesized default constructor**
+3. When members of class type are not explicitly initialized in a constructor initializer list 
+
+Value initialization happens: 
+- Array Initilization, 当提供的初始值  fewer than its size
+- <span style="background-color:#FFFF00">when we define a local static object without an initializer</span>
+- 当我们书写乳```T()```的表达式explicitly request value initialization where ```T``` is the name of a type (比如vector constructor takes a single argument to specify vector's size) 
+
+```c++
+class NoDefault { 
+public:
+    NoDefault(const std::string&);
+    // additional members follow, but no other constructors 
+
+};
+
+struct A { 
+    NoDefault my_mem;
+};
+A a; // error: cannot synthesize a constructor for A 
+
+
+struct B {
+    B() {} // error: no initializer for b_member 
+    
+    NoDefault b_member;
+};
+```
+
+错误declare object
+
+```c++
+Sales_data obj(); // error:  declare a function, not an object
+
+//表示a function taking no parameters and return type is Sales_data
+
+Sales_data obj;
+```
 
 
 
