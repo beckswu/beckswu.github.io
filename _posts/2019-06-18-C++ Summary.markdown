@@ -2733,12 +2733,12 @@ total.combine(trans);
 - constructor  run whenever an object of a class type is created.只要class的对象被创建, 就会执行constructor
 - Unlike other member functions, <span style="background-color:#FFFF00">constructor 不能被declared as const</span>. <span style="color:red">When we create a **const** object of a class type, the object 直到constructure completes the object's initialization 才获得constness 属性 </span>. constructors initialize const objects during their construction.
 - Classes control default initialization by defining a special constructor, known as the **default constructor**: is one that takes no arguments.
-  - default constructor 是constructor work without any argument; 错误的概念是constructor with no parameter; 比如```dog(string name = “Bob”); ```属于can work without any argument, 但有default parameter
+  - default constructor 是constructor work without any argument; 错误的概念是constructor with no parameters (either no parameters, or all parameters have default values); 比如```dog(string name = “Bob”); ```属于can work without any argument, 但有default parameter
   - 如果没有explicitly define any constructors, <span style="color:red">compiler will implicitly define and generate the default constructor</span> known as the <span style="background-color:#FFFF00">**synthesized default constructor**</span>, 对于大多数class, this synthesized constructor initializes each data member as follows: 
-    - 如果there is an in-class initializer, 用它initialize member(如果存在class的初始值,用初始值初始化成员) 比如class 中```string a = "dog";```
+    - 如果there is an in-class initializer, 用default constructor without parameters initialize member(如果存在class的初始值,用初始值初始化成员) 比如class 中```string a = "dog";```
     - Otherwise, default-initialize the member(否则, 默认初始化成员),比如class 中```string a;``` 默认初始化为空
+    -  如果不支持默认初始化, your default constructor should use the **constructor initailizer list** to initialize every member of the class (e.g. ```sale(): a(0) {}```)
   - ```Sales_data() = default;``` 让compiler generate default constructor: <span style="color:red">The = default can appear with the declaration inside the class body or on the definition outside the class body(既可以和声明出现在class 内部, 也可以作为定义出现在class 外部)</span>. <span style="background-color:#FFFF00">如果用```=default``` inside class, the default constructor will be **inlined**. 如果出现在definition outside the class, the member will not be inlined by default </span>
-  - 如果compiler 支持in-class initializer (在class 内部```int a = 1;```) 我们可以用default constructor without parameters, 如果不支持, your default constructor should use the **constructor initailizer list** to initialize every member of the class (e.g. ```sale(): a(0) {}```)
 - constructor 不应该override in-class initializers except to use a different initial value.
 
 **Some Classes Cannot Rely on the Synthesized Default Constructor**
