@@ -2757,25 +2757,25 @@ A class may contain zero or more access specifiers(private, public), and there a
 The only difference between using class and using struct to define a class is the default access level and 继承是public and private. 
 
 定义private encapsulation 的优点:
-- 通过定义data private, 作用可以自由修改数据,只要nterface 不变，用户代码不变，但是如果the data are public, then any code that used the old data members 也许brokern. 需要rewrite any code that relied on old representation 后才能使用
+- 通过定义data private, 作用可以自由修改数据,只要interface 不变，用户代码不变，但是如果the data are public, then any code that used the old data members 也许brokern. 需要rewrite any code that relied on old representation 后才能使用
 - 另一个定义private 优点.data are protected from mistakes that users might introduce, 防止因为用户原因数据被破坏, 如果发现bug corrupt object state, 发现bug位置是本地, 就去implementation差错, 而不用看用户的code, 降低了维护的难度
 
 
 **friend**: 
-- A class can allow another class or function to <span style="background-color:#FFFF00">access its nonpublic members</span> by making that class or function a friend. 
+- A class can allow another class or function to <span style="background-color:#FFFF00">access its nonpublic members</span> by making that class or function a **friend**. 
 - Friend declarations may appear only inside a class definition. 友元声明只能在class 内部 (好的编程习惯是: 集中在程序开始或者结尾集中定义友元)
-- <span style="color:red">如果Friend function定义在class 内部是inline function</span>
-- <span style="background-color:#FFFF00">friend declaraction 仅仅specifies access, 而不是general declaration of the function</span>, <span style="color:red">如果我们想要users able to call friend function, 需要declare the function separately from the friend declaration</span>. 让friend visible to users, we usually declare each friend (outside the class) in the same header as the class itself. 
+- <span style="color:red">如果Friend function定义在class 内部是**inline function**</span>
+- <span style="background-color:#FFFF00">friend declaraction 仅仅specifies access, 而不是general declaration of the function</span>, <span style="color:red">如果我们想要users able to call friend function, 需要declare the function separately from the friend declaration</span>. 让friend visible to users, we usually **declare each friend (outside the class)** in the same header as the class itself. 
 
 #### (c). Additional Class Features
 
 - inline member functions should be defined in the same header as the corresponding class definition
 - **mutable Data Members**: <span style="background-color:#FFFF00">a mutable data member is never const even when it is a member of a const object(即使是const 对象成员,也不是const), a const member function of class may change a mutable member </span>
 - <span style="color:red">When we provide an in-class initializer, we must do so following an = sign or inside braces.</span>
-- <span style="background-color:#FFFF00">A const member function that returns *this as a reference should have a return type that is a reference to const.</span>一个const 成员函数如果return type 是 class reference 形式返回```*this```, 则return type 是 ```const class & ```
+- <span style="background-color:#FFFF00">A const member function that returns *this as a reference should have a return type that is a reference to const```const class & ```.</span>
 - <span style="background-color:#FFFF00">可以overload function 基于是不是const </span> (match rule 跟function overloading match rule 类似)
-  - <span style="color:red">const object 只能call const function, 可能call nonconst function</span>
-  - <span style="color:red">nonconst obeject 可以call non-const 也可以call const version， 但是nonconst version 是better match</span>
+  - <span style="color:red">const object 只能call const function, 不能call nonconst function</span>
+  - <span style="color:red">nonconst obeject 可以call non-const 也可以call const version， 但是nonconst version 是better match(因为exact match 优于const version)</span>
 
 下面初始化Screen, class 内部初始化要么使用```=``` 在class内部初始化, or the direct form of initialization using ```{}```
 ```c++
@@ -2822,14 +2822,27 @@ inline Screen &Screen::set(char c)
 myScreen.move(4,0).set('#');
 ```
 如果```move``` 和 ```set``` 返回都是class, 而不是reference
-```
+```c++
 Screen temp = myScreen.move(4,0)
 temp =  temp.set('#');
-
 ```
+```const function```不能返回 nonconst的reference. 因为```*this``` is ```const Screen&```,```const Screen&``` 不能转换成```Screen&```. 所以```const```  function, 只能返回```const``` reference. 对于```const``` reference 不能call ordinary function (cannot conver from (const pointer to const) to (const pointer to nonconst) )
 
-Returning *this from a const Member Function: 如果有一个新的function ```display``` return type 是 ```Screen &```, 但是<span style="color:red">const function</span>, 则下面是错误的. If ```display``` is a ```const``` member, then ```this``` is a pointer to ```const``` and ```*this``` is a ```const``` object. Hence, the return type of ```display``` must be const ```Screen&```. 即使```myScreen``` is non const, 原因是```display``` 的返回时const reference, we cannot call ```set ``` on a ```const``` object
+```const Screen&```. 
 ```c++
+//error
+
+Screen& display(cout) const {
+   return (*this);
+}
+
+//correct
+
+const Screen& display(cout) const {
+   return (*this);
+}
+
+
 Screen myScreen;
 // if display returns a const reference, the call to set is an error 
 
