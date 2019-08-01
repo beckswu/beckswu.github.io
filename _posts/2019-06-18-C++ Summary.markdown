@@ -2706,7 +2706,7 @@ std::istream &read(std::istream&, Sales_data&);
 
 **const Member Functions**
 - ```const``` is to modify the type of the implicit ```this``` pointer, 表示 ```this``` is a pointer to ```const```. Member function that use ```const```被称为<span style="color:red">const member functions</span>
-- <span style="background-color:#FFFF00">Cannot bind ```this```（this 没有low level const） to a ```const``` object, 同时 const object (```this```有lower const) cannot call an ordinary member function (```this```没有lower const) </span>(lower const ->no lower const的 不可以, const function call ```this``` is a const pointer to const object, 而non-const function的```this``` 是const pointer to nonconst obejct). ; 
+- <span style="background-color:#FFFF00">Cannot bind ```this```（this 没有low level const） to a ```const``` object, 同时 const object (```this```有lower const) cannot call an ordinary member function (```this```没有lower const) </span>(lower const -> no lower const的 不可以, const function call ```this``` is a const pointer to const object, 而non-const function的```this``` 是const pointer to nonconst obejct). ; 
     - 比如```const A a; a.get();//error when get is not const function``` 
     - 所以把不改变object 的<span style="background-color:#FFFF00">function 设置成const, 可以提高函数灵活性</span>
 - const function 表示```this``` is a pointer to ```const```, <span style="background-color:#FFFF00">const member functions cannot change the object on which they are called</span>. 因此const function 不能write to data members of the objects 只能read
@@ -2731,14 +2731,14 @@ total.combine(trans);
 
 **Constructors** 
 - constructor  run whenever an object of a class type is created.只要class的对象被创建, 就会执行constructor
-- Unlike other member functions, <span style="background-color:#FFFF00">constructor 不能被declared as const</span>. <span style="color:red">When we create a **const** object of a class type, the object 直到constructure completes the object's initialization 才获得constness 属性 </span>. constructors can write to const objects during their construction.
-- Classes control default initialization by defining a special constructor, known as the **default constructor**.  <span style="background-color:#FFFF00">constructor 不能被declared as const. The default constructor is one that takes no arguments.</span> default constructor 是constructor work without any parameter; 错误的概念是constructor with no parameter; 比如```dog(string name = “Bob”); ```属于can work without any parameter
-  - 如果我们explicitly define any constructors, <span style="color:red">compiler will implicitly define the default constructor</span>
-  - <span style="background-color:#FFFF00">The compiler-generated constructor is known as the **synthesized default constructor**</span>, 对于大多数class, this synthesized constructor initializes each data member as folows: 
-    - 如果there is an in-class initializer, 用它initialize member(如果存在class的初始值,用初始值初始化成员)
-    - Otherwise, default-initialize the member(否则, 默认初始化成员)
-  - ```Sales_data() = default;``` we need to provide default constructor as well as default constructor, <span style="color:red">The = default can appear with the declaration inside the class body or on the definition outside the class body(既可以和声明出现在class 内部, 也可以作为定义出现在class 外部)</span>. <span style="background-color:#FFFF00">如果用```=default``` inside class double, the default constructor will be inlined. 如果出现在definition outside the class, the member will not be inlined by default </span>
-  - 如果compiler 支持in-class initializer (在class 内部```int a = 1;```) 我们可以用default constructor without parameters, 如果不支持, your default constructor should use the **constructor initailizer list** to initialize every member of the class (e.g. ```sale(): a(0) {}```, 函数体是空的, 因为目的是为了数据成员赋值, 一旦没有其他成员, 函数体就是空)
+- Unlike other member functions, <span style="background-color:#FFFF00">constructor 不能被declared as const</span>. <span style="color:red">When we create a **const** object of a class type, the object 直到constructure completes the object's initialization 才获得constness 属性 </span>. constructors initialize const objects during their construction.
+- Classes control default initialization by defining a special constructor, known as the **default constructor**:  <span style="background-color:#FFFF00"> is one that takes no arguments.
+  - </span> default constructor 是constructor work without any argument; 错误的概念是constructor with no parameter; 比如```dog(string name = “Bob”); ```属于can work without any argument, 但有default parameter
+  - 如果没有explicitly define any constructors, <span style="color:red">compiler will implicitly define and generate the default constructor</span> known as the <span style="background-color:#FFFF00">**synthesized default constructor**</span>, 对于大多数class, this synthesized constructor initializes each data member as follows: 
+    - 如果there is an in-class initializer, 用它initialize member(如果存在class的初始值,用初始值初始化成员) 比如class 中```string a = "dog";```
+    - Otherwise, default-initialize the member(否则, 默认初始化成员),比如class 中```string a;``` 默认初始化为空
+  - ```Sales_data() = default;``` 让compiler generate default constructor: <span style="color:red">The = default can appear with the declaration inside the class body or on the definition outside the class body(既可以和声明出现在class 内部, 也可以作为定义出现在class 外部)</span>. <span style="background-color:#FFFF00">如果用```=default``` inside class, the default constructor will be **inlined**. 如果出现在definition outside the class, the member will not be inlined by default </span>
+  - 如果compiler 支持in-class initializer (在class 内部```int a = 1;```) 我们可以用default constructor without parameters, 如果不支持, your default constructor should use the **constructor initailizer list** to initialize every member of the class (e.g. ```sale(): a(0) {}```)
 - constructor 不应该override in-class initializers except to use a different initial value.
 
 **Some Classes Cannot Rely on the Synthesized Default Constructor**
