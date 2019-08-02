@@ -2376,7 +2376,7 @@ cout << (s1.size() < s2.size() ? s1 : s2 )<<endl;
 
 **constexpr function**: 
 - <span style="background-color:#FFFF00">return type must be literal type</span> (int(reference, pointer), double, enum, char, char pointer, 但string 不是)
-- <span style="background-color:#FFFF00">函数主体只能有一个return statement</span>(function body must contain exactly one return statement, 不能有通过if 判断的多个statement)
+- <span style="background-color:#FFFF00">函数主体有且只有一个return statement</span>(function body must contain exactly one return statement, 不能有通过if 判断的多个statement)
 - compiler will replace a call to constexpr funcion with its resulting value.(compiler 把constexpr 函数的调用换成其结果值)
 - <span style="color:red">constexpr functions are implicitly inline </span>
 - <span style="color:red">A constexpr function body 可以含有other statements 只要这个statement generate no actions at run time</span> (e.g. null statment, type aliases, and using declaractions)
@@ -3185,6 +3185,7 @@ public:
 class Sales_data { 
 public:
     // defines the default constructor as well as one that takes a string argument 
+
     Sales_data(std::string s = ""): bookNo(s) { }
 }
 ```
@@ -3253,6 +3254,199 @@ Sales_data obj(); // error:  declare a function, not an object
 
 Sales_data obj;
 ```
+
+
+**(3). Implicit Class-Type Conversions**
+
+-  constructor that can be called with **single argument** defined an **implicit conversion** (有时候叫 **converting constructors**)
+    - 定义了conversion from constructor's parameter type to class type.
+- 只允许一步conversion, 比如constructor take a string parameter, 我们不可以用```const char*``` 到string 再到class type
+- **explicit**: prevents implicit conversion. <span style="background-color:#FFFF00">explicit meaningful only on constructor that can be called with a single constructor.</span>.
+    - <span style="color:red">**explicit** is used nly on constructor declaration inside the class.</span> It is not repeated on a definition outside class body.  
+    -  对于constructor that require more arguments 不会perform implicit conversion,所以没有用explicit的必要性
+    - **explicit** 只能用于direct initialization, 不能用于copy initialization 
+    - compiler will not do implicit conversion for **explicit**, but we can use 有**explicit** constructor to force a conversion (比如```static_cast```)
+
+e.g. ```string -> Sales_data```, compiler automatically creats a ```Sales_data``` object from the given ```string``` which pass to ```combine```. 因为```combine``` take const reference, we can pass tempoary to const reference
+```c++
+struct Sales_data {
+    Sales_data(std::string s): Sales_data(s, 0,0) {} 
+    Sales_data(std::istream &is): Sales_data() {read(is, *this); }
+    Sales_data& Sales_data::combine(const Sales_data &rhs)
+    {
+        units_sold += rhs.units_sold; 
+        revenue += rhs.revenue; 
+        return *this; // return the object on which the function was called 
+        //use this to access the object as a whole 
+    }
+  };
+
+string null_book = "9-999-99999-9";
+item.combine(null_book);
+
+// error: requires two user-defined conversions: 
+
+// (1) convert "9-999-99999-9" to string
+
+// (2) convert that (temporary) string to Sales_data 
+
+item.combine("9-999-99999-9");
+
+
+// ok: explicit conversion to string, implicit conversion to Sales_data
+
+ item.combine(string("9-999-99999-9"));
+ // ok: implicit conversion to string, explicit conversion to Sales_data 
+ 
+ item.combine(Sales_data("9-999-99999-9"));
+```
+
+**Class-type are not always useful**: <span style="color:red">More problematic is the conversion from istream to Sales_data</span>. The code 转换```cin``` to ```Sales_data```, 创建的```Sales_data```是temporary. We have no access to it 一旦```combine```finishes. 当```item``` 完成后, ```temporary``` 会被丢弃
+```c++
+// uses the istream constructor to build an object to pass to combine 
+
+item.combine(cin);
+```
+
+**explicit**
+```c++
+class Sales_data { 
+public:
+    Sales_data() = default;
+    Sales_data(const std::string &s, unsigned n, double p):
+        bookNo(s), units_sold(n), revenue(p*n) { } 
+    explicit Sales_data(const std::string &s): bookNo(s) { } 
+    explicit Sales_data(std::istream&);
+};
+
+item.combine(null_book); // error: string constructor is explicit 
+
+item.combine(cin); // error: istream constructor is explicit
+
+```
+
+explicit 只用于declaration inside class, not for definition outside class 
+```c++
+// error: explicit allowed only on a constructor declaration in a class header 
+
+explicit Sales_data::Sales_data(istream& is)
+{ read(is, *this);}
+```
+
+explicit 只能用于direct initialization, not for copy initialization 
+```c++
+Sales_data item1 (null_book); // ok: direct initialization
+
+// error: cannot use the copy form of initialization with an explicit constructor 
+
+Sales_data item2 = null_book;
+```
+
+可以用 有explicit constructor to force conversion, ```static_cast``` to perform an explicit, rather than an implicit conversion. 用```static_cast``` uses the ```istream```constructor to construct temporary ```Sales_data``` object 
+```c++
+// ok: the argument is an explicitly constructed Sales_data object 
+
+item.combine(Sales_data(null_book));
+// ok: static_cast can use an explicit constructor
+
+item.combine(static_cast<Sales_data>(cin));
+```
+
+**(4). Aggregate Classes**
+
+An **aggregate class** gives users direct access to its members and has special initialization syntax. A class is an aggregate if 
+- All of its data members are public (所有public)
+- It does not define any constructors (没有定义任何constructor)
+- It has no in-class initializers (没有class 内部数据初始值)
+- It has no base classes or virtual functions. (没有base 和 virtual)
+
+Initialization: 
+- we can initialize the data members of an aggregate class <span style="background-color:#FFFF00">by providing a braced list of member initializers</span>
+- <span style="color:red">Initializer的**order** 必须与declaration of data members 一样</span>
+- 如果提供的elements are fewer than class members, <span style="color:red">the trailing members are value initialized</span>
+
+Aggregate class 的Intialization **Drawbacks**: 
+1. Requires that all the data members of class be <span style="color:red">**public**</span>
+2. 将正确初始化的重任(burden)给了user. <span style="color:red">**error-prone**</span>, 因为用户容易忘记值, 或者提供一个不正确的初始值 
+3. If a member is added or removed, all initialization have to be updated.
+
+
+Example of aggregate class
+```c++
+struct Data{
+    int ival;
+    string s;
+}
+
+
+// val1.ival = 0; val1.s = string("Anna") 
+
+Data val1 = { 0, "Anna" };
+```
+
+**(5). Literal Classes**
+
+```constexpr``` parameter 和 return type 必须是 **literal type**. 除了arithmetic types, references, and pointers, certain classes 也是**literal types**,  class that are **literal type** 也许有funcition members that are **constexpr**(需要meet all requirements of ```constexpr``` function, 这些function 也是<span style="color:red">**implicitly const**</span>)
+
+- 一个**aggregate class** whose data members are of literal type is a literal class. 
+- nonaggregate class 需要满足下列要求: 
+  - data members all must literal type
+  - The class must have <span style="background-color:#FFFF00">at least one ```constexpr``` constructor</span> 
+  - If a data member has an in-class initializer, the initializer for a member of built-in type must be a [constant expression](#Constexpr). 如果不是built-in type, the initializer must use the member's own ```constexpr``` constructor.  
+  - The class must use default definition for its destructor (default constructor), which is the member that destroys objects of the class type.
+
+**constexpr Constructor**
+- **constexpr constructor** can be declared as ```= default``` (or ```= delete```)的形式. 
+- 如果没有用```=default```, <span style="background-color:#FFFF00">需要meet requirements of constructor(no return statment) and ```constexpr function```</span>(the only executable statement it can have is return statment(only one return)), <span style="color:red">所以通常上body of **constexpr constructor** (body)  is empty</span>
+- <span style="color:red">**constexpr constructor** must initialize every data member.</span> The initializers 必须either **constexpr constructor** or a constant expression 
+- A **constexpr constructor** is used to generate objects that are ```constexpr``` and for parameters or return types in constexpr functions(用于生成```constexpr```对象以及```constexpr``` 函数的参数或返回类型)
+
+```c++
+class Debug { 
+public:
+    constexpr Debug(bool b = true): hw(b), io(b), other(b) {}
+    constexpr Debug(bool h, bool i, bool o):
+        hw(h), io(i), other(o) {}
+    constexpr bool any() { return hw || io || other; } 
+    void set_io(bool b) { io = b; }
+    void set_hw(bool b) { hw = b; }
+    void set_other(bool b) { hw = b; }
+private:
+    bool hw; // hardware errors other than IO errors 
+    
+    bool io; // IO errors
+
+    bool other; // other errors
+};
+```
+
+```c++
+constexpr Debug io_sub(false, true, false); // debugging IO
+
+if (io_sub.any()) // equivalent to if(true)
+
+    cerr << "print appropriate error messages" << endl;
+
+constexpr Debug prod(false); // no debugging during production 
+
+if (prod.any()) // equivalent to if(false)
+
+    cerr << "print an error message" << e
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
