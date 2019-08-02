@@ -2698,6 +2698,7 @@ std::istream &read(std::istream&, Sales_data&);
 **this**: 
 - ```this``` is a <span style="background-color:#FFFF00">const pointer</span>, we cannot change the address that ```this``` holds. <span style="color:red">```this``` is a constant pointer that holds the memory address of current object. this is not available in static member function </span> 
 -  By default, the type of ```this``` is ```const``` pointer<span style="color:red"> to the non const version of the class type</span>(top level const, lower level nonconst).
+    - ```*this``` 指reference to object, 而不是const reference to object, 因为```this```没有lower constness
 - Member functions access the object through extra, <span style="color:red">implicit</span> parameter named **this**. **this** is initialized with<span style="color:red"> the address of the object</span> which the function (只限于nonstatic) was invoked.
     -  比如 ```total.isbn()``` compiler passes the address of ```total``` to the implicit ```this``` parameter. compiler 会等价的rewrite 为 ```Sales_data::isbn(&total)```(调用Sales_data的isbn的成员时传入total 的地址)
 - 在class 函数内部的直接access member of the object, 因为any direct use of a member of the class is assumed to be an implicit reference through ```this```(任何对类成员直接访问都被看作this的隐式引用)
@@ -2826,9 +2827,8 @@ myScreen.move(4,0).set('#');
 Screen temp = myScreen.move(4,0)
 temp =  temp.set('#');
 ```
-```const function```不能返回 nonconst的reference. 因为```*this``` is ```const Screen&```,```const Screen&``` 不能转换成```Screen&```. 所以```const```  function, 只能返回```const``` reference. 对于```const``` reference 不能call ordinary function (cannot conver from (const pointer to const) to (const pointer to nonconst) )
+```const function```不能返回 nonconst的reference. 因为const function 的```*this``` is ```const Screen&```,```const Screen&``` 不能转换成```Screen&```(initialization rule). 所以```const```  function, 只能返回```const``` reference. 而```const``` reference 指的const object 不能call ordinary function (cannot conver from (const pointer to const) to (const pointer to nonconst) )
 
-```const Screen&```. 
 ```c++
 //error
 
@@ -2849,7 +2849,7 @@ Screen myScreen;
 myScreen.display(cout).set('*');
 ```
 
-Const function overload, <span style="background-color:#FFFF00">object 是不是const, 决定call 哪个display function.</span>  <span style="color:red">```*this``` pointer is passed implicitly</span>. when ```display```calls ```do_display```, ```*this``` pointer is implicitly passed to ```do_display```. 当nonconst version of ```display``` calls ```do_display```, <span style="background-color:#FFFF00">```*this``` pointer is implicitly convert from a pointer to nonconst to a pointer to const </span>, 当```do_display```完成后，```display```函数各自返回解引用```this```所得的对象, nonconst version, ```*this``` points to a nonconst object, ```display``` 函数返回一个ordinary(普通的, non-const) reference, the const member returns a reference to const.
+Const function overload, <span style="background-color:#FFFF00">object 是不是const, 决定call 哪个display function.</span>. when ```display```calls ```do_display```, ```*this``` pointer is implicitly passed to ```do_display```. 对于nonconst version of ```display```calling, <span style="background-color:#FFFF00">```*this``` pointer implicitly converted from a const pointer to nonconst to a const pointer to const </span>, 当```do_display```完成后，nonconst version, ```*this``` is a ordinary(普通的, non-const) reference, the const member ```*this``` a const reference.
 
 ```c++
 class Screen { 
@@ -2872,12 +2872,12 @@ void do_display(std::ostream &os) const {os << contents;} //inline implicitly
 ```
 
 **Class Types**: 
-- Every class deines a unique type, <span style="color:red">即使两个different types define the same members 他们也是不同类型的</span>. Even if two classes have exactly the same member list, they are different types. The members of each class are distinct from the members of any other class (or any other scope).
-- 声明class object, 可以直接用class or struct name as type, 或者把name 放在keyword class or type的后面
-- 也可以只声明class 而不定义class, like ```class Screen;```, 这种声明叫做**forward declaration**, 但在它声明之后 定义之前是一个**imcomplete type**, 因为不清楚它包含哪些成员
-  - **imcomplete type** can bed used in limited ways: define pointers or references to such types, 也可以定义functions that use an imcomplete type as a parameter or return type 
-- A class 必须被defined 而不仅仅是声明before we write code that creats objects of that type. 因为compiler 需要know how much storage such objects need. 同理, a class 必须被定义before a reference or pointer is used to access a member of the type. 如果不定义, compiler cannot know 它有什么member
-- <span style="background-color:#FFFF00">A class member 可以有pointers or references of its own type. 因为class is considered declared (not yet defined) as soon as its class name has been seen</span>. 但是compiler 需要知道how much storage the data memeber requires, 因为class is not defined until its class body is complete, <span style="color:red">a class cannot have members ot is own type</span>
+- Every class defines a unique type, <span style="color:red">即使两个different types define the same members 他们也是不同类型的</span>. The members of each class are distinct from the members of any other class (or any other scope).
+- 声明class/struct <span style="color:red">object</span> 也可以用 ```class Screen a```
+- 可以只声明class 而不定义class, like ```class Screen;```, 这种声明叫做**forward declaration**, 但在它声明之后 定义之前是一个**incomplete type**, 因为<span style="color:red">不清楚它包含哪些成员</span>
+  - **imcomplete type** can be used in limited ways: define <span style="color:red">pointers</span> or <span style="color:red">references</span> to such types, 也可以定义functions that use an incomplete type as a <span style="color:red">parameter</span> or <span style="color:red">return type </span>
+- <span style="background-color:#FFFF00">A class 必须被defined 而不仅仅是声明before we creats objects of that type</span>. 因为compiler 需要know storage such objects need. 同理, a class 必须被定义before access a member of the type by using reference or pointer. 如果不定义, compiler cannot know 它有什么member
+- <span style="background-color:#FFFF00">A class member 可以有pointers or references of its own type. 因为class is considered declared (not yet defined) as soon as its class name has been seen</span>. 但是 <span style="color:red">a class cannot have members ot is own type</span> 因为compiler 需要知道storage data memebers require, class is not defined until its class body is complete,
 
 ```c++
 struct First { int memi;
@@ -2932,7 +2932,7 @@ extern BitMap& storeOn(BitMap &, Screen &);
 class Screen {
 // ostream version of storeOn may access the private parts of Screen objects
 
-friend std::ostream& storeOn(std::ostream &, Screen &); // . . .
+friend std::ostream& storeOn(std::ostream &, Screen &);
 };
 ```
 
@@ -2954,9 +2954,10 @@ void X::h() { return f(); } // ok: declaration for f is now in scope
 ```
 
 #### (d). Class Scope
-- class 外部访问public data/function，只能通过object, reference, pointer; type members(typedef) from the class 可以访问 using the scope operator .
-- 在class 外部定义function, 需要provide class name + function name. 当class name 被看见 知道function 属于class, function定义就可以随便用class member without using class name (因为everyname is seen in class scope)
-- class 返回值声明在 class name 前, 因为any named in return type is outside scope 当定义function outside class. 因此<span style="color:red">return type需要specify class name, 如果返回类型是在class 内部定义的</span>
+- class 外部访问public data/function，只能通过object, reference, pointer; <span style="color:red">type members(typedef) from the class 可以访问 using the scope operator.</span>
+- 在class 外部定义function, 
+   - 需要provide class name :: function name. function定义就可以随便用class member without using class name (因为everyname is seen in class scope)
+   - function return type 声明在 class name 前, so any return type is outside scope, 因此<span style="color:red">return type需要specify class name, 如果return type is defined inside class</span>
 
 ```c++
 class Window_mgr { 
@@ -2971,19 +2972,19 @@ Window_mgr::ScreenIndex Window_mgr::addScreen(const Screen &s)
 ```
 
 **(1).name lookup**: the process of finding which declarations match the use of a name
-1. Look for declaration of the name in the block (before use of name) which the name was used. 只在名字现在块中(使用之前的)查找
+1. Look for declaration of the name in the block (before use of name) which the name was used. 只在名字出现在块中(使用之前的)查找
 2. 如果名字没有发现, look in the enclosing scope（继续查找外层作用域)
 3. if no declaration found, program is error
 
-class defintion are processed into: 
-1. memeber declarations are compiled (编译成员声明)
+class defintion are processed in order of : 
+1. memeber declarations are compiled (先编译成员声明)
 2. function bodies/definitions are processed and compiled only after the entire class has been seen (<span style="background-color:#FFFF00">直到class全部可见后,编译函数体</span>)
 
-- 因为函数体直到class 可见后 才processed. 所以function 可以用任何name defined inside the class. 假如function definition 和member declaration 同时进行, 比如order memeber functions 这样才能用已经被看见的名字
+- 因为函数体直到class 可见后 才compiled. 所以function 可以用任何name defined inside the class. 假如function definition 和member declaration 同时进行, function只能用已经被看见的名字
 - <span style="color:red">上面的two-step process 只适用于member function bodies</span>, Names used in declarations, 包括了<span style="background-color:#FFFF00">return type and types in parameter list 必须被看见before they are used</span>. 否则会报错
-- <span style="color:red">tips:</span>: 定义type names 通常在class beginning, 这样any member that uses that type will be seen after the type name has been already been defined
+- <span style="color:red">tips:</span>: 定义type names (typedef, using) 通常在class beginning, 这样any member that uses that type will be seen after the type name has been already been defined
 
-看到```balance``` function, 寻找```Money```的声明,先看在Account class中是否声明, 没有. 然后需要declaration in enclosing scope(外层作用域). 找到typedef 对象return type; 另一方面, <span style="color:red">因为balance 函数的在class is seen之后才看见, 所以返回的bal 是class 的</span>, 而不是外层作用域的string
+看到```balance``` function, 寻找```Money```的声明,先看在Account class中是否声明, 没有. 再寻找declaration in enclosing scope(外层作用域). 找到typedef 的```Money```; 另一方面, <span style="color:red">因为在class is seen之后```balance```才processed, 所以返回的bal 是class(double)的</span>, 而不是外层作用域的string
 ```c++
 typedef double Money; 
 string bal;
@@ -2995,29 +2996,45 @@ class Account {
 };
 ```
 
-**(2).Type Names Are Special**: 一般来说, inner scope can redefine a name from an outer scope even if that name has already been used in the inner scope. 但是class 不行, <span style="color:red">if a member uses a name from an outer scope and that name is a type, then class 不能重新定义它</span> class 不能重新定义type, 如果这个type 被member function parameter/return 使用
+**(2).Type Names Are Special**: 一般来说, inner scope can redefine a name from an outer scope (out scope names is hidden). 但是对于type 不行, <span style="color:red">class inner scope cannot redefine a typename </span> class 不能重新定义type, 如果这个type 被member function parameter/return 使用(typedef redefine 可以在VS中, 但不适用于linux) 
 
 ```c++
 typedef double Money;
 class Account {
 public:
-    scope Money balance() { return bal; } 
+    Money balance() { return bal; } 
     // uses Money from the outer
 
 private:
     typedef double Money; // error: cannot redefine Money
 
-    Moeny bal;
+    Money bal;
+};
+```
+
+比如下面的例子, in class and outside 都有typedef, 但是function 对同一个typedef用到不同的type, extremely confusing, 所以standard bans it 
+```
+using Foo = int;
+
+struct X {
+    Foo a;    // ::Foo, i.e., int
+    
+    void meow() { 
+        Foo b = a; // X::Foo; error: no conversion from int to char*
+	
+    }
+    using Foo = char*;
 };
 ```
 
 **(3). Normal Block-Scope Name Lookup inside Member Definitions**
 
 A name used in the body of a member function is resolved as follows:(一般不建议use the name of another member as the name for function parameter, 不建议使用成员的名字用作函数参数)
-1. 首先在member function内部寻找 在name 被使用之前)
-2. 如果没有找到, 再到class 内部继续寻找declaration. All the members of the class are considered (class所有成员都被考虑)3. 如果没有找打, look for a declaration that is in scope before the member function defintiion. (在函数定义前的作用域, 因为函数可能定义在class外部(in file) ) 
+1. 首先在member function内部寻找(在name 被使用之前部分)
+2. 如果没有找到, 再到class 内部继续寻找declaration. All the members of the class are considered (class所有成员都被考虑)
+3. 如果没有找打, look for a declaration that is in scope before the member function defintiion. (在函数定义前的作用域, 因为函数可能定义在class外部(in file) ) 
 
-当compiler 处理dummy_fcn 的乘法时， 首先寻找 ```height```  in the scope of that function. function parameter in function scope 所以使用的是parameter 的```height```
+当compiler 处理dummy_fcn 的乘法时， 首先寻找 ```height```  in the scope of that function. 从parameter中找到
 ```c++
 // note: this code is for illustration purposes only and reflects bad practice
 
@@ -3042,6 +3059,8 @@ private:
 上面例子中```height``` 隐藏了member named ```height```. 如果我们想override the normal lookup rules, 可以如下, 如果想使用outer class 外层作用域的, 可以用scope operator ```::```
 
 ```c++
+//Case 1: class member height
+
 // bad practice: names local to member functions shouldn't hide member names 
 
 void Screen::dummy_fcn(pos height) 
@@ -3054,16 +3073,16 @@ cursor = width * Screen::height; // member height
 
 }
 
-// good practice: don't use a member name for a parameter or other local variable 
+//Case 2: use class member 
 
-//即使height 出现在dummy_fcn 后面, 根据lookup rule会使用class member height (而不用外面的height)
+// good practice: don't use a member name for a parameter or other local variable 
 
 void Screen::dummy_fcn(pos ht) {
 cursor = width * height; // member height 
 
 }
 
-//outer scope 的height
+//Case 3:  Use global
 
 // bad practice: don't hide names that are needed from surrounding scopes 
 
@@ -3073,7 +3092,7 @@ cursor = width * ::height;// which height? the global one
 }
 ```
 
-注意 ```verify``` is not visible before the definition of the class screen. 但是第三步lookup includes the scope where member definition befores. 因为```verify```在```setHeight```前定义,因此可以使用 
+注意 ```verify``` is not visible before the definition of the class screen. 但是第三步lookup includes the scope where member definition befores. 因为```verify```在```setHeight```前定义,因此找到
 ```c++
 int height; // defines a name subsequently used inside Screen 
 
