@@ -2730,26 +2730,6 @@ revenue += rhs.revenue;
 total.combine(trans); 
 ```
 
-**Constructors** 
-- constructor  run whenever an object of a class type is created.只要class的对象被创建, 就会执行constructor
-- Unlike other member functions, <span style="background-color:#FFFF00">constructor 不能被declared as const</span>. <span style="color:red">When we create a **const** object of a class type, the object 直到constructure completes the object's initialization 才获得constness 属性 </span>. constructors initialize const objects during their construction.
-- Classes control default initialization by defining a special constructor, known as the **default constructor**: is one that takes no arguments.
-  - <span style="background-color:#FFFF00">**default constructor** 是constructor work without any argument(either no parameters, or all parameters have default values)</span>; 错误的概念是constructor with no parameters; 比如```dog(string name = “Bob”); ```属于can work without any argument, 但有default parameter
-  - 如果没有explicitly define any constructors, <span style="color:red">compiler will implicitly define and generate the default constructor</span> known as the <span style="background-color:#FFFF00">**synthesized default constructor**</span>, 对于大多数class, this synthesized constructor initializes each data member as follows: 
-    - 如果there is an in-class initializer, 用default constructor without parameters initialize member(如果存在class的初始值,用初始值初始化成员) 比如class 中```string a = "dog";```
-    - Otherwise, default-initialize the member(否则, 默认初始化成员),比如class 中```string a;``` 默认初始化为空
-    -  如果不支持默认初始化, your default constructor should use the **constructor initailizer list** to initialize every member of the class (e.g. ```sale(): a(0) {}```)
-  - ```Sales_data() = default;``` 让compiler generate default constructor: <span style="color:red">The = default can appear with the declaration inside the class body or on the definition outside the class body(既可以和声明出现在class 内部, 也可以作为定义出现在class 外部)</span>. <span style="background-color:#FFFF00">如果用```=default``` inside class, the default constructor will be **inlined**. 如果出现在definition outside the class, the member will not be inlined by default </span>
-- constructor 不应该override in-class initializers except to use a different initial value.
-
-**Some Classes Cannot Rely on the Synthesized Default Constructor**
-- <span style="color:red">只有我们没有声明任何的constructor，compiler 才会generates **synthesized default constructor**, 如果有自己定义constructor， 除非自己定义default constructor, 否则不会生成
-- 第二原因是: synthesized default constructor does the wrong thing, 比如数组或者指针对象被默认初始化, 他们值是未定义的. 所以当class has compound type (pointer or array) or built-in 应该有自己定义的constructor, 否则有 undefined value 
-  - <span style="color:red">Classes that have members of built-in or compound type usually should rely on the synthesized default constructor only if all such members have in-class initializers.</span>
-- 第三个原因是: some classes must define their own default constructor <span style="color:red">是因为有时候compiler is unable to systhesize one</span>. 比如一个class has member which is class type, and that class doesn't have a default constructor, then compiler can't initialize that memeber, 对于这个种情况, 必须定义自己的constructor
-
-如果我们不定义Copy, Assignment, and Destruction, compiler也许会synthesize them for us. <span style="color:red">对于class的vector or string, compiler generated 的 copy, assignment, destructor works correctly</span>, 因为we copy or assign an object that has a vector member, the vector class takes care of copying or assigning the element. 当object is destroyed, the vector member is destroyed which 反过来destroys the elements in vector.
-
 
 #### (b), Access Control and Encapsulation
 
@@ -3122,10 +3102,32 @@ void Screen::setHeight(pos var) {
 
 #### (e). Constructors Revisited
 
+
+**Constructors** 
+- constructor  run whenever an object of a class type is created.只要class的对象被创建, 就会执行constructor
+- Unlike other member functions, <span style="background-color:#FFFF00">constructor 不能被declared as const</span>. <span style="color:red">When we create a **const** object of a class type, the object 直到constructure completes the object's initialization 才获得constness 属性 </span>. constructors initialize const objects during their construction.
+- Classes control default initialization by defining a special constructor, known as the **default constructor**: is one that takes no arguments.
+  - <span style="background-color:#FFFF00">**default constructor** 是constructor work without any argument(either no parameters, or all parameters have default values)</span>; 错误的概念是constructor with no parameters; 比如```dog(string name = “Bob”); ```属于can work without any argument, 但有default parameter
+  - 如果没有explicitly define any constructors, <span style="color:red">compiler will implicitly define and generate the default constructor</span> known as the <span style="background-color:#FFFF00">**synthesized default constructor**</span>, 对于大多数class, this synthesized constructor initializes each data member as follows: 
+    - 如果there is an in-class initializer, 用default constructor without parameters initialize member(如果存在class的初始值,用初始值初始化成员) 比如class 中```string a = "dog";```
+    - Otherwise, default-initialize the member(否则, 默认初始化成员),比如class 中```string a;``` 默认初始化为空
+    -  如果不支持默认初始化, your default constructor should use the **constructor initailizer list** to initialize every member of the class (e.g. ```sale(): a(0) {}```)
+  - ```Sales_data() = default;``` 让compiler generate default constructor: <span style="color:red">The = default can appear with the declaration inside the class body or on the definition outside the class body(既可以和声明出现在class 内部, 也可以作为定义出现在class 外部)</span>. <span style="background-color:#FFFF00">如果用```=default``` inside class, the default constructor will be **inlined**. 如果出现在definition outside the class, the member will not be inlined by default </span>
+- constructor 不应该override in-class initializers except to use a different initial value.
+
+**Some Classes Cannot Rely on the Synthesized Default Constructor**
+- <span style="color:red">只有我们没有声明任何的constructor，compiler 才会generates **synthesized default constructor**, 如果有自己定义constructor， 除非自己定义default constructor, 否则不会生成
+- 第二原因是: synthesized default constructor does the wrong thing, 比如数组或者指针对象被默认初始化, 他们值是未定义的. 所以当class has compound type (pointer or array) or built-in 应该有自己定义的constructor, 否则有 undefined value 
+  - <span style="color:red">Classes that have members of built-in or compound type usually should rely on the synthesized default constructor only if all such members have in-class initializers.</span>
+- 第三个原因是: some classes must define their own default constructor <span style="color:red">是因为有时候compiler is unable to systhesize one</span>. 比如一个class has member which is class type, and that class doesn't have a default constructor, then compiler can't initialize that memeber, 对于这个种情况, 必须定义自己的constructor
+
+如果我们不定义Copy, Assignment, and Destruction, compiler也许会synthesize them for us. <span style="color:red">对于class的vector or string, compiler generated 的 copy, assignment, destructor works correctly</span>, 因为we copy or assign an object that has a vector member, the vector class takes care of copying or assigning the element. 当object is destroyed, the vector member is destroyed which 反过来destroys the elements in vector.
+
+
 **(1). Constructor Initializer List**
 
 
-Assignment 和 initialization 是不同的: <span style="background-color:#FFFF00">在class 中, Assignment是先初始化 再赋值， initializatin是直接初始化</span>, 比如下面例子, How significant the distinction between initialization and assignment 由data member 类型决定
+Assignment 和 initialization 是不同的: <span style="background-color:#FFFF00">在class 中, Assignment是先初始化 再赋值， initialization是直接初始化</span>, 比如下面例子, How significant the distinction between initialization and assignment 由data member 类型决定
 
 ```c++
 //is Initialization
@@ -3136,10 +3138,10 @@ class data{
 };
 
 //Is Assignment
+
 class data{
     double revenue; 
     string bookNo;
-
     data(const string & a, double price){
         bookNo = a;
         revenue = price;
@@ -3147,12 +3149,12 @@ class data{
 };
 ```
 
-- <span style="color:red">必须用**constructor initializer** list to privide values for members that are const, reference, or a class type that does have a default constructor</span>,const, reference 是必须initialized的
-  - <span style="background-color:#FFFF00"> 如果member 有 const or reference, 不会有default constructor, 必须要Initialized </span>
-  -  **constructor initializer list** specifies only the values used to initialize the members, not the order in which those initializations are performed. **constructor initializer list**没有说明初始化的order
--  <span style="background-color:#FFFF00">class members are initialized 与他们在class 出现的顺序一致, 因为 **constructor initializer list** order 不会影响他们实际初始化的顺序</span>
+- <span style="color:red">必须用**constructor initializer list**  to privide values for members that are const, reference, or a class type that does have a default constructor</span>,const, reference 是必须initialized的
+  - <span style="background-color:#FFFF00"> 如果member 有 const or reference, 不会有default constructor, 必须要Initialized using constructor initialization list</span>
+  -  **constructor initializer list** specifies only the values used to initialize the members, not the order. **constructor initializer list**没有说明初始化的order
+-  <span style="background-color:#FFFF00">class members are initialized 与他们在class 出现的顺序一致, **constructor initializer list** order 不会影响他们实际初始化的顺序</span>
    -  一般顺序不matter, 但是如果一个成员用另一个成员初始化后的值, order 就matter了 (有些compiler 会有warning)
-   -  最好write **constructor initializer** in the same order as members are declared. 其次避免using members to initialize other members
+   -  最好write **constructor initializer** in the same order as members are declared in class. 其次避免using members to initialize other members
  
 ```c++
 class ConstRef { 
@@ -3163,26 +3165,12 @@ private:
     const int ci;
 };
 
-// error: ci and ri must be initialized 
-
-ConstRef::ConstRef(int ii)
-{   // assignments:
-
-i=ii; //ok
-
-ci = ii; // error: cannot assign to a const 
-
-ri = i; // error: ri was never initialized
-
-}
-
 // ok: explicitly initialize reference and const members 
 
 ConstRef::ConstRef(int ii): i(ii), ci(ii), ri(i) { }
-
 ```
 
-Order of Initialization, 下边例子中, **constructor initializer** 让 j is initialized then i. <span style="color:red">但实际上是i先initialized, 但是当initialized 时 with the undefined value of j</span>
+Order of Initialization, 下边例子中, **constructor initializer list** 让 ```j``` is initialized then ```i```. <span style="color:red">但实际上是i先initialized, 但是当initialized 时 with the undefined value of j</span>
 ```c++
 class X{
     int i;
@@ -3192,28 +3180,13 @@ public:
 
     X(int val): j(val), i(j){}
 };
-
-```
-
-
-**Default Arguments and Constructors**: the only difference between default constructor and takes a default parameter constructor: default constructor 用string的default constructor to initialize bookNo. constructor with a single argument 用argument to initialize ```bokNo```
-
-<span style="background-color:#FFFF00">**A constructor that supplies default arguments for all its parameters also defines the default constructor**</span>
-
-```c++
-class Sales_data { 
-public:
-    // defines the default constructor as well as one that takes a string argument 
-
-    Sales_data(std::string s = ""): bookNo(s) { }
-}
 ```
 
 **(2) Delegating Constructor(委托构造函数)**: 
 
-- <span style="background-color:#FFFF00">A delegating constructor uses another constructor from its own class to perform its initialization</span>
-- In a delegating constructor, the member initializer list 有single entry call class another constructor. 
-- When a constructor delegates to another constructor, 先run delegated-to constructor 之后才把control returned to the function body of delegating constructor(叫别的delegatted constructor的函数的主体)
+- <span style="background-color:#FFFF00">A **delegating constructor** uses another constructor from its own class to perform its initialization</span>
+- In a delegating constructor, the member initializer list has single entry to call the same class another constructor. 
+- When a constructor delegates to another constructor, 先run delegated-to constructor 之后才把control returned to the function body of delegating constructor
 
 ```c++
 class Sales_data {
@@ -3241,7 +3214,7 @@ Sales_data(std::istream &is): Sales_data() {read(is, *this); }
 Value initialization happens: 
 - Array Initilization, 当提供的初始值  fewer than its size
 - <span style="background-color:#FFFF00">when we define a local static object without an initializer</span>
-- 当我们书写乳```T()```的表达式explicitly request value initialization where ```T``` is the name of a type (比如vector constructor takes a single argument to specify vector's size) 
+- 当我们书写```T()```的表达式explicitly request value initialization where ```T``` is the name of a type (比如vector constructor takes a single argument to specify vector's size) 
 
 ```c++
 class NoDefault { 
@@ -3279,14 +3252,14 @@ Sales_data obj;
 
 -  constructor that can be called with **single argument** defined an **implicit conversion** (有时候叫 **converting constructors**)
     - 定义了conversion from constructor's parameter type to class type.
-- 只允许一步conversion, 比如constructor take a string parameter, 我们不可以用```const char*``` 到string 再到class type
+- <span style="background-color:#FFFF00">只允许一步conversion</span>, 比如constructor take a string parameter, 我们不可以用```const char*``` 到string 再到class type
 - **explicit**: prevents implicit conversion. <span style="background-color:#FFFF00">explicit meaningful only on constructor that can be called with a single constructor.</span>.
-    - <span style="color:red">**explicit** is used nly on constructor declaration inside the class.</span> It is not repeated on a definition outside class body.  
+    - <span style="color:red">**explicit** is used only on constructor declaration inside the class.</span> It is not repeated on a definition outside class body.  
     -  对于constructor that require more arguments 不会perform implicit conversion,所以没有用explicit的必要性
     - **explicit** 只能用于direct initialization, 不能用于copy initialization 
     - compiler will not do implicit conversion for **explicit**, but we can use 有**explicit** constructor to force a conversion (比如```static_cast```)
 
-e.g. ```string -> Sales_data```, compiler automatically creats a ```Sales_data``` object from the given ```string``` which pass to ```combine```. 因为```combine``` take const reference, we can pass tempoary to const reference
+e.g. ```string -> Sales_data```, compiler automatically creates a temporary ```Sales_data``` object from ```string``` then pass to ```combine```. 因为```combine``` take const reference, we can pass tempoary object
 ```c++
 struct Sales_data {
     Sales_data(std::string s): Sales_data(s, 0,0) {} 
@@ -3296,7 +3269,7 @@ struct Sales_data {
         units_sold += rhs.units_sold; 
         revenue += rhs.revenue; 
         return *this; // return the object on which the function was called 
-        //use this to access the object as a whole 
+		
     }
   };
 
@@ -3311,6 +3284,7 @@ item.combine(null_book);
 
 item.combine("9-999-99999-9");
 
+//one step implicit type conversion 
 
 // ok: explicit conversion to string, implicit conversion to Sales_data
 
@@ -3318,13 +3292,6 @@ item.combine("9-999-99999-9");
  // ok: implicit conversion to string, explicit conversion to Sales_data 
  
  item.combine(Sales_data("9-999-99999-9"));
-```
-
-**Class-type are not always useful**: <span style="color:red">More problematic is the conversion from istream to Sales_data</span>. The code 转换```cin``` to ```Sales_data```, 创建的```Sales_data```是temporary. We have no access to it 一旦```combine```finishes. 当```item``` 完成后, ```temporary``` 会被丢弃
-```c++
-// uses the istream constructor to build an object to pass to combine 
-
-item.combine(cin);
 ```
 
 **explicit**
@@ -3352,7 +3319,7 @@ explicit Sales_data::Sales_data(istream& is)
 { read(is, *this);}
 ```
 
-explicit 只能用于direct initialization, not for copy initialization 
+<span style="color:red">explicit 只能用于direct initialization, not for copy initialization</span> 
 ```c++
 Sales_data item1 (null_book); // ok: direct initialization
 
@@ -3361,7 +3328,7 @@ Sales_data item1 (null_book); // ok: direct initialization
 Sales_data item2 = null_book;
 ```
 
-可以用 有explicit constructor to force conversion, ```static_cast``` to perform an explicit, rather than an implicit conversion. 用```static_cast``` uses the ```istream```constructor to construct temporary ```Sales_data``` object 
+可以用 有explicit constructor to <span style="color:red"force conversion</span>, ```static_cast``` to perform an explicit, rather than an implicit conversion. 用```static_cast``` uses the ```istream```constructor to construct temporary ```Sales_data``` object 
 ```c++
 // ok: the argument is an explicitly constructed Sales_data object 
 
@@ -3384,8 +3351,8 @@ Initialization:
 - <span style="color:red">Initializer的**order** 必须与declaration of data members 一样</span>
 - 如果提供的elements are fewer than class members, <span style="color:red">the trailing members are value initialized</span>
 
-Aggregate class 的Intialization **Drawbacks**: 
-1. Requires that all the data members of class be <span style="color:red">**public**</span>
+Aggregate class 的Initialization **Drawbacks**: 
+1. Requires that all data members of class be <span style="color:red">**public**</span>
 2. 将正确初始化的重任(burden)给了user. <span style="color:red">**error-prone**</span>, 因为用户容易忘记值, 或者提供一个不正确的初始值 
 3. If a member is added or removed, all initialization have to be updated.
 
@@ -3396,7 +3363,6 @@ struct Data{
     int ival;
     string s;
 }
-
 
 // val1.ival = 0; val1.s = string("Anna") 
 
