@@ -3370,7 +3370,11 @@ An **aggregate class** gives users direct access to its members and has special 
 - All of its data members are public (所有public)
 - It does not define any constructors (没有定义任何constructor)
 - It has no in-class initializers (没有class 内部数据初始值)
-- It has no base classes or virtual functions. (没有base 和 virtual)
+- It has no base classes or virtual functions. (没有base class 和 virtual)
+
+An aggregate class 可以:
+- An aggregate class can define member functions
+- An aggregate class can overload operators.
 
 Initialization: 
 - we can initialize the data members of an aggregate class <span style="background-color:#FFFF00">by providing a braced list of member initializers</span>
@@ -3464,6 +3468,116 @@ Initializers for all nonstatic data members that are not named by a member initi
 - When initializing data members, all implicit conversions that are involved in the following context must be valid in a constant expression:
    - Calling any constructors
    - Converting any expressions to data member types
+
+#### (f). Static Members
+
+- static member can be public or private. The type of ```static``` data member can be ```const```, reference, array, class type. 
+- static members of a class exist outside any object.Object do not contain data associated with static data members
+- static member functions 不与对象绑定(bound)在一起.  因此<span style="background-color:#FFFF00">static member function 不能declared as const function</span>. static member functions <span style="color:red">don't have ```*this``` pointer.不能用```*this```在static member 中</span>, This restriction适用于explicit use of ```this``` and implicit use of ```this``` by calling a nonstatic member.
+- can use scope operator to access static member ```Account::initRate```, 也可以通过object, reference, pointer of class type to access 
+- <span style="color:red">member function can use static member directly</span> without scope operator
+
+```c++
+class Account{
+public:
+   void calculate() { amount += amount * interestRate; }
+   static double rate() { return interestRate; }
+   static void rate(double);
+private:
+   std::string owner;
+   double amount;
+   static double interestRate;
+   static double initRate();
+   //银行利率 需要apply给所有user, 用static
+   
+};
+```
+
+```c++
+double r;
+Account ac1;
+Account *ac2 = &ac1;
+// equivalent ways to call the static member rate function
+
+r = ac1.rate(); // through an Account object or reference
+
+r = ac2->rate(); // through a pointer to an Account object
+
+```
+
+**Define Static Members**
+- 可以define static member function inside or outside of class body.如果在outside define, we don't need to repeat ```static``` keyword(static只需要声明时候加上)
+- 因为static data members 不是 part of objects of class type, 他们并不是在create object是被定义的. They are <span style="color:red">not initialized by class constructor</span>, 
+- 不能initialize static member inside class, 必须<span style="background-color:#FFFF00">define and initialize static data member outside class body</span>
+- 向其他object一样,static data member只能被定义一次 (好习惯是 把所有static member的definitions 和所有noninlin member functions的定义放在一起)
+
+下面例子initialize static ```interestRate```例子, Once the class name ```Account``` is seen, we can use ```initRate``` without qualification as the initializer for ```rate```. Note 尽管```initRate``` is private, 可以用它initialize ```interestRate```. 
+```c++
+//不需要static keyword to define static member
+
+void Account::rate(double newRate)
+{
+interestRate = newRate;
+}
+
+//initialize static data member
+double Account::interestRate = initRate();
+```
+
+**In-Class Initialization of static Data Members**
+- 通常static members不能intialized in class body. 但可以为static members 提供  <span style="color:red">**const integral type**</span>的in-class initialzers,  不过必须要求static mmembers必须是 <span style="color:red">**constexpr of literal type**</span>.
+   - initializer 必须是**constant expression**
+- 如果某个static member 仅限于compiler可以替换它的值, then 一个初始化的const or constexpr static 不需要分别定义. 如果将它用于值不能替换的场景中, then 该成员必须有一个定义语句 
+   - 例如下面例子中, 用到```period```的地方仅仅是```daily_tbl```, there is no need to define ```period``` outside class ```Account```, 但是程序细微的改变不能造成无法编译, 因为找不到该成员定义. e.g. pass ```period``` to a function that takes a ```const int&``` then peiord must be defined 
+- 如果an initializer provided inside class, <span style="background-color:#FFFF00"> member definition outside class 不能specify an initial value</span>
+- 好的编程习惯是: Even if a const static data member is initialized in the class body, that
+member ordinarily should be defined outside the class.
+
+```c++
+class Account {
+public:
+   static double rate() { return interestRate; }
+   static void rate(double);
+private:
+   static constexpr int period = 30;// period is a constant expression
+
+   double daily_tbl[period];
+};
+
+// definition of a static member with no initializer
+
+constexpr int Account::period; // initializer provided in the class
+
+```
+
+**static Members Can Be Used in Ways Ordinary Members Can’t**
+
+- 因为static member 是不跟object 绑定, 所以static data member 可以是incomplete type. static data member 可以事the same type as the class type, A non-static member 是可以这样declared, 只可以declare reference or pointer to an object of its class
+- we can use static member as default argument. (非static data member不能被使用为default argument 因为its value is part of the object, 我们无法提供一个真的对象从中获取成员的值, so is an error) 
+
+```c++
+class Bar {
+private:
+   static Bar mem1; // ok: static member can have incomplete type
+   
+   Bar *mem2; // ok: pointer member can have incomplete type
+   
+   Bar mem3; // error: data members must have complete type
+};
+```
+拿static member as default argument 
+```c++
+class Screen {
+public:
+// bkground refers to the static member
+
+// declared later in the class definition
+
+   Screen& clear(char = bkground);
+private:
+   static const char bkground;
+};
+```
 
 
 
