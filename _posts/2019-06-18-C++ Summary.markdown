@@ -649,7 +649,7 @@ decltype(i) e;//ok: e is an int (uninitialized)
 
 ```
 
-<br/>
+<br/> <br/> <br/>
 
 ## 3. Strings, Vectors, and Arrays
 
@@ -1250,7 +1250,7 @@ for(int_array * p = ia; p!= ia + 3; ++p)
         oout << *q <<endl;
 ```
 
-<br/>
+<br/>  <br/>  <br/>
 
 ## 4. Expressions
 
@@ -1634,7 +1634,7 @@ char *pc = (char*) ip; // ip是指向整数的指针
 //效果与使用reinterpret_cast一样
 
 ```
-<br/> <br/>
+<br/> <br/> <br/>
 
 ## 5. Statements
 
@@ -1838,7 +1838,7 @@ try{
 
 
 
-<br/> <br/>
+<br/> <br/>  <br/>
 
 ## 6. Functions
 
@@ -2682,7 +2682,7 @@ string::size_type largerLength(const string&, const string&);
 decltype(sumLength) *getFcn(const string &);
 ```
 
-<br/> <br/>
+<br/> <br/>  <br/>
 
 
 ## 7. Classes
@@ -3859,6 +3859,7 @@ for (const auto &entry : people) {
 }
 ```
 
+<br/> <br/> <br/>
 
 ## (9). Sequential Containers
 
@@ -3895,7 +3896,7 @@ for (const auto &entry : people) {
 
 
 
-<br/> <br/>
+<br/> <br/> <br/>
 
 ## Include Guard
 
