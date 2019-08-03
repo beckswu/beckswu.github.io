@@ -3671,13 +3671,14 @@ cin.clear(cin.rdstate() & ~cin.failbit & ~cin.badbit);
 - <span style="background-color:#FFFF00">Buffers Are not flushed if program crashes</span>. 如果程序异常终止, 缓冲区不会刷新, 当一个程序崩溃(crash)后, 它输出的数据可能停留在输出缓冲区中等待打印
   - when debug a program that crashed, 需要make sure any output you think should have been written was actually flushed. 否则可能花大量时间track through code 为什么没有执行. 而实际上已经执行了, 只是程序crash后缓冲区没有刷新(flush), 输出的数据没有打印而已(output pending)
 
-- 有几种条件导致换种刷新(buffer flushed - write to actual output device or file  ) 
+有几种条件导致换种刷新(buffer flushed - write to actual output device or file  ) 
   - The program completes normally. All output buffers are flushed as part of return from main. 
   - At some indeterminate time, the buffer can become full, it will flushed before writing next value (缓冲区满了)
   - flush the buffer explicitly using a manipulator(操作符) such as ```endl```
   -  after each output operation, 可以用 manipulator ```unitbuf``` 设置流内部状态(set the stream's internal state) to 清空缓存. 默认情况下, 对```cerr```是设置```unitbuf```的, 所以写到```cerr```的内容都是立即刷新的
   -  Output stream might be tie to another stream. 这种情况下, when tied stream is read or written, 关联的流的缓冲区会被刷新(flush). By default,```cin``` and ```cerr``` are both tied to ```cout```. 因此reading to ```cin``` or writing to ```cerr``` flushes the buffer in ```cout```.
 
+Manipulators
 - ```endl```: end current line and flush the buffer
 - ```flush``` flush the stream and adds no character to the output
 - ```ends``` inserts a null character into buffer and flush
