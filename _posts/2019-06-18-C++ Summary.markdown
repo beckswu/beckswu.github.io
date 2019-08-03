@@ -3579,6 +3579,27 @@ private:
 };
 ```
 
+## 8. IO Library
+
+#### (a). IO Classes
+
+|  Header     | Type |
+|   ---      | :---    |  
+| iostream |  istream, wistream reads from a stream <br/> ostream, wostream writes to a stream <br/> iostream, wiostream reads and writes a stream  | 
+| fstream |  iftream, wifstream reads from a file <br/> ofstream, wofstream writes to a file <br/> fstream, wfstream reads and writes a file  | 
+| sstream |  istringstream, wistringstream reads from a string <br/> ostringstream, wostringstream writes to a string <br/> stringstream, wstringstream reads and writes a string  | 
+
+为了支持wide characters,library defines types and objects 用来操作 ```wchar_t``` data. e,g, ```wcin```,```wcout```, ```wcerr```. wider character types and objects 定义在same header, 所以比如 ```fstream``` 有```ifstream```, 也有```wifstream```.
+
+- <span style="background-color:#FFFF00">ifstream and istringstream inherit from istream, 因次可以像使用istream对象一样使用```ifstream``` 和 ```istringstream```</span>, 同样, <span style="background-color:#FFFF00">ofstream and ostringstream inherit from ostream</span> , 所以他们用```cin```, ```cout```的方法都是一样的,
+
+
+
+
+
+
+
+
 
 
 
