@@ -4060,7 +4060,9 @@ v1 < v2 // true; v1 and v2 differ at element [2]: v1[2] is less than v2[2]
 
 v1 < v3 // false; all elements are equal, but v3 has fewer of them;
 
-v1 == v4 // true; each element is equal and v1 and v4 have the same size() v1 == v2 // false; v2 has fewer elements than v1
+v1 == v4 // true; each element is equal and v1 and v4 have the same size() 
+
+v1 == v2 // false; v2 has fewer elements than v1
 
 ```
 
@@ -4076,16 +4078,9 @@ v1 == v4 // true; each element is equal and v1 and v4 have the same size() v1 ==
 
 
 | Syntax | Description | 
-| --- | :--- |
+| --- | :--- | 
 |  ```forward_list``` 有自己的```insert``` and ```emplace```  |
 |  ```forward_list``` 不支持```push_back``` and ```emplace_back```  |
-|  ```vector```, ```string``` 不支持```push_front``` and ```emplace_front``  |
-| ```c.push_back(t)``` <br/>  ```c.emplace_back(arg)``` | 在尾部创建一个值为t或者由args 创建的元素 |
-| ```c.push_front(t)``` <br/>  ```c.emplace_front(arg)``` | |
-| ```c.insert(p,t)``` <br/>  ```c.emplace(p,args)``` <br/> | p is iterator, 在p之前插入，返回iterator 指向新添加元素 |
-| ```c.insert(p,n,t)```  | 在p之前, 插入n个t, 返回指向新添加的第一个元素的iterator, 若n为0, 返回p |
-| ```c.insert(p,b,e)```  | 在p之前, 插入由iteartor b 和e返回内的元素, 返回指向新添加的第一个元素的iterator, 若range 为空, 返回p |
-| ```c.insert(p,il)```  | il是一个braced list of element values. 在p之前插入, 返回指向新添加的第一个元素的iterator, 若列表为空, 返回p |
 
 
 
