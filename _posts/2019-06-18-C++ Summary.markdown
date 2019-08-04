@@ -3940,6 +3940,17 @@ sequential containers 为user 提供 control the order in which the elements are
     - array 不支持 braced list assignment ```array<int,10>a1; a1 = {0}; //error```
     - array 不支持 iterator constructor, Assign operations 
 - Assignment related operations invalidate iterators, references, and pointer into the left-hand container。除了string 和array 外, 而```swap``` 操作不会导致iterator, 引用，指针失效
+- Excepting array, swap does not copy, delete, or insert any elements and is <span style="background-color:#FFFF00">guaranteed to run in constant time</span>.
+    - elements themselves are not swapped; internal data structures are swapped.
+    - <span style="background-color:#FFFF00">但是swap arrays 会真正交换他们的element</span>, 因为swap two arrays require 的时间与array 中数目成正比. 因此After swap, pointers, references, and iterators remain <span style="color:red">bound to the same element</span> they denoted before the swap, . 但是<span style="color:red">值已经与另一个array中交换了</span>(e,g,iterator 指向一样的```ivec[1]```,只是```ivec[1]```的值已经换成另一个了)
+- 在library 有both and nonmember version of ```swap```，好习惯是使用nonmember version of ```swap```
+- **Relational Operators**:(>, >=, <=, <=, ==, !=), 必须保证right- and left-hand operands 必须是same kind of container and hold elements of same type (e.g. 不能拿```vector<int>``` compare to ```list<int>```), 比较two container 实际上是perform pariwise comparision of the elements, 与string比较方式类似
+    - 两个container size 一样, element也一样，则相等, 否则不等
+    - 两个container size 不一样, 但是较小的每个元素 和size 较大都一样, 则较大size 的大
+    - size 不同, size小的容器 每个元素大于较大容器对应元素, 较小容器大
+    - If neither container is an initial subsequence of the other, 取决于第一个不一样的element 
+- 只有当type 定义了relational operator 才可以进行比较. 比如```vector<Sales_data> storeA, storeB; if (storeA < storeB);``` 有可能是error,如果```Sales```没有定义 ```<``` operator
+
 
 ```c++
 // assume noDefault is a type without a default constructor
@@ -4006,6 +4017,78 @@ list<string>::iterator it5 = a.begin();
 auto it7 = a.begin(); // const_iterator only if a is const
 
 ```
+
+Assign 可以用于different but compatible type
+
+```c++
+list<string> names;
+vector<const char*> oldstyle;
+names = oldstyle; // error: container types don't match
+
+// ok: can convert from const char*to string 
+
+names.assign(oldstyle.cbegin(), oldstyle.cend());
+
+
+// equivalent to slist1.clear();
+
+// followed by slist1.insert(slist1.begin(), 10, "Hiya!");
+
+list<string> slist1(1); // one element, which is the empty string 
+
+slist1.assign(10, "Hiya!"); // ten elements; each one is Hiya !
+
+```
+
+**swap** : with the exception of string, iterators, references, and pointers into the containers are not invalidated. 比如had ```iter``` denoted the string at ```sevc1[3]``` before swap, swap之后, ```iter```指的是```svec2[3]```
+```c++
+vector<string> svec1(10); // vector with ten elements 
+
+vector<string> svec2(24); // vector with 24 elements 
+
+swap(svec1, svec2);
+```
+
+**比较container**
+```c++
+vector<int> v1 = { 1, 3, 5, 7, 9, 12 };
+vector<int> v2 = { 1, 3, 9 };
+vector<int> v3 = { 1, 3, 5, 7 };
+vector<int> v4 = { 1, 3, 5, 7, 9, 12 };
+v1 < v2 // true; v1 and v2 differ at element [2]: v1[2] is less than v2[2]
+
+v1 < v3 // false; all elements are equal, but v3 has fewer of them;
+
+v1 == v4 // true; each element is equal and v1 and v4 have the same size() v1 == v2 // false; v2 has fewer elements than v1
+
+```
+
+#### (c). Sequential Container Operations
+- 除了```array```, 所有library containers 都提供了flexible memory management, we can add or remove elements dynamically the size of container at run time. 
+- 
+
+
+
+
+
+
+
+
+| Syntax | Description | 
+| --- | :--- |
+|  ```forward_list``` 有自己的```insert``` and ```emplace```  |
+|  ```forward_list``` 不支持```push_back``` and ```emplace_back```  |
+|  ```vector```, ```string``` 不支持```push_front``` and ```emplace_front``  |
+| ```c.push_back(t)``` <br/>  ```c.emplace_back(arg)``` | 在尾部创建一个值为t或者由args 创建的元素 |
+| ```c.push_front(t)``` <br/>  ```c.emplace_front(arg)``` | |
+| ```c.insert(p,t)``` <br/>  ```c.emplace(p,args)``` <br/> | p is iterator, 在p之前插入，返回iterator 指向新添加元素 |
+| ```c.insert(p,n,t)```  | 在p之前, 插入n个t, 返回指向新添加的第一个元素的iterator, 若n为0, 返回p |
+| ```c.insert(p,b,e)```  | 在p之前, 插入由iteartor b 和e返回内的元素, 返回指向新添加的第一个元素的iterator, 若range 为空, 返回p |
+| ```c.insert(p,il)```  | il是一个braced list of element values. 在p之前插入, 返回指向新添加的第一个元素的iterator, 若列表为空, 返回p |
+
+
+
+
 
 
 
