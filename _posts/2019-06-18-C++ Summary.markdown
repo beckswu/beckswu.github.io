@@ -3987,21 +3987,11 @@ Containner Assignment Operatior, <span style="background-color:#FFFF00">Assign o
 | Syntax | Description | 
 | --- | :--- | 
 | ```c1 = c2``` | Replace element in ```c1``` with copies of elements in ```c2```, ```c1``` 与```c2```类型必须一样 |
-| ```c = {a,b,c}`` | Replace elements in ```c1``` with copies of elements in initializer list (<span style="color:red">not valid for array</span>) |
-| ```swap(c1,c2)```<br/> ``` c1.swap(c2)``` | <span style="background-color:#FFFF00">Swap 会比copy elements 快的多</span> | 
-| ```seq.assgin(b,e)``` | Replaces elements in seq with those range denoted by iterators ```b``` and ```e``` |
-| ```seq.assign(il)``` | Replaces elements in seq with those in **initializer list** ```il``` |
-| ```seq.assign(n,t)``` | Replaces elements in seq with n elements with value t |
+
 
 
 
 Syntax common to all sequential container
-
-| Syntax | Description | 
-| --- | :--- |
-| ```difference_type``` | signed integral type big enough to thold the distance between two iterators |
-| ```C c(b ,e)``` | copy elements from range denoted by iterators b and e (<span style="color:red">not valid for array</span>) |
-| ```c.max_size()``` | C 可保存最大的数目 | 
 
 | Syntax | Description | 
 | --- | :--- | 
