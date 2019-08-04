@@ -666,7 +666,7 @@ decltype(i) e;//ok: e is an int (uninitialized)
 **(1). Initialization**
 
 - ```string s2(s1)``` ```s2``` is a copy of ```s1``` 
-- ```string s2 = s1``` 与```s2(s1)``` 作用一眼
+- ```string s2 = s1``` 与```s2(s1)``` 作用一样
 - ```string s3("value")``` ```s3``` is a copy of **string literal**， not including the null(null在const char\*的结尾处)
 - ```string s3 = "value"```, 与```string s3("value")```一样, copy of **string literal**
 - ```string s4(n,'c')```, initialize ```s4``` with n copies of character ```c```
@@ -4135,6 +4135,245 @@ while (it != lst.end())
 
 
 **(2).Specialized forward_list Operations**
+
+![](/img/post/C++/forward_list.png)
+
+因为```forward_list``` 是single linked list, 如果add/remove element 需要访问前一个元素(prepocessor),但是forward_list是单向,不能访问前一个元素, 所以定义insert emplace, erase 都是after, e.g. 我们想删除```elem3``` 需要call ```erase_after``` on iterator ```elem2```. To support 这种操作, ```forward_list``` 也定义了一个```before_begin``` returns off-the-begining (首前) iterator
+
+| Syntax | Description | 
+| --- | :--- | 
+| ```c.before_begin()``` <br/> ```c.cbefore_begin()```  | 不存在的元素在列表首前, <span style="color:red">不能用dereferenced</span> |
+| ```c.insert_after(p,t)``` <br/> ```c.insert_after(p,n,t)```  <br/> ```c.insert_after(p,b,e)```  <br/> ```c.insert_after(p,il)```  | p is iterator, t is object, n is count, b 和 e是iterator, il is braced list. <span style="color:red">返回last insert element</span> 如果range is empty returns p, <span style="color:red">Undefined if p 是off-the-end iterator (end)</span>  |
+| ```c.emplace_after(p.args)``` | 返回the iterator to new element, Undefined if p 是off-the-end iterator (end) |
+| ```c.erase_after(p)``` <br/>  ```c.erase_after(b,e)``` | 删除p后面的一个elements or 删除(b,e)之间的元素 (不包括b,e). 返回an iterator to the eement after the one deleted, or 返回off-the-end iterator(如果不存在这样的element), Undefined if p 是off-the-end iterator (end) |
+
+当删除elements in ```forward_list``` 必须关注两个iterator, the one we checking and the one to that element's predecessor.
+
+```c++
+forward_list<int> flst = {0,1,2,3,4,5,6,7,8,9};
+auto prev = flst.before_begin(); // denotes element "off the start" of flst
+
+auto curr = flst.begin();
+while (curr != flst.end()) { // while there are still elements to process
+
+    if (*curr % 2)
+        curr = flst.erase_after(prev); // erase it and move curr
+
+    else {
+        prev = curr;
+        ++curr;
+    }
+}
+```
+
+**(3).Resize**
+
+- 如果```resize``` 缩小容器, then iterators, references, and pointers to the deleted elements are invalidated; ```resize``` on a vector, string, deque potentially invalidates all iterators, pointers, and references.
+
+| Syntax | Description | 
+| --- | :--- | 
+| ```c.resize(n)```  | if n < c.size(), 多的元素被丢弃, 如果必须添加新的元素, value initialized |
+| ```c.resize(n,t)```  | Resize c to have n elements of t  |
+
+**(4).Operations May Invalidate Iterators**
+
+- Invalidate iterator, pointer, or reference is serious <span style="color:red">run-time error</span>
+- After Options that add elements: (Iterators, pointers, and references aka IPR)
+  - IPR to vector or strings are <span style="color:red">invalid 如果 container **reallocated** </span>. 如果没有reallocate, 插入元素之前的IPR有效, 插入元素之后的IPR 无效
+  - 对于 **deque**, add elements 除了收尾任何位置都invalid; <span style="background-color:#FFFF00">在 front or back, Iterators are invalidated, but references and pointers to existing elements are not</span>
+  - 对于 **list**, **forward_list** IPR都 都有效
+- After we remove element
+  -  **list**, **forward_list** IPR 都 remain valid 
+  -  对于 **deque**, remove elements 除了收尾任何位置都invalid; <span style="background-color:#FFFF00">如果删除是back, off-the-end itertor is invaldiated 但是其他的IPR 都有效 （unaffected）. 如果删除是begin, 所有都unaffected. </span>
+  -  IPR to **vector** or **string** remain valid对于删除元素之前的, 注意: 当我们删除元素时, off-the-end iterator is always invalidated when we remove elements
+- Avoid Storing the Iterator Returned from end 因为add / remove elements 总会把```vector``` or ```sttring``` 的```end``` iterator invalid
+
+
+
+```c++
+// silly loop to remove even-valued elements and insert a duplicate of odd-valued elements
+
+vector<int> vi = {0,1,2,3,4,5,6,7,8,9};
+auto iter = vi.begin(); // call begin, not cbegin because we're changing vi
+
+while (iter != vi.end()) { if (*iter % 2) {
+    if(*itera%2)
+        iter = vi.insert(iter, *iter); // duplicate the current element
+
+        iter += 2; // advance past this element and the one inserted before it
+
+    } else
+        iter = vi.erase(iter); // remove even elements
+
+        // don't advance the iterator; iter denotes the element after the one we erased
+
+}
+```
+
+**Avoid Storing the Iterator Returned from end**: 不要特地的保存```end```, 下面的代码行为是未定义的, 会导致代码无限循环
+```c++
+// disaster: the behavior of this loop is undefined 
+
+auto begin = v.begin(),
+    end = v.end(); // bad idea, saving the value of the end iterator 
+
+while (begin != end) {
+    // insert the new value and reassign begin, which otherwise would be invalid 
+
+    ++begin; // 想在此元素后插入元素
+
+    begin = v.insert(begin, 42); // insert the new value 
+    
+    ++begin; // advance begin past the element we just added
+
+}
+
+
+//正确做法
+while (begin != v.end()) {
+    ++begin; // advance begin because we want to insert after this element 
+    
+    begin = v.insert(begin, 42); // insert the new value
+    
+     ++begin; // advance begin past the element we just added
+
+}
+
+```
+
+#### (d). How a vector Grows
+
+- **vector** 和 **string** 通常会分配比新的空间需求更大的内存空间，holds this storage in reserve and use it to allocate new elements as they are added. 因此而不会每次添加元素的是都reallocate 
+- vector implementation strategy 是 doubling the current capacity each time it has to allocate new storage.(1->2->4->8->16...)
+- ```capacity``` 告诉我们how many elements the container can hold before it must allocate more space. ```size``` is the number of a elements the container already holds 
+- ```reserve``` 允许我们通知container how many elements it should prepare to hold.  ```reserve``` 不改变容器中元素的数量，仅影响预先分配多大的内存空间 (how much memory the ```vector``` preallocates )
+  - 如果request space > current capacity, ```reserve``` allocates at least as much as requested amount
+  - 如果request size 小于 或者 等于 existing capacity, ```reserve``` does nothing. 
+  - <span style="background-color:#FFFF00">```reserve``` never reduce the amount of space that container uses.</span>. 如果想减少memory, 可以call ```shrink_to_fit``` 对于 deque, vector, or srtring; <span style="color:red">```resize``` 只改变容器中元素数目, 而不改变its capacity</span>
+- Calling shrink_to_fit is only a request; there is no guarantee that the library will return the memory.比如当size == capacity
+
+
+| Syntax | Description | 
+| --- | :--- | 
+| | ```shrink_to_fit``` valid only for vector, string, deque |
+| | ```capcity()``` and ```reserve``` valid only for vector, string |
+| ```c.shrink_to_fit(n)```  | Request to reduce ```capacity()``` to equal to ```size()```|
+| ```c.capacity(n,t)```  | 不重新分配的话，c可以保存多少元素  |
+| ```c.reserve(n)``` | Allocate space for at least n elements | 
+
+用光预留空间
+```c++
+vector<int> ivec;
+while (ivec.size() != ivec.capacity())
+    ivec.push_back(0);
+```
+
+#### (e). Additional string Operations
+
+**(1). 其他构造string 的方法**
+
+| Syntax | Description | 
+| --- | :--- | 
+|  | n, len2, pos2 are all unsigned values |
+| ```string s(cp, n)```  | s is a copy of the first n character in array which cp points. Array 必须有至少n个char|
+| ```string s(s2, pos2)```  | s is a copy of characters in the string s2 starting from the index ```pos2```. Undefined if ```pos2>s2.size()``` |
+| ```string s(s2, pos2, len2)``` | s is a copy of characters in string s2 \[pos2, pos2+len2 \), 不管len2多大， 最多copy ```s2.size() - pos2```个chars| 
+
+
+- 当create a string from a ```const char*```, <span style="color:red">array 必须是 null terminated.</span>, copy 遇到null 停止. or pass a count , array 可以不用以null 结尾
+    - <span style="color:red">但是如果不pass count and no null, 或者given count 大于size of array, operation is undefined</span>
+- 当pass的起始值pos2 大于size, 会throw out_of_range exception. 
+- library copies up to the size of string or null 结尾的char array
+
+```c++
+const char *cp = "Hello World!!!"; // null-terminated array
+
+char noNull[] = {'H', 'i'}; // not null terminated
+
+string s1(cp); // copy up to the null in cp; s1 == "Hello World!!!"
+
+string s2(noNull,2); // copy two characters from no_null; s2 == "Hi" 
+
+string s3(noNull); // undefined: noNull not null terminated
+
+string s4(cp + 6, 5);// copy 5 characters starting at cp[6]; s4 == "World" 
+
+string s5(s1, 6, 5); // copy 5 characters starting at s1[6]; s5 == "World" 
+
+string s6(s1, 6); // copy from s1 [6] to end of s1; s6 == "World!!!" 
+
+string s7(s1,6,20); // ok, copies only to end of s1; s7 == "World!!!" 
+
+string s8(s1, 16); // throws an out_of_range exception
+
+```
+
+string operation 
+
+| Syntax | Description | 
+| --- | :--- | 
+| ```s.substr(pos, n)``` | pos起始点, n 是从起始点copy 多少个, \[pos, pos+n\), 会throws an out_of_range exception 如果pos超过size |
+|  |定义了member function  ```assign```, ```erase```, ```insert``` | 
+| ```s.append(args)``` | | 
+| ```s.assign(args)``` |  replace chararcters in s = args | 
+| ```s.erase(pos,len)``` | 删除\[pos, pos+len\), 如果没有提供len, 表示 删除\[pos, end\), return a reference to s |
+| ```s.insert(pos,args)``` | pos 可以是下标 or iterator, 在p之前插入args, 接受index的版本 返回reference to s; 接受iterator的返回an iterator 表示第一插入的character |
+| ```s.replace(range,args)``` | 删除range 内的字符, 替换成args指定的字符, range 可以是一个下标或者一个长度, or a pair of iterators into s. returns a reference to s |
+
+上表的arg 可以是如下的形式
+
+
+
+**(2). String Search Operations**
+
+- 有6中search的functions, 每个function 提供4个overloaded functins. 每一个search 返回 ```string::size_type``` value that is the index of where match occurred 如果没有match, function 返回一个 ```static``` member named ```string::npos```.  Library defines ```npos``` as a ```const string::size_type``` 初始值 -1. 因为```npos```是unsinged type.  意味着```npos```等于任何```string```最大可能的值得大小
+
+![](/img/post/C++/string_search.png)
+
+```c++
+string river("Mississippi");
+auto first_pos = river.find("is"); // returns 1 
+
+auto last_pos = river.rfind("is"); // returns 4
+
+```
+
+**(3). Compare Functions**
+
+```compare``` function 类似于 C library的 ```strcmp``` function. Like ```strcmp, s.compare``` 返回0(等于), positive(大于) or negative(小于) value 
+
+| Syntax | Description | 
+| --- | :--- | 
+| ```s2``` | Compare s to s2 |
+| ```pos1, n1, s2``` | 将s中 \[pos1, pos1 + n1) compare to s2 | 
+| ```pos1, n1, s2, pos2, n2``` | 将s中 \[pos1, pos1 + n1 ) compare to s2 的\[pos2, pos2 + n2 )   | 
+| ```cp``` | compares s to null-terminated array pointed to by cp | 
+| ```pos1, n1, cp``` | 将s中 \[pos1, pos1 + n1) compare to cp | 
+| ```pos1, n1, cp, n2``` | 将s中 \[pos1, pos1 + n1) compare to n2 characters starting from pointer cp | 
+
+**(4).Numeric Conversions**
+
+- 如果string 不能转换为一个数值, 转换 functions 会 throw an ```invalid_argument``` exception. 如果转换得到数值无法用任何类型来表示, throw ```out_of_range```
+| Syntax | Description | 
+| --- | :--- | 
+| ```stoi(s, p, d)``` <br/>  ```stol(s, p, d)``` <br/>  ```stoul(s, p, d)``` <br/>  ```stoll(s, p, d)``` <br/>  ```stoull(s, p, d)```  | b表示numeric base for the conversion(几进制), p is a pointer to a ```size_t``` in which to put index of first non-numeric character(非数值的) in s` |
+| ```stof(s,p)``` <br/> ```stod(s,p)``` <br/> ```stold(s,p)``` | p跟上面的作用一样 | 
+
+
+#### (f). Container Adaptors
+- 除了 sequential containers, 还定义了sequential container adaptors: ```stack```, ```queue```, and ```priority_queue```. An adaptor 是 general concept. 
+- container adaptor takes an existing containeer type and makes it act like a different type. 比如```stack``` 可以takes a sequential container (other than ```array``` or ```forward_list```. 
+- Each adaptor defines two constructors: the default constructor that creates an empty object, and a constructor that takes a container and initializes the adaptor by copying the given container. 
+- 默认情况下, ```stack```and ```queue``` are implemented in terms of ```deque```, 而```priority_queue```是在```vector```上实现的
+    - e.g. 假定```deq```是一个```deque<int>```, ```stack<int>stk(deq);``` 从deq拷贝元素到stk,
+    - e.g. override default container type by naming a sequential container as a secnd type argument. ```stack<string, vector<string>str(svec)```
+- <span style="background-color:#FFFF00">All adpator 需要the ability to add / remove elements. 因为they cannot be built on ```array```. 同样的, 我们也不能用```forward_list```, 因为adaptor需要具有add, remove, access the last element (back) ability. </span>
+- ```stack```仅需要有```back```, ```push_back```, ```pop_back```,所以用于除了```array``` 和 ```forward_list```以外所有容器
+- ```queue```需要有```back```,```push_back```, ```front```, ```push_front```的能力,所以只能建立在```list``` or ```deque```上而不能在```vector```上. 
+- ```priority_queue``` 需要有random access in addition to ```front```, ```pusk_back```, ```pop_back```, 所以只能用于```vector``` or ```deque```, 不能用于```list```
+- 每一个container adpator defines 自己的操作类型 in terms of 底层容器的操作类型. 只能使用adaptor自己的操作类型,不能用underlying container type. 
+    - ```intStack.push(ix);``` calls ```push_back``` on the ```deque``` on which ```intStack``` is based,尽管```stack```是基于```deque```实现的, 但我们不能使用```deque```操作, 不能call ```push_back```, 只能call ```push```
+
 
 
 
