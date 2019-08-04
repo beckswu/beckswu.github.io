@@ -3984,8 +3984,8 @@ a2 = {0}; // error: cannot assign to an array from a braced list
 
 Containner Assignment Operatior, <span style="background-color:#FFFF00">Assign operations not valid for associative containers or array。 Assignment related operations invalidate iterators, references, and pointer into the left-hand container。除了string 和array 外,而```swap``` 操作不会导致iterator, 引用，指针失效 </span>
 
-| Syntax | Assignment Operations Description | 
-| --- | :--- |
+| Syntax | Description | 
+| --- | :--- | 
 | ```c1 = c2``` | Replace element in ```c1``` with copies of elements in ```c2```, ```c1``` 与```c2```类型必须一样 |
 | ```c = {a,b,c}`` | Replace elements in ```c1``` with copies of elements in initializer list (<span style="color:red">not valid for array</span>) |
 | ```swap(c1,c2)```<br/> ``` c1.swap(c2)``` | <span style="background-color:#FFFF00">Swap 会比copy elements 快的多</span> | 
