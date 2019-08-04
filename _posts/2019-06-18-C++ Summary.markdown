@@ -3996,6 +3996,7 @@ Containner Assignment Operatior, <span style="background-color:#FFFF00">Assign o
 
 
 Syntax common to all sequential container
+
 | Syntax | Description | 
 | --- | :--- |
 | ```difference_type``` | signed integral type big enough to thold the distance between two iterators |
