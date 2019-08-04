@@ -3983,6 +3983,7 @@ a2 = {0}; // error: cannot assign to an array from a braced list
 ```
 
 Containner Assignment Operatior, <span style="background-color:#FFFF00">Assign operations not valid for associative containers or array。 Assignment related operations invalidate iterators, references, and pointer into the left-hand container。除了string 和array 外,而```swap``` 操作不会导致iterator, 引用，指针失效 </span>
+
 | Syntax | Assignment Operations Description | 
 | --- | :--- |
 | ```c1 = c2``` | Replace element in ```c1``` with copies of elements in ```c2```, ```c1``` 与```c2```类型必须一样 |
@@ -4065,7 +4066,7 @@ v1 == v4 // true; each element is equal and v1 and v4 have the same size() v1 ==
 
 #### (c). Sequential Container Operations
 - 除了```array```, 所有library containers 都提供了flexible memory management, we can add or remove elements dynamically the size of container at run time. 
-- 
+- Adding elements to ```vector```, ```string```, ```deque``` 会invalidates all existing iterators, references, and pointer
 
 
 
