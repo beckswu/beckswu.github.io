@@ -4067,11 +4067,18 @@ v1 == v2 // false; v2 has fewer elements than v1
 ```
 
 #### (c). Sequential Container Operations
+
+**(1).Add, Access, Delete**
+
 - 除了```array```, 所有library containers 都提供了flexible memory management, we can add or remove elements dynamically the size of container at run time. 
-- Adding elements to ```vector```, ```string```, ```deque``` 会invalidates all existing iterators, references, and pointer
-
-
-
+- Adding (insert) elements to ```vector```, ```string```, ```deque``` 会invalidates all existing iterators, references, and pointer
+- 像一个```vector``` or ```string``` 添加元素可能会引起entire object to be reallocated. <span style="background-color:#FFFF00">Reallocating an object requires allocating new memory and moving elements from the old space to the new.</span>
+- ```Array``` 和```forward_list``` 不支持```push_back``` 剩下都支持 (a copy of object)
+- ```Array``` 不支持```insert```, 剩下都支持,(vector, deque, list, string, forward_list), Insert into a vector, deque, string is expensive operation 
+- ```emplace(front, back)```construct elements in the container ( construct an element directly in space managed by the container在内存空间中直接构造元素). The argumentsmust match a constructor for the element type. 
+- 包括```Array```在内所有成员都有```front```,只有```forward_list```没有```back```,因为不支持```reverse_iterator```, 也不能```--```递减```forward_list```的iterator, 但可以call ```forward_list```的```end()```
+- The Access Members Return References (```back()```, ```frot()```, ```c[n]```, ```c.at(n)```), e.g. ```auto & v = c.back(); v = 1024;```, 
+    -  ```at```与下标的区别是如果越界, ```at```throw out_of_range error 如果invalid, （subscript operator 不会check index）
 
 
 
@@ -4084,18 +4091,50 @@ v1 == v2 // false; v2 has fewer elements than v1
 |  |```vector```, ```string``` 不支持```push_front``` and ```emplace_front```  |
 | ```c.push_back(t)``` <br/>  ```c.emplace_back(arg)``` | 在尾部创建一个值为t或者由args 创建的元素 |
 | ```c.push_front(t)``` <br/>  ```c.emplace_front(arg)``` | |
-| ```c.insert(p,t)``` <br/>  ```c.emplace(p,args)``` <br/> | p is iterator, 在p之前插入，返回iterator 指向新添加元素 |
+| ```c.insert(p,t)``` <br/>  ```c.emplace(p,args)``` | p is iterator, 在p之前插入，返回iterator 指向新添加元素 |
 | ```c.insert(p,n,t)```  | 在p之前, 插入n个t, 返回指向新添加的第一个元素的iterator, 若n为0, 返回p |
 | ```c.insert(p,b,e)```  | 在p之前, 插入由iteartor b 和e返回内的元素, 返回指向新添加的第一个元素的iterator, 若range 为空, 返回p |
 | ```c.insert(p,il)```  | il是一个braced list of element values. 在p之前插入, 返回指向新添加的第一个元素的iterator, 若列表为空, 返回p |
 
+Delete Element
+
+| Syntax | Description | 
+| --- | :--- | 
+|  | <span style="color:red">这些操作改变容器大小, 不适合```Array```</span> |
+|  |```forward_list```有特殊的 ```erase```, 不支持```pop_back()```  |
+|  |```vector```, ```string``` 不支持```pop_front```  |
+| ```c.pop_back()``` <br/> ```c.pop_front()```  | return void |
+| ```c.erase(p)``` | p is iterator, 删除p,返回删除元素之后的元素的 iterator，如果p is end, undefined |
+| ```c.erase(b,e)``` | b,e is iterator of range, 删除p,返回删除元素之后的元素的 iterator，如果e is end, return end iterator |
+| ```c.clear``` | return all element, returns void |
 
 
 
 
+理解下面insert的返回值,每次返回都是begin, 指向新的元素
+```c++
+list<string> 1st;
+auto iter = 1st.begin(); 
+while (cin >> word)
+    iter = 1st.insert(iter, word); // same as calling push_front
+
+```
+
+删除元素
+```c++
+list<int> lst = {0,1,2,3,4,5,6,7,8,9}; 
+auto it = lst.begin();
+while (it != lst.end())
+    if (*it % 2) // if the element is odd 
+
+        it = lst.erase(it); // erase this element
+
+    else
+        ++it;
+```
 
 
-
+**(2).Specialized forward_list Operations**
 
 
 
