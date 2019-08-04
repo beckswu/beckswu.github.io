@@ -4002,7 +4002,7 @@ Syntax common to all sequential container
 | ```C c(b ,e)``` | copy elements from range denoted by iterators b and e (<span style="color:red">not valid for array</span>) |
 | ```c.max_size()``` | C 可保存最大的数目 | 
 
-| Type | Description | 
+| Syntax | Description | 
 | --- | :--- | 
 | ```difference_type``` | signed integral type big enough to thold the distance between two iterators |
 | ```C c(b ,e)``` | copy elements from range denoted by iterators b and e (<span style="color:red">not valid for array</span>) |
