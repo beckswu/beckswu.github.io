@@ -3928,28 +3928,29 @@ sequential containers 为user 提供 control the order in which the elements are
 - If your program has lots of small elements and space overhead matters, don’t use list or forward_list.
 - If the program requires random access to elements, use a **vector** or a **deque**.
 - If the program needs to insert or delete elements：
-   - Insert/Delete in the middle of the container, use a **list** or **forward_list**.
-   - Insert/Delete elements at the front and the back, but not in the middle, use a **deque**.
-   - Insert into the middle, consider using a **list** for the input phase. Once the input is complete, copy the list into a **vector**.
+   - Insert/Delete in the  <span style="color:red"> middle</span> of the container, use a **list** or **forward_list**.
+   - Insert/Delete elements at the  <span style="color:red"> front and the back</span>, but not in the middle, use a **deque**.
+   - Insert into the  <span style="color:red"> middle</span>, consider using a **list** for the input phase. Once the input is complete, copy the list into a **vector**.
 - 如果程序需要random access , insertion and deletion. 决定取决于 <span style="color:red"> Random Access VS Insertion/Deletion </span> the relative cost of accessing the elements in a **list** or **forward_list** VS the code of inserting or deleting elements in a **vector** or **deque**
 - 如果不确定使用哪个, 可以在程序中只使用 operations common to both **vector** and **list**. <span style="background-color:#FFFF00">**Use iterators, not subscripts and avoid random access to elements**</span>
 
 #### (b). Container Library Overview
 
-- Can use constructor that takes a size argument if the element type is built-in type or a class type that has a default constructor 例如: ```vector<int> a(10)``` 默认初始化了10个0
-- The constructors that <span style="background-color:#FFFF00">take a size are valid only for sequential containers</span>; they are not supported for the associative containers.
-- <span style="color:red">如果没有default constructor type, we cannot cosntruct such containers using only an element count</span>
+- Constructor:
+   - Can use constructor that takes a size argument if the element type is built-in type or a class type that has a  <span style="color:red"> **default constructor**</span> 例如: ```vector<int> a(10)``` 默认初始化了10个0
+   - <span style="color:red">如果没有default constructor type, we cannot construct such containers using only an element count</span>
+   - The constructors that <span style="background-color:#FFFF00">take a size are valid only for sequential containers</span>; they are not supported for the associative containers.
 - <span style="color:red">**Array**: size is part of its type</span>. 当define array, 需要specify element type and size ```array<int, 42>```. **Array** 不支持normal container constructor 因为这些constructor need the size of the container. 
     - 不像其他container, <span style="color:red">A default-constructed array is not empty: It has as many elements as its size(elements are default initialized)</span>
     - 如果提供initializer,必须提供equal or less than size. 如果fewer initializers than size, remaining value是value initialized. <span style="background-color:#FFFF00">如果array element type is class type, class 必须有default constructor.</span>
-    - array 支持copy assignment constructor, 只要type (size, element type) matches
-    - array 不支持 braced list assignment ```array<int,10>a1; a1 = {0}; //error```
-    - array 不支持 iterator constructor, Assign operations 
+    - array 支持copy assignment constructor, 只要type (size, element type) matches, ```array<int, 10>a3(a2);```
+    - array 不支持 braced list assignment(新版C++17支持), 但支持braced list initialization ```array<int,10>a1; a1 = {0}; ```
+    - array 不支持 iterator constructor (no ```begin```, ```end```), ```Assign``` function 
 - Assignment related operations invalidate iterators, references, and pointer into the left-hand container。除了string 和array 外, 而```swap``` 操作不会导致iterator, 引用，指针失效
 - Excepting array, swap does not copy, delete, or insert any elements and is <span style="background-color:#FFFF00">guaranteed to run in constant time</span>.
     - elements themselves are not swapped; internal data structures are swapped.
     - <span style="background-color:#FFFF00">但是swap arrays 会真正交换他们的element</span>, 因为swap two arrays require 的时间与array 中数目成正比. 因此After swap, pointers, references, and iterators remain <span style="color:red">bound to the same element</span> they denoted before the swap, . 但是<span style="color:red">值已经与另一个array中交换了</span>(e,g,iterator 指向一样的```ivec[1]```,只是```ivec[1]```的值已经换成另一个了)
-- 在library 有both and nonmember version of ```swap```，好习惯是使用nonmember version of ```swap```
+- 在library 有both mmber and nonmember version of ```swap```，好习惯是使用nonmember version of ```swap```
 - **Relational Operators**:(>, >=, <=, <=, ==, !=), 必须保证right- and left-hand operands 必须是same kind of container and hold elements of same type (e.g. 不能拿```vector<int>``` compare to ```list<int>```), 比较two container 实际上是perform pariwise comparision of the elements, 与string比较方式类似
     - 两个container size 一样, element也一样，则相等, 否则不等
     - 两个container size 不一样, 但是较小的每个元素 和size 较大都一样, 则较大size 的大
@@ -4012,9 +4013,8 @@ Syntax common to all sequential container
 
 
 **Iterators**
-- ```forward_list``` 不支持 递减(--) operator. 也不支持```reverse_iteator```
 - 对于一个```reverse_iterator``` 进行 ```++``` operation, 得到上一个element
-- 对一个const object 调用iterator时, 普通的iterator 会convert to ```const_iterator```
+- <span style="color:red">对一个const object 调用iterator时, 普通的iterator 会convert to ```const_iterator```</span>
 - <span style="background-color:#FFFF00">除了```array```以外, every container type defines a default constructor.</span>, 且都可以接受argument that specify size and initial values
 - create a container as copy another container, 两个container类型必须匹配 ```C c(a)```. 如果pass iterators```C c(begin, end)```,两个containers 类型不用相同 (只要可以convert elements to the initialized type)
 
@@ -4025,7 +4025,7 @@ auto it7 = a.begin(); // const_iterator only if a is const
 
 ```
 
-Assign 可以用于different but compatible type
+<span style="background-color:#FFFF00">**Assign 可以用于different but compatible type**</span>
 
 ```c++
 list<string> names;
@@ -4047,7 +4047,7 @@ slist1.assign(10, "Hiya!"); // ten elements; each one is Hiya !
 
 ```
 
-**swap** : with the exception of string, iterators, references, and pointers into the containers are not invalidated. 比如had ```iter``` denoted the string at ```sevc1[3]``` before swap, swap之后, ```iter```指的是```svec2[3]```
+**swap** : with the exception of string, iterators, references, and pointers into the containers are not invalidated(仍然有效). 比如had ```iter``` denoted the string at ```sevc1[3]``` before swap, swap之后, ```iter```指的是```svec2[3]```
 ```c++
 vector<string> svec1(10); // vector with ten elements 
 
@@ -4075,14 +4075,16 @@ v1 == v2 // false; v2 has fewer elements than v1
 #### (c). Sequential Container Operations
 
 **(1).Add, Access, Delete**
-
-- 除了```array```, 所有library containers 都提供了flexible memory management, we can add or remove elements dynamically the size of container at run time. 
-- Adding (insert) elements to ```vector```, ```string```, ```deque``` 会invalidates all existing iterators, references, and pointer
 - 像一个```vector``` or ```string``` 添加元素可能会引起entire object to be reallocated. <span style="background-color:#FFFF00">Reallocating an object requires allocating new memory and moving elements from the old space to the new.</span>
-- ```Array``` 和```forward_list``` 不支持```push_back``` 剩下都支持 (a copy of object)
-- ```Array``` 不支持```insert```, 剩下都支持,(vector, deque, list, string, forward_list), Insert into a vector, deque, string is expensive operation 
-- ```emplace(front, back)```construct elements in the container ( construct an element directly in space managed by the container在内存空间中直接构造元素). The argumentsmust match a constructor for the element type. 
-- 包括```Array```在内所有成员都有```front```,只有```forward_list```没有```back```,因为不支持```reverse_iterator```, 也不能```--```递减```forward_list```的iterator, 但可以call ```forward_list```的```end()```
+-```array```
+   - 除了```array```, 所有library containers 都提供了flexible memory management, we can add or remove elements dynamically the size of container at run time. 
+    - 不支持```push_back/emplace_back, push_front/emplace_front``` (a copy of object)
+    - 不支持```insert```,剩下都支持```insert```(vector, deque, list, string, forward_list)
+-  ``forward_list```
+    - 没有```back```,因为不支持```reverse_iterator```, 
+    -  也不能```--```递减```forward_list```的iterator, 但可以call ```forward_list```的```end()```
+    - 不支持```push_back``` 剩下都支持 (a copy of object)
+- ```emplace(front, back)```construct elements in the container ( construct an element directly in space managed by the container在内存空间中直接构造元素). The arguments must match a constructor for the element type. 
 - The Access Members Return References (```back()```, ```frot()```, ```c[n]```, ```c.at(n)```), e.g. ```auto & v = c.back(); v = 1024;```, 
     -  ```at```与下标的区别是如果越界, ```at```throw out_of_range error 如果invalid, （subscript operator 不会check index）
 
@@ -4187,6 +4189,7 @@ while (curr != flst.end()) { // while there are still elements to process
 - After Options that add elements: (Iterators, pointers, and references aka IPR)
   - IPR to vector or strings are <span style="color:red">invalid 如果 container **reallocated** </span>. 如果没有reallocate, 插入元素之前的IPR有效, 插入元素之后的IPR 无效
   - 对于 **deque**, add elements 除了收尾任何位置都invalid; <span style="background-color:#FFFF00">在 front or back, Iterators are invalidated, but references and pointers to existing elements are not</span>
+  - Adding (insert) elements to ```vector```, ```string```, ```deque``` 会invalidates all existing IPR
   - 对于 **list**, **forward_list** IPR都 都有效
 - After we remove element
   -  **list**, **forward_list** IPR 都 remain valid 
