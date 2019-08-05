@@ -4191,12 +4191,12 @@ while (curr != flst.end()) { // while there are still elements to process
 - Invalidate iterator, pointer, or reference is serious <span style="color:red">run-time error</span>
 - After Options that add elements: (Iterators, pointers, and references aka IPR)
   - IPR to vector or strings are <span style="color:red">invalid 如果 container **reallocated** </span>. 如果没有reallocate, 插入元素之前的IPR有效, 插入元素之后的IPR 无效
-  - 对于 **deque**, add elements 除了收尾任何位置都invalid; <span style="background-color:#FFFF00">在 front or back, Iterators are invalidated, but references and pointers to existing elements are not</span>
+  - 对于 **deque**, add elements 除了首尾任何位置, IPR都invalid; <span style="background-color:#FFFF00">在 front or back, Iterators are invalidated, but references and pointers to existing elements are not</span>
   - Adding (insert) elements to ```vector```, ```string```, ```deque``` 会invalidates all existing IPR
   - 对于 **list**, **forward_list** IPR都 都有效
 - After we remove element
   -  **list**, **forward_list** IPR 都 remain valid 
-  -  对于 **deque**, remove elements 除了收尾任何位置都invalid; <span style="background-color:#FFFF00">如果删除是back, off-the-end itertor is invaldiated 但是其他的IPR 都有效 （unaffected）. 如果删除是begin, 所有都unaffected. </span>
+  -  对于 **deque**, remove elements 除了首尾任何位置 IPR都invalid; <span style="background-color:#FFFF00">如果删除是back, off-the-end itertor is invaldiated 但是其他的IPR 都有效 （unaffected）. 如果删除是begin, 所有都unaffected. </span>
   -  IPR to **vector** or **string** remain valid对于删除元素之前的, 注意: 当我们删除元素时, off-the-end iterator is always invalidated when we remove elements
 - Avoid Storing the Iterator Returned from end 因为add / remove elements 总会把```vector``` or ```sttring``` 的```end``` iterator invalid
 
