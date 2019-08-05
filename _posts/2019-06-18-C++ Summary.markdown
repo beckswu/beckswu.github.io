@@ -3579,6 +3579,8 @@ private:
 };
 ```
 
+<br/><br/><br/>
+
 ## 8. IO Library
 
 #### (a). IO Classes
@@ -3596,7 +3598,7 @@ private:
 
 **(1). No Copy or Assign for IO objects**
 
-- 因为IO 不能符号或者赋值, 所以 不能有parameter or return ytpe 是 IOStream types. 对IO操作的function <span style="background-color:#FFFF00">通常通过reference的方式pass and return</span>
+- 因为IO 不能符号或者赋值, 所以 不能有parameter or return type 是 IOStream types. 对IO操作的function <span style="background-color:#FFFF00">通常通过reference的方式pass and return</span>
 - <span style="color:red">因为Reading or writting IO object change its state</span>, 因此<span style="background-color:#FFFF00">reference must not be ```const```</span>
 
 ```c++
@@ -3612,7 +3614,7 @@ out2 = print(out2); // error: cannot copy stream objects
 **(2). Condition States**
 
 - 因为IO操作会可能发生错误, 一些错误是可以恢复的, 而另一些错误已经到了系统深处(deep within the system),已经超过程序可以修改的范围. IO classes 定义了一些functions and flags 让我们access and manipulate the condition state of a stream
-- 一旦stream 发生错误, 后续的IO 操作都失败, 比如```int a; cin>>a``` 却输入了string. 简单方法是check the stream is okay before attempint to use, 下面的while <span style="color:red">check the state of stream returned from ```>>``` expression</spann> . 如果成功再继续
+- 一旦stream 发生错误, 后续的IO 操作都失败, 比如```int a; cin>>a``` 却输入了string. 简单方法是check the stream is okay before attempint to use, 下面的while <span style="color:red">check the state of stream returned from ```>>``` expression</span> . 如果成功再继续
   - while 只告诉valid or not, not telling why invalid 
 - ```iostate``` used to convey information about the state of a stream. <span style="background-color:#FFFF00">This type used the collection of bits.</span> IO 定义了四个```constexpr```values of type ```iostate```
   - 一旦```badbit``` set, 不能再使用stream了,
@@ -3632,7 +3634,7 @@ out2 = print(out2); // error: cannot copy stream objects
 | ```s.eof()``` | return true if eofbit in the stream s is set (若流到达了eofbit位置) |
 | ```s.fail()``` | return true if failbit or badbit in the sream s is set |
 | ```s.bad()``` |  return true if badbit is in stream s in set | 
-| ```sgood()``` |  return true if the stream s is in a valid state | 
+| ```s.good()``` |  return true if the stream s is in a valid state | 
 | ```s.clear()``` | reset all condition values in the stream s to valid state. Return void |
 | ```s.setstate(flag)``` | reset the condition of s to flags(根据条件状态对流s置位). type of flag 需要是上面几个state 的一种. Return void | 
 | ```s.rdstate()``` | return current condition of s as a ```strm::iostate``` value | 
@@ -3660,7 +3662,6 @@ cin.setstate(old_state);// now reset cin to its old state
 // turns off failbit and badbit but all other bits unchanged 
 
 cin.clear(cin.rdstate() & ~cin.failbit & ~cin.badbit);
-
 ```
 
 
@@ -3704,11 +3705,12 @@ cout << nounitbuf; // returns to normal buffering
 ```
 
 - 当一个输入流关联到输出流, 任何试图从输入流(intput stream)读取数据的操作 都会先刷新关联的输出流(output stream). 
-  - The library ties ```cout``` to ```cin```. 因此 ```cin >> ival``` 会导致```count```的缓冲区刷新(flush)
+  - The library ties ```cout``` to ```cin```. 因此 ```cin >> ival``` 会导致```cout```的缓冲区刷新(flush)
 - interactive systems 通常应该关联输入流和输出流, 意味着, 用户提示的信息，都会在读操作前被打印出来
 
 **tie**: has two overloaded versions. 
-- one version takes no argument, 返回指向输出流指针. 如果this object is currently tie to output streams. 返回就是a pointer to the output stream。 另一个version: take a pointer to an ```ostream```, 将自己关联到```ostream```上, ```x.tie(&o)```: tie the stream ```x``` to the output stream ```o```. 
+- one version takes no argument, 返回指向输出流指针. 如果this object is currently tie to output streams. 返回就是a pointer to the output stream。 
+- 另一个version: take a pointer to an ```ostream```, 将自己关联到```ostream```上, ```x.tie(&o)```: tie the stream ```x``` to the output stream ```o```. 
 - can tie either an ```istream``` or an ```ostream``` object to another ```ostream```
 
 下面代码中, 将一个给定的流关联到一个新的输出流, 我们将新流的指针传递给```tie```。而彻底解开关联的流, we pass an null pointer. <span style="background-color:#FFFF00">每个流最多可以关联到一个流, 但是多个流可以关联到同一个```ostream```</span>
@@ -3721,7 +3723,7 @@ ostream *old_tie = cin.tie(nullptr); // cin 不再与其他流灌流
 
 // ties cin and cerr; not a good idea because cin should be tied to cout 
 
-cin.tie(&cerr); // 读取cin 会刷新cerr 而不是count 
+cin.tie(&cerr); // 读取cin 会刷新cerr 而不是cout 
 
 cin.tie(old_tie); // reestablish normal tie between cin and cout
 
@@ -3731,17 +3733,17 @@ cin.tie(old_tie); // reestablish normal tie between cin and cout
 
 - ```getline```是从一个```ifstream```中读取数据.
 - ```fstream``` 除了继承```iostream```的类型外, ```fstream```中定义的类型还增加了一些新的成员管理与流关联的文件. 如表中, 可以对```fstream```, ```ifstream```, ```ofstream``` 对象调用这些操作, 但不能对其他的```IO```类型调用这些操作
-- when we creat a file stream, 可以选择性提供一个file namem, associate that object with file. 如果提供file name, ```open``` is called automatically.
+- when we creat a file stream, 可以选择性提供一个file name, associate that object with file. 如果提供file name, ```open``` is called automatically.
 - 因为 ```fstream``` 除了继承```iostream```的类型, 可以用```fstream``` type 代替```iostream&``` tyes
 - 如果关联一个流从一个file到另一个file, 需要先关闭```ifstream in(a); in.close()``` 再open ```in.open(name)```
-- When an fstream object is destroyed, close is called automatically. 局部变量```fstream```离开作用域时, 关联文件会自动关闭
+- When an fstream object is <span style="background-color:#FFFF00">destroyed</span>, <span style="background-color:#FFFF00">close is called automatically</span>. 局部变量```fstream```离开作用域时, 关联文件会自动关闭
 
 | Syntax | Description |
 |  --- | :--- |
 | ```fstream fstrm``` | 创建一个未绑定的流. ```fstream```是定义在```fstream``` header中的一种类型 |
 |  ```fstream fstrm(s)``` | Creates an ```fstream``` and opens the file named s. ```s``` 可以是string or pointer to C-style character string. 这个constructor 是```explicit```的, 文件默认模式depends on the type of ```fstream``` |
 |  ```fstream fstrm(s,mode)``` | 按照指定mode 打开文件 | 
-| ```fstrm.open(s)``` | 打开名为s的文件, 并将文件与```fstrm``` 绑定.  ```s``` 可以是string or pointer to C-style character string. 这个constructor 是```explicit```的, 文件默认模式depends on the type of ```fstream``` | 
+| ```fstrm.open(s)``` | 打开名为s的文件, 并将文件与```fstrm``` 绑定.  ```s``` 可以是string or pointer to C-style character string. 这个<span style="color:red">constructor 是```explicit```的</span>, 文件默认模式depends on the type of ```fstream``` | 
 | ```fstrm.close()``` | 关闭与```fstrm``` 绑定的文件，并返回void | 
 | ```fstrm.is_open()``` | 返回一个bool 值,指出与```fstrm``` 关联文件是否成功打开且尚未关闭 | 
 
@@ -3771,15 +3773,16 @@ if(out) // check that open succeeded
 | ```binary``` | 以二进制方式进行IO operations |
 
 The mode that we can specify have following restrictions: 
-- ```out``` 只能对```ofstream``` or ```fstream``` object
-- ```in``` 只能对 ```ifstream``` or ```fstream``` object
+- ```out``` 只能对```ofstream``` or ```fstream``` object, ```out``` is default for ```ofstream```
+- ```in``` 只能对 ```ifstream``` or ```fstream``` object, ```in``` is default for ```ifstream```
 -  只有当```out``` is specified, 才能设定```trunc``` 模式
 -  只要当 ```trunc``` 没被设定, 就可以设定```app``` 模式. 如果指定```app```, 即使没有explicitly specify ```out```, 文件也是以输出方式打开
--  By default, ```trunc```is default mode for ```out```.如果要保留文件内容, 需要specify ```app```, or specify ```in``` mode which file is open for both input and output 
+-  By default, ```trunc```is default mode for ```out```(如果不设定, 默认是```trunc```).如果要保留文件内容, 需要specify ```app```, or specify ```in``` mode which file is open for both input and output 
 - The ```ate``` and ```binary``` modes may be specified on any file stream , 且可以与任何其他文件模式组合使用
 
 ```c++
 // 下面三行是一样的
+
 ofstream out("file1"); // out and trunc are implicit
 
 ofstream out2("file1", ofstream::out); // trunc is implicit 
@@ -3789,6 +3792,7 @@ ofstream out3("file1", ofstream::out | ofstream::trunc);
 // to preserve the file's contents, we must explicitly specify app mode
 
 //下面两行是一样的
+
 ofstream app("file2", ofstream::app); // out is implicit 
 
 ofstream app2("file2", ofstream::out | ofstream::app);
@@ -3817,7 +3821,7 @@ drew 9735550130
 lee 6095550132 2015550175 8005550000
 ```
 
-下面code 中 ```while(record >> name``` 与 ```while(getline(cin, line))``` 不同的是, loop reads data from ```string``` rather than the standard input. 当string completely read, "end-of-file" is signaled aand the next input operation on record will fail. 
+下面code 中 ```while(record >> name)``` 与 ```while(getline(cin, line))``` 不同的是, loop reads data from ```string``` rather than the standard input. 当string completely read, "end-of-file" is signaled aand the next input operation on record will fail. 
 
 ```c++
 struct PersonInfo {
@@ -3828,6 +3832,7 @@ struct PersonInfo {
 string line, word;
 vector<PersonInfo> people;
 while(getline(cin, line))// or while (cin >> line)
+
 {
     PeopleInfo info;
     istringstream record(line);
@@ -3841,7 +3846,7 @@ while(getline(cin, line))// or while (cin >> line)
 
 **(2). ostringstream**: is useful when一点点build up a output, 但是希望最后一起output
 
-例如继续用上面```PersonInfo`` struct
+例如继续用上面```PersonInfo``` struct
 ```c++
 for (const auto &entry : people) { 
     ostringstream formatted, badNums; 
