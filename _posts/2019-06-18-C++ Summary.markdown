@@ -4078,9 +4078,9 @@ v1 == v2 // false; v2 has fewer elements than v1
 - 像一个```vector``` or ```string``` 添加元素可能会引起entire object to be reallocated. <span style="background-color:#FFFF00">Reallocating an object requires allocating new memory and moving elements from the old space to the new.</span>
 - ```array```
    - 除了```array```, 所有library containers 都提供了flexible memory management, we can add or remove elements dynamically the size of container at run time. 
-    - 不支持任何 add operation 因为会改变size, 
-    	- 不支持```push_back/emplace_back, push_front/emplace_front``` (a copy of object)
-	- 不支持```insert```,剩下container都支持```insert```(vector, deque, list, string, forward_list)
+    - 不支持任何 add operation 因为会改变size
+       - 不支持```push_back/emplace_back, push_front/emplace_front``` (a copy of object)
+       - 不支持```insert```,剩下container都支持```insert```(vector, deque, list, string, forward_list)
     - 不支持任何 deletion operation 因为会改变size 
 -  ``forward_list```
     - 没有```back```,因为不支持```reverse_iterator```, 
