@@ -3914,8 +3914,8 @@ sequential containers 为user 提供 control the order in which the elements are
 | string | A specialized container, similar to vector that contains characters. Fast random ccess. Fast insert/delete at the back |
 
 - the new library containers are <span style="color:red">dramatically faster</span> than previous release. <span style="background-color:#FFFF00">Modern C++ programs should use library containers</span> 而不是原始的数据结构, 例如build-in 数据
-- 除了```array`` which is fixed-size, 剩下的container provide efficient, flexible memory management, growing and shrinking the size.
-- **string** and **vector** old their elements in <span style="background-color:#FFFF00">contiguous memory</span>.由下表计算其地址很快, 但是一次插入或者删除后,<span style="background-color:#FFFF00">需要移动插入/删除位置之后的所有元素, 来保持连续存储(maintain contiguity)</span>; 而且添加一个元素可能需要分配额外的存储空间. At the case, every element must be moved into the new storage. 
+- 除了```array``` which is fixed-size, 剩下的container provide efficient, flexible memory management, growing and shrinking the size.
+- **string** and **vector** hold their elements in <span style="background-color:#FFFF00">contiguous memory</span>.由下标计算其地址很快, 但是一次插入或者删除后,<span style="background-color:#FFFF00">需要移动插入/删除位置之后的所有元素, 来保持连续存储(maintain contiguity)</span>; 而且添加一个元素可能需要分配额外的存储空间. At the case, every element must be moved into the new storage. 
 - **list** and **forward list** designed to fast to add / remove element anywhere in container. 作为代价，不支持random access. 而且与**string**,  **deque**
 ,**array** 相比, memory 开销(overhead) 也很大
 - **forward_list** and **array** types were added by new standard. 与build-in array相比, An **array** 是更安全容易使用的. 与build-in array一样,是fixed size的,不支持add/remove element.
@@ -3927,10 +3927,11 @@ sequential containers 为user 提供 control the order in which the elements are
     - 如果需要add elements in middle. common to add all elements in **vector** and call ```sort```
 - If your program has lots of small elements and space overhead matters, don’t use list or forward_list.
 - If the program requires random access to elements, use a **vector** or a **deque**.
-- If the program needs to insert or delete elements in the middle of the container, use a **list** or **forward_list**.
-- If the program needs to insert or delete elements at the front and the back, but not in the middle, use a **deque**.
-- If you must insert into the middle, consider using a **list** for the input phase. Once the input is complete, copy the list into a **vector**.
-- 如果程序需要random access , insertion and deletion. 决定取决于the relative cost of accessing the elements in a **list** or **forward_list** VS the cose of inserting or deleting elements in a **vector** or **deque**
+- If the program needs to insert or delete elements：
+   - Insert/Delete in the middle of the container, use a **list** or **forward_list**.
+   - Insert/Delete elements at the front and the back, but not in the middle, use a **deque**.
+   - Insert into the middle, consider using a **list** for the input phase. Once the input is complete, copy the list into a **vector**.
+- 如果程序需要random access , insertion and deletion. 决定取决于 <span style="color:red"> Random Access VS Insertion/Deletion </span> the relative cost of accessing the elements in a **list** or **forward_list** VS the code of inserting or deleting elements in a **vector** or **deque**
 - 如果不确定使用哪个, 可以在程序中只使用 operations common to both **vector** and **list**. <span style="background-color:#FFFF00">**Use iterators, not subscripts and avoid random access to elements**</span>
 
 #### (b). Container Library Overview
