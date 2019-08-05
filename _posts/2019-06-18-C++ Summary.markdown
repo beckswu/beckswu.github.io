@@ -4076,16 +4076,19 @@ v1 == v2 // false; v2 has fewer elements than v1
 
 **(1).Add, Access, Delete**
 - 像一个```vector``` or ```string``` 添加元素可能会引起entire object to be reallocated. <span style="background-color:#FFFF00">Reallocating an object requires allocating new memory and moving elements from the old space to the new.</span>
--```array```
+- ```array```
    - 除了```array```, 所有library containers 都提供了flexible memory management, we can add or remove elements dynamically the size of container at run time. 
-    - 不支持```push_back/emplace_back, push_front/emplace_front``` (a copy of object)
-    - 不支持```insert```,剩下都支持```insert```(vector, deque, list, string, forward_list)
+    - 不支持任何 add operation 因为会改变size, 
+    	- 不支持```push_back/emplace_back, push_front/emplace_front``` (a copy of object)
+	- 不支持```insert```,剩下container都支持```insert```(vector, deque, list, string, forward_list)
+    - 不支持任何 deletion operation 因为会改变size 
 -  ``forward_list```
     - 没有```back```,因为不支持```reverse_iterator```, 
     -  也不能```--```递减```forward_list```的iterator, 但可以call ```forward_list```的```end()```
-    - 不支持```push_back``` 剩下都支持 (a copy of object)
+    - 不支持```push_back``` 
+    - 有自己的```insert``` and ```emplace```
 - ```emplace(front, back)```construct elements in the container ( construct an element directly in space managed by the container在内存空间中直接构造元素). The arguments must match a constructor for the element type. 
-- The Access Members Return References (```back()```, ```frot()```, ```c[n]```, ```c.at(n)```), e.g. ```auto & v = c.back(); v = 1024;```, 
+- The Access Members Return References (```back()```, ```front()```, ```c[n]```, ```c.at(n)```), e.g. ```auto & v = c.back(); v = 1024;```, 
     -  ```at```与下标的区别是如果越界, ```at```throw out_of_range error 如果invalid, （subscript operator 不会check index）
 
 
@@ -4205,7 +4208,7 @@ while (curr != flst.end()) { // while there are still elements to process
 vector<int> vi = {0,1,2,3,4,5,6,7,8,9};
 auto iter = vi.begin(); // call begin, not cbegin because we're changing vi
 
-while (iter != vi.end()) { if (*iter % 2) {
+while (iter != vi.end()) { 
     if(*itera%2)
         iter = vi.insert(iter, *iter); // duplicate the current element
 
@@ -4259,7 +4262,7 @@ while (begin != v.end()) {
   - 如果request space > current capacity, ```reserve``` allocates at least as much as requested amount
   - 如果request size 小于 或者 等于 existing capacity, ```reserve``` does nothing. 
   - <span style="background-color:#FFFF00">```reserve``` never reduce the amount of space that container uses.</span>. 如果想减少memory, 可以call ```shrink_to_fit``` 对于 deque, vector, or srtring; <span style="color:red">```resize``` 只改变容器中元素数目, 而不改变its capacity</span>
-- Calling shrink_to_fit is only a request; there is no guarantee that the library will return the memory.比如当size == capacity
+- Calling ```shrink_to_fit``` is only a request; there is no guarantee that the library will return the memory.比如当size == capacity
 
 
 | Syntax | Description | 
@@ -4375,7 +4378,7 @@ auto last_pos = river.rfind("is"); // returns 4
 - Each adaptor defines two constructors: the default constructor that creates an empty object, and a constructor that takes a container and initializes the adaptor by copying the given container. 
 - 默认情况下, ```stack```and ```queue``` are implemented in terms of ```deque```, 而```priority_queue```是在```vector```上实现的
     - e.g. 假定```deq```是一个```deque<int>```, ```stack<int>stk(deq);``` 从deq拷贝元素到stk,
-    - e.g. override default container type by naming a sequential container as a secnd type argument. ```stack<string, vector<string>str(svec)```
+    - e.g. override default container type by naming a sequential container as a secnd type argument. ```stack<string, vector<string>>str(svec)```
 - <span style="background-color:#FFFF00">All adpator 需要the ability to add / remove elements. 因为they cannot be built on ```array```. 同样的, 我们也不能用```forward_list```, 因为adaptor需要具有add, remove, access the last element (back) ability. </span>
 - ```stack```仅需要有```back```, ```push_back```, ```pop_back```,所以用于除了```array``` 和 ```forward_list```以外所有容器
 - ```queue```需要有```back```,```push_back```, ```front```, ```push_front```的能力,所以只能建立在```list``` or ```deque```上而不能在```vector```上. 
