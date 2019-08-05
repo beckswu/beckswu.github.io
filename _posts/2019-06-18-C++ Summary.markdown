@@ -4293,8 +4293,8 @@ while (ivec.size() != ivec.capacity())
 
 
 - 当create a string from a ```const char*```, <span style="color:red">array 必须是 null terminated.</span>, copy 遇到null 停止. or pass a count , array 可以不用以null 结尾
-    - <span style="color:red">但是如果不pass count and no null, 或者given count 大于size of array, operation is undefined</span>
-- 当pass的起始值pos2 大于size, 会throw out_of_range exception. 
+    - <span style="color:red">但是如果不pass count and no null terminated, 或者given count 大于size of array, operation is undefined</span>
+- 当pass的起始值pos2 大于size, 会throw ```out_of_range``` exception. 
 - library copies up to the size of string or null 结尾的char array
 
 ```c++
@@ -4366,24 +4366,25 @@ auto last_pos = river.rfind("is"); // returns 4
 **(4).Numeric Conversions**
 
 - 如果string 不能转换为一个数值, 转换 functions 会 throw an ```invalid_argument``` exception. 如果转换得到数值无法用任何类型来表示, throw ```out_of_range```
+
 | Syntax | Description | 
 | --- | :--- | 
-| ```stoi(s, p, d)``` <br/>  ```stol(s, p, d)``` <br/>  ```stoul(s, p, d)``` <br/>  ```stoll(s, p, d)``` <br/>  ```stoull(s, p, d)```  | b表示numeric base for the conversion(几进制), p is a pointer to a ```size_t``` in which to put index of first non-numeric character(非数值的) in s` |
+| ```stoi(s, p, b)``` <br/>  ```stol(s, p, b)``` <br/>  ```stoul(s, p, b)``` <br/>  ```stoll(s, p, b)``` <br/>  ```stoull(s, p, b)```  | b表示numeric base for the conversion(几进制), p is a pointer to a ```size_t``` in which to put index of first non-numeric character(非数值的) in s` |
 | ```stof(s,p)``` <br/> ```stod(s,p)``` <br/> ```stold(s,p)``` | p跟上面的作用一样 | 
 
 
 #### (f). Container Adaptors
 - 除了 sequential containers, 还定义了sequential container adaptors: ```stack```, ```queue```, and ```priority_queue```. An adaptor 是 general concept. 
-- container adaptor takes an existing containeer type and makes it act like a different type. 比如```stack``` 可以takes a sequential container (other than ```array``` or ```forward_list```. 
+- container adaptor takes an existing container type and makes it act like a different type.
 - Each adaptor defines two constructors: the default constructor that creates an empty object, and a constructor that takes a container and initializes the adaptor by copying the given container. 
 - 默认情况下, ```stack```and ```queue``` are implemented in terms of ```deque```, 而```priority_queue```是在```vector```上实现的
     - e.g. 假定```deq```是一个```deque<int>```, ```stack<int>stk(deq);``` 从deq拷贝元素到stk,
-    - e.g. override default container type by naming a sequential container as a secnd type argument. ```stack<string, vector<string>>str(svec)```
+    - e.g. override default container type by naming a sequential container as a second type argument. ```stack<string, vector<string>>str(svec)```
 - <span style="background-color:#FFFF00">All adpator 需要the ability to add / remove elements. 因为they cannot be built on ```array```. 同样的, 我们也不能用```forward_list```, 因为adaptor需要具有add, remove, access the last element (back) ability. </span>
 - ```stack```仅需要有```back```, ```push_back```, ```pop_back```,所以用于除了```array``` 和 ```forward_list```以外所有容器
 - ```queue```需要有```back```,```push_back```, ```front```, ```push_front```的能力,所以只能建立在```list``` or ```deque```上而不能在```vector```上. 
 - ```priority_queue``` 需要有random access in addition to ```front```, ```pusk_back```, ```pop_back```, 所以只能用于```vector``` or ```deque```, 不能用于```list```
-- 每一个container adpator defines 自己的操作类型 in terms of 底层容器的操作类型. 只能使用adaptor自己的操作类型,不能用underlying container type. 
+- 每一个container adpator defines 自己的操作类型 in terms of 底层容器的操作类型. 只能使用adaptor自己的操作类型,不能用underlying container type的操作类型. 
     - ```intStack.push(ix);``` calls ```push_back``` on the ```deque``` on which ```intStack``` is based,尽管```stack```是基于```deque```实现的, 但我们不能使用```deque```操作, 不能call ```push_back```, 只能call ```push```
 
 
