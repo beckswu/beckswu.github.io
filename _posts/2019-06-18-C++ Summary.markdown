@@ -2395,9 +2395,9 @@ cout << shortString(s1,s2)<<endl;
 cout << (s1.size() < s2.size() ? s1 : s2 )<<endl;
 ```
 
-<span style="background-color:#FFFF00">The inline specification is only a request to the compiler. The compiler may choose to ignore this request.(inline 是向compiler 发送请求, compiler可以选择忽略这个请求)</span>
-
-<span style="background-color:#FFFF00">inline meachanism 用于规模小的, 流程直接, 频繁调用的函数, 不支持recursion</span>(optimize small, straight-line functions that are called frequently. Many compilers will not inline a recursive function.)<span style="background-color:#FFFF00"> 也不支持很多行的函数</span>(比如一个75行的函数很难被inline expanded)
+- <span style="background-color:#FFFF00">The inline specification is only a request to the compiler. The compiler may choose to ignore this request.(inline 是向compiler 发送请求, compiler可以选择忽略这个请求)</span>
+- <span style="background-color:#FFFF00">inline meachanism 用于规模小的, 流程直接, 频繁调用的函数, 不支持recursion</span>(optimize small, straight-line functions that are called frequently. Many compilers will not inline a recursive function.)<span style="background-color:#FFFF00"> 也不支持很多行的函数</span>(比如一个75行的函数很难被inline expanded)
+- inline function defintion 最好放进header, 因为inline function 和 class compilation 需要在一个translation unit. Function 放进header must marked ```inline``` 否则every translation unit which includes the header will contain a definition of the function. linker will complain about multiple definition (违反了one defintion rule)
 
 **constexpr function**: 
 - <span style="background-color:#FFFF00">return type must be literal type</span> (int(reference, pointer), double, enum, char, char pointer, 但string 不是)
