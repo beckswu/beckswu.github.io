@@ -4458,6 +4458,10 @@ string sum = accumulate(v.cbegin(), v.cend(), "");
 
 equal(roster1.cbegin(), roster1.cend(), roster2.cbegin());
 
+list<int> a = { 1,2,3,4,5 };
+array<int,5> b = { 1,2,3,4,5 }; 
+cout << equal(a.begin(), a.end(), b.begin());//print 1
+
 ``` 
 
 Algorithm that write element
