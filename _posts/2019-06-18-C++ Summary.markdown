@@ -2364,7 +2364,7 @@ void f(){
 比如我们有个比较string 大小的function, 好处是如果我们修改比较方法,直接修改function, 而不用找比较表达式所有出现的地方修改conditon. 潜在缺点是: slower than evaluating the equivalent expression.  因为call function does a lot of work: 调用前先保存寄存器(registers) , 返回时恢复. 可能需要copy argument and program branches to a new location(程序转向一个新的位置继续执行)
 
 **inline vs constexpr**
-- inline functions, expression are always evaluated at the <span style="color:red"run time</span>. 但是constexpr functions are evaluated at <span style="color:red">compiled time(not always)</span>
+- inline functions, expression are always evaluated at the <span style="color:red">run time</span> and are request to compiler to expand(展开function) at compile time . 但是constexpr functions are evaluated at <span style="color:red">compiled time(not always)</span> 
 
 ```c++
 constexpr long int fib(int n) 
@@ -3355,7 +3355,7 @@ Sales_data item1 (null_book); // ok: direct initialization
 Sales_data item2 = null_book;
 ```
 
-可以用 有explicit constructor to <span style="color:red"force conversion</span>, ```static_cast``` to perform an explicit, rather than an implicit conversion. 用```static_cast``` uses the ```istream```constructor to construct temporary ```Sales_data``` object 
+可以用 有explicit constructor to <span style="color:red">force conversion</span>, ```static_cast``` to perform an explicit, rather than an implicit conversion. 用```static_cast``` uses the ```istream```constructor to construct temporary ```Sales_data``` object 
 ```c++
 // ok: the argument is an explicitly constructed Sales_data object 
 
