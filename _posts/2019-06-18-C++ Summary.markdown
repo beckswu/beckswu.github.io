@@ -1450,7 +1450,7 @@ bool status = quiz1 & (1<<27) //学生27是否通过测验
 #### (f). Sizeof Operators
 
 - ```sizeof``` 返回一个类型大小 /表达式结果类型(return type)大小 所占字符数, returns the size  in bytes of an expression or a type name. ```sizeof (type)``` or  ```sizeof expr```
-- ```sizeof``` is a constant expression of type ```size_t```. 
+- ```sizeof``` is a <span style="background-color:#FFFF00">**constant expression**</span> of type ```size_t```. 
 - The operator is right associative. 
 - ```sizeof *p```, <span style="background-color:#FFFF00">p可以是invalid</span>
 - result applying sizeof  
@@ -4141,7 +4141,7 @@ Delete Element
 |  |```vector```, ```string``` 不支持```pop_front```  |
 | ```c.pop_back()``` <br/> ```c.pop_front()```  | return void |
 | ```c.erase(p)``` | p is iterator, 删除p,返回删除元素之后的元素的 iterator，如果p is end, undefined |
-| ```c.erase(b,e)``` | b,e is iterator of range, 删除p,返回删除元素之后的元素的 iterator，如果e is end, return end iterator |
+| ```c.erase(b,e)``` | b,e is iterator of range, 删除p,返回删除元素之后的元素的 iterator，如果e is end, return end iterator; if ```b= e```,是安全的,删除一个空范围没有不良后果  |
 | ```c.clear``` | return all element, returns void |
 
 
@@ -4411,6 +4411,174 @@ auto last_pos = river.rfind("is"); // returns 4
 - ```priority_queue``` 需要有random access in addition to ```front```, ```pusk_back```, ```pop_back```, 所以只能用于```vector``` or ```deque```, 不能用于```list```
 - 每一个container adpator defines 自己的操作类型 in terms of 底层容器的操作类型. 只能使用adaptor自己的操作类型,不能用underlying container type的操作类型. 
     - ```intStack.push(ix);``` calls ```push_back``` on the ```deque``` on which ```intStack``` is based,尽管```stack```是基于```deque```实现的, 但我们不能使用```deque```操作, 不能call ```push_back```, 只能call ```push```
+
+
+
+## (10). Generic Algorithms
+
+
+#### (a). Overview
+
+Kep Concept: <span style="background-color:#FFFF00">Algorithms Never Execute Container Operations</span>. They operate solely in terms of iterators and iterator operations. 有个重要的implication: Algorithm nevver change the size of the underlying container, Algorithm 可能改变container中的值, 可能会moeve elements within the container。 但是never add or remove elements directly. A special class of iterator is **iterator** 会插入elements, 但是算法自身itseflf never does so
+
+#### (b), First Look at the Algorithm
+
+- **Read-Only Algorithms**： 
+    - never write to element
+    - it is best to use ```cbegin()``` and ```cend()``` with algorithms that read, but do not write
+    - ALgorithm that take a <span style="background-color:#FFFF00">single iterator</span> denoting a <span style="background-color:#FFFF00">second squence</span>, <span style="background-color:#FFFF00">都假定 second sequence is at least as large at the first(至少一样长)</span> 
+        - 比如```equal```中的第二个sequence 没有第一个长, 程序会报错
+    - 一些算法从两个序列(containers)中读取元素, <span style="background-color:#FFFF00">不一定要求两个container 是一样类型, 也不要求element types are indentical</span>. e.g. 见表中的```equal```
+- **Algorithms That Write Container Elements**
+    - Some algorithms assign new values to the elements in sequence, 必须确保序列原大小 必须大于 我们要求写入的 元素数目。<span style="background-color:#FFFF00">算法不执行container operations, no way to change the size of a container</span> 
+    - Algorithms Do Not Check Write Operations: Algorithms that write to a destination iterator <span style="color:red">assume the destination is large enough to hold the number of elements</span> being written. 会假定container 有足够的size (容量)来操作 比如```fill_n```, 如果空间不够, undefined behavior
+    - 还有一些算法 so called "copying" ersion, 这些算法compute new element values, but instead of putting them back into input sequnce, 算法创建一个新序列保存这些结果, 例如```replace_copy```
+- 一种确保algorithm has enough elements to hold is to use **insert iterator** (right-hand value is added to container)
+    - **back_inserter**: takes a <span style="background-color:#FFFF00">reference to a container</span> and <span style="background-color:#FFFF00">returns an insert iterator bound to that container</span>. 当assign through that iterator, assignment calls ```push_back``` to add an element with the given value to the container
+
+Read-only Algorithm
+
+| Syntax | Description | 
+| --- | :--- | 
+| ```accumulate``` | accumulate第三个类型决定了函数使用哪个加法运算符和返回类型(注意：不可以传入empty string as string literal) <br/> ```string sum = accumulate(v.cbegin(), v.cend(), string(""));```  |
+| ```equal``` | 判断两个sequences hold the same value, compare each elements, return true 如果一样, 否则false; equal 不一定需要两个cointainer 一样 类型也一样, 可以是不同的container, 不同的类型, 只需可以用```==```来比较来自两个序列的元素 |
+
+```c++
+//accumulate
+
+int sum = accumulate(vec.cbegin(), vec.cend(), 0);
+string sum = accumulate(v.cbegin(), v.cend(), string(""))
+// error: no + on const char*
+
+string sum = accumulate(v.cbegin(), v.cend(), "");
+
+//equal
+
+// roster2 should have at least as many elements as roster1 
+
+equal(roster1.cbegin(), roster1.cend(), roster2.cbegin());
+
+``` 
+
+Algorithm that write element
+
+| Syntax | Description | 
+| --- | :--- | 
+| ```fill``` | 将给定的值赋予序列中每个元素, 有点像```resize```, ```assign```,但不会像它们一样改变size |
+| ```fill_n``` | ```fill_n(dest, n, val)``` takes a iterator, a count and a value. 从iterator声明的位置开始, fill n 个 元素 value.  <span style="color:red">assumes that dest refers to an element and that there are at least n elements in the sequence starting from dest.</span> |
+| ```copy``` | 接受三个iterator, 前两个表示input range, 第三个表示beginning of the destination sequence: copy from input range to destinaion. 很重要的是: destination passed to ```copy``` 至少跟input range 一样长, The value returned by copy is the (incremented) value of its destination iterator.(就是完成copy后的下一点) |
+| ```replace``` |  接受4个参数， 前两个是iterator, 表示输入序列, 后两个一个是要搜索的值, 一个是replace的值  |
+| ```replace_copy``` | 跟```replace```想法一样,只不过不更改input sequence, 接受5个参数， 前两个是iterator, 表示输入序列, 第三个表示write的destination, 后两个一个是要搜索的值, 一个是replace的值  |
+
+
+```c++
+//fill
+
+fill(vec.begin(), vec.begin() + vec.size()/2, 10);
+
+//fill_n: Do Not Check Write Operations
+
+vector<int> vec; // empty vector
+
+// disaster: attempts to write to ten (nonexistent) elements in vec 
+
+fill_n(vec.begin(), 10, 0);//The result is undefined.
+
+
+//copy
+
+int a1[] = {0,1,2,3,4,5,6,7,8,9};
+int a2[sizeof(a1)/sizeof(*a1)]; // a2 has the same size as a1
+
+// ret points just past the last element copied into a2
+
+auto ret = copy(begin(a1), end(a1), a2); // copy a1 into a2
+
+// ret will point just past the last element copied into a2.
+
+
+//replace 
+
+replace(ilst.begin(), ilst.end(), 0, 42);//把所有的0 替换成42
+
+// use back_inserter to grow destination as needed 
+
+replace_copy(ilst.cbegin(), ilst.cend(), back_inserter(ivec), 0, 42);
+
+//把范围内所有的0替换成42, 并push_back到ivec
+
+``` 
+
+**back_inserter**; apply to ```fill_n```: 因为we passed an iterator returned by ```back_inserter```(back_iterator返回的迭代器), each assignment will call ```push_back``` on ```vec```
+
+```c++
+vector<int> vec; // empty vector
+
+auto it = back_inserter(vec); // assigning through it adds elements to vec
+
+it = 342; // vec now has one element with value 42, size = 1
+
+*it = 42; // vec now has one element with value 42, size = 2
+
+//因为*it = 会call push_back, 向后推, it iterator 不会前进，
+
+
+//用到fill_n 
+
+vector<int> vec; // empty vector
+
+// ok: back_inserter creates an insert iterator that adds elements to vec 
+
+fill_n(back_inserter(vec), 10, 0); // appends ten elements to vec
+
+```
+
+**Algorithms That Reorder Container Elements**
+
+
+| Syntax | Description | 
+| --- | :--- | 
+| ```sort``` |  |
+| ```stable_sort``` | 与```sort``` 不同的是, ```stable_sort```会维持相等元素原有的序列 | 
+| ```unique``` | 消除相邻的重复(如果不相邻一样的，不会删除), <span style="background-color:#FFFF00">因为算法不对容器进行操作, 不能直接添加/删除元素</span>, 返回an iterator that denotes the end of the range of the unique value |
+
+```c++
+vector<int>  = {10,20,20,20,30,30,20,20,10};   // 10 20 20 20 30 30 20 20 10
+
+  // using default comparison:
+
+std::vector<int>::iterator end_unique = std::unique (myvector.begin(), myvector.end());   
+
+// 10 20 30 20 10 ?  ?  ?  ?
+
+                  ^
+                  |
+                end_unique                              
+```
+
+#### (c), Customizing Operations
+
+- A **predicate** is an expression that can be called and that returns a value that can be used <span style="color:red">as a condition</span>. Has two version:
+    - **unary predicate**: they have a single parameter
+    - **binary predicates**: they have two parameters, 比如```sort```
+- 算法call the given predicate on the elements in the input range. 因此, must be <span style="color:red">possible to convert</span> the element type to the parameter type of the predicate
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
