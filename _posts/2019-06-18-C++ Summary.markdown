@@ -4419,20 +4419,20 @@ auto last_pos = river.rfind("is"); // returns 4
 
 #### (a). Overview
 
-Kep Concept: <span style="background-color:#FFFF00">Algorithms Never Execute Container Operations</span>. They operate solely in terms of iterators and iterator operations. 有个重要的implication: Algorithm nevver change the size of the underlying container, Algorithm 可能改变container中的值, 可能会moeve elements within the container。 但是never add or remove elements directly. A special class of iterator is **iterator** 会插入elements, 但是算法自身itseflf never does so
+Kep Concept: <span style="background-color:#FFFF00">Algorithms Never Execute Container Operations</span>. They operate solely in terms of iterators and iterator operations. 有个重要的implication: <span style="color:red">Algorithm never change the size of the underlying container</span>, Algorithm 可能改变container中的值, 可能会move elements within the container。 但是never add or remove elements directly. A special class of iterator is **inserter** 会插入elements, 但是算法自身itself never does so
 
 #### (b), First Look at the Algorithm
 
 - **Read-Only Algorithms**： 
     - never write to element
     - it is best to use ```cbegin()``` and ```cend()``` with algorithms that read, but do not write
-    - ALgorithm that take a <span style="background-color:#FFFF00">single iterator</span> denoting a <span style="background-color:#FFFF00">second squence</span>, <span style="background-color:#FFFF00">都假定 second sequence is at least as large at the first(至少一样长)</span> 
+    - Algorithm that take a <span style="background-color:#FFFF00">single iterator</span> denoting a <span style="background-color:#FFFF00">second squence</span>, <span style="background-color:#FFFF00">都假定 second sequence is at least as large at the first(至少一样长)</span> 
         - 比如```equal```中的第二个sequence 没有第一个长, 程序会报错
     - 一些算法从两个序列(containers)中读取元素, <span style="background-color:#FFFF00">不一定要求两个container 是一样类型, 也不要求element types are indentical</span>. e.g. 见表中的```equal```
 - **Algorithms That Write Container Elements**
     - Some algorithms assign new values to the elements in sequence, 必须确保序列原大小 必须大于 我们要求写入的 元素数目。<span style="background-color:#FFFF00">算法不执行container operations, no way to change the size of a container</span> 
     - Algorithms Do Not Check Write Operations: Algorithms that write to a destination iterator <span style="color:red">assume the destination is large enough to hold the number of elements</span> being written. 会假定container 有足够的size (容量)来操作 比如```fill_n```, 如果空间不够, undefined behavior
-    - 还有一些算法 so called "copying" ersion, 这些算法compute new element values, but instead of putting them back into input sequnce, 算法创建一个新序列保存这些结果, 例如```replace_copy```
+    - 还有一些算法 so called "copying" version, 这些算法compute new element values, but instead of putting them back into input sequnce, 算法创建一个新序列保存这些结果, 例如```replace_copy```
 - 一种确保algorithm has enough elements to hold is to use **insert iterator** (right-hand value is added to container)
     - **back_inserter**: takes a <span style="background-color:#FFFF00">reference to a container</span> and <span style="background-color:#FFFF00">returns an insert iterator bound to that container</span>. 当assign through that iterator, assignment calls ```push_back``` to add an element with the given value to the container
 
