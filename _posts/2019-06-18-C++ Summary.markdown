@@ -4587,18 +4587,18 @@ std::vector<int>::iterator end_unique = std::unique (myvector.begin(), myvector.
     - can also return a lambda from a function.  The function might directly return a **callable object** or the function might return **an object of a class that has a callable object as a data member**. 如果Function returns a lambda, 不能return a reference to a local varaibles (<span style="background-color:#FFFF00">不能有reference captures</span>)
 
 Capture: 
-- **Capture by value** ```auto f = [v1] { return v1; };```. 前提是变量必须是可以copy的，Unlike parameters, 被捕获的值是在lambda 创建时copy 而不是在被调用(call)时copy,因此随后的对其修改不会影响到lambda 内对应的值
+- **Capture by value** ```auto f = [v1] { return v1; };```. 前提是变量必须是可以copy的，Unlike parameters, 被捕获的值是在lambda <span style="color:red">**创建时copy**</span> 而不是在被调用(call)时copy,因此随后的对其修改不会影响到lambda 内对应的值
     -  If we want change the value of a captured variable, we must follow the parameter list with the keyword ```mutable```. 
-        - lambda that are mutable不能省略parameter list ```auto f = [v1] () mutable { return ++v1; };```
+        - lambda that are mutable<span style="color:red">不能省略parameter list</span> ```auto f = [v1] () mutable { return ++v1; };```, 不加```mutable```不能更改
         
 - **Capture by Reference**: ```auto f2 = [&v1] { return v1; };```when use the variable inside the lambda body, 使用的是引用所绑定的对象, 比如返回```v1```, 返回的是```v1``` 指向对象的值
     - 必须确保 the referenced object exists at the time the lambda is executed(<span style="background-color:#FFFF00">被引用对象在lambda 执行时候是存在的)</span>.<span style="color:red">因为捕获的都是局部变量</span>. 这些变量在函数结束后就不存在了,如果lambda 可能在函数结束后执行, 捕获引用指向的局部变量已经消失
     - 捕获引用是有必要的, 比如函数接受一个```ostream```的引用,
-    - 一个variable captured by reference can be changed depends only on whether that reference refers to a ```const``` or nonconst type (如果variable 指向const object不能修改, 如果不是const 可以修改)
-- **Implicit Captures**: 可以让compiler根据lambda中代码nfer which variables we use from the code. To direct the compiler to infer the capture list, we use an ```&```(capture by reference) or ```=```(capture by value) in the capture list.
+    - 一个variable captured by reference 是否可以改变 depends only on whether that reference refers to a ```const``` or nonconst type (如果variable 指向const object不能修改, 如果不是const 可以修改)
+- **Implicit Captures**: 可以让compiler根据lambda中代码infer which variables we use from the code. To direct the compiler to infer the capture list, we use an ```&```(capture by reference) or ```=```(capture by value) in the capture list.
 - **Mix implicit and explicit Capture**: 
     - 必须确保the first item in capture list is ```&```or ```=```
-    - <span style="background-color:#FFFF00">Explicit capture variables must use the alternate form(显示捕获和隐式捕获必须是不同的方式)</span>: 如果隐式捕获是引用(```&```), 则显示捕获必须是值, 因为不能在显示名字前加上```&```; 如果隐式捕获是值方式, 则显示捕获必须用引用方式 (加上```&```)
+    - <span style="background-color:#FFFF00">Explicit capture variables must use the alternate form(显示捕获和隐式捕获必须是不同的方式)</span>: 如果隐式捕获是引用(```&```), 则显示捕获必须是值, 不能在显示名字前加上```&```; 如果隐式捕获是值方式, 则显示捕获必须用引用方式 (加上```&```)
 
 ![](/img/post/C++/lambda_capture.png)
 
@@ -4612,7 +4612,7 @@ wc = find_if(words.begin(), words.end(),
 
 we can mix implicit and explicit captures:
 
-```
+```x++
 void biggies(vector<string> &words, vector<string>::size_type sz,
         ostream &os = cout, char c = ' ')
 {
@@ -4662,7 +4662,7 @@ void fnc4()
 Capture Advise: 需要keep your lambda captures simple
 - A lambda capture stores information between the time the lambda is created (i.e., when the code that defines the lambda is executed) and the time (or times) the lambda itself is executed (捕获保存信息从定义到执行).
 - Capture ordinary variable 比如```int```, ```string```, or nonpointer type - by value is usually straightforward. 这种情况下, 只需关注在捕获时有我们需要的值就可以了
-- 如果捕获pointer, iterator, or capture by reference, 必须ensure pointer, iterator, or reference still exists whenever the lambda executes. 可能是在指针或引用被捕获时候, 绑定对象的值是我们期望的, 但在lambda执行时, 该对象的值可能完全不同了
+- 如果捕获pointer, iterator, or capture by reference, 必须ensure pointer, iterator, or reference  <span style="background-color:#FFFF00">still exists whenever the lambda executes</span>. 还可能是, 在指针或引用被捕获时候, 绑定对象的值是我们期望的, 但在lambda执行时, 该对象的值可能完全不同了
 - if possible, avoid capturing pointers or references.
 
 
@@ -4699,7 +4699,7 @@ transform(vi.begin(), vi.end(), vi.begin(), [](int i) -> int
 **(2).Binding Arguments**:
 
 - Lambda expression are most useful for 只在一两个地方使用的简单操作, 如果在很多地方使用相同操作, 通常定义一个函数
-- 比如```find_if```函数，如果不用捕获, 无法让只接受一个argument的predicate 接受另一个```size_type```的variable, 可以用```bind```来解决这个问题, 定义在```functional``` header中,It takes a **callable object** and generates a new **callable** that “adapts” the parameter list of the original object.
+- 比如```find_if```函数，如果不用捕获, 无法让只接受一个argument的predicate 接受另一个```size_type```的variable, 可以用```bind```(in ```functional``` heade)来解决这个问题,It takes a **callable object** and generates a new **callable** that “adapts” the parameter list of the original object.
 - ```auto newCallable = bind(callable, arg_list);``` : the general form of a call to ```bind```
     -  ```newCallable``` is itself a callable object
     - ```arg_list``` is 逗号分隔的参数列表,对应给```callable```的parameter
@@ -4712,7 +4712,7 @@ transform(vi.begin(), vi.end(), vi.begin(), [](int i) -> int
     - ```ref``` returns an object that contains the given reference and that is itself copyable.标准库中还有另一个```cref```: generates a class that holds a reference to const, 生成一个保存```const```的引用类
         - Modern C++ programs should use bind. 旧版C++提供了```bind1st``` 和 ```bind2nd```有更多限制,已经被deprecated 在新版中 
 
-下面的function bind has only one **placeholder**, which means that check6 takes a single argument。The placeholder appears first in arg_list 对应 ```check_size```的第一个参数 (```const string&```),表示调用```check6```必须一个string 参数
+下面的function bind has only one **placeholder**, which means that ```check6``` takes a single argument。The placeholder appears first in arg_list 对应 ```check_size```的第一个参数 (```const string&```),表示调用```check6```必须一个string 参数
 ```c++
 bool check_size(const string &s, string::size_type sz)
 { return s.size() >= sz; }
@@ -4720,6 +4720,7 @@ bool check_size(const string &s, string::size_type sz)
 // check6 is a callable object(可调用对象) that takes one argument of type string
 
  // and calls check_size on its given string and the value 6
+ 
 auto check6 = bind(check_size, _1, 6);
 
 string s = "hello";
