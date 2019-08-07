@@ -4440,8 +4440,8 @@ Read-only Algorithm
 
 | Syntax | Description | 
 | --- | :--- | 
-| ```accumulate``` | accumulate第三个类型决定了函数使用哪个加法运算符和返回类型(注意：不可以传入empty string as string literal) <br/> ```string sum = accumulate(v.cbegin(), v.cend(), string(""));```  |
-| ```equal``` | 判断两个sequences hold the same value, compare each elements, return true 如果一样, 否则false; equal 不一定需要两个cointainer 一样 类型也一样, 可以是不同的container, 不同的类型, 只需可以用```==```来比较来自两个序列的元素 |
+| ```accumulate``` | accumulate第三个类型决定了使用哪个加法运算符和返回类型(注意：不可以传入empty string as string literal) <br/> ```string sum = accumulate(v.cbegin(), v.cend(), string(""));```  |
+| ```equal``` | 判断两个sequences hold the same value, compare each elements, return true 如果一样, 否则false; equal 不一定需要两个cointainer 一样 类型也一样, 可以是<span style="color:red">不同的container</span>, 不同的类型, 只需可以用```==```来比较来自两个序列的元素 |
 
 ```c++
 //accumulate
@@ -4576,11 +4576,11 @@ std::vector<int>::iterator end_unique = std::unique (myvector.begin(), myvector.
         - The capture list is used for <span style="color:red">**local nonstatic variables**</span> only; lambdas can use local statics and variables declared outside the function directly(比如```cout```)
     - return type:
         - 如果specify return type的话, unlike ordinary functions, a lambda must use a trailing return (尾置返回) to specify its return type.
-        - <span style="background-color:#FFFF00">如果忽略返回类型, lambda 根据函数体的代码推断出返回类型</span>. Lambdas with function bodies that contain anything other than a single return statement that do not specify a return type return void.
+        - <span style="background-color:#FFFF00">如果忽略返回类型, lambda 根据函数体的代码推断出返回类型</span>. 
     -  can <span style="color:red">omit either or both of the parameter list and return type</span> but must always include the capture list and function body ```auto f = [] { return 42; };``` 定义了```f``` callable object that takes no arguments and returns 42.```cout << f() << endl; // prints 42```
     - parameter:
-        - lambda中忽略parameter list 等于指定一个empty parameer list.
-        - lambda 不能有默认参数. 因此call lambda 的参数永远与lambda 的参数一样多
+        - lambda中忽略parameter list 等于指定一个empty parameter list.
+        - lambda 不能有<span style="color:red">默认参数</span>. 因此call lambda 的参数永远与lambda 的参数一样多
     - When we define a lambda, the compiler generates a new (unnamed) class type that corresponds to that lambda, <span style="color:red">当函数传递一个lambda时, we define both a new type and an object of that type</span>: 传递的参数就是**an unnamed object** of this compiler-generated class type. 但我们跟使用```auto``` 定义一个lambda 变量的初始值时, define an **object** of the type generated from that lambda.
         - By default, the class (generated from a lambda) contains a data member corresponding to the variables captured by the lambda
         - 类似普通data members of any class, <span style="color:red">the data members of a lambda are initialized when a lambda object is created</span>.
