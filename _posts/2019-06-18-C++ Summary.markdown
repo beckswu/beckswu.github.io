@@ -1633,7 +1633,7 @@ string str(pc); //result in bizarre run-time behavior.
 上面例子提供了使用reinterpret_cast非常危险, 类型改变了，但compiler没有任何警告或者错误的信息提示. 比如上面中```pc```实际指向```int *```, 但使用```pc```时候, 会认定它是```char*```类型. compiler没法知道它存放是指向int 的指针
 
 
-When to use ```reinterpret_cast```: when interface with <span style="color:red">opaque data types(frequently occurs in vendor APIs over which programmer has no control). 下面例子是where a vendor provides an API for storing and retrieving arbitrary global data:
+When to use ```reinterpret_cast```: when interface with <span style="color:red">opaque data types(frequently occurs in vendor APIs over which programmer has no control)</span>. 下面例子是where a vendor provides an API for storing and retrieving arbitrary global data:
 
 ```c++
 // vendor.hpp
@@ -1659,23 +1659,22 @@ nt main() {
     // store global data
     
     VendorGlobalUserData d1;
-//  d1 = &u;                                          // compile error
+ //  d1 = &u;                                          // compile error
 
-//  d1 = static_cast<VendorGlobalUserData>(&u);       // compile error
+ //  d1 = static_cast<VendorGlobalUserData>(&u);       // compile error
 
     d1 = reinterpret_cast<VendorGlobalUserData>(&u);  // ok
     
     VendorSetUserData(d1);
-
         // do other stuff...
 
         // retrieve global data
 	
     VendorGlobalUserData d2 = VendorGetUserData();
     MyUserData * p = 0;
-//  p = d2;                                           // compile error
+ //  p = d2;                                           // compile error
 
-//  p = static_cast<MyUserData *>(d2);                // compile error
+ //  p = static_cast<MyUserData *>(d2);                // compile error
 
     p = reinterpret_cast<MyUserData *>(d2);           // ok
 
@@ -1710,7 +1709,7 @@ while(iter != svc.end()); //while 循环主体
     ++iter; //iter is not part of the loop, run after while
 ```
 
-**Dangling(悬垂) else**: 规定了else与最近的if匹配, 比如下面的if else 从初衷来看是为了跟外层的if 匹配, 但是不管怎么锁紧都是跟内层if 比配的. 如果想让与外层if 匹配，需要花括号
+**Dangling(悬垂) else**: 规定了else与最近的if匹配, 比如下面的else 初衷是为跟外层的if 匹配,但是却跟内层匹配, 如果想让与外层if 匹配，需要花括号
 
 ```c++
 if (grade > 6)
@@ -1882,7 +1881,7 @@ expression must represent a sequence(必须是一个序列), 例如 a braced ini
 #### (c). Exception Handling
 
 - when throw error, need to initialize error by give a string or c-style character style
-- Each exception classes define a member function named ```what```, function takes no arguments and return c-style character style (即 ```const char*```), 返回的对象是copy of string used to initialize the object; 对于没有初始值的exception,```what``` returns 由compiler 决定 
+- Each exception classes define a member function named ```what```：takes no arguments and return c-style character style (即 ```const char*```), 返回值是copy of string used to initialize the object; 对于没有初始值的exception,```what``` returns 由compiler 决定 
 - If no appropriate catch is found, execution is transferred to a library function ```terminate```. 该函数行为与系统有关 but is guaranteed to stop further execution of the program
 
 ```c++
