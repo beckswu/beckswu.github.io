@@ -4796,6 +4796,15 @@ insert_iterator<list<int>>insert_it(lst3, lst3.begin());
 copy(lst.begin(), lst.end(), insert_it);
 ```
 
+```c++
+list<int> l;
+auto it = inserter(l, l.begin());
+it = 1; it = 2;
+
+copy(l.begin(), l.end(), ostream_iterator<int>(cout, ","));//print 1, 2,
+	
+```
+
 **back_inserter**; apply to ```fill_n```: 因为we passed an iterator returned by ```back_inserter```(back_iterator返回的迭代器), each assignment will call ```push_back``` on ```vec```
 
 ```c++
@@ -4829,7 +4838,7 @@ fill_n(back_inserter(vec), 10, 0); // appends ten elements to vec
 - ```istream_iterator``` use ```>>``` to read a stream. 
     - the type that an ```istream_iterator``` reads must have an input operator defined. (比如```int```, ```string``` 都有input operator defined)
     - 当我们create an ```istream_iterator```, we can bind it to a stream (绑定到流上).
-    - 还可以使用默认initialize iterator, which creates an iterator that we can use as the off-the-end value (可以当尾后使用的迭代器)
+    - 还可以使用默认initialize iterator constructor, which creates an iterator that we can use as the off-the-end value (可以当尾后使用的迭代器)
     -  An iterator bound to a stream is equal to the end iterator(用默认```iostream iterator```constructor 生成的iterator) once its associated stream hits end-of-file or encounters an IO error.
     - ```istream_iterators``` Are Permitted to Use Lazy Evaluation: 当绑定流到 ```istream_iterator```, 不保证it will 立即 read the stream. The implementation is permitted to delay reading the stream until we use the iterator. 我们保证的是: 在一次dereference the iterator前, the stream will have been read. 
         - 对于大多程序, 何时读取没有差别, 但是如果我们创建一个```istream+iterator```， 没有读取就销毁了, 或者我们从两个不同的对象同步读取the same stream，那么合适读取就很重要了
@@ -4846,13 +4855,13 @@ fill_n(back_inserter(vec), 10, 0); // appends ten elements to vec
 |  ```in1 == in2 ```<br/>  ```in1 != in2```  |  ```in1``` 和 ```in2```必须读取相同类型. 如果他们都是尾后iterator, 或绑定到相同的input stream则他们相等 | 
 | ```*in``` | 返回从流中读取的值 | 
 | ```in->mem``` | 与```(*in).mem``` 含义相同 | 
-|   ```++in ```<br/>  ```in++``` | Reads the next value from the input stream using the ```>>``` operator for the element type. 通常上prefix version returns a reference to the incremented iterator. The postfix version returns the old value |
+|   ```++in ```<br/>  ```in++``` | Reads the **next value** from the input stream using the ```>>``` operator for the element type. 通常上prefix version returns a reference to the incremented iterator. The postfix version returns the old value |
 
 
 | Syntax | Description | 
 | --- | :--- | 
 | ```ostream_iterator<T>out(os)``` | ```out```将类型为T的值写到输出流```os```中 |
-| ```ostream_iterator<T>out(os, d)``` |  | ```out```将类型为T的值写到输出流```os```中, 每个值后面都输出一个```d```, d points to a null-terminated character array |
+| ```ostream_iterator<T>out(os, d)``` |  ```out```将类型为T的值写到输出流```os```中, 每个值后面都输出一个```d```, d points to a null-terminated character array |
 |  ```out = val```  | 用```<<``` 运算符将val 写入到 out 绑定的 ostream 中,val的类型必须与 out 可写的类型 兼容 | 
 |  ```*out```<br/>  ```++out``` <br/> ```out++``` |  这些运算符是存在的, 但不对```out```做任何事情, 每个运算符都返回```out``` |
 
