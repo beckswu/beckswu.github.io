@@ -41,6 +41,9 @@ public:
 };
 ```
 
+
+陷阱: 1. constexpr, type Aliases under  [2. Variable and Basic Types](# 2. Variable and Basic Types) 2. Array: Pointer Arithmetic: 可以负数  [3. Strings, Vectors, and Arrays](# 3. Strings, Vectors, and Arrays)
+
 ## 2. Variable and Basic Types
 
 <span style="background-color: #FFFF00">**Initialization is not assignment**</span>. Initialization happens when a variable is given a value *when it is created*.(创建变量时 赋予它一个初始值). **Assignment** obliterates an object's current value and replaces that value with a new one (
@@ -72,9 +75,7 @@ int c(ld), d = ld; // 转化执行，但是丢失了部分值 (truncated)
 
 **(2). Default Initialization**
 
-Most classess let us define objects without <span style="color: red">explict initializers</span>. Such classes supply an appropriate default value. e.g. std:string empty; empty implicitly initialized to the empty string. 
-
-Note: Uninitialized objects of built-in type defined inside a function body have undefined value. Objects of class type that we do not explicitly initialize have a value that is defined by the class.
+Most classess let us define objects without <span style="color: red">explict initializers</span>. Such classes supply an appropriate default value. e.g. ```std:string s```; ```s``` implicitly initialized to the empty string. 
 
 **(3). Variable Declarations and Definitions**
 
@@ -119,7 +120,7 @@ int main(){
 A **compount type** is a type that is defined in terms of another type, which is references and pointers
 
 1. reference, pointer:
-    - <span style="background-color: #FFFF00">等号两边类型(type)必须相同 </span> type modifier(&, \*) 不一定相同, <span style="background-color: #FFFF00">除了一个特殊情况 const reference</span>
+    - <span style="background-color: #FFFF00">等号两边类型(type)必须相同 </span>, <span style="background-color: #FFFF00">除了一个特殊情况 const reference</span>
          - 比如 ```double dval = 3.14;,int &refVal5 = dval;//error``` 
 2. 对于const非reference 非pointer, 等号左右两边等号类型可以不同. 
 3. **对于const reference 等号两边可以不同类型，compiler会做转换**  ```const double pi = 3.14; const int & i = pi;```
@@ -127,7 +128,10 @@ A **compount type** is a type that is defined in terms of another type, which is
 
 **Reference** At here, reference is only lvalue reference not rvalue reference
 
-<span style="background-color: #FFFF00"> reference must be assigned at initlization, non-const reference 不能assign rvalue, must be lvalue </span>. 程序把引用和初始值绑定(bind)到一起，而不是将初始值拷给引用, 引用无法绑定到另一个对象. <span style="color: red"> **A reference is not an object**. Instead, a reference is just another name for an already existing object </span>
+- <span style="background-color: #FFFF00"> reference must be assigned at initlization</span>
+- <span style="background-color: #FFFF00">non-const reference 不能assign rvalue, must be lvalue </span>. 
+- 程序把引用和初始值绑定(bind)到一起，而不是将初始值拷给引用, 引用无法绑定到另一个对象. 
+- <span style="color: red"> **A reference is not an object**. Instead, a reference is just another name for an already existing object </span>
 
 
 ```c++
@@ -162,7 +166,7 @@ int &r3 = i3, &r4 = i2; // both r3 and r4 are references
 - <span style="background-color: #FFFF00">It is error to copy or try to access the value of an invalid pointer</span>. As when we use an uninitialized variable, <span style="color: red">this error is one that the compiler is unlikely to detect(编译器不会检查access invalid pointer)</span>. The result of accessing an invalid pointer is undefined. 
 -  Given two valid pointers of the same type, we can compare them use<span style="background-color: #FFFF00"> the equality(==) or inequality(!=) operator, Two pointers are equal if they hold the same address (两个指针存放的地址相同) </span>
 - <span style="background-color: #FFFF00">修饰符 (type modifier \*)仅仅是修饰一个variable</span>,  而非修饰整行所有变量.  Each declarator can relate its variable to the base type differently from the other declarators in the same definition.```int* p1, p2```, p1 是 int pointer, p2 是int, , 如果两个都是pointer 用```int* p1, *p2```
-- deference ```*``` 返回类型是reference,所以可以用```int *p = &i; *p = 5;//change object```
+- <span style="background-color: #FFFF00">**deference ```*``` 返回类型是reference**</span>,所以可以用```int *p = &i; *p = 5;//change object```
 
 ```c++
 double dval;
@@ -211,7 +215,7 @@ int *p1, *p2; // both p1 and p2 are pointers to int
 ```
 
 
-**void pointer**: <span style="background-color: #FFFF00">A void* pointer holds an address, but the type of the object at that address is unknown:  </span>. Generally,we use a void* pointer to deal with memory as memory, rather than using the pointer to access the object stored in that memory. 
+**void pointer**: <span style="background-color: #FFFF00">A void* pointer holds an address, but the type of the object at that address is unknown:  </span>. Generally,we use a void* pointer to <span style="color:red">deal with memory as memory</span>, rather than using the pointer to access the object stored in that memory. 
 
 
 
@@ -235,7 +239,6 @@ cout << "The value of ival\n"
 
 
 ```c++
-
 int i = 42; 
 int *p; //p is a pointer to int
 
@@ -250,7 +253,6 @@ r = &i;// r refers to a pointer; assigning &i to r makes p point to i
 
 *r = 0; 
 // dereferencing r yields i, the object to which p points; changes i to 0
-
 
 ```
 
@@ -281,7 +283,7 @@ r = &i;// r refers to a pointer; assigning &i to r makes p point to i
     - **Const Value -> Const Ref** ✔️,```const int val = 5;const int & cstRef = val;```
 5. ```const reference```, 如果type 不匹配 or 用rvalue expression, 会生成一个**temporary object**, 这样如果改了原来的值, ```const reference```不会改 (因为```const reference```连得是temporary object) e.g. ```double val = 3.14; const int & cstRef = val; ```
     - 如果不是const reference, ```double val = 3.14; int & cstRef = val;  ``` 因为没有**中间值**生成, 改变```val```的值,有改变const reference 风险, <span style="color:red">**Error**</span>
-6. ```const reference```生成后 <span style="background-color:#FFFF00">不能直接更改，但可能会被间接更改(没有temporary object生成)</span> ```int val = 3;const int & cstRef = val;val = 10;``` , ```val = cstRef = 10```
+6. ```const reference```生成后 <span style="background-color:#FFFF00">不能直接更改，但可能会被间接更改(没有temporary 中间值 生成)</span> ```int val = 3;const int & cstRef = val;val = 10;``` , ```val = cstRef = 10```
 
 
 const value 必须initialize when define 
@@ -481,7 +483,7 @@ constexpr int sz2 = get_size();
 
 The type we can use in a **constexpr** declaration are known as **literal types**.
 - <span style="background-color: #FFFF00"> arithmetic, reference, pointer types are **literal types**</span>, 
-- <span style="background-color: #FFFF00"> 自己定义的class, **string** types 不是**literal types**, 不能用于define varaibles as **constexpr**</span>. varaibles defined inside a function 因为没有fixed address, 不能用**constexpr**,
+- <span style="background-color: #FFFF00"> **string** types 不是**literal types**, 不能用于define varaibles as **constexpr**</span>. varaibles defined inside a function 因为没有fixed address, 不能用**constexpr**,
 - The **address** of an object defined  <span style="color:red">outside</span> of any function is **constant expression**, and **some objects have fixed address** so may used to initialzie a **constexpr** pointer.
 
 - **Pointers and constexpr**
@@ -545,10 +547,15 @@ const pstring* ps; //ps is a pointer to a constant pointer to char
 
 - **auto** tells the compiler to deduce the type from the initializer. By implication, a variable that uses **auto** as its type specifier <span style="background-color: #FFFF00">must have an initializer</span>.
 - **auto** can define multiple variables in single line, 但是initializers for all the variables in the declaration must <span style="background-color: #FFFF00">have types that are consistent</span>
-- **auto** is not always exactly the same as initializer types. 当用auto时候，<span style="background-color: #FFFF00">top level const通常会被忽略, low-level const 会被kept</span>, <span style="color:red"> 用```auto``` deduced ```int&``` is int, deduce ```const int&```是```int&```</span> 
+- **auto** is not always exactly the same as initializer types. 当用auto时候，<span style="background-color: #FFFF00">top level const通常会被忽略, low-level const 会被kept</span>, <span style="color:red"> 
 - 用```auto &``` or ```auto*``` to auto-deduced type, <span style="background-color: #FFFF00">会keep top level, low-level const</span>
 - 不能用**auto** to deduce the type from a list of initializer ```auto a = {1,2,3}; //error```
-- <span style="background-color: #FFFF00">用```auto``` deduced array 是pointer type</span>
+- Deduce: 
+   - 用```auto``` deduced ```int&``` or ```const int&``` is ```int```
+   - deduce ```auto v = &i``` from reference is pointer
+   - deduce ```auto v = *i``` from deference is value (因为deference 返回是reference,但是```auto```对于reference deduce是value)
+   - 用reference 表示deduce 是reference type, 用pointer 表示deduce是pointer type, 会keep top-level const, ```auto & m = cval, *p = & cval;``` m是reference type, p是pointer type
+   - <span style="background-color: #FFFF00">用```auto``` deduced array 是pointer type</span>
 
 可以定义多个variables in single line, 但是需要都是一个类型(type)的
 ```c++
@@ -569,12 +576,12 @@ auto a = ref; // a is an int
 const int cval = i, &cstRef = cval;
 auto b = cval; //b is an int (top-level const dropped)
 
-auto c = cstRef; //c is an int& (cr is an alias for cval whose top-level const dropped)
+auto c = cstRef; //c is an int (cr is an alias for cval whose top-level const dropped)
 
 auto d = & i; //d is an int*
 
 auto e = &cval; 
-//e is const int * (& of a const is low-level const)
+//e is const int * (& of a const is low-level const, 把top-level 转成low-level)
 
 ```
 
@@ -607,7 +614,7 @@ auto &n = i, *p2 = & cval;
 - handles **top-level const** subtly different from **auto**
     - **variables**: <span style="background-color: #FFFF00">include **top-level const** and reference</span>
     - **expression**: we can get the type that expression yields. <span style="background-color: #FFFF00">注:Dereference operator(\*) yields type as reference</span>
-    - **function**, ```decltype(functionName)``` 返回的是function type, not a pointer to function type.
+    - **function**, ```decltype(functionName)``` 返回的是function return type, not a pointer to function type.
     - **decltype** and **auto** difference: deduction done by **decltype** depends on the form of its expression. 
         - <span style="background-color: #FFFF00">切记```decltype((variable))```结果永远是引用，```decltype(variable)``` 只有当variable 本身是引用时, 结果才是引用</span>
 
@@ -634,9 +641,9 @@ use decltype for expression. ```decltype(r)``` is a reference type. but ```r+0``
 
 ```c++
 int i = 42, *ptr = & i, &ref = i;
-decltype(r + 0) b; //addition yields an int, b is int (uninitialized)
+decltype(ref + 0) b; //addition yields an int, b is int (uninitialized)
 
-decltype(*p) c; //error: c is int& and must be initialized
+decltype(*ptr) c; //error: c is int& and must be initialized
 
 ```
 
@@ -858,7 +865,7 @@ auto it3 = v.cbegin(); // eturn vector<int>::const_iterator
 - 因为arrays have fixed size, they sometimes offer better run-time performance for specialized applications, 但是相应也损失了一些灵活性(flexibility)
 - array size是part of array's type. The dimension must be known at compile time, which is [**constant expression**](#Constexpr)
 - 默认值初始化会令数组含有未定义的值 (a default-initialized array of )
-- As with vector, arrays hold objects. <span style="background-color:#FFFF00">Thus **there are no array of references**, 但可以有reference to array</span>.
+- As with vector, arrays hold objects. <span style="background-color:#FFFF00">Thus **there are no array of references**(array 不是objects), 但可以有reference to array</span>.
 - <span style="background-color:#FFFF00">When define an array, we must specify a type. We cannot use **auto** to deduce the type from a list of initializers</span>
 
 ```c++
@@ -1076,14 +1083,14 @@ int k = p[-2]; // p[1] = *(p-2); = arr[0] = 0;
 **(7). C-Style Character Strings**
 
 - C-style strings are not a type, 而是convention to use character strings. Strings that follow this convention 储存在character arrays and **null terminated \0** 
-- C library string.h provides a set of functions 在C++中 functions 被定义在 cstring header
+- C library string.h provides a set of functions 在C++中 functions 被定义在 ```cstring``` header
     - ```strlen(p)```: 返回p的长度, <span style="color:red">not counting the null</span>
     - ```strcmp(p1,p2)```: compares p1 and p2 for equality. Returns 0 if p1 == p2, a positive value if p1 > p2, a negative value if p1 < p2
     - ```strcat(p1,p1)``` : Appends p2 to p1. Returns p1. <span style="color:red">p1必须large enough to hold result </span>
     - ```strcpy(p1,p2)``` : copies p2 into p1. Returns p1. <span style="color:red">p1必须large enough to hold result</span>
 
 
-用strlen 必须有```\0``` terminate. 如果没有 null terminated, the result is undefined. The most likely effect of  this is that ```strlen``` will keep looking through the memory taht follows ```ca``` until it encounter a null character
+<span style="background-color:#FFFF00"> 用strlen 必须有```\0``` terminate. 如果没有 null terminated, the result is undefined</span>. The most likely effect of  this is that ```strlen``` will keep looking through the memory THAT follows ```ca``` until it encounter a null character
 ```c++
 char ca[] = {'C', '+', '+'}; // not null terminated
 
@@ -1108,6 +1115,7 @@ concat： 对于string, 可以直接用加号, 但是<span style="color:red">doi
 string largeStr = s1 + " " + s2;
 
 // disastrous if we miscalculated the size of largeStr
+
 strcpy(largeStr, ca1); // copies ca1 into largeStr
 
 strcat(largeStr, " ");  // adds a space at the end of largeStr
@@ -1178,12 +1186,13 @@ size_t cnt = 0;
 for (auto &row : ia) // for every element in the outer array
 
     for (auto &col : row) { // for every element in the inner array 
+    
            ++cnt; 
     }
 
 for (const auto &row : ia) // for every element in the outer array
 
-     for (auto col : row) // for every element in the inner array
+     for (auto col : row) // for every element in the inner array, col is int
 
         cout << col << endl;
 
@@ -1216,6 +1225,7 @@ p = &ia[2]; //p points to the last element in ia
 
 
 //iterate
+
 for(auto p = ia; p != ia + 3; ++p){
     //q points to the first element of an array of 4 ints, q points to an int
 
