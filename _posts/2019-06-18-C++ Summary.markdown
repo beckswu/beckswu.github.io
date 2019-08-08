@@ -42,7 +42,7 @@ public:
 ```
 
 
-陷阱: 1. constexpr, type Aliases under  [2. Variable and Basic Types](# 2. Variable and Basic Types) 2. Array: Pointer Arithmetic: 可以负数  [3. Strings, Vectors, and Arrays](# 3. Strings, Vectors, and Arrays)
+陷阱: 1. constexpr, type Aliases under  [2. Variable and Basic Types](# 2. Variable and Basic Types) 2. Array: Pointer Arithmetic: 可以负数  [3. Strings, Vectors, and Arrays](# 3. Strings, Vectors, and Arrays). 4. Function only with top level and return difference error. 5. Function name lookup before type checking [6. Functions. d](#(6). Functions) 6.Function Names resolve and calculate [6. Functions. d](#(6). Functions) 
 
 ## 2. Variable and Basic Types
 
@@ -389,7 +389,7 @@ cout<<i<< ", "<<r1<<", "<<r2<<endl; //print 0, 0 , 0
 **(2). Pointer and const**
 
 1. Level Const
-   - **low-level const**(object is const): const <span style="background-color: #FFFF00">在pointer 左面</span>表data is const, cannot change underlying data value. but can point to different underlying. <br/>
+   - **low-level const**(object is const): const <span style="background-color: #FFFF00">在pointer/reference 左面</span>表data is const, cannot change underlying data value. but can point to different underlying. ```const int & j = 5 ```是 low -level const 
    - **top-level const**(pointer is const): const <span style="background-color: #FFFF00">在pointer 右面有pointer在时候表示 pointer is const (**a const pointer**), 如果没有pointer 在表示数据const (```const int a = 0```</span>, 不能改变指向对象，但可以改变the value of underlying object)
 2. <span style="background-color: #FFFF00">The distinction between **top-level** and **low-level** matters when we copy an object</span>. When we copy an object, **top-level consts can be ignored:** e.g. ```const * const int = const * int```
     -  <span style="background-color: #FFFF00">对于pointer之间的copy, 如果忽略Low Level const</span>, <span style="color:red">**Error**</span> 
@@ -1921,7 +1921,7 @@ void f2(void){ /* ... */ } // explicit void parameter list
 
 ```
 
-**Function Return Type**: return type can be void. <span style="background-color:#FFFF00">但是不能是array type or function type.</span>, 但是可以return a pointer to array or a function. 
+**Function Return Type**: return type can be void. <span style="background-color:#FFFF00">但是不能是array type, IO type, or function type.</span>, 但是可以return a pointer to array or a function. 
 
 **local variable**: 如果局部变量和外面变量名字一样, <span style="color:red">
 局部变量会hide declarations of the same name made in outer scope</span>
@@ -1971,13 +1971,13 @@ cout << *p << " , "<<i<<endl; //print 10, 10
 
 **(2) Reference Parameter**: Can use Reference Parameters to return additional information
 
-**(3). const Parameters and Arguments**: <span style="background-color:#FFFF00">when we copy an argument to initialize a parameter. top-level const are ignored. 顶层const被ignore</span> We can pass either a const or a nonconst object to a parameter that has a top-level const:
+**(3). const Parameters and Arguments**: <span style="background-color:#FFFF00">when we copy an argument to initialize a parameter. top-level const are ignored. 顶层const被ignore</span> We can pass either a const or a nonconst object to a parameter that has a top-level const, <span style="color:red"> Error to write functions, only parameter top-level const不同</span>
 
 因为顶层const 被忽略掉, 所以两个fun, 两个reset function是一样的function
 ```c++
 void fcn(const int i) // 可以pass int or const int 
 
-void fcn(int i) //也可以接受int, const int
+void fcn(int i) //也可以接受int, const int, compiler报错already has a body
 
 void reset(int const * const ip); 
 //可以pass const int * p, 也可以是pass const int * const p
@@ -1985,6 +1985,10 @@ void reset(int const * const ip);
 void reset(int const * ip);
 //是两个一样的reset function
 
+//下面两个function 不一样, 因为不是top-level const
+
+void fun(const int & i);
+void fun(int & i);
 ```
 
 **(4). Use Reference to const When Possible**：如果只pass reference without const，可能给读者错误导function可能改变value; 另外<span style="color:red">用reference, we cannot pass a const object, a literal, or an object requires conversion to a plain reference parameter </span>
@@ -2046,7 +2050,7 @@ void print(const char *cp)
 }
 ```
 
-方法二: Using the Standard Library Conventions, pass pointers to the frist and one past the last element in the array.
+方法二: Using the Standard Library Conventions, pass pointers to the first and one past the last element in the array.
 ```c++
 void print(const int *beg, const int *end)
 {
@@ -2072,7 +2076,7 @@ intj[]={0,1};
 print(j, end(j) - begin(j));
 ```
 
-**(6).Array Reference Parameters** 只有需要change the value, 采用Array reference, 如果不改变value, 用 pointer to const, 当有引用时, <span style="background-color:#FFFF00">只能传入与引用size 一样维度的array,**size matters**</span>, 比如下面的function, 只能传入size = 10的  
+**(6).Array Reference Parameters** 只有需要change the value, 采用Array reference, 如果不改变value, 用 pointer to const, 当有引用时, <span style="background-color:#FFFF00">只能传入与引用size 一样维度的array,**size matters**</span>, 比如下面的function, 只能传入size = 10的, <span style="color:red">只有当reference 传入时候才能用for_range loop 因为function pass的是array, 不是reference传入的 function pass的是pointer</span>  
 
 ```c++
 void print(int (&arr)[10])
@@ -2131,7 +2135,7 @@ An **initializer_list** is a library type that represents an array of values of 
 | :---        | :---    |  
 | ```initializer_list<T>lst``` | Default initialization, an empty list of elements of type T |
 | ```initializer_list<T>lst{a,b,c}``` | elements are copied of correspoding initializers. <span style="color:red"> elements in the list are const </span> | 
-| ```lst2(lst)``` | copy or assigning an initailizer_list 但不会一一拷贝列表中元素. After the copy, the original and the copy share he elements. <span style="color:red">  sallow copy</span>| 
+| ```lst2(lst)``` | copy or assigning an ```initailizer_list``` 但不会 一 一拷贝列表中元素. After the copy, the original and the copy share he elements. <span style="color:red">  shallow copy</span>| 
 | ```lst.size()``` | number of elements in list | 
 | ```lst.begin() / lst.end())``` | returns a pointer to the first / one past the last element in lst|
 
@@ -2168,7 +2172,7 @@ Failing to provide a return after a loop that contains a return is an error(for 
 - 如果return是value (<span style="background-color:#FFFF00">returns are **rvalue**</span>), return value is copied to the call site. The function returns a copy of he return value. 
 - 如果return是reference(<span style="background-color:#FFFF00">returns are **lvalue**</span>), reference is just another name for the object to which it refers
 
-当function return 是 list initializing the return value, <span style="color:red">element inside brace list cannot have larger type which require narrowning conversion</span> 
+当function return 是 list initializing the return value, <span style="color:red">element inside brace list cannot have larger type which require **narrowning conversion**</span> 
 ```c++
 vector<int>get(){
     return {3.14,5};//3.14->int illegal, 
@@ -2180,7 +2184,7 @@ vector<int>get(){
 **(2). Never Return a Reference or Pointer to a Local Object**: <span style="color:red">after a terminate, reference to local objects refer to memory that is no longer valid.</span>
 
 ```c++
-const string &manip()
+const string & manip()
 {
     string ret;
     if (!ret.empty()) return ret; 
@@ -2211,7 +2215,7 @@ cout << s << endl; // prints A value return 0;
 auto sz = shorterString(s1, s2).size();
 ```
 
-**(4). Return from main**: The main function is allowed to terminate without a return. 如果control reaches the end of main and there is no return, compiler implicitly inserts a return of 0. main的返回值看做状态指示器, 返回0表示执行成功, 返回其他值表示执行失败. 非0值得含义由机器而定. 为了使返回值与机器无关, ```cstdlib``` header中定义了连个预处理(preprocessor)变量 that we can use to indicate success or failure, <span style="background-color:#FFFF00">因为是预处理变量, 不能加上```std::```, 也不能```using``` 声明中出现.</span> <span style="color:red">注: main function may not call itself</span>
+**(4). Return from main**: The main function is allowed to terminate without a return. 如果control reaches the end of main and there is no return, <span style="color:red">compiler implicitly inserts a return of 0</span>. main的返回值看做状态指示器, 返回0表示执行成功, 返回其他值表示执行失败. 非0值得含义由机器而定. 为了使返回值与机器无关, ```cstdlib``` header中定义了2个预处理(preprocessor)变量 that we can use to indicate success or failure, <span style="background-color:#FFFF00">因为是预处理变量, 不能加上```std::```, 也不能```using``` 声明中出现.</span> <span style="color:red">注: main function may not call itself</span>
 
 ```c++
 int main()
@@ -2408,8 +2412,13 @@ window = screen(, , '?'); // error: can omit only trailing arguments
 ```c++
 int wd = 80;
 char def = ' ';
-size_t ht();
-string screen(int = ht(), int = wd, char = def);
+size_t ht = 5;
+string screen(int = ht, int = wd, char = def);
+
+void screen(int a1 = ht, int a2 = wd, char a3 = def) { //与上面function是一样的
+
+	cout << a1 << " , " << a2 << " , " << a3; //print 5, 80 , *
+}
 
 void f(){
     def = '*';  //change value of default argument
@@ -2444,7 +2453,9 @@ int main ()
 } 
 
 const long int res = fib(30);  // run time is 0.0003s;
+
 long int res = fib(30); //run time is 0.017s;
+
 ```
 
 
@@ -2468,7 +2479,7 @@ cout << (s1.size() < s2.size() ? s1 : s2 )<<endl;
 - constexpr function should not be viod type and some operator like prefix increment (++v) are not allowed in constexpr function. 
 - compiler will replace a call to constexpr funcion with its resulting value.(compiler 把constexpr 函数的调用换成其结果值)
 - <span style="color:red">constexpr functions are implicitly inline </span>
-- <span style="color:red">A constexpr function body 可以含有other statements 只要这个statement generate no actions at run time</span> (e.g. null statment, type aliases, and using declaractions)
+- <span style="color:red">A constexpr function body 可以含有other statements 只要这个statement generate no actions at run time</span> (e.g. null statement, type aliases, and using declaractions)
 - <span style="color:red">A constexpr function is not required to return a constant expression.</span>
 - 如果需要constexpr function 返回constant expression, 需要function argument也是constant expression
 
