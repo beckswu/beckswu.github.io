@@ -42,7 +42,7 @@ public:
 ```
 
 
-陷阱: 1. constexpr, type Aliases under  [2. Variable and Basic Types](# 2. Variable and Basic Types) 2. Array: Pointer Arithmetic: 可以负数  [3. Strings, Vectors, and Arrays](# 3. Strings, Vectors, and Arrays). 4. Function only with top level and return difference error. 5. Function name lookup before type checking [6. Functions. d](#(6). Functions) 6.Function Names resolve and calculate [6. Functions. d](#(6). Functions) 7. function pointer parameter 和return type的转换[6. Functions. d](#(6). Functions) 8. ```*thi```s is reference to object (not const reference) 7. const class object 不能call non const member function  8.const function 对于 const function is better match (因为不用转化lower const) 9.const function 只能返回 const reference （buneng ）10. constructor initializer list order 不会影响他们实际初始化的顺序
+陷阱: 1. constexpr, type Aliases under  [2. Variable and Basic Types](# 2. Variable and Basic Types) 2. Array: Pointer Arithmetic: 可以负数  [3. Strings, Vectors, and Arrays](# 3. Strings, Vectors, and Arrays). 4. Function only with top level and return difference error. 5. Function name lookup before type checking [6. Functions. d](#(6). Functions) 6.Function Names resolve and calculate [6. Functions. d](#(6). Functions) 7. function pointer parameter 和return type的转换[6. Functions. d](#(6). Functions) 8. ```*thi```s is reference to object (not const reference) 7. const class object 不能call non const member function  8.const function 对于 const function is better match (因为不用转化lower const) 9.const function 只能返回 const reference （buneng ）10. constructor initializer list order 不会影响他们实际初始化的顺序. 11 static member可以用于default argument
 
 
 ## 2. Variable and Basic Types
@@ -3582,6 +3582,7 @@ Initializers for all nonstatic data members that are not named by a member initi
 - private static member 只能被member function call,不能被outside class用
 - static members of a class exist outside any object.Object do not contain data associated with static data members
 - static member functions 不与对象绑定(bound)在一起.  因此<span style="background-color:#FFFF00">static member function 不能declared as const function</span>. static member functions <span style="color:red">don't have ```*this``` pointer.不能用```*this```在static member 中</span>, This restriction适用于explicit use of ```this``` and implicit use of ```this``` by calling a nonstatic member.
+   - static function 中不能call nonstatic variable 或者 nonstatic function
 - can use scope operator to access static member ```Account::initRate```, 也可以通过object, reference, pointer of class type to access 
 - <span style="color:red">member function can use static member directly</span> without scope operator
 
@@ -3616,7 +3617,7 @@ r = ac2->rate(); // through a pointer to an Account object
 **Define Static Members**
 - 因为static data members 不是 part of objects of class type, 他们并不是在create object是被定义的. They are <span style="color:red">not initialized by class constructor</span>, 
 - 不能initialize static member inside class, 必须<span style="background-color:#FFFF00">define and initialize static data member outside class body</span>
-- 和其他object一样,static data member只能被定义一次 (好习惯是 把所有static member的definitions 和所有noninlin member functions的定义放在一起)
+- 和其他object一样,static data member只能被定义一次 (好习惯是 把所有static member的definitions 和所有noninline member functions的定义放在一起)
 - 可以define static member function 在class内部或者外部.如果在外部define, 不用加上 ```static``` keyword
 
 
@@ -3635,7 +3636,7 @@ double Account::interestRate = initRate();
 ```
 
 **In-Class Initialization of static Data Members**
-- 通常static members不能intialized in class body. 但可以为static members 提供  <span style="color:red">**const integral type**</span>的in-class initialzers,  不过必须要求static mmembers必须是 <span style="color:red">**constexpr of literal type**</span>.
+- 通常static members不能intialized in class body. 但可以为static members 提供  <span style="color:red">**const integral type**</span>的in-class initialzers,  不过必须要求static members必须是 <span style="color:red">**constexpr of literal type**</span>.
    - initializer 必须是**constant expression**
 - 如果某个static member 仅限于compiler可以替换它的值, then 一个初始化的const or constexpr static 不需要分别定义. 如果将它用于值不能替换的场景中, then 该成员必须有一个定义语句 
    - 例如下面例子中, 用到```period```的地方仅仅是```daily_tbl```, there is no need to define ```period``` outside class ```Account```, 但是程序细微的改变不能造成无法编译, 因为找不到该成员定义. e.g. pass ```period``` to a function that takes a ```const int&``` then peiord must be defined 
