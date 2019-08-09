@@ -42,7 +42,7 @@ public:
 ```
 
 
-陷阱: 1. constexpr, type Aliases under  [2. Variable and Basic Types](# 2. Variable and Basic Types) 2. Array: Pointer Arithmetic: 可以负数  [3. Strings, Vectors, and Arrays](# 3. Strings, Vectors, and Arrays). 4. Function only with top level and return difference error. 5. Function name lookup before type checking [6. Functions. d](#(6). Functions) 6.Function Names resolve and calculate [6. Functions. d](#(6). Functions) 7. function pointer parameter 和return type的转换[6. Functions. d](#(6). Functions) 8. ```*thi```s is reference to object (not const reference) 7. const class object 不能call non const member function  8.const function 对于 const function is better match (因为不用转化lower const) 9.const function 只能返回 const reference （buneng ）
+陷阱: 1. constexpr, type Aliases under  [2. Variable and Basic Types](# 2. Variable and Basic Types) 2. Array: Pointer Arithmetic: 可以负数  [3. Strings, Vectors, and Arrays](# 3. Strings, Vectors, and Arrays). 4. Function only with top level and return difference error. 5. Function name lookup before type checking [6. Functions. d](#(6). Functions) 6.Function Names resolve and calculate [6. Functions. d](#(6). Functions) 7. function pointer parameter 和return type的转换[6. Functions. d](#(6). Functions) 8. ```*thi```s is reference to object (not const reference) 7. const class object 不能call non const member function  8.const function 对于 const function is better match (因为不用转化lower const) 9.const function 只能返回 const reference （buneng ）10. constructor initializer list order 不会影响他们实际初始化的顺序
 
 
 ## 2. Variable and Basic Types
@@ -3249,7 +3249,7 @@ class data{
 };
 ```
 
-- <span style="color:red">必须用**constructor initializer list**  to privide values for members that are const, reference, or a class type that does have a default constructor</span>,const, reference 是必须initialized的
+- <span style="color:red">必须用**constructor initializer list**  to provide values for members that are const, reference, or a class type that does have a default constructor</span>,const, reference 是必须initialized的
   - <span style="background-color:#FFFF00"> 如果member 有 const or reference, 不会有default constructor, 必须要Initialized using constructor initialization list</span>
   -  **constructor initializer list** specifies only the values used to initialize the members, not the order. **constructor initializer list**没有说明初始化的order
 -  <span style="background-color:#FFFF00">class members are initialized 与他们在class 出现的顺序一致, **constructor initializer list** order 不会影响他们实际初始化的顺序</span>
@@ -3280,6 +3280,19 @@ public:
 
     X(int val): j(val), i(j){}
 };
+
+class want{
+public:
+	int a;
+	int b;
+	want(int x_, int y_) : b(x_), a(b) {}
+};
+
+
+list<int> l;
+want a(10, 5);
+cout << a.a << " , " << a.b << endl; //print 0, 10 
+
 ```
 
 **(2) Delegating Constructor(委托构造函数)**: 
