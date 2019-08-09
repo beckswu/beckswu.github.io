@@ -42,7 +42,7 @@ public:
 ```
 
 
-陷阱: 1. constexpr, type Aliases under  [2. Variable and Basic Types](# 2. Variable and Basic Types) 2. Array: Pointer Arithmetic: 可以负数  [3. Strings, Vectors, and Arrays](# 3. Strings, Vectors, and Arrays). 4. Function only with top level and return difference error. 5. Function name lookup before type checking [6. Functions. d](#(6). Functions) 6.Function Names resolve and calculate [6. Functions. d](#(6). Functions) 
+陷阱: 1. constexpr, type Aliases under  [2. Variable and Basic Types](# 2. Variable and Basic Types) 2. Array: Pointer Arithmetic: 可以负数  [3. Strings, Vectors, and Arrays](# 3. Strings, Vectors, and Arrays). 4. Function only with top level and return difference error. 5. Function name lookup before type checking [6. Functions. d](#(6). Functions) 6.Function Names resolve and calculate [6. Functions. d](#(6). Functions) 7. function pointer parameter 和return type的转换[6. Functions. d](#(6). Functions)
 
 ## 2. Variable and Basic Types
 
@@ -2592,7 +2592,7 @@ f(5.6); // calls void f(double, double)
 **compiler ranks the conversions thatconver each argument to the type of parameters**:
 
 1. 精准匹配(exact match). An exact match happens when:
-    - argument and parameter types sre identical
+    - argument and parameter types are identical
     - The argument is converted from an array or function type to the corresponding pointer type.
     - top-level const is added or discarded from the argument (<span style="background-color:#FFFF00">添加或去掉top-level const</span>)
 2. Match through a const conversion (通过const 转化实现)
@@ -2646,7 +2646,6 @@ lookup(b); // calls lookup(Account&)
 - we can directly use function pointer without dereference operator
 - There is no conversion between pointers to one function type and pointers to another function type.(<span style="background-color:#FFFF00">不同的函数指针之间没有转换规则</span>)
 - 可以assign ```nullptr``` or ```zero``` valued integer constant expression to a function pointer 表示function pointer 没有指向任何的function
-- when we use an overloaded function, the context must make it clear which version is being used. 当使用overloaded function上下文必须指出选用哪个函数
 - <span style="background-color:#FFFF00">function parameter can convert function to function pointer, 但是function return cannot convert function to function pointer</span>
 
 function pointer 括号```(*pf)``` 必不可少, 否则的话是 function returns bool pointer
@@ -2690,7 +2689,7 @@ double (*pf3)(int*) = ff; // error: return type of ff and pf3 don't match
 
 ```
 
-**Function Pointer Parameters**: we can write parameter that looks like a function, 但实际上是被treated as pointer.当pass a function as an argument, 它将自动convert to a pointer
+**Function Pointer Parameters**: we can write parameter that looks like a function, 但实际上是被treated as pointer.当pass a function as an argument, <span style="color:red">它将自动convert to a pointer</span>
 ```c++
 // third parameter is a function type and is automatically treated as a pointer to function
 
@@ -2745,7 +2744,7 @@ F *f1(int); // ok: explicitly specify that the return type is a pointer to funct
 
 **Using auto or decltype for Function Pointer Types**
 
-如果我们知道函数返回是哪个一个, 可以用```decltype```简化书写. 需要注意的是,  when we apply decltype to a function, it returns a function type, not a pointer to function type. 需要add ```*``` to indicate that we are returning a pointer not a function
+如果我们知道函数返回是哪个一个, 可以用```decltype```简化书写. 需要注意的是,  <span style="background-color:#FFFF00">when we apply decltype to a function, it returns a function type, not a pointer to function type</span>. 需要add ```*``` to indicate that we are returning a pointer not a function
 
 ```c++
 string::size_type sumLength(const string&, const string&); 
@@ -2798,7 +2797,7 @@ std::istream &read(std::istream&, Sales_data&);
 **this**: 
 - ```this``` is a <span style="background-color:#FFFF00">const pointer</span>, we cannot change the address that ```this``` holds. <span style="color:red">```this``` is a constant pointer that holds the memory address of current object. this is not available in static member function </span> 
 -  By default, the type of ```this``` is ```const``` pointer<span style="color:red"> to the non const version of the class type</span>(top level const, lower level nonconst).
-    - ```*this``` 指reference to object, 而不是const reference to object, 因为```this```没有lower constness
+    - ```*this``` 指<span style="background-color:#FFFF00">reference to object, 而不是const reference to object</span>, 因为```this```没有lower constness
 - Member functions access the object through extra, <span style="color:red">implicit</span> parameter named **this**. **this** is initialized with<span style="color:red"> the address of the object</span> which the function (只限于nonstatic) was invoked.
     -  比如 ```total.isbn()``` compiler passes the address of ```total``` to the implicit ```this``` parameter. compiler 会等价的rewrite 为 ```Sales_data::isbn(&total)```(调用Sales_data的isbn的成员时传入total 的地址)
 - 在class 函数内部的直接access member of the object, 因为any direct use of a member of the class is assumed to be an implicit reference through ```this```(任何对类成员直接访问都被看作this的隐式引用)
@@ -2853,10 +2852,10 @@ The only difference between using class and using struct to define a class is th
 - inline member functions should be defined in the same header as the corresponding class definition
 - **mutable Data Members**: <span style="background-color:#FFFF00">a mutable data member is never const even when it is a member of a const object(即使是const 对象成员,也不是const), a const member function of class may change a mutable member </span>
 - <span style="color:red">When we provide an in-class initializer, we must do so following an = sign or inside braces.</span>
-- <span style="background-color:#FFFF00">A const member function that returns *this as a reference should have a return type that is a reference to const```const class & ```.</span>
+- <span style="background-color:#FFFF00">A const member function that returns ```*this``` as a reference should have a return type that is a reference to const```const class & ```.</span>
 - <span style="background-color:#FFFF00">可以overload function 基于是不是const </span> (match rule 跟function overloading match rule 类似)
   - <span style="color:red">const object 只能call const function, 不能call nonconst function</span>
-  - <span style="color:red">nonconst obeject 可以call non-const 也可以call const version， 但是nonconst version 是better match(因为exact match 优于const version)</span>
+  - <span style="color:red">nonconst object 可以call non-const 也可以call const version， 但是nonconst version 是better match(因为exact match 优于const version)</span>
 
 下面初始化Screen, class 内部初始化要么使用```=``` 在class内部初始化, or the direct form of initialization using ```{}```
 ```c++
@@ -2907,7 +2906,7 @@ myScreen.move(4,0).set('#');
 Screen temp = myScreen.move(4,0)
 temp =  temp.set('#');
 ```
-```const function```不能返回 nonconst的reference. 因为const function 的```*this``` is ```const Screen&```,```const Screen&``` 不能转换成```Screen&```(initialization rule). 所以```const```  function, 只能返回```const``` reference. 而```const``` reference 指的const object 不能call ordinary function (cannot conver from (const pointer to const) to (const pointer to nonconst) )
+```const function```不能返回 nonconst的reference. 因为const function 的```*this``` is ```const Screen&```,```const Screen&``` 不能转换成```Screen&```(initialization rule). 所以```const```  function, 只能返回```const``` reference. 而```const``` reference 指的const object 不能call ordinary function (cannot convert from (const pointer to const) to (const pointer to nonconst) )
 
 ```c++
 //error
