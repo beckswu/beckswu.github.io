@@ -42,7 +42,8 @@ public:
 ```
 
 
-陷阱: 1. constexpr, type Aliases under  [2. Variable and Basic Types](# 2. Variable and Basic Types) 2. Array: Pointer Arithmetic: 可以负数  [3. Strings, Vectors, and Arrays](# 3. Strings, Vectors, and Arrays). 4. Function only with top level and return difference error. 5. Function name lookup before type checking [6. Functions. d](#(6). Functions) 6.Function Names resolve and calculate [6. Functions. d](#(6). Functions) 7. function pointer parameter 和return type的转换[6. Functions. d](#(6). Functions)
+陷阱: 1. constexpr, type Aliases under  [2. Variable and Basic Types](# 2. Variable and Basic Types) 2. Array: Pointer Arithmetic: 可以负数  [3. Strings, Vectors, and Arrays](# 3. Strings, Vectors, and Arrays). 4. Function only with top level and return difference error. 5. Function name lookup before type checking [6. Functions. d](#(6). Functions) 6.Function Names resolve and calculate [6. Functions. d](#(6). Functions) 7. function pointer parameter 和return type的转换[6. Functions. d](#(6). Functions) 8. ```*thi```s is reference to object (not const reference) 7. const class object 不能call non const member function  8.const function 对于 const function is better match (因为不用转化lower const) 9.const function 只能返回 const reference （buneng ）
+
 
 ## 2. Variable and Basic Types
 
@@ -2956,7 +2957,7 @@ void do_display(std::ostream &os) const {os << contents;} //inline implicitly
 - 可以只声明class 而不定义class, like ```class Screen;```, 这种声明叫做**forward declaration**, 但在它声明之后 定义之前是一个**incomplete type**, 因为<span style="color:red">不清楚它包含哪些成员</span>
   - **imcomplete type** can be used in limited ways: define <span style="color:red">pointers</span> or <span style="color:red">references</span> to such types, 也可以定义functions that use an incomplete type as a <span style="color:red">parameter</span> or <span style="color:red">return type </span>
 - <span style="background-color:#FFFF00">A class 必须被defined 而不仅仅是声明before we creats objects of that type</span>. 因为compiler 需要know storage such objects need. 同理, a class 必须被定义before access a member of the type by using reference or pointer. 如果不定义, compiler cannot know 它有什么member
-- <span style="background-color:#FFFF00">A class member 可以有pointers or references of its own type. 因为class is considered declared (not yet defined) as soon as its class name has been seen</span>. 但是 <span style="color:red">a class cannot have members ot is own type</span> 因为compiler 需要知道storage data memebers require, class is not defined until its class body is complete,
+- <span style="background-color:#FFFF00">A class member 可以有pointers or references of its own type. 因为class is considered declared (not yet defined) as soon as its class name has been seen</span>. 但是 <span style="color:red">a class cannot have members of its own type</span> 因为compiler 需要知道storage data memebers require, class is not defined until its class body is complete,
 
 ```c++
 struct First { int memi;
