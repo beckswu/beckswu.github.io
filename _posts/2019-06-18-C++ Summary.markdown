@@ -42,7 +42,8 @@ public:
 ```
 
 
-陷阱: 1. constexpr, type Aliases under  [2. Variable and Basic Types](# 2. Variable and Basic Types) 2. Array: Pointer Arithmetic: 可以负数  [3. Strings, Vectors, and Arrays](# 3. Strings, Vectors, and Arrays). 4. Function only with top level and return difference error. 5. Function name lookup before type checking [6. Functions. d](#(6). Functions) 6.Function Names resolve and calculate [6. Functions. d](#(6). Functions) 
+陷阱: 1. constexpr, type Aliases under  [2. Variable and Basic Types](# 2. Variable and Basic Types) 2. Array: Pointer Arithmetic: 可以负数  [3. Strings, Vectors, and Arrays](# 3. Strings, Vectors, and Arrays). 4. Function only with top level and return difference error. 5. Function name lookup before type checking [6. Functions. d](#(6). Functions) 6.Function Names resolve and calculate [6. Functions. d](#(6). Functions) 7. function pointer parameter 和return type的转换[6. Functions. d](#(6). Functions) 8. ```*this``` is reference to object (not const reference) 7. const class object 不能call non const member function  8.const function 对于 const function is better match (因为不用转化lower const) 9.const function 只能返回 const reference （buneng ）10. constructor initializer list order 不会影响他们实际初始化的顺序. 11 static member可以用于default parameter
+
 
 ## 2. Variable and Basic Types
 
@@ -2592,7 +2593,7 @@ f(5.6); // calls void f(double, double)
 **compiler ranks the conversions thatconver each argument to the type of parameters**:
 
 1. 精准匹配(exact match). An exact match happens when:
-    - argument and parameter types sre identical
+    - argument and parameter types are identical
     - The argument is converted from an array or function type to the corresponding pointer type.
     - top-level const is added or discarded from the argument (<span style="background-color:#FFFF00">添加或去掉top-level const</span>)
 2. Match through a const conversion (通过const 转化实现)
@@ -2646,7 +2647,6 @@ lookup(b); // calls lookup(Account&)
 - we can directly use function pointer without dereference operator
 - There is no conversion between pointers to one function type and pointers to another function type.(<span style="background-color:#FFFF00">不同的函数指针之间没有转换规则</span>)
 - 可以assign ```nullptr``` or ```zero``` valued integer constant expression to a function pointer 表示function pointer 没有指向任何的function
-- when we use an overloaded function, the context must make it clear which version is being used. 当使用overloaded function上下文必须指出选用哪个函数
 - <span style="background-color:#FFFF00">function parameter can convert function to function pointer, 但是function return cannot convert function to function pointer</span>
 
 function pointer 括号```(*pf)``` 必不可少, 否则的话是 function returns bool pointer
@@ -2690,7 +2690,7 @@ double (*pf3)(int*) = ff; // error: return type of ff and pf3 don't match
 
 ```
 
-**Function Pointer Parameters**: we can write parameter that looks like a function, 但实际上是被treated as pointer.当pass a function as an argument, 它将自动convert to a pointer
+**Function Pointer Parameters**: we can write parameter that looks like a function, 但实际上是被treated as pointer.当pass a function as an argument, <span style="color:red">它将自动convert to a pointer</span>
 ```c++
 // third parameter is a function type and is automatically treated as a pointer to function
 
@@ -2745,7 +2745,7 @@ F *f1(int); // ok: explicitly specify that the return type is a pointer to funct
 
 **Using auto or decltype for Function Pointer Types**
 
-如果我们知道函数返回是哪个一个, 可以用```decltype```简化书写. 需要注意的是,  when we apply decltype to a function, it returns a function type, not a pointer to function type. 需要add ```*``` to indicate that we are returning a pointer not a function
+如果我们知道函数返回是哪个一个, 可以用```decltype```简化书写. 需要注意的是,  <span style="background-color:#FFFF00">when we apply decltype to a function, it returns a function type, not a pointer to function type</span>. 需要add ```*``` to indicate that we are returning a pointer not a function
 
 ```c++
 string::size_type sumLength(const string&, const string&); 
@@ -2798,7 +2798,7 @@ std::istream &read(std::istream&, Sales_data&);
 **this**: 
 - ```this``` is a <span style="background-color:#FFFF00">const pointer</span>, we cannot change the address that ```this``` holds. <span style="color:red">```this``` is a constant pointer that holds the memory address of current object. this is not available in static member function </span> 
 -  By default, the type of ```this``` is ```const``` pointer<span style="color:red"> to the non const version of the class type</span>(top level const, lower level nonconst).
-    - ```*this``` 指reference to object, 而不是const reference to object, 因为```this```没有lower constness
+    - ```*this``` 指<span style="background-color:#FFFF00">reference to object, 而不是const reference to object</span>, 因为```this```没有lower constness
 - Member functions access the object through extra, <span style="color:red">implicit</span> parameter named **this**. **this** is initialized with<span style="color:red"> the address of the object</span> which the function (只限于nonstatic) was invoked.
     -  比如 ```total.isbn()``` compiler passes the address of ```total``` to the implicit ```this``` parameter. compiler 会等价的rewrite 为 ```Sales_data::isbn(&total)```(调用Sales_data的isbn的成员时传入total 的地址)
 - 在class 函数内部的直接access member of the object, 因为any direct use of a member of the class is assumed to be an implicit reference through ```this```(任何对类成员直接访问都被看作this的隐式引用)
@@ -2853,10 +2853,10 @@ The only difference between using class and using struct to define a class is th
 - inline member functions should be defined in the same header as the corresponding class definition
 - **mutable Data Members**: <span style="background-color:#FFFF00">a mutable data member is never const even when it is a member of a const object(即使是const 对象成员,也不是const), a const member function of class may change a mutable member </span>
 - <span style="color:red">When we provide an in-class initializer, we must do so following an = sign or inside braces.</span>
-- <span style="background-color:#FFFF00">A const member function that returns *this as a reference should have a return type that is a reference to const```const class & ```.</span>
+- <span style="background-color:#FFFF00">A const member function that returns ```*this``` as a reference should have a return type that is a reference to const```const class & ```.</span>
 - <span style="background-color:#FFFF00">可以overload function 基于是不是const </span> (match rule 跟function overloading match rule 类似)
   - <span style="color:red">const object 只能call const function, 不能call nonconst function</span>
-  - <span style="color:red">nonconst obeject 可以call non-const 也可以call const version， 但是nonconst version 是better match(因为exact match 优于const version)</span>
+  - <span style="color:red">nonconst object 可以call non-const 也可以call const version， 但是nonconst version 是better match(因为exact match 优于const version)</span>
 
 下面初始化Screen, class 内部初始化要么使用```=``` 在class内部初始化, or the direct form of initialization using ```{}```
 ```c++
@@ -2907,7 +2907,7 @@ myScreen.move(4,0).set('#');
 Screen temp = myScreen.move(4,0)
 temp =  temp.set('#');
 ```
-```const function```不能返回 nonconst的reference. 因为const function 的```*this``` is ```const Screen&```,```const Screen&``` 不能转换成```Screen&```(initialization rule). 所以```const```  function, 只能返回```const``` reference. 而```const``` reference 指的const object 不能call ordinary function (cannot conver from (const pointer to const) to (const pointer to nonconst) )
+```const function```不能返回 nonconst的reference. 因为const function 的```*this``` is ```const Screen&```,```const Screen&``` 不能转换成```Screen&```(initialization rule). 所以```const```  function, 只能返回```const``` reference. 而```const``` reference 指的const object 不能call ordinary function (cannot convert from (const pointer to const) to (const pointer to nonconst) )
 
 ```c++
 //error
@@ -2957,7 +2957,7 @@ void do_display(std::ostream &os) const {os << contents;} //inline implicitly
 - 可以只声明class 而不定义class, like ```class Screen;```, 这种声明叫做**forward declaration**, 但在它声明之后 定义之前是一个**incomplete type**, 因为<span style="color:red">不清楚它包含哪些成员</span>
   - **imcomplete type** can be used in limited ways: define <span style="color:red">pointers</span> or <span style="color:red">references</span> to such types, 也可以定义functions that use an incomplete type as a <span style="color:red">parameter</span> or <span style="color:red">return type </span>
 - <span style="background-color:#FFFF00">A class 必须被defined 而不仅仅是声明before we creats objects of that type</span>. 因为compiler 需要know storage such objects need. 同理, a class 必须被定义before access a member of the type by using reference or pointer. 如果不定义, compiler cannot know 它有什么member
-- <span style="background-color:#FFFF00">A class member 可以有pointers or references of its own type. 因为class is considered declared (not yet defined) as soon as its class name has been seen</span>. 但是 <span style="color:red">a class cannot have members ot is own type</span> 因为compiler 需要知道storage data memebers require, class is not defined until its class body is complete,
+- <span style="background-color:#FFFF00">A class member 可以有pointers or references of its own type. 因为class is considered declared (not yet defined) as soon as its class name has been seen</span>. 但是 <span style="color:red">a class cannot have members of its own type</span> 因为compiler 需要知道storage data memebers require, class is not defined until its class body is complete,
 
 ```c++
 struct First { int memi;
@@ -3249,7 +3249,7 @@ class data{
 };
 ```
 
-- <span style="color:red">必须用**constructor initializer list**  to privide values for members that are const, reference, or a class type that does have a default constructor</span>,const, reference 是必须initialized的
+- <span style="color:red">必须用**constructor initializer list**  to provide values for members that are const, reference, or a class type that does have a default constructor</span>,const, reference 是必须initialized的
   - <span style="background-color:#FFFF00"> 如果member 有 const or reference, 不会有default constructor, 必须要Initialized using constructor initialization list</span>
   -  **constructor initializer list** specifies only the values used to initialize the members, not the order. **constructor initializer list**没有说明初始化的order
 -  <span style="background-color:#FFFF00">class members are initialized 与他们在class 出现的顺序一致, **constructor initializer list** order 不会影响他们实际初始化的顺序</span>
@@ -3280,6 +3280,19 @@ public:
 
     X(int val): j(val), i(j){}
 };
+
+class want{
+public:
+	int a;
+	int b;
+	want(int x_, int y_) : b(x_), a(b) {}
+};
+
+
+list<int> l;
+want a(10, 5);
+cout << a.a << " , " << a.b << endl; //print 0, 10 
+
 ```
 
 **(2) Delegating Constructor(委托构造函数)**: 
@@ -3569,6 +3582,7 @@ Initializers for all nonstatic data members that are not named by a member initi
 - private static member 只能被member function call,不能被outside class用
 - static members of a class exist outside any object.Object do not contain data associated with static data members
 - static member functions 不与对象绑定(bound)在一起.  因此<span style="background-color:#FFFF00">static member function 不能declared as const function</span>. static member functions <span style="color:red">don't have ```*this``` pointer.不能用```*this```在static member 中</span>, This restriction适用于explicit use of ```this``` and implicit use of ```this``` by calling a nonstatic member.
+   - static function 中不能call nonstatic variable 或者 nonstatic function
 - can use scope operator to access static member ```Account::initRate```, 也可以通过object, reference, pointer of class type to access 
 - <span style="color:red">member function can use static member directly</span> without scope operator
 
@@ -3603,7 +3617,7 @@ r = ac2->rate(); // through a pointer to an Account object
 **Define Static Members**
 - 因为static data members 不是 part of objects of class type, 他们并不是在create object是被定义的. They are <span style="color:red">not initialized by class constructor</span>, 
 - 不能initialize static member inside class, 必须<span style="background-color:#FFFF00">define and initialize static data member outside class body</span>
-- 和其他object一样,static data member只能被定义一次 (好习惯是 把所有static member的definitions 和所有noninlin member functions的定义放在一起)
+- 和其他object一样,static data member只能被定义一次 (好习惯是 把所有static member的definitions 和所有noninline member functions的定义放在一起)
 - 可以define static member function 在class内部或者外部.如果在外部define, 不用加上 ```static``` keyword
 
 
@@ -3622,7 +3636,7 @@ double Account::interestRate = initRate();
 ```
 
 **In-Class Initialization of static Data Members**
-- 通常static members不能intialized in class body. 但可以为static members 提供  <span style="color:red">**const integral type**</span>的in-class initialzers,  不过必须要求static mmembers必须是 <span style="color:red">**constexpr of literal type**</span>.
+- 通常static members不能intialized in class body. 但可以为static members 提供  <span style="color:red">**const integral type**</span>的in-class initialzers,  不过必须要求static members必须是 <span style="color:red">**constexpr of literal type**</span>.
    - initializer 必须是**constant expression**
 - 如果某个static member 仅限于compiler可以替换它的值, then 一个初始化的const or constexpr static 不需要分别定义. 如果将它用于值不能替换的场景中, then 该成员必须有一个定义语句 
    - 例如下面例子中, 用到```period```的地方仅仅是```daily_tbl```, there is no need to define ```period``` outside class ```Account```, 但是程序细微的改变不能造成无法编译, 因为找不到该成员定义. e.g. pass ```period``` to a function that takes a ```const int&``` then peiord must be defined 
