@@ -5422,9 +5422,26 @@ pos.first != pos.second; ++pos.first)
 
 ![](/img/post/C++/unordered_map.png)
 
-**Difference between rehash and reserve**
+**Difference between rehash and reserve**: ```rehash``` doesn't give you any guarantees, and ```reserve``` doesn't express the purpose of rehashing. Use ```rehash``` if you think your map is inefficient, and ```reserve``` if you're preparing for a lot of insertions.
 - ```rehash``` takes an existing map and rebuilds a new size of buckets, rehashing in the process and redistributing elements into the new buckets.
+  - If <span style="color:red">n >= current buckets</span> into the container then rehashed is done. The new bucket count can be greater than or equal to n.
+  - If <span style="color:red">n < current buckets</span> then there may or may not be any effect of function. <span style="color:red">It totally depends upon compiler</span>
 - ```reserve``` guarantees you that if you don't insert more than the reserved number of elements, there will be no rehashing (i.e. your iterators will remain valid).
+
+比如有code, 下面是okay的
+```c++
+auto itr = myMap.begin();
+while (itr != myMap.end()) {
+    if (/* removal condition */) {
+        itr = myMap.erase(itr);
+    } else {
+        ++itr;
+    }
+}
+```
+
+The <span style="background-color:#FFFF00">**erase members shall invalidate only iterators and references to the erased elements**</span>, and preserve the relative order of the elements that are not erased. 而<span style="background-color:#FFFF00">**Rehashing invalidates iterators, changes ordering between elements**</span>.
+
 
 **Requirements on Key Type for Unordered Containers**
 
