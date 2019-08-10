@@ -3843,7 +3843,7 @@ cin.tie(old_tie); // reestablish normal tie between cin and cout
 
 #### (b). File Input and Output
 
-- ```getline```是从一个```ifstream```中读取数据.
+- ```getline```是从一个```ifstream```中读取数据.  <span style="color:red">```getline``` 不会跳过空格, 如果读取的string 第一是空格，会保留空格</span>
 - ```fstream``` 除了继承```iostream```的类型外, ```fstream```中定义的类型还增加了一些新的成员管理与流关联的文件. 如表中, 可以对```fstream```, ```ifstream```, ```ofstream``` 对象调用这些操作, 但不能对其他的```IO```类型调用这些操作
 - when we creat a file stream, 可以选择性提供一个file name, associate that object with file. 如果提供file name, ```open``` is called automatically.
 - 因为 ```fstream``` 除了继承```iostream```的类型, 可以用```fstream``` type 代替```iostream&``` tyes
@@ -5215,6 +5215,243 @@ remove_copy_if(v1.begin(), v1.end(), back_inserter(v2), [](int i) { return i % 2
 
 
 #### (11). Associative Containers
+
+#### (a). Overview
+
+**(1). Defining an Associative Container**
+
+- 对于ordered container, map, multimap, set, and multiset. <span style="background-color:#FFFF00">library uses the ```<``` operator for the key tyoe to compare the keys</span>.
+- Key Types for Ordered Containers: 可以提供自己定义的比较操作代理关键字的```<``` operator on keys. The specified operation must define a <span style="color:red">**strict weak ordering**</span> over the key type
+    - 两个关键词不能同时小于等于对方: 比如 如果 ```k1 <= k2```, 那么<span style="color:red">不可以 ```k2 <= k1```</span>
+    - 如果```k1<=k2, k2<=k3```, 那么 ```k1 <= k3```
+    - 如果两个Key, 任何都不小于等于另一个, 则成两个key, equivalent, 如果 k1 ==k2 and k2 == k3, 则 k1 == k3
+- 如果用自己定义的comparison operation. 需要pass data type and <span style="color:red">comparison type</span> which is a <span style="color:red">**function pointer** type</span>, 并且pass comparison function as constructor argument(类型必须与尖括号中类型一样 )
+
+
+用自己定义的比较运算,  must <span style="background-color:#FFFF00">supply the type of that operation (pass as a constructor argument, the same type as specified inside the angle brackets) when we define the type of an associative container</span>, 比如下面定义```multiset```, 定义两个types, 一个是Sales_data, 另一个是comparison type, which is a function pointer type that point to ```compareIsbn```. 因为```decltype```返回的是函数类型，需要加上```*```表示函数指针， 注: 下面```compareIsbn``` or ```&compareIsbn``` 都是可以的, 因为当函数作为parameter, 会自动转化为指针
+
+```c++
+bool compareIsbn(const Sales_data &lhs, const Sales_data &rhs)
+{ 
+    return lhs.isbn < rhs.isbn;
+}
+multiset<Sales_data, decltype(compareIsbn)*> bookstore(compareIsbn);
+
+//也可用&compareIsbn, 因为当函数作为argument时候，会自动转换成指针
+
+multiset<Sales_data, decltype(compareIsbn)*> bookstore(&compareIsbn);
+```
+
+
+**(2). Pair Type**
+
+The default pair constructor **value initializes** the data members, ```anon``` is a pair of two empty string and, ```line``` holds an empty string and an empty vector
+
+```c++
+pair<string, string> anon; // holds two strings 
+
+pair<string, size_t> word_count; // holds a string and an size_t 
+
+pair<string, vector<int>> line; // holds string and vector<int>
+
+pair<string, string> author{"James", "Joyce"};
+
+```
+
+- <span style="background-color:#FFFF00">data members of pair are public</span>. member are named **first** and **second**
+- function 可以用list intiailize(braced initializers) return value for pair ```return pair<string, int>();```
+
+![](/img/post/C++/pair.png)
+
+#### (b). Associative Containers Operations
+
+
+| Syntax | Description | 
+| --- | :--- | 
+| ```key_type``` | Type of key for this container type |
+| ```mapped_type``` | Type associated with each key, **map types only** |
+| ```value_type``` | For ```sets```, same as the ```key_type```. <br/> For ```maps```, ```pair<const key_type, mapped_typed> |
+
+```c++
+set<string>::value_type v1; // v1 is a string 
+
+set<string>::key_type v2; // v2 is a string
+
+map<string, int>::value_type v3; // v3 is a pair<const string, int> 
+
+map<string, int>::key_type v4; // v4 is a string
+
+map<string, int>::mapped_type v5; // v5 is an int
+
+```
+
+- When we dereference an iterator, get a <span style="background-color:#FFFF00">**reference**</span> to a value of container's ```value_type```. 
+  - 对于```map```, ```value_type``` is a pair which ```first``` holds the <span style="background-color:#FFFF00">**const key**</span> and ```second``` holds the value. 可以改变value 值 但不能改变key的值
+- <span style="background-color:#FFFF00">Iterators for ```sets``` Are **const**</span>,虽然sets定义了```iterator``` 和 ```const_iterator``` 但都**read-only access**
+- map, multimap, set, or multiset, the iterators yield elements in ascending key order. 比如for loop 是按照升序来读(由小到大)
+- we do not use the generic algorithms (Chapter 10) with the associative containers. . The fact that the **keys are const** means that we cannot pass associative container iterators to algorithms that write to or reorder container elements.
+  - Associative containers can be used with the algorithms that read elements.However, many of these algorithms search the sequence. 因为elements in associative container 可以被快速找到根据他们的key, <span style="color:red">bad idea to use generic search algorithm</span>, associative containers define a member named ```find```, 用它比generic ```find``` algorithm 快的多(generic algorithm use sequential search)
+  - 如果把associative container with algorithms either source sequence or as a destination.可以使用```copy``` or ```inserter``` to bind an insert iterator (用```inserter```,可把associative container as a destination for another algorithm)
+- map 和 set, 只有key 不存在时候，才会真的插入，如果存在，对于set 无更改, map 会更改value
+- 对于<span style="color:red">multiset, multimap, ```insert``` 不需要return bool, 因为总是insert 成功</span>, 返回an iterators to the new element
+- <span style="color:red">set 不支持下表运算</span>, <span style="color:red"> 也不能对 multimap 和 unordered_multi_map 进行下表运算 </span>, 因为一个key 对应多个value
+  - ```c[k]``` 和 ```c.at[k]``` 区别是 ```at``` 有range check, 会throw ```out_of_range``` exception 
+  - <span style="background-color:#FFFF00">下表运算 和 ```at``` 只能用于**non const 的 map, unordered_map**</span>
+  - subscript a map, we get a ```mapped_type``` object; when we dereference a map iterator, we get a ```value_type``` object (有first, second)
+- multimap 和 multiset, multiple elements of a givne key, those elements 是相邻的
+
+```c++
+// get an iterator to an element in word_count
+
+auto map_it = word_count.begin();
+
+// *map_it is a reference to a pair<const string, size_t> object
+
+map_it->first = "new key"; // error: key is const 
+
+++map_it->second; // ok: we can change the value through an iterator
+
+```
+
+iterator for set is const, 不能修改
+
+```c++
+set<int> iset = {0,1,2,3,4,5,6,7,8,9}; 
+set<int>::iterator set_it = iset.begin(); 
+if (set_it != iset.end()) {
+    *set_it = 42; // error: keys in a set are read-only
+
+    cout << *set_it << endl; // ok: can read the key 
+    
+}
+```
+
+insert into map 
+```c++
+// four ways to add word to word_count 
+
+word_count.insert({word, 1});
+word_count.insert(make_pair(word, 1)); 
+word_count.insert(pair<string, size_t>(word, 1)); 
+word_count.insert(map<string, size_t>::value_type(word, 1));
+```
+
+**Insert**
+
+| Syntax | Description | 
+| --- | :--- | 
+| ```c.insert(v)``` <br/> ```c.emplace(args)``` | 对于map, set Returns a pair containing an iterator referring to the element with the given key and a bool 表示element 是否插入成功, false 表示之前就已经存在, 未插入; 对于multiset, multimap, 返回 iterator to the new element  |
+| ```c.insert(b,e)``` <br/> ```c.insert(il)``` | <span style="color:red">return void</span>. ```b,e``` is itertor, 对于map, set 如果key 不存在才会插入, multimap 和multiset inserts each element in the rage|
+| ```c.insert(p,v)``` <br/> ```c.emplace(p, args)``` | iterator p是一个插入位置的提示。<span style="color:red">returns an iterator to the element with the given key</span>. |
+
+e.g. insert 是上面的version 1, 返回的是```pair<iterator, bool>```
+```c++
+map<string, size_t> word_count; 
+string word;
+while (cin >> word) {
+    auto ret = word_count.insert({word, 1});
+    if (!ret.second) 
+        ++ret.first->second; 
+}
+```
+
+**Erase**
+
+
+| Syntax | Description | 
+| --- | :--- | 
+| ```c.erase(k)```  |  removes  每一个等于k的key, <span style="color:red">Returns a ```size_type``` 表示删除元素的数量 </span>  |
+| ```c.insert(p)```| iterator p是一个删除的位置, 不能是```c.end()```, <span style="color:red">return an iterator after ```p``` or ```c.end()```(if p is the last element) |
+| ```c.insert(b,e)```  | removes the range from ```[b,e)```, <span style="color:red">return ```e```</span>  |
+
+
+
+**Access**
+
+
+| Syntax | Description | 
+| --- | :--- | 
+| ```c.find(k)```  |  return an iterator 指向第一个key = k的 |
+| ```c.count(k)```  |  returns the number of elements with k, 对于containers with unique keys, result always is 0 or 1 |
+| ```c.lower_bound(k)```  |  returns an iterator 指向第一个不小于k的元素 |
+| ```c.upper_bound(k)```| returns an iterator 指向第一个大于k的元素 |
+| ```c.equal_range(k)```  | returns an pair of iterators denoting the elements with key ```k```. 如果```k``` 不存在，both members are ```c.end()``` |
+
+Access ```multimap```
+
+```c++
+string search_item("Alain de Botton");
+auto entries = authors.count(search_item); /
+auto iter = authors.find(search_item); 
+while(entries) {
+    cout << iter->second << endl; 
+    ++iter;
+    --entries; 
+}
+```
+
+可以用**lower_bound, upper_bound** 解决上面问题
+```c++
+for (auto beg = authors.lower_bound(search_item),
+            end = authors.upper_bound(search_item); beg != end; ++beg)
+cout << beg->second << endl; 
+```
+再用 **equal_range** 解决上面问题, equal_range 返回 等于查找元素的 range ```[beg,end)```  
+```
+for (auto pos = authors.equal_range(search_item);
+pos.first != pos.second; ++pos.first)
+    cout << pos.first->second << endl; 
+```
+
+#### (c). Unordered Containers
+
+- Rather than comparison operation to organize elements, <span style="background-color:#FFFF00">these containers use a ```hash``` function and the key type's ```==``` operator</span>. 
+- unordered container 的输出与 order container的输出会有不同
+
+**Manage the Buckets**
+- The unordered containers are organized as a <span style="background-color:#FFFF00">**collection of buckets**</span>, each of which holds zero or more elements. 
+- use hash function to map elements to bucekts. The container puts all of its <span style="color:red">elements with a given hash value into the same bucket</span>.
+- To access an element, container first computes the element's **hash code**, which tells which bucket to search.
+
+- The hash function must always yield the same result when called with the same argument. Ideally, the hash function also maps each particular value to a unique bucket. However, a hash function is allowed to map elements with differing keys to the same bucket
+  - When a bucket holds several elements, those elements are <span style="color:red">**searched sequentially to find**</span> the one we want.
+  -  However, if the **bucket has many elements**, **many comparisons may be needed** to find a particular element.
+- 如果container 允许重复elements with a given key (multi_unordered_map, multi_unordered_set), all the elements with the same key will be in the same bucket.
+- The performance of an unordered container depends on the quality of its hash function and on the number and size of its buckets.
+
+
+![](/img/post/C++/unordered_map.png)
+
+**Requirements on Key Type for Unordered Containers**
+
+- use an object of type ```hash<key_type>``` to generate the hash code for each element. 
+- library 定义一些```hash``` template for <span style="background-color:#FFFF00">**built-in types, including pointers**</span>. 同样也定义了hash for some library types including <span style="background-color:#FFFF00">**strings** and the **smart pointer types**</span>.  we can directly define unordered containers whose key is one of the built-in types (including pointer types), or a string, or a smart pointer.
+- 我们不能直接定义unordered container that uses our own class types as key type. Must supply our own version of ```hash``` template. 
+
+To use Sales_data as the key, we’ll need to supply functions to replace both the <span style="color:red">```==``` operator</span> and to <span style="color:red">calculate a hash code</span>. 如果我们<span style="color:red">class 内有 ```==``` operator</span>  we can <span style="color:red">override just the hash function</span>
+```c++
+size_t hasher(const Sales_data &sd) { 
+    return hash<string>()(sd.isbn());
+}
+bool eqOp(const Sales_data &lhs, const Sales_data &rhs)
+{
+return lhs.isbn() == rhs.isbn();
+}
+
+using SD_multiset = unordered_multiset<Sales_data, decltype(hasher)*, decltype(eqOp)*>;
+// arguments are the bucket size, pointers to the hash function, and equality operator
+
+SD_multiset bookstore(42, hasher, eqOp);//42 is bucket size 
+
+
+// 方法二: use FooHash to generate the hash code; Foo must have an == operator 
+
+unordered_set<Foo, decltype(FooHash)*> fooSet(10, FooHash);
+```
+
+
+
+
 
 
 
