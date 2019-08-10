@@ -5426,7 +5426,7 @@ pos.first != pos.second; ++pos.first)
 - ```rehash``` takes an existing map and rebuilds a new size of buckets, rehashing in the process and redistributing elements into the new buckets.
   - If <span style="color:red">n >= current buckets</span> into the container then rehashed is done. The new bucket count can be greater than or equal to n.
   - If <span style="color:red">n < current buckets</span> then there may or may not be any effect of function. <span style="color:red">It totally depends upon compiler</span>
-- ```reserve``` guarantees you that if you don't insert more than the reserved number of elements, there will be no rehashing (i.e. your iterators will remain valid).
+- ```reserve``` guarantees you that if you don't insert more than the reserved number of elements, there will be no rehashing (i.e. your iterators will remain valid). Effectively calls ```rehash(std::ceil(count / max_load_factor()))```. ```reserve``` 最好在插入元素前call
 
 比如有code, 下面是okay的
 ```c++
