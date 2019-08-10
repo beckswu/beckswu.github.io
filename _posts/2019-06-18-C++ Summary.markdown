@@ -4486,6 +4486,28 @@ auto last_pos = river.rfind("is"); // returns 4
     - ```intStack.push(ix);``` calls ```push_back``` on the ```deque``` on which ```intStack``` is based,尽管```stack```是基于```deque```实现的, 但我们不能使用```deque```操作, 不能call ```push_back```, 只能call ```push```
 
 
+<br/><br/><br/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## (10). Generic Algorithms
 
@@ -5025,6 +5047,168 @@ while (item_iter != eof) {
 out_iter = sum; //打印最后一组记录的和
 
 ```
+
+
+**(3). Reverse Iterators**
+
+- A **reverse iterator** is an iterator that traverses a container backward, from the last element toward the first.
+- ```++it```: move the iterator to the previous element, ```--it``` moves the iterator to the next element.
+- 除了```forward_list``` 所有container 都支持 reverse iterators
+- obtain a **reverse iterator** by ```rbegin```, ```rend```, ```crbegin```, and ```crend```: to last element and one "past" the beginning of the container
+- 下面例子只中```[line.crbegin(), rcomma）``` 和 ```[rcomma.base(), line.cend())``` 指向相同的元素范围, 所以```rcomma``` 和 ```rcomma.base()``` 必须生成相邻而不是相同的位置. ```crbegin()``` 和 ```cend()```也是如此
+    - When we initialize or assign a reverse iterator from a plain iterator, the resulting iterator does not refer to the same element as the original.
+
+找到从结尾到最后一个逗号之间的词, 但注意reverse_iterator会反向打印```line```的内容, 需要用```base``` 完成这一个转换
+```c++
+auto comma = find(line.cbegin(), line.cend(), ','); 
+cout << string(line.cbegin(), comma) << endl;
+
+auto rcomma = find(line.crbegin(), line.crend(), ',');
+// WRONG: will generate the word in reverse order
+
+cout << string(line.crbegin(), rcomma) << endl;
+
+FIRST,MIDDLE,LAST
+then this statement would print TSAL!
+
+// ok: get a forward iterator and read to the end of line
+
+cout << string(rcomma.base(), line.cend()) << endl;
+```
+
+可以看到```base``` 和不加base指向不同元素
+
+![](/img/post/C++/iterator.PNG)
+
+
+#### (e). Structure of Generic Algorithms
+
+Iterator Categories, 有五种: Each algorithm specifies what kind of iterator must be supplied 作为 its iterator parameters.
+1. **Input iterator**: Read, but not write; single pass, increment only
+2. **Output iterator**: Write, but not read; single pass, increment only
+3. **Forward iterator**: Read and write, multi-pass, increment only
+4. **Birectional iteator**: Read and write, multi-pass, increment and decrement
+5. **Random-access iteator**: Read and write, multi-pass, full iterator arithmetic
+
+- The standard specifies the minimum category for each iterator parameter of the generic and numeric algorithms: 算法需要iterator 的最小类别
+  - 比如```find``` 需要one pass, read-only traversal sequence, 最小需要 input iterator. 比如```replace_copy``` 前两个iterator最小是Forward iterator, 第三iterator至少是output iterator
+  - 如果传递iterator of a lesser power is an error
+  - Many compilers will not complain when we pass the wrong category of iterator to an algorithm.
+  
+**Input iterator** 必须支持
+- 用于比较相等或者不等的运算符 ```==```, ```!=``` 
+- Prefix and postfix increment (```++```)
+- Dereference operator ```*```` to read element, dereference may appear only on the right-hand side of an assignment
+- arrow operator ```->```, same as ```(*it).member``` dereference the iterator and fetch member from underlying object
+
+**Input iterator**  用于顺序访问(sequentially).  ```*it++``` is 保证 valid, 但是递增它可能导致所有其他指向流的iterator 失效, 因此no guarantee that we  can save the state of input iterator and examine an element through that saved iterator. 只能用于single-pass algorithm, 例如```find```, ```accumulate```, ```istream_iterator``` are input iterators.
+
+**Input iterator** 可以想成**Input iterator**的补集. Output iterator must provide 
+- Prefix and postfix increment ```++```
+- Dereference ```*``` 只能作为left-hand side of an assignment (Assigning to a dereferenced output iterator 就是 writes to the underlying element.)
+ 
+copy 函数第三个iterator 就是output iterator, ostream iterator 也是 output iterator 
+
+**Forward iterator**: 
+- can read and write a given sequence
+- move in only <span style="color:red">**one direction**</span> through the sequence.
+- support all the operations of both input iterators and output iterators
+- they can read or write the same element multiple times
+  - 可以save state of a forward iterator 
+- 因为algorithm use forward iterator may <span style="color:red"> make multiple passes through the sequence</span>.
+- ```replace``` 要求 forward iterator, ```forward_list``` 也要求 forward iterator
+
+
+**Bidirectional iterators**: 
+- can read and write a sequence forward or backward
+- supporting all the operations of a forward iterator
+- support prefix and postfix decrement (```--```) operators
+- ```reverse``` 要求 bidirectional iterators
+- 除了```forward_list``` 标准库的container 都满足 bidirectional iterator
+
+
+**Random-access iterators**: 
+- provide <span style="background-color:#FFFF00">**constant-time access**</span> to any position in the sequence.
+- support all the functionality of bidirectional iterators. 除此以外还支持
+  - The relational operators (<, <=, >, and >=) to compare the relative positions of two iterators.
+  - Addition and subtraction operators (+, +=, -, and -=) on an iterator and an integral value.
+  - The subtraction operator (-) when applied to two iterators, which yields the distance between two iterators.
+  - The subscript operator (```iter[n]```) as a synonym for ```* (iter + n)```.
+- ```sort``` 要求Random-access iterators, array, deque, string, vector, pointer when used to access elements of a built-in array are all random-access iteartor, 
+
+
+**Algorithm Parameter Patterns**
+
+- ```alg(beg, end, other args);```
+- ```alg(beg, end, dest, other args);```
+  - ```dest``` is an iteartor that denotes a destination algorithm writes output. <span style="color:red">假定safe to write as many elements as needed.  assume the destination is large enough to hold the output.</span>
+  - 如果```dest``` 是 iterator that refers directly to container, then algorithm 直接输出到容器exisiting elements. 更常见的是 ```dest``` is bound to an insert iterator or an ```ostream_iterator ```. Insert iterator 是add new elements to container 确保enough space. An ```ostream_iterator``` writes to an output stream, 也是不管写多少个元素都没有问题
+- ``` alg(beg, end, beg2, other args);```
+  - 将```beg2```作为第二个输入范围的首元素, 此范围结束位置未指定. 算法假定从beg2 开始范围 与 ```beg``` 和```end```所表示范围至少一样大
+- ``` alg(beg, end, beg2, end2, other args);```
+
+
+**Some Algorithms Use Overloading to Pass a Predicate**: 比如
+
+```c++
+unique(beg, end); // uses the == operator to compare the elements
+
+unique(beg, end, comp); // uses comp to compare the elements
+
+```
+
+
+**Algorithms with _if Versions**: Algorithms that take an element value typically have a second named (not overloaded) version that takes a predicate  in place of the value. The algorithms that take a predicate have the suffix ```_if``` appended: 例子the ```find_if``` algorithm looks for a value for which pred returns a nonzero value.
+```c++
+find(beg, end, val); // find the first instance of val in the input range 
+
+find_if(beg, end, pred); // find the first instance for which pred is true
+
+```
+**Distinguishing Versions That Copy from Those That Do Not**: algorithms that rearrange elements write the rearranged elements back into the given input range. These algorithms provide a second version that writes to a specified output destination. 同时也有一些算法同时提供_copy 和_if 版本
+
+```c++
+reverse(beg, end); // reverse the elements in the input range 
+
+reverse_copy(beg, end, dest);// copy elements in reverse order into dest
+
+
+// removes the odd elements from v1 ]
+
+remove_if(v1.begin(), v1.end(),
+    [](int i) { return i % 2; }); 
+
+// copies only the even elements from v1 into v2; v1 is unchanged
+
+remove_copy_if(v1.begin(), v1.end(), back_inserter(v2), [](int i) { return i % 2; });
+```
+
+#### (f). Container-Specific Algorithms
+
+- ```list``` 和 ```forward_list``` 定义了他们独有的```sort```, ```merge```, ```remove```, ```reverse```, and ```unique```, <span style="color:red">因为generic version of ```sort``` requires random-access iterators, 因此```sort``` 不能用于 ```list``` 和 ```forward_list``` 因为他们offer bidirectional 和 forward iterators</span>. 
+- Generic version 其他的algorithm可以用于```list```，但是performance cost 代价太高, 比如A list can “swap” 快速交换元素 its elements by changing the links among its elements rather than swapping the values of those elements. 
+- 对于list 和 forward list 优先考虑成员函数版本算法 而不是通用算法
+- list 和 forward list  还定义了 ```splice```算法，
+- important difference between the list-specific and the generic versions is that the <span style="background-color:#FFFF00">list versions change the underlying container</span>.
+- ```merge``` and ```splice``` are destructive on their arguments(会销毁参数).例如generic merge将merged sequence to a given destination iterator; the two input sequences are unchanged. 而```list``` 的```merge```destroys (removed) the given list—elements from the argument list as they are merged into the object on which merge was called. After a merge, the elements from both lists continue to exist, but they are all elements of the same list.
+
+![](/img/post/C++/list_forward_list_algo.png)
+
+都是从```lst2```移动到```lst1```
+![](/img/post/C++/splice.png)
+
+
+
+
+#### (11). Associative Containers
+
+
+
+
+
+
+
+
 
 
 
