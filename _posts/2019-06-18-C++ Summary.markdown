@@ -5469,6 +5469,73 @@ SD_multiset bookstore(42, hasher, eqOp);//42 is bucket size
 
 unordered_set<Foo, decltype(FooHash)*> fooSet(10, FooHash);
 ```
+<br/><br/><br/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## (12). Dynamic Memory
+
+- Local, **automatic objects** are created and destroyed when the block in which they are defined is entered and exited
+- Local **static objects** are allocated before their first use and are destroyed when the program ends
+- **Dynamically allocated objects** have a lifetime that is <span style="color:red">**independent** of where they are created</span>; they exist until they are explicitly freed.只有显示的释放, 才能被销毁
+
+---
+
+Our programs have used only static or stack memory.
+- Objects allocated in **static** or **stack memory** are <span style="background-color:#FFFF00">automatically created and destroyed by the compiler</span>. 
+  - **Static memory** is used for <span style="color:red">local static objects(局部静态变量, 见6.1, 程序执行路径第一次经过时define exist until 程序结束)</span>, for <span style="color:red">class static data members</span>, and for <span style="color:red">variables defined outside any function</span>
+    - **static objects** are allocated before they are used, and they are destroyed when the program ends.
+  - **Stack memory** is used for <span style="color:red">**nonstatic objects** defined inside functions</span>.
+    - **Stack objects** exist only while the block in which they are defined is <span style="color:red">executing</span>;
+- In addition to static or stack memory,This memory is referred to as the **free store** or **heap**. 
+  - Programs use the **heap** for objects that they **dynamically allocate**—that is, for objects that the program <span style="color:red">allocates at **run time**</span>
+  - The program <span style="background-color:#FFFF00">controls the lifetime of dynamic objects</span>; <span style="color:red">our code must explicitly destroy such objects</span> when they are no longer needed.
+
+
+Dynamic Memory and Smart Pointers: 
+
+- ```new``` : <span style="color:red">**allocates**</span>, and <span style="color:red">**optionally initializes**</span>, an object in dynamic memory and <span style="color:red">**returns a pointer**</span> to that object;
+- ```delete```: takes a pointer to a dynamic object, <span style="color:red">**destroys that object**</span>, and <span style="color:red">**frees the associated memory**</span>.
+- Dynamic memory is **problematic** because it is surprisingly hard to ensure that we free memory at the right time. 有时忘记释放内存，会造成**memory leak**, 或者尚有指针引用存储的情况下就释放了它, 造成pointer is invalid.
+- To make using dynamic memory easier (and safer), new library定义了two smart pointer, A smart pointer acts like a regular pointer with the important exception that it <span style="color:red">**automatically deletes** the object to which it points</span>. 
+
+**(a). shared_ptr**
+- A default initialized smart pointer holds a null pointer；```shared_ptr<string> p1; ```
+
+
+| Syntax | Description | 
+| --- | :--- | 
+| ```c.find(k)```  |  return an iterator 指向第一个key = k的 |
+| ```c.count(k)```  |  returns the number of elements with k, 对于containers with unique keys, result always is 0 or 1 |
+| ```c.lower_bound(k)```  |  returns an iterator 指向第一个不小于k的元素 |
+| ```c.upper_bound(k)```| returns an iterator 指向第一个大于k的元素 |
+| ```c.equal_range(k)```  | returns an pair of iterators denoting the elements with key ```k```. 如果```k``` 不存在，both members are ```c.end()``` |
+
+
 
 
 
