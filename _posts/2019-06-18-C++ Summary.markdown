@@ -5469,6 +5469,8 @@ SD_multiset bookstore(42, hasher, eqOp);//42 is bucket size
 
 unordered_set<Foo, decltype(FooHash)*> fooSet(10, FooHash);
 ```
+***
+
 <br/><br/><br/>
 
 
@@ -5503,7 +5505,6 @@ unordered_set<Foo, decltype(FooHash)*> fooSet(10, FooHash);
 - Local **static objects** are allocated before their first use and are destroyed when the program ends
 - **Dynamically allocated objects** have a lifetime that is <span style="color:red">**independent** of where they are created</span>; they exist until they are explicitly freed.只有显示的释放, 才能被销毁
 
----
 
 Our programs have used only static or stack memory.
 - Objects allocated in **static** or **stack memory** are <span style="background-color:#FFFF00">automatically created and destroyed by the compiler</span>. 
@@ -5526,14 +5527,30 @@ Dynamic Memory and Smart Pointers:
 **(a). shared_ptr**
 - A default initialized smart pointer holds a null pointer；```shared_ptr<string> p1; ```
 
+```shared_ptr``` 和 ```unique_ptr``` 都支持的操作
 
 | Syntax | Description | 
 | --- | :--- | 
-| ```c.find(k)```  |  return an iterator 指向第一个key = k的 |
-| ```c.count(k)```  |  returns the number of elements with k, 对于containers with unique keys, result always is 0 or 1 |
-| ```c.lower_bound(k)```  |  returns an iterator 指向第一个不小于k的元素 |
-| ```c.upper_bound(k)```| returns an iterator 指向第一个大于k的元素 |
-| ```c.equal_range(k)```  | returns an pair of iterators denoting the elements with key ```k```. 如果```k``` 不存在，both members are ```c.end()``` |
+| ```shared_ptr<T> sp```<br/>  ```shared_ptr<T> up```  |  Null smart pointer that can point to objects of type T |
+| ```p```  |  将p用作一个条件判断, 若p 指向一个对象, 则为true |
+| ```*p```  |  Dereference p to get the object to which p points |
+| ```p->mem```| same as ```(*p).mem``` |
+| ```p.get()```  | 返回p中保存的指针, 要小心使用，如果指针指针释放了其对象， 返回指针所指向的对象就消失了 |
+| ```swap(p,q)```  <br/> ```p.swap(q)``` | 交换p和q的指针 | 
+
+
+```shared_ptr``` 独有的操作
+
+| Syntax | Description | 
+| --- | :--- | 
+| ```make_shared<T>(args)```  |  返回一个```shared_ptr```, pointing to a <span style="color:red">**dynamically allocated object**</span> of type ```T```. Use args to initialize that object |
+| ```shared_ptr<T>p(q)```  |  p is a copy of ```shared_ptr q```, <span style="color:red">*递增q中的计数器</span>, The pointer in q must be convertible to ```T*``` |
+| ```p = q```  |  p 和 q 都是 ```shared_ptr```, 所保存的指针必须能相互转换，<span style="color:red">**Decrement p's reference count and increment q's count**; **delets** p's **existing memory** if p's **count goes to 0**</span> |
+| ```p->unique```| 若```p.use_count```为1，返回true, 否则返回false |
+| ```p.use_count```  |  返回与p 共享对象的智能指针数量, 可能很慢, <span style="color:red">intended primarily for debugging purposes</span> |
+
+
+
 
 
 
