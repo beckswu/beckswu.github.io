@@ -44,6 +44,7 @@ public:
 
 陷阱: 1. constexpr, type Aliases under  [2. Variable and Basic Types](# 2. Variable and Basic Types) 2. Array: Pointer Arithmetic: 可以负数  [3. Strings, Vectors, and Arrays](# 3. Strings, Vectors, and Arrays). 4. Function only with top level and return difference error. 5. Function name lookup before type checking [6. Functions. d](#(6). Functions) 6.Function Names resolve and calculate [6. Functions. d](#(6). Functions) 7. function pointer parameter 和return type的转换[6. Functions. d](#(6). Functions) 8. ```*this``` is reference to object (not const reference) 7. const class object 不能call non const member function  8.const function 对于 const function is better match (因为不用转化lower const) 9.const function 只能返回 const reference （buneng ）10. constructor initializer list order 不会影响他们实际初始化的顺序. 11 static member可以用于default parameter
 
+***
 
 ## 2. Variable and Basic Types
 
@@ -657,6 +658,7 @@ decltype((i)) d; //error: d is int& and must be initialized
 decltype(i) e;//ok: e is an int (uninitialized)
 
 ```
+***
 
 <br/> <br/> <br/>
 
@@ -1261,6 +1263,7 @@ for(int_array * p = ia; p!= ia + 3; ++p)
     for(int * q = *p; q!=*p + 4; ++q)
         oout << *q <<endl;
 ```
+***
 
 <br/>  <br/>  <br/>
 
@@ -1698,6 +1701,8 @@ char *pc = (char*) ip; // ip是指向整数的指针
 //效果与使用reinterpret_cast一样
 
 ```
+***
+
 <br/> <br/> <br/>
 
 ## 5. Statements
@@ -1901,7 +1906,7 @@ try{
 - 只能用default initialization ```exception```,  ```bad_alloc```, ```bad_cast```  不允许提供initializer for these exception types
 
 
-
+***
 <br/> <br/>  <br/>
 
 ## 6. Functions
@@ -2755,7 +2760,7 @@ string::size_type largerLength(const string&, const string&);
 
 decltype(sumLength) *getFcn(const string &);
 ```
-
+***
 <br/> <br/>  <br/>
 
 
@@ -3690,7 +3695,7 @@ private:
    static const char bkground;
 };
 ```
-
+***
 <br/><br/><br/>
 
 ## 8. IO Library
@@ -3975,7 +3980,7 @@ for (const auto &entry : people) {
             << " invalid number(s) " << badNums.str() << endl; 
 }
 ```
-
+***
 <br/> <br/> <br/>
 
 
@@ -4009,7 +4014,7 @@ for (const auto &entry : people) {
 
 
 
-## (9). Sequential Containers
+## 9. Sequential Containers
 
 
 sequential containers 为user 提供 control the order in which the elements are stored and accessed. Order 取决于元素加入容器(container)时的位置. By contrast, the ordered and unordered associative containers store theire elements based on the value of a key
@@ -4499,7 +4504,7 @@ auto last_pos = river.rfind("is"); // returns 4
 - 每一个container adpator defines 自己的操作类型 in terms of 底层容器的操作类型. 只能使用adaptor自己的操作类型,不能用underlying container type的操作类型. 
     - ```intStack.push(ix);``` calls ```push_back``` on the ```deque``` on which ```intStack``` is based,尽管```stack```是基于```deque```实现的, 但我们不能使用```deque```操作, 不能call ```push_back```, 只能call ```push```
 
-
+***
 <br/><br/><br/>
 
 
@@ -4523,7 +4528,7 @@ auto last_pos = river.rfind("is"); // returns 4
 
 
 
-## (10). Generic Algorithms
+## 10. Generic Algorithms
 
 
 #### (a). Overview
@@ -5211,10 +5216,10 @@ remove_copy_if(v1.begin(), v1.end(), back_inserter(v2), [](int i) { return i % 2
 都是从```lst2```移动到```lst1```
 ![](/img/post/C++/splice.png)
 
-
+***
 <br/><br/><br/>
 
-## (11). Associative Containers
+## 11. Associative Containers
 
 #### (a). Overview
 
@@ -5499,7 +5504,7 @@ unordered_set<Foo, decltype(FooHash)*> fooSet(10, FooHash);
 
 
 
-## (12). Dynamic Memory
+## 12. Dynamic Memory
 
 - Local, **automatic objects** are created and destroyed when the block in which they are defined is entered and exited
 - Local **static objects** are allocated before their first use and are destroyed when the program ends
@@ -5571,7 +5576,7 @@ Dynamic Memory and Smart Pointers:
 
 
 
-
+***
 <br/> <br/> <br/>
 
 ## Include Guard
