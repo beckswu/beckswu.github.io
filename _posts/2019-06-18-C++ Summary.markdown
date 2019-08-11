@@ -42,7 +42,7 @@ public:
 ```
 
 
-陷阱: 1. constexpr, type Aliases under  [2. Variable and Basic Types](# 2. Variable and Basic Types) 2. Array: Pointer Arithmetic: 可以负数  [3. Strings, Vectors, and Arrays](# 3. Strings, Vectors, and Arrays). 4. Function only with top level and return difference error. 5. Function name lookup before type checking [6. Functions. d](#(6). Functions) 6.Function Names resolve and calculate [6. Functions. d](#(6). Functions) 7. function pointer parameter 和return type的转换[6. Functions. d](#(6). Functions) 8. ```*this``` is reference to object (not const reference) 7. const class object 不能call non const member function  8.const function 对于 const function is better match (因为不用转化lower const) 9.const function 只能返回 const reference （buneng ）10. constructor initializer list order 不会影响他们实际初始化的顺序. 11 static member可以用于default parameter
+陷阱: 1. constexpr, type Aliases under  [2. Variable and Basic Types](# 2. Variable and Basic Types) 2. Array: Pointer Arithmetic: 可以负数  [3. Strings, Vectors, and Arrays](# 3. Strings, Vectors, and Arrays). 4. Function only with top level and return difference error. 5. Function name lookup before type checking [6. Functions. d](#(6). Functions) 6.Function Names resolve and calculate [6. Functions. d](#(6). Functions) 7. function pointer parameter 和return type的转换[6. Functions. d](#(6). Functions) 8. ```*this``` is reference to object (not const reference) 7. const class object 不能call non const member function  8.const function 对于 const function is better match (因为不用转化lower const) 9.const function 只能返回 const reference （buneng） 10. const function 内不能call不是const的function. nonconst function 可以call const function.  11. constructor initializer list order 不会影响他们实际初始化的顺序. 11 static member可以用于default parameter
 
 ***
 
@@ -5524,8 +5524,9 @@ Our programs have used only static or stack memory.
 
 Dynamic Memory and Smart Pointers: 
 
-- ```new``` : <span style="color:red">**allocates**</span>, and <span style="color:red">**optionally initializes**</span>, an object in dynamic memory and <span style="color:red">**returns a pointer**</span> to that object;
-- ```delete```: takes a pointer to a dynamic object, <span style="color:red">**destroys that object**</span>, and <span style="color:red">**frees the associated memory**</span>.
+- ```new``` 和 ```delete``` error-prone, cannot rely on the default definitions for the members that copy, assign, and destroy class objects
+  - ```new``` : <span style="color:red">**allocates**</span>, and <span style="color:red">**optionally initializes**</span>, an object in dynamic memory and <span style="color:red">**returns a pointer**</span> to that object;
+  - ```delete```: takes a pointer to a dynamic object, <span style="color:red">**destroys that object**</span>, and <span style="color:red">**frees the associated memory**</span>.
 - Dynamic memory is **problematic** because it is surprisingly hard to ensure that we free memory at the right time. 有时忘记释放内存，会造成**memory leak**, 或者尚有指针引用存储的情况下就释放了它, 造成pointer is invalid.
 - To make using dynamic memory easier (and safer), new library定义了two smart pointer, A smart pointer acts like a regular pointer with the important exception that it <span style="color:red">**automatically deletes** the object to which it points</span>. 
 
@@ -5553,6 +5554,237 @@ Dynamic Memory and Smart Pointers:
 | ```p = q```  |  p 和 q 都是 ```shared_ptr```, 所保存的指针必须能相互转换，<span style="color:red">**Decrement p's reference count and increment q's count**; **delets** p's **existing memory** if p's **count goes to 0**</span> |
 | ```p->unique```| 若```p.use_count```为1，返回true, 否则返回false |
 | ```p.use_count```  |  返回与p 共享对象的智能指针数量, 可能很慢, <span style="color:red">intended primarily for debugging purposes</span> |
+
+
+**(1). make_shared**
+
+- The <span style="background-color:#FFFF00">**safest way** to **allocate** and **use dynamic memory**</span> is to call a library function named ```make_shared```.
+- This function <span style="color:red">**allocates** and **initializes** an object in dynamic memory</span> and <span style="color:red">returns a shared_ptr</span> that points to that object
+- defined in ```memory``` header 
+- 类似于```emplace```, 可以用its argument to constructur an object of the given type.
+- 可以用```auto``` 来存储 ```make_shared``` 的 ```shared_ptr```
+
+```c++
+// shared_ptr that points to an int with value 42
+
+shared_ptr<int> p3 = make_shared<int>(42);
+
+// p4 points to a string with value 9999999999 
+
+shared_ptr<string> p4 = make_shared<string>(10, '9');
+
+// p6 points to a dynamically allocated, empty vector<string> 
+
+auto p6 = make_shared<vector<string>>();
+```
+
+**Copying and Assigning shared_ptrs**
+
+- <span style="color:red">copy or assign a shared_ptr</span>, each shared_ptr <span style="color:red">keeps track of how many other shared_ptrs (**reference count**) point to the **same object**</span>:
+    - 当use shared_ptr to initialize another ```shared_ptr```, 或者 pass it to or return it from a function **by value**, reference count 都会增加
+    - 当assign a new value to ```shared_ptr``` 或者```shared_ptr``` 被destoryed, 或者goes out of scope 时候, counter 会decrement. 
+- **shared_ptr’s counter goes to zero**, the shared_ptr <span style="color:red">**automatically frees**</span> the object that it manages
+
+```c++
+auto p = make_shared<int>(42); // object to which p points has one user 
+
+auto q(p); // p and q point to the same object
+
+// object to which p and q point has two users
+
+```
+
+```c++
+auto r = make_shared<int>(42); // int to which r points has one user 
+
+r = q; // assign to r, making it point to a different address
+
+    // increase the use count for the object to which q points 
+
+    // reduce the use count of the object to which r had pointed
+
+    // the object r had pointed to has no users; that object is automatically freed
+
+```
+
+**(3).shared_ptrs Automatically Destroy Their Objects**
+
+- When the **last** shared_ptr pointing to an object is **destroyed**, shared_ptr 会自动销毁此对象。It does so through **destructor**. 
+    - 比如string 的constructuor 会分配空间来保存character that compose string. destructor 会free memory.  同样的, vector allocate memory to hold elements in vector, desctructor destory elements and free memory used for the elements. 
+- The **destructor** for shared_ptr **decrements the reference count** of the object to which that shared_ptr points. If the count 变成0, the shared_ptr <span style="color:red">destructor 销毁 shared_ptr指的对象 and frees the memory used by that object</span>.
+- 如果把```shared_ptr``` 放进一个容器中, 如果不需要使用, call ```erase``` 删除不再需要的那些元素. 
+
+下面例子中当```p``` 销毁时，递减其引用计数并检查是否为0，因为p是唯一引用factory 返回内存的对象。由于p将要销毁，p指向的这个对象也被销毁， 所占用的内存会被释放.
+```c++
+shared_ptr<Foo> factory(T arg)
+{
+    return make_shared<Foo>(arg);
+}
+
+void use_factory(T arg)
+{
+    shared_ptr<Foo> p = factory(arg);
+} // p goes out of scope; the memory to which p points is automatically freed
+
+```
+
+对于下面例子，returns a copy of p to its caller. <span style="background-color:#FFFF00">Copying a shared_ptr adds to the reference count of that object</span>. Now when p is destroyed, there will be another user for the memory to which p points. Memory itself will not be freed.
+```c++
+shared_ptr<Foo>  use_factory(T arg)
+{
+    shared_ptr<Foo> p = factory(arg);
+    return p;
+} 
+```
+
+**(4). Classes with Resources That Have Dynamic Lifetime**
+
+Programs tend to use dynamic memory for one of three purposes: 
+1. They don’t know how many objects they’ll need 不知道自己需要使用多少对象
+2. They don’t know the precise type of the objects they need, 不知道所需对象准确类型
+3. They want to share data between several objects  需要在多个对象空间共享操作
+
+e.g. 使用shared_ptr, 比如```vector```,allocated resources that exist 与对象生存期一致, 但我们想定义对象 allocated resources 与对象生存期是独立的
+
+```c++
+vector<string> v1; 
+{ 
+    vector<string> v2 = {"a", "an", "the"};
+    v1 = v2; // copies the elements from v2 into v1 
+
+} // v2 is destroyed, 但是v1 仍有三个元素,
+
+
+Blob<string> b1;
+{
+    Blob<string> b2 = {"a", "an", "the"};
+    b1 = b2;
+}// 想让b2 被销毁时，但是b2中的元素不能销毁
+
+//b1 指向最初由b2创建的元素
+
+```
+
+因为template 在后面用到, 先用string类
+```c++
+class StrBlob{
+public: 
+    typedef vector<string>::size_type size_type;
+    StrBlob();
+    StrBlob(initializer_list<string>il);
+    
+    size_type size() const {return data->size;}
+    bool empty() const {return data->empty();}
+    void push_back(const string & t) {data->push_back(t);}
+    void pop_back();
+    string& front();
+    string& back();
+
+private: 
+    shared_ptr<<vector<string>> data; 
+//没有 copy constructor, data 也能被定义, 因为compiler generate copy constructor
+    
+    void check(size_type i, const string & msg) const; 
+};
+
+StrBlob::StrBlob(): data(make_shared<vector<string>>()) {} 
+
+StrBlob::StrBlob(initializer_list<string>il): data(make_shared<vector<string>>(il)) {} 
+
+void StrBlob::check(size_type i, const string & msg) const {
+    if (i>= data->size())
+        throw out_of_range(msg);
+}; 
+```
+
+
+#### (b). Managing Memory Directly
+
+- Objects <span style="background-color:#FFFF00">allocated on the **free store** are unnamed</span>, Instead, new returns a pointer to the object it allocates:
+- By default, dynamically allocated objects are **default initialized**: <span style="color:red"> built-in or compound type objects have undefined value; objects of class type are initialized by their default constructor</span>
+- 可以nitialize a dynamically allocated object using 直接初始化. 可以用**parentheses 的constructor** or 使用**list initialization(curly braces)**, 也可以用**value initialization**, 只需要在类型别名后跟一个空括号
+    - 对于**class type** that define their own constructor, value initialization 是没有意义的. 因为不管用什么形式, 都用default constructor 来初始化
+    - 对于**built-in** type, 有difference, a <span style="color:red">**value-initialized object** of built-in type has a **well-defined value**</span> but a <span style="color:red">**default-initialized object does not** default-initialized 是未定义的</span>
+
+
+```c++
+int *pi = new int; // pi points to a dynamically allocated, unnamed, uninitialized int
+
+string *ps = new string; // initialized to empty string
+
+int *pi = new int; // pi points to an uninitialized int 未初始化
+
+```
+初始化
+
+```c++
+int *pi = new int(1024); // object to which pi points has value 1024 
+
+string *ps = new string(10, '9'); // *ps is "9999999999"
+
+// vector with ten elements with values from 0 to 9
+
+vector<int> *pv = new vector<int>{0,1,2,3,4,5,6,7,8,9};
+```
+
+value initialization
+```c++
+string *ps1 = new string; // default initialized to the empty string 
+
+string *ps = new string(); // value initialized to the empty string 
+
+int *pi1 = new int; // default initialized; *pi1 is undefined 
+
+int *pi2 = new int(); // value initialized to 0; *pi2 is 0
+
+```
+
+pointer of class type initialization When we provide **an initializer inside parentheses**, we can use ```auto``` to <span style="color:red">deduce the type</span> of the object we want to allocate from that initializer(第一个例子). 如果 obj 是int, 那么 p1 是 ```int*```, 如果 obj string, 那么 p1 是 ```string*```
+```
+auto p1 = new auto(obj); // p points to an object of the type of obj // that object is initialized from obj
+
+auto p2 = new auto{a,b,c}; // error: must use parentheses for the initializer, 只能用括号包含单个初始器
+
+
+```
+
+**Dynamically Allocated const Objects**
+- It is <span style="background-color:#FFFF00">legal to use new to allocate const objects</span>:
+- <span style="background-color:#FFFF00">A dynamically allocated const object must be **initialized**</span>
+-  A <span style="color:red">**const dynamic object** of a **class type**</span> that defines a default constructor  may be <span style="color:red">**initialized implicitly**</span>. Objects of other types must be explicitly initialized. <span style="background-color:#FFFF00">const 动态对象可以隐式初始化, 其他类型对象必须显示初始化</span> 
+- Because the allocated object is ```const```, <span style="color:red">the pointer returned by ```new``` is a pointer to ```const```</span
+
+
+```c++
+// allocate and initialize a const int
+
+const int *pci = new const int(1024); 
+
+// allocate a default-initialized const empty string const 
+
+string *pcs = new const string;
+```
+
+**Memory Exhaustion**
+
+- Although modern machines tend to have huge memory capacity, 按时也有可能自由空间(free store)被耗尽(exhausted). Once a program has <span style="background-color:#FFFF00">**used all of its available memory**, **new expressions will fail**</span>.
+- if new is **unable to allocate** the requested storage, it <span style="color:red">throws an exception of type ```bad_alloc```</span>,
+    - 可以<span style="color:red">prevent ```new``` from throwing an exception</span> by using a different form of ```new``` 
+    - 下面例子阻止抛出异常叫: **placement new**, 传递一个由标准库定义的 ```nothrow``` 对象, 如果将```nothrow``` 传递给 ```new```, 我们是告诉它不要抛出异常, 如果```new```不能分配内存, 返回一个空指针.
+    - ```bad_alloc``` 和 ```nothrow``` 都定义在```new``` header中
+
+阻止抛出```bad_alloc```
+```c++
+// if allocation fails, new returns a null pointer
+
+int *p1 = new int; // if allocation fails, new throws std::bad_alloc
+
+int *p2 = new (nothrow) int; // if allocation fails, new returns a null pointer
+
+```
+
+
+
 
 
 
