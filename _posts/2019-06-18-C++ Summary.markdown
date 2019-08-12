@@ -5526,7 +5526,7 @@ Our programs have used only static or stack memory.
     - **Stack objects** exist only while the block in which they are defined is <span style="color:red">executing</span>;
     - Stack similar to ```std::stack``` class, FIFO, the function knows 他们期望的parameters can be found on the end of the stack. Function can push locals on stack and pop before returning the function. 
     - **Stack** is usually in **CPU cache**, so operations involving objects stored on it tend to be <span style="color:red">**faster**</span> (因为FIFO design)
-    - However, **stack** is limited resoource, Running out of stack is called **stack buffer overflow**, 不会遇到这样问题除有crazy recursive function
+    - However, **stack** is limited resource, Running out of stack is called **stack buffer overflow**, 不会遇到这样问题除非有crazy recursive function
 - In addition to static or stack memory,This memory is referred to as the **free store** or **heap**. 
   - Programs use the **heap** for objects that they **dynamically allocate**—that is, for objects that the program <span style="color:red">allocates at **run time**</span>
   - The program <span style="background-color:#FFFF00">controls the lifetime of dynamic objects</span>; <span style="color:red">our code must explicitly destroy such objects</span> when they are no longer needed.
@@ -5571,7 +5571,7 @@ Dynamic Memory and Smart Pointers:
 - The <span style="background-color:#FFFF00">**safest way** to **allocate** and **use dynamic memory**</span> is to call a library function named ```make_shared```.
 - This function <span style="color:red">**allocates** and **initializes** an object in dynamic memory</span> and <span style="color:red">returns a shared_ptr</span> that points to that object
 - defined in ```memory``` header 
-- 类似于```emplace```, 可以用its argument to constructur an object of the given type.
+- 类似于```emplace```, 可以用 <span style="color:red">its argument to construct an object of the given type in place</span>
 - 可以用```auto``` 来存储 ```make_shared``` 的 ```shared_ptr```
 
 ```c++
@@ -5624,7 +5624,7 @@ r = q; // assign to r, making it point to a different address
 - The **destructor** for shared_ptr **decrements the reference count** of the object to which that shared_ptr points. If the count 变成0, the shared_ptr <span style="color:red">destructor 销毁 shared_ptr指的对象 and frees the memory used by that object</span>.
 - 如果把```shared_ptr``` 放进一个容器中, 如果不需要使用, call ```erase``` 删除不再需要的那些元素. 
 
-下面例子中当```p``` 销毁时，递减其引用计数并检查是否为0，因为p是唯一引用factory 返回内存的对象。由于p将要销毁，p指向的这个对象也被销毁， 所占用的内存会被释放.
+下面例子中当```p``` 销毁时，递减其引用计数并检查是否为0，因为p是唯一引用factory 返回内存的对象。由于p将要销毁，p指向的这个<span style="color:red">**对象也被销毁**</span>， 所占用的<span style="color:red">**内存会被释放**</span>.
 ```c++
 shared_ptr<Foo> factory(T arg)
 {
@@ -5712,12 +5712,12 @@ void StrBlob::check(size_type i, const string & msg) const {
 
 **(1). Using new to Dynamically Allocate and Initialize Objects**
 
-- Objects <span style="background-color:#FFFF00">allocated on the **free store** are unnamed</span>, Instead, new returns a pointer to the object it allocates:
+- Objects <span style="background-color:#FFFF00">allocated on the **free store** are unnamed</span>(没有命名的), Instead, new returns a pointer to the object it allocates:
 - By default, dynamically allocated objects are **default initialized**: <span style="color:red"> built-in or compound type objects have undefined value; objects of class type are initialized by their default constructor</span>
-- 可以nitialize a dynamically allocated object using 直接初始化. 可以用**parentheses 的constructor** or 使用**list initialization(curly braces)**, 也可以用**value initialization**, 只需要在类型别名后跟一个空括号
+- 可以nitialize a dynamically allocated object using 直接初始化. 可以用**parentheses 的constructor**(in place construct) or 使用**list initialization(curly braces)**, 也可以用**value initialization**, 只需要在类型别名后跟一个空括号
     - 对于**class type** that define their own constructor, value initialization 是没有意义的. 因为不管用什么形式, 都用default constructor 来初始化
     - 对于**built-in** type, 有difference, a <span style="color:red">**value-initialized object** of built-in type has a **well-defined value**</span> but a <span style="color:red">**default-initialized object does not** default-initialized 是未定义的</span>
-
+- 可以用```auto``` 去deduce the type
 
 ```c++
 int *pi = new int; // pi points to a dynamically allocated, unnamed, uninitialized int
@@ -5752,7 +5752,7 @@ int *pi2 = new int(); // value initialized to 0; *pi2 is 0
 ```
 
 pointer of class type initialization When we provide **an initializer inside parentheses**, we can use ```auto``` to <span style="color:red">deduce the type</span> of the object we want to allocate from that initializer(第一个例子). 如果 obj 是int, 那么 p1 是 ```int*```, 如果 obj string, 那么 p1 是 ```string*```
-```
+```c++
 auto p1 = new auto(obj); // p points to an object of the type of obj // that object is initialized from obj
 
 auto p2 = new auto{a,b,c}; // error: must use parentheses for the initializer, 只能用括号包含单个初始器
@@ -5763,8 +5763,8 @@ auto p2 = new auto{a,b,c}; // error: must use parentheses for the initializer, �
 **(2). Dynamically Allocated const Objects**
 - It is <span style="background-color:#FFFF00">legal to use new to allocate const objects</span>:
 - <span style="background-color:#FFFF00">A dynamically allocated const object must be **initialized**</span>
--  A <span style="color:red">**const dynamic object** of a **class type**</span> that defines a default constructor  may be <span style="color:red">**initialized implicitly**</span>. Objects of other types must be explicitly initialized. <span style="background-color:#FFFF00">const 动态对象可以隐式初始化, 其他类型对象必须显示初始化</span> 
-- Because the allocated object is ```const```, <span style="color:red">the pointer returned by ```new``` is a pointer to ```const```</span
+-  A <span style="color:red">**const dynamic object** of a **class type**</span> that defines a default constructor  may be <span style="color:red">**initialized implicitly**</span>. Objects of other types must be explicitly initialized. <span style="background-color:#FFFF00">const 动态对象可以隐式初始化, 不是const动态类型对象必须显示初始化</span> 
+- Because the allocated object is ```const```, <span style="color:red">the pointer returned by ```new``` is a pointer to ```const```</span>
 
 
 ```c++
@@ -5775,6 +5775,11 @@ const int *pci = new const int(1024);
 // allocate a default-initialized const empty string const 
 
 string *pcs = new const string;
+```
+
+```c++
+
+
 ```
 
 **(3). Memory Exhaustion**
