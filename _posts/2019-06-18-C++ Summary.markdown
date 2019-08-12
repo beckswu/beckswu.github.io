@@ -5273,9 +5273,9 @@ pair<string, string> author{"James", "Joyce"};
 
 | Syntax | Description | 
 | --- | :--- | 
-| ```key_type``` | Type of key for this container type |
+| ```key_type``` | Type of key for this container type, 不是const |
 | ```mapped_type``` | Type associated with each key, **map types only** |
-| ```value_type``` | For ```sets```, same as the ```key_type```. <br/> For ```maps```, ```pair<const key_type, mapped_typed> |
+| ```value_type``` | For ```sets```, same as the ```key_type```. <br/> For ```maps```, ```pair<const key_type, mapped_typed>``` |
 
 ```c++
 set<string>::value_type v1; // v1 is a string 
@@ -5284,26 +5284,32 @@ set<string>::key_type v2; // v2 is a string
 
 map<string, int>::value_type v3; // v3 is a pair<const string, int> 
 
-map<string, int>::key_type v4; // v4 is a string
+//cannot do 
+
+v4["123"] = 456;//因为key is const 
+
+map<string, int>::key_type v4; // v4 is a string, not const string 
+
+v4 = "123";
 
 map<string, int>::mapped_type v5; // v5 is an int
 
 ```
 
 - When we dereference an iterator, get a <span style="background-color:#FFFF00">**reference**</span> to a value of container's ```value_type```. 
-  - 对于```map```, ```value_type``` is a pair which ```first``` holds the <span style="background-color:#FFFF00">**const key**</span> and ```second``` holds the value. 可以改变value 值 但不能改变key的值
+  - 对于map, ```value_type``` is a pair which ```first``` holds the <span style="background-color:#FFFF00">**const key**</span> and ```second``` holds the value. 可以改变value 值 但不能改变key的值
 - <span style="background-color:#FFFF00">Iterators for ```sets``` Are **const**</span>,虽然sets定义了```iterator``` 和 ```const_iterator``` 但都**read-only access**
 - map, multimap, set, or multiset, the iterators yield elements in ascending key order. 比如for loop 是按照升序来读(由小到大)
-- we do not use the generic algorithms (Chapter 10) with the associative containers. . The fact that the **keys are const** means that we cannot pass associative container iterators to algorithms that write to or reorder container elements.
+- we do not use the generic algorithms (Chapter 10) with the associative containers.  The fact that the **keys are const** means that we cannot pass associative container iterators to algorithms that write to or reorder container elements.
   - Associative containers can be used with the algorithms that read elements.However, many of these algorithms search the sequence. 因为elements in associative container 可以被快速找到根据他们的key, <span style="color:red">bad idea to use generic search algorithm</span>, associative containers define a member named ```find```, 用它比generic ```find``` algorithm 快的多(generic algorithm use sequential search)
-  - 如果把associative container with algorithms either source sequence or as a destination.可以使用```copy``` or ```inserter``` to bind an insert iterator (用```inserter```,可把associative container as a destination for another algorithm)
+  - 如果把associative container with algorithms either <span style="color:red">source sequence or as a destination</span>.可以使用```copy``` or ```inserter``` to bind an insert iterator (用```inserter```,可把associative container as a destination for another algorithm)
 - map 和 set, 只有key 不存在时候，才会真的插入，如果存在，对于set 无更改, map 会更改value
 - 对于<span style="color:red">multiset, multimap, ```insert``` 不需要return bool, 因为总是insert 成功</span>, 返回an iterators to the new element
-- <span style="color:red">set 不支持下表运算</span>, <span style="color:red"> 也不能对 multimap 和 unordered_multi_map 进行下表运算 </span>, 因为一个key 对应多个value
+- <span style="color:red">set 不支持下标运算</span>, <span style="color:red"> 也不能对 multimap 和 unordered_multi_map 进行下标运算 </span>, 因为一个key 对应多个value
   - ```c[k]``` 和 ```c.at[k]``` 区别是 ```at``` 有range check, 会throw ```out_of_range``` exception 
-  - <span style="background-color:#FFFF00">下表运算 和 ```at``` 只能用于**non const 的 map, unordered_map**</span>
+  - <span style="background-color:#FFFF00">下标运算 和 ```at``` 只能用于**non const 的 map, unordered_map**</span>
   - subscript a map, we get a ```mapped_type``` object; when we dereference a map iterator, we get a ```value_type``` object (有first, second)
-- multimap 和 multiset, multiple elements of a givne key, those elements 是相邻的
+- multimap 和 multiset, multiple elements of a given key, those elements 是相邻的
 
 ```c++
 // get an iterator to an element in word_count
@@ -5366,8 +5372,8 @@ while (cin >> word) {
 | Syntax | Description | 
 | --- | :--- | 
 | ```c.erase(k)```  |  removes  每一个等于k的key, <span style="color:red">Returns a ```size_type``` 表示删除元素的数量 </span>  |
-| ```c.insert(p)```| iterator p是一个删除的位置, 不能是```c.end()```, <span style="color:red">return an iterator after ```p``` or ```c.end()```(if p is the last element) |
-| ```c.insert(b,e)```  | removes the range from ```[b,e)```, <span style="color:red">return ```e```</span>  |
+| ```c.erase(p)```| iterator p是一个删除的位置, 不能是```c.end()```, <span style="color:red">return an iterator after ```p``` or ```c.end()```(if p is the last element) |
+| ```c.erase(b,e)```  | removes the range from ```[b,e)```, <span style="color:red">return ```e```</span>  |
 
 
 
