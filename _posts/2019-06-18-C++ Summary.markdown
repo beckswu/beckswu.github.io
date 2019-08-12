@@ -5807,7 +5807,7 @@ int *p2 = new (nothrow) int; // if allocation fails, new returns a null pointer
 - <span style="color:red">Deleting</span> a pointer to memory that <span style="color:red">**was not allocated by new**</span>, or deleting the same pointer value <span style="color:red">**more than once**</span>, is <span style="color:red">**undefined**</span>
    - <span style="color:red">删除non dynamically allocated 指针是错误的</span>. Compiler cannot tell whether a pointer 指向statically or dynamically allocated object.
    - 如果两个指针指向一个object, 删除第一个指针, 不用删除第二个指针(delete more than once), 否则error
-     - Compiler <span style="color:red">cannot tell</span> whether <span style="color:red">memory addressed</span> by a pointer has already <span style="color:red">been freed</span>. <span style="color:red">Most compilers will accept these delete expressions</span>, even though they are in error. 
+   - Compiler <span style="color:red">cannot tell</span> whether <span style="color:red">memory addressed</span> by a pointer has already <span style="color:red">been freed</span>. <span style="color:red">Most compilers will accept these delete expressions</span>, even though they are in error. 
 - 对于shared_pointer 管理的内存在最后一个shared_ptr销毁时被自动释放, 但对于built-in pointer 是不是这样的,  A **dynamic object** managed through a built-in pointer (rather than smart pointers) <span style="color:red">**exists** until it is **explicitly deleted** (freed)</span>.
   - Functions that return **pointers** (rather than smart pointers) to **dynamic memory** put a burden on their callers—<span style="color:red">the caller must remember to delete the memory</span>
 
