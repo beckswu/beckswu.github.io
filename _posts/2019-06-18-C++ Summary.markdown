@@ -5429,7 +5429,8 @@ pos.first != pos.second; ++pos.first)
   -  However, if the **bucket has many elements**, **many comparisons may be needed** to find a particular element.
 - 如果container 允许重复elements with a given key (multi_unordered_map, multi_unordered_set), all the elements with the same key will be in the same bucket.
 - The performance of an unordered container depends on the quality of its hash function and on the number and size of its buckets.
-
+- ```load_factor``` = size(#elements) / bucket_count; ```max_load_factor```被用作threshold that forces an increase in the number of buckets. ```max_load_factor```越小, 更频繁call ```rehash```
+- ```bucket_count```是现在有几个可以使用，不是有几个已经被占用, ```max_bucket_count```是最大的potential number of buckets that unordered_map can have (受system constraints or limitation 影响而不同) 
 
 ![](/img/post/C++/unordered_map.png)
 
@@ -5521,12 +5522,15 @@ Our programs have used only static or stack memory.
 - Objects allocated in **static** or **stack memory** are <span style="background-color:#FFFF00">automatically created and destroyed by the compiler</span>. 
   - **Static memory** is used for <span style="color:red">local static objects(局部静态变量, 见6.1, 程序执行路径第一次经过时define exist until 程序结束)</span>, for <span style="color:red">class static data members</span>, and for <span style="color:red">variables defined outside any function</span>
     - **static objects** are allocated before they are used, and they are destroyed when the program ends.
-  - **Stack memory** is used for <span style="color:red">**nonstatic objects** defined inside functions</span>.
+  - **Stack memory** is used for <span style="color:red">**nonstatic objects** defined inside functions</span> (local variables, also hold parameters passed to functions).
     - **Stack objects** exist only while the block in which they are defined is <span style="color:red">executing</span>;
+    - Stack similar to ```std::stack``` class, FIFO, the function knows 他们期望的parameters can be found on the end of the stack. Function can push locals on stack and pop before returning the function. 
+    - **Stack** is usually in **CPU cache**, so operations involving objects stored on it tend to be <span style="color:red">**faster**</span> (因为FIFO design)
+    - However, **stack** is limited resoource, Running out of stack is called **stack buffer overflow**, 不会遇到这样问题除有crazy recursive function
 - In addition to static or stack memory,This memory is referred to as the **free store** or **heap**. 
   - Programs use the **heap** for objects that they **dynamically allocate**—that is, for objects that the program <span style="color:red">allocates at **run time**</span>
   - The program <span style="background-color:#FFFF00">controls the lifetime of dynamic objects</span>; <span style="color:red">our code must explicitly destroy such objects</span> when they are no longer needed.
-
+  - Running out of heap memory result in ```std::bad_alloc```
 
 Dynamic Memory and Smart Pointers: 
 
