@@ -5784,7 +5784,7 @@ string *pcs = new const string;
 
 **(3). Memory Exhaustion**
 
-- Although modern machines tend to have huge memory capacity, 按时也有可能自由空间(free store)被耗尽(exhausted). Once a program has <span style="background-color:#FFFF00">**used all of its available memory**, **new expressions will fail**</span>.
+- Although modern machines tend to have huge memory capacity, 可是也有可能自由空间(free store)被耗尽(exhausted). Once a program has <span style="background-color:#FFFF00">**used all of its available memory**, **new expressions will fail**</span>.
 - if new is **unable to allocate** the requested storage, it <span style="color:red">throws an exception of type ```bad_alloc```</span>,
     - 可以<span style="color:red">prevent ```new``` from throwing an exception</span> by using a different form of ```new``` 
     - 下面例子阻止抛出异常叫: **placement new**, 传递一个由标准库定义的 ```nothrow``` 对象, 如果将```nothrow``` 传递给 ```new```, 我们是告诉它不要抛出异常, 如果```new```不能分配内存, 返回一个空指针.
@@ -5805,9 +5805,9 @@ int *p2 = new (nothrow) int; // if allocation fails, new returns a null pointer
 - 为了避免 **memory exhaustion**,  we must <span style="background-color:#FFFF00">return dynamically allocated memory to the system</span> once we are finished using it through ```delete``` expression 
 - ```delete p;```: p must point to a **dynamically allocated object** or be **null**
 - <span style="color:red">Deleting</span> a pointer to memory that <span style="color:red">**was not allocated by new**</span>, or deleting the same pointer value <span style="color:red">**more than once**</span>, is <span style="color:red">**undefined**</span>
-- 如果两个指针指向一个object, 删除第一个指针, 不用删除第二个指针
-- 删除non dynamically allocated 指针是错误的. Compiler cannot tell whether a pointer 指向statically or dynamically allocated object.
-- Compiler <span style="color:red">cannot tell</span> whether <span style="color:red">memory addressed</span> by a pointer has already <span style="color:red">been freed</span>. <span style="color:red">Most compilers will accept these delete expressions</span>, even though they are in error. 
+   - <span style="color:red">删除non dynamically allocated 指针是错误的</span>. Compiler cannot tell whether a pointer 指向statically or dynamically allocated object.
+   - 如果两个指针指向一个object, 删除第一个指针, 不用删除第二个指针(delete more than once), 否则error
+     - Compiler <span style="color:red">cannot tell</span> whether <span style="color:red">memory addressed</span> by a pointer has already <span style="color:red">been freed</span>. <span style="color:red">Most compilers will accept these delete expressions</span>, even though they are in error. 
 - 对于shared_pointer 管理的内存在最后一个shared_ptr销毁时被自动释放, 但对于built-in pointer 是不是这样的,  A **dynamic object** managed through a built-in pointer (rather than smart pointers) <span style="color:red">**exists** until it is **explicitly deleted** (freed)</span>.
   - Functions that return **pointers** (rather than smart pointers) to **dynamic memory** put a burden on their callers—<span style="color:red">the caller must remember to delete the memory</span>
 
