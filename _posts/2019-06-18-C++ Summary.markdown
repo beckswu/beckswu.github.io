@@ -6085,7 +6085,7 @@ void f(destination &d /* other parameters */)
 **Smart Pointer Pitfalls**
 1. 不使用相同的built-in pointer value to initialize more than one smart pointer 
 2. 不delete ```get``` 返回的指针
-3. Don’t use ```get()``` to initialize or ```reset``` another smart pointer.
+3. Don’t use ```get()``` to initialize or ```reset``` another smart pointer.(不把get返回的指针跟其他smart pointer 绑定)
 4. If you use a pointer returned by ```get()```, remember that the <span style="color:red">pointer</span> will <span style="color:red">become **invalid** when the last corresponding smart pointer goes away.</span>
 5. 如果使用smart pointer to manage <span style="background-color:#FFFF00">a resource other than memory allocated by new, remember to pass a deleter</span>
 
