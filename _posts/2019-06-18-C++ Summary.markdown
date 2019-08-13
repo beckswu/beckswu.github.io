@@ -5511,6 +5511,9 @@ unordered_set<Foo, decltype(FooHash)*> fooSet(10, FooHash);
 
 
 
+
+
+
 ## 12. Dynamic Memory
 
 - Local, **automatic objects** are created and destroyed when the block in which they are defined is entered and exited
@@ -5540,7 +5543,181 @@ Dynamic Memory and Smart Pointers:
 - Dynamic memory is **problematic** because it is surprisingly hard to ensure that we free memory at the right time. 有时忘记释放内存，会造成**memory leak**, 或者尚有指针引用存储的情况下就释放了它, 造成pointer is invalid.
 - To make using dynamic memory easier (and safer), new library定义了two smart pointer, A smart pointer acts like a regular pointer with the important exception that it <span style="color:red">**automatically deletes** the object to which it points</span>. 
 
-#### (a). shared_ptr
+
+
+
+
+
+#### (a). Managing Memory Directly
+
+**(1). Using new to Dynamically Allocate and Initialize Objects**
+
+- Objects <span style="background-color:#FFFF00">allocated on the **free store** are unnamed</span>(没有命名的), Instead, new returns a pointer to the object it allocates:
+- By default, dynamically allocated objects are **default initialized**: <span style="color:red"> built-in or compound type objects have undefined value; objects of class type are initialized by their default constructor</span>
+- 可以nitialize a dynamically allocated object using 直接初始化. 可以用**parentheses 的constructor**(in place construct) or 使用**list initialization(curly braces)**, 也可以用**value initialization**, 只需要在类型别名后跟一个空括号
+    - 对于**class type** that define their own constructor, value initialization 是没有意义的. 因为不管用什么形式, 都用default constructor 来初始化
+    - 对于**built-in** type, 有difference, a <span style="color:red">**value-initialized object** of built-in type has a **well-defined value**</span> but a <span style="color:red">**default-initialized object does not** default-initialized 是未定义的</span>
+- 可以用```auto``` 去deduce the type
+
+```c++
+int *pi = new int; // pi points to a dynamically allocated, unnamed, uninitialized int
+
+string *ps = new string; // initialized to empty string
+
+int *pi = new int; // pi points to an uninitialized int 未初始化
+
+```
+初始化
+
+```c++
+int *pi = new int(1024); // object to which pi points has value 1024 
+
+string *ps = new string(10, '9'); // *ps is "9999999999"
+
+// vector with ten elements with values from 0 to 9
+
+vector<int> *pv = new vector<int>{0,1,2,3,4,5,6,7,8,9};
+```
+
+value initialization
+```c++
+string *ps1 = new string; // default initialized to the empty string 
+
+string *ps = new string(); // value initialized to the empty string 
+
+int *pi1 = new int; // default initialized; *pi1 is undefined 
+
+int *pi2 = new int(); // value initialized to 0; *pi2 is 0
+
+```
+
+pointer of class type initialization When we provide **an initializer inside parentheses**, we can use ```auto``` to <span style="color:red">deduce the type</span> of the object we want to allocate from that initializer(第一个例子). 如果 obj 是int, 那么 p1 是 ```int*```, 如果 obj string, 那么 p1 是 ```string*```
+```c++
+auto p1 = new auto(obj); // p points to an object of the type of obj // that object is initialized from obj
+
+auto p2 = new auto{a,b,c}; // error: must use parentheses for the initializer, 只能用括号包含单个初始器
+
+
+```
+
+**(2). Dynamically Allocated const Objects**
+- It is <span style="background-color:#FFFF00">legal to use new to allocate const objects</span>:
+- <span style="background-color:#FFFF00">A dynamically allocated const object must be **initialized**</span>
+-  A <span style="color:red">**const dynamic object** of a **class type**</span> that defines a default constructor  may be <span style="color:red">**initialized implicitly**</span>. Objects of other types must be explicitly initialized. <span style="background-color:#FFFF00">const 动态对象可以隐式初始化, 不是const动态类型对象必须显示初始化</span> 
+- Because the allocated object is ```const```, <span style="color:red">the pointer returned by ```new``` is a pointer to ```const```</span>
+
+
+```c++
+// allocate and initialize a const int
+
+const int *pci = new const int(1024); 
+
+// allocate a default-initialized const empty string const 
+
+string *pcs = new const string;
+```
+
+```c++
+
+
+```
+
+**(3). Memory Exhaustion**
+
+- Although modern machines tend to have huge memory capacity, 可是也有可能自由空间(free store)被耗尽(exhausted). Once a program has <span style="background-color:#FFFF00">**used all of its available memory**, **new expressions will fail**</span>.
+- if new is **unable to allocate** the requested storage, it <span style="color:red">throws an exception of type ```bad_alloc```</span>,
+    - 可以<span style="color:red">prevent ```new``` from throwing an exception</span> by using a different form of ```new``` 
+    - 下面例子阻止抛出异常叫: **placement new**, 传递一个由标准库定义的 ```nothrow``` 对象, 如果将```nothrow``` 传递给 ```new```, 我们是告诉它不要抛出异常, 如果```new```不能分配内存, 返回一个空指针.
+    - ```bad_alloc``` 和 ```nothrow``` 都定义在```new``` header中
+
+阻止抛出```bad_alloc```
+```c++
+// if allocation fails, new returns a null pointer
+
+int *p1 = new int; // if allocation fails, new throws std::bad_alloc
+
+int *p2 = new (nothrow) int; // if allocation fails, new returns a null pointer
+
+```
+
+**(4). Freeing Dynamic Memory**
+
+- 为了避免 **memory exhaustion**,  we must <span style="background-color:#FFFF00">return dynamically allocated memory to the system</span> once we are finished using it through ```delete``` expression 
+- ```delete p;```: p must point to a **dynamically allocated object** or be **null**
+- <span style="color:red">Deleting</span> a pointer to memory that <span style="color:red">**was not allocated by new**</span>, or deleting the same pointer value <span style="color:red">**more than once**</span>, is <span style="color:red">**undefined**</span>
+   - <span style="color:red">删除non dynamically allocated 指针是错误的</span>. Compiler cannot tell whether a pointer 指向statically or dynamically allocated object.
+   - 如果两个指针指向一个object, 删除第一个指针, 不用删除第二个指针(delete more than once), 否则error
+   - Compiler <span style="color:red">cannot tell</span> whether <span style="color:red">memory addressed</span> by a pointer has already <span style="color:red">been freed</span>. <span style="color:red">Most compilers will accept these delete expressions</span>, even though they are in error. 
+- 对于shared_pointer 管理的内存在最后一个shared_ptr销毁时被自动释放, 但对于built-in pointer 是不是这样的,  A **dynamic object** managed through a built-in pointer (rather than smart pointers) <span style="color:red">**exists** until it is **explicitly deleted** (freed)</span>.
+  - Functions that return **pointers** (rather than smart pointers) to **dynamic memory** put a burden on their callers—<span style="color:red">the caller must remember to delete the memory</span>
+
+```c++
+int i, *pi1 = &i, *pi2 = nullptr;
+double *pd = new double(33), *pd2 = pd;
+
+delete i; // error: i is not a pointer
+
+delete pi1; // undefined: pi1 refers to a local (指的是局部静态对象)
+
+delete pd; // ok
+
+delete pd2; // undefined: the memory pointed to by pd2 was already freed 
+
+delete pi2; // ok: it is always ok to delete a null pointer
+
+```
+
+对于function 返回指针指的是dynamically allocated object. function 的caller 必须释放内存, 比如下面的例子, pointer out of scope, 但是内存还没有释放
+```c++
+Foo* factory(T arg)
+{
+    return new Foo(arg); // caller is responsible for deleting this memory 
+
+}
+
+void use_factory(T arg){
+// use p but do not delete it
+
+    Foo *p = factory(arg);
+} // p goes out of scope, but the memory to which p points 没有被释放
+
+
+//正确方式
+void use_factory(T arg){
+    Foo *p = factory(arg);
+    delete p;
+} 
+
+
+```
+
+Managing Dynamic Memory Is Error-Prone: can avoid all of these problem by using smart pointers exclusively. 
+1. 忘记```delete```内存 -- 内存泄漏问题, memory is never returned to the free store, 查找内存泄漏错误是困难的, 因为通常程序运行很长时间后，真正耗尽内存是，才能检测到这种错误
+2. Using an object after it has been deleted. This error can sometimes be detected by <span style="background-color:#FFFF00">**making the pointer null** after the delete</span>.
+3. 同一块内存释放两次. This error can happen <span style="background-color:#FFFF00">when **two pointers** address **the same dynamically allocated object**</span>. If delete is applied to one of the pointers, then the object’s memory is returned to the free store. <span style="color:red">If we subsequently delete the second pointer, then the free store may be corrupted</span>.
+
+
+**(5).Resetting the Value of a Pointer after a delete ...**
+
+- 当```delete``` pointer, <span style="color:red">pointer becomes **invalid**</span>. 尽管pointer is invalid, <span style="color:red">pointer 继续hold the address of the dynamic memory</span>.  After the delete, the pointer becomes what is referred to as a <span style="background-color:#FFFF00">**dangling pointer**</span>. 即曾经保存对象数据 但现已经无效的内存指针
+  - Dangling pointers have all the problems of uninitialized pointers. 有种方法可以避免问题: 即 If need to keep the pointer after delete memory 在离开现scope前<span style="color:red">assign **nullptr** to the pointer after we use delete</span>. 这样清楚指出指针不指向任何对象
+
+
+下面例子中p 和 q, 指向the same dynamically allocated object. We ```delete``` that memory and set ```p``` to ```nullptr```, 表示 that the pointer no longer points to an object. However, <span style="background-color:#FFFF00">resetting p has no effect on q, which became invalid when we deleted the memory to which p</span>
+```c++
+int *p(new int(42)); // p points to dynamic memory
+
+auto q=p; // p and q pointtothesamememory 
+
+delete p; // invalidates both p and q
+
+p = nullptr; // indicates that p is no longer bound to an object
+
+```
+
+
+
+#### (b). shared_ptr
 - A default initialized smart pointer holds a null pointer；```shared_ptr<string> p1; ```
 
 ```shared_ptr``` 和 ```unique_ptr``` 都支持的操作
@@ -5707,173 +5884,214 @@ void StrBlob::check(size_type i, const string & msg) const {
 }; 
 ```
 
+**(5). Using shared_ptrs with new**
 
-#### (b). Managing Memory Directly
+- if we do <span style="background-color:#FFFF00">not initialize</span> a smart pointer, it is initialized as a <span style="background-color:#FFFF00">**null pointer**</span>.
+- The smart pointer  <span style="background-color:#FFFF00">constructors</span> that take pointers are <span style="background-color:#FFFF00">**explicit**</span>. <span style="color:red">Cannot **implicitly** convert a built-in pointer to a smart pointer</span>. 必须使用direct form of initialization 
+    - a function that <span style="color:red">returns a shared_ptr **cannot implicitly convert** a plain pointer</span> in its return statement
+- <span style="color:red">a pointer used to initialize a smart pointer must point to **dynamic memory**</span> because, by default, smart pointers <span style="color:red">use ```delete``` to **free the associated object**</span>.
+- ```reset``` 通常与 ```unique``` 一起使用, 控制多个shared_ptr 共享的对象. <span style="background-color:#FFFF00">Before changing the **underlying object**, we check whether we’re the only user</span>. If not, we <span style="background-color:#FFFF00">**make a new copy** before making the change</span>, 详见下面例子
 
-**(1). Using new to Dynamically Allocate and Initialize Objects**
-
-- Objects <span style="background-color:#FFFF00">allocated on the **free store** are unnamed</span>(没有命名的), Instead, new returns a pointer to the object it allocates:
-- By default, dynamically allocated objects are **default initialized**: <span style="color:red"> built-in or compound type objects have undefined value; objects of class type are initialized by their default constructor</span>
-- 可以nitialize a dynamically allocated object using 直接初始化. 可以用**parentheses 的constructor**(in place construct) or 使用**list initialization(curly braces)**, 也可以用**value initialization**, 只需要在类型别名后跟一个空括号
-    - 对于**class type** that define their own constructor, value initialization 是没有意义的. 因为不管用什么形式, 都用default constructor 来初始化
-    - 对于**built-in** type, 有difference, a <span style="color:red">**value-initialized object** of built-in type has a **well-defined value**</span> but a <span style="color:red">**default-initialized object does not** default-initialized 是未定义的</span>
-- 可以用```auto``` 去deduce the type
 
 ```c++
-int *pi = new int; // pi points to a dynamically allocated, unnamed, uninitialized int
+shared_ptr<double> p1; // shared_ptr that can point at a double 
 
-string *ps = new string; // initialized to empty string
+shared_ptr<int> p2(new int(42)); // p2 points to an int with value 42
 
-int *pi = new int; // pi points to an uninitialized int 未初始化
 
-```
-初始化
+shared_ptr<int>p1 = new  = new int(1024);//error: must use direct initialization
 
-```c++
-int *pi = new int(1024); // object to which pi points has value 1024 
-
-string *ps = new string(10, '9'); // *ps is "9999999999"
-
-// vector with ten elements with values from 0 to 9
-
-vector<int> *pv = new vector<int>{0,1,2,3,4,5,6,7,8,9};
-```
-
-value initialization
-```c++
-string *ps1 = new string; // default initialized to the empty string 
-
-string *ps = new string(); // value initialized to the empty string 
-
-int *pi1 = new int; // default initialized; *pi1 is undefined 
-
-int *pi2 = new int(); // value initialized to 0; *pi2 is 0
+shared_ptr<int> p2(new int(1024)); // ok: uses direct initialization
 
 ```
 
-pointer of class type initialization When we provide **an initializer inside parentheses**, we can use ```auto``` to <span style="color:red">deduce the type</span> of the object we want to allocate from that initializer(第一个例子). 如果 obj 是int, 那么 p1 是 ```int*```, 如果 obj string, 那么 p1 是 ```string*```
-```c++
-auto p1 = new auto(obj); // p points to an object of the type of obj // that object is initialized from obj
-
-auto p2 = new auto{a,b,c}; // error: must use parentheses for the initializer, 只能用括号包含单个初始器
-
-
-```
-
-**(2). Dynamically Allocated const Objects**
-- It is <span style="background-color:#FFFF00">legal to use new to allocate const objects</span>:
-- <span style="background-color:#FFFF00">A dynamically allocated const object must be **initialized**</span>
--  A <span style="color:red">**const dynamic object** of a **class type**</span> that defines a default constructor  may be <span style="color:red">**initialized implicitly**</span>. Objects of other types must be explicitly initialized. <span style="background-color:#FFFF00">const 动态对象可以隐式初始化, 不是const动态类型对象必须显示初始化</span> 
-- Because the allocated object is ```const```, <span style="color:red">the pointer returned by ```new``` is a pointer to ```const```</span>
-
+function return 
 
 ```c++
-// allocate and initialize a const int
-
-const int *pci = new const int(1024); 
-
-// allocate a default-initialized const empty string const 
-
-string *pcs = new const string;
-```
-
-```c++
-
-
-```
-
-**(3). Memory Exhaustion**
-
-- Although modern machines tend to have huge memory capacity, 可是也有可能自由空间(free store)被耗尽(exhausted). Once a program has <span style="background-color:#FFFF00">**used all of its available memory**, **new expressions will fail**</span>.
-- if new is **unable to allocate** the requested storage, it <span style="color:red">throws an exception of type ```bad_alloc```</span>,
-    - 可以<span style="color:red">prevent ```new``` from throwing an exception</span> by using a different form of ```new``` 
-    - 下面例子阻止抛出异常叫: **placement new**, 传递一个由标准库定义的 ```nothrow``` 对象, 如果将```nothrow``` 传递给 ```new```, 我们是告诉它不要抛出异常, 如果```new```不能分配内存, 返回一个空指针.
-    - ```bad_alloc``` 和 ```nothrow``` 都定义在```new``` header中
-
-阻止抛出```bad_alloc```
-```c++
-// if allocation fails, new returns a null pointer
-
-int *p1 = new int; // if allocation fails, new throws std::bad_alloc
-
-int *p2 = new (nothrow) int; // if allocation fails, new returns a null pointer
-
-```
-
-**(4). Freeing Dynamic Memory**
-
-- 为了避免 **memory exhaustion**,  we must <span style="background-color:#FFFF00">return dynamically allocated memory to the system</span> once we are finished using it through ```delete``` expression 
-- ```delete p;```: p must point to a **dynamically allocated object** or be **null**
-- <span style="color:red">Deleting</span> a pointer to memory that <span style="color:red">**was not allocated by new**</span>, or deleting the same pointer value <span style="color:red">**more than once**</span>, is <span style="color:red">**undefined**</span>
-   - <span style="color:red">删除non dynamically allocated 指针是错误的</span>. Compiler cannot tell whether a pointer 指向statically or dynamically allocated object.
-   - 如果两个指针指向一个object, 删除第一个指针, 不用删除第二个指针(delete more than once), 否则error
-   - Compiler <span style="color:red">cannot tell</span> whether <span style="color:red">memory addressed</span> by a pointer has already <span style="color:red">been freed</span>. <span style="color:red">Most compilers will accept these delete expressions</span>, even though they are in error. 
-- 对于shared_pointer 管理的内存在最后一个shared_ptr销毁时被自动释放, 但对于built-in pointer 是不是这样的,  A **dynamic object** managed through a built-in pointer (rather than smart pointers) <span style="color:red">**exists** until it is **explicitly deleted** (freed)</span>.
-  - Functions that return **pointers** (rather than smart pointers) to **dynamic memory** put a burden on their callers—<span style="color:red">the caller must remember to delete the memory</span>
-
-```c++
-int i, *pi1 = &i, *pi2 = nullptr;
-double *pd = new double(33), *pd2 = pd;
-
-delete i; // error: i is not a pointer
-
-delete pi1; // undefined: pi1 refers to a local (指的是局部静态对象)
-
-delete pd; // ok
-
-delete pd2; // undefined: the memory pointed to by pd2 was already freed 
-
-delete pi2; // ok: it is always ok to delete a null pointer
-
-```
-
-对于function 返回指针指的是dynamically allocated object. function 的caller 必须释放内存, 比如下面的例子, pointer out of scope, 但是内存还没有释放
-```c++
-Foo* factory(T arg)
-{
-    return new Foo(arg); // caller is responsible for deleting this memory 
+shared_ptr<int> clone(int p) {
+    return new int(p); // error: implicit conversion to shared_ptr<int> 
 
 }
 
-void use_factory(T arg){
-// use p but do not delete it
+shared_ptr<int> clone(int p) {
+    // ok: explicitly create a shared_ptr<int> from int*
 
-    Foo *p = factory(arg);
-} // p goes out of scope, but the memory to which p points 没有被释放
-
-
-//正确方式
-void use_factory(T arg){
-    Foo *p = factory(arg);
-    delete p;
-} 
-
+    return shared_ptr<int>(new int(p));
+}
 
 ```
 
-Managing Dynamic Memory Is Error-Prone: can avoid all of these problem by using smart pointers exclusively. 
-1. 忘记```delete```内存 -- 内存泄漏问题, memory is never returned to the free store, 查找内存泄漏错误是困难的, 因为通常程序运行很长时间后，真正耗尽内存是，才能检测到这种错误
-2. Using an object after it has been deleted. This error can sometimes be detected by <span style="background-color:#FFFF00">**making the pointer null** after the delete</span>.
-3. 同一块内存释放两次. This error can happen <span style="background-color:#FFFF00">when **two pointers** address **the same dynamically allocated object**</span>. If delete is applied to one of the pointers, then the object’s memory is returned to the free store. <span style="color:red">If we subsequently delete the second pointer, then the free store may be corrupted</span>.
 
+Define and Change shared_ptr
 
-**(5).Resetting the Value of a Pointer after a delete ...**
+| Syntax | Description | 
+| --- | :--- | 
+| ```shared_ptr<T>p(q)```  | p manages the object to which the **built-in pointer** q points; <span style="color:red">q must point to **memory allocated** by ```new```</span>  and must be convertible to ```T*``` |
+| ```shared_ptr<T> p (u)``` | p assumes ownership from the ```unique_ptr``` u(接管u接管了对象所有权); makes ```u``` null (将u设置成null)|
+| ```shared_ptr<T> p (q, d)``` | p assumes ownership from the object to which <span style="color:red">**built-in poiner** q points</span>. q must be convertible to ```T*```, p will <span style="color:red">use</span> the callable object <span style="color:red">d(lambda expression) in place of ```delete``` to free q</span> (call d 代替 delete ) |
+| ```shared_ptr<T>p (p2, d)``` | p is a copy of shared_ptr p2 (递增p2的计数器) except that p uses the callable object d  in place of ```delete``` |
+| ```p.reset()``` <br/> ```p.reset(q)``` <br/> ```p.reset(q,d)``` | 若p is <span style="color:red">only</span> shared_ptr pointing at its object, ```reset``` <span style="color:red">frees p's existing object</span>. 若传递了可选的参数**built-in pointer** q, makes p pointer to q, otherwise <span style="color:red">makes p null</span>. If d is supplied will call d to free q otherwise uses ```delete``` to free q | 
 
-- 当```delete``` pointer, <span style="color:red">pointer becomes **invalid**</span>. 尽管pointer is invalid, <span style="color:red">pointer 继续hold the address of the dynamic memory</span>.  After the delete, the pointer becomes what is referred to as a <span style="background-color:#FFFF00">**dangling pointer**</span>. 即曾经保存对象数据 但现已经无效的内存指针
-  - Dangling pointers have all the problems of uninitialized pointers. 有种方法可以避免问题: 即 If need to keep the pointer after delete memory 在离开现scope前<span style="color:red">assign **nullptr** to the pointer after we use delete</span>. 这样清楚指出指针不指向任何对象
+reset + unique
 
-
-下面例子中p 和 q, 指向the same dynamically allocated object. We ```delete``` that memory and set ```p``` to ```nullptr```, 表示 that the pointer no longer points to an object. However, <span style="background-color:#FFFF00">resetting p has no effect on q, which became invalid when we deleted the memory to which p</span>
 ```c++
-int *p(new int(42)); // p points to dynamic memory
+if (!p.unique()) //true 表示p不是唯一控制underlying object的
+    p.reset(new string(*p)); // 我们不是唯一用户, 分配新的拷贝
 
-auto q=p; // p and q pointtothesamememory 
-
-delete p; // invalidates both p and q
-
-p = nullptr; // indicates that p is no longer bound to an object
+*p += newVal; // now that 我们知道自己是唯一用户, okay to change this object
 
 ```
+
+
+
+
+
+**Don’t Mix Ordinary Pointers and Smart Pointers**
+
+- A shared_ptr can coordinate destruction only with other shared_ptrs that are copies of itself(当只有自身拷贝，可以call destructor). 这也是推荐使用 recommend using ```make_shared``` rather than ```new```. ```make_shared``` we <span style="background-color:#FFFF00">bind a shared_ptr to the object at **the same time** that we **allocate** it</span>. <span style="color:red">从而避免了将同一块内存绑定到多个独立创建的```shared_ptr```上</span>
+- It is <span style="color:red">dangerous to use a **built-in pointer** to access an object owned by a smart pointer</span>, because we may not know when that object is destroyed.
+- When we <span style="color:red">bind a shared_ptr to a plain pointer</span>, we give responsibility for that **memory** to that shared_ptr. we should <span style="color:red">no longer use a built-in pointer to access the memory</span> to which the shared_ptr now points
+
+下面例子 parameter to ```process``` is <span style="color:red">passed **by value**</span>. 
+-  正确方式是 pass it a ```shared_ptr``` 因此 argument to ```process``` is copied into ```ptr```. Copying a shared_ptr increments its reference count. Thus, inside process the count is at least 2. When process completes, ptr reference count 会递减, 但不会变为0，因此当局部变量ptr被销毁时, the memory to which ptr points will not be deleted。 
+-  错误的方法二: 传递了一个临时的shared_ptr that we explicitly construct from a built-in pointer. 但是会有error, 因为pass的是temporary. That <span style="background-color:#FFFF00">**temporary is destroyed**</span> when the expression in which the <span style="background-color:#FFFF00">**call appears finishes**</span>. Destroying the temporary decrements the reference count, which goes to zero. <span style="color:red">临时对象被销毁时,所指的内存会被释放</span>. But x continues to point to that (freed) memory; x is now a **dangling pointer**. <span style="color:red">Attempting to use the value of x is **undefined**</span>.
+
+```c++
+// ptr is created and initialized when process is called 
+
+void process(shared_ptr<int> ptr)
+{
+    // use ptr
+
+} // ptr goes out of scope and is destroyed
+
+
+shared_ptr<int> p(new int(42)); // reference count is 1
+
+process(p); // copying p increments its count; in process the reference count is 2
+
+int i = *p; // ok: reference count is 1
+
+
+
+int *x(new int(1024)); // dangerous: x is a plain pointer, not a smart pointer
+
+process(x); // error: cannot convert int* to 
+
+shared_ptr<int> process(shared_ptr<int>(x)); // legal, but the memory will be deleted!
+
+//shared_ptr<int>(x) 是 r-value 在function完之后, 就被删除掉了, 明天记得debug看什么时候删除的
+
+int j = *x; // undefined: x is a dangling pointer!
+
+```
+
+
+**Don’t Use get to Initialize or Assign Another Smart Pointer**
+
+- smart pointer 定义了一个函数 ```get```, <span style="background-color:#FFFF00">**返回built-in pointer**</span> to the object that smart pointer is managing. 此函数是为了这样一种情况设计的:
+  - This function is intended for cases when we need to <span style="color:red">pass a built-in pointer</span> to code that <span style="color:red">can’t use a smart pointer</span>. <span style="color:red">The code</span> that uses the return from get <span style="color:red">**must not delete that pointer**</span>.
+- Although the compiler will not complain, it is an <span style="color:red">**error** to bind another smart pointer to the pointer returned by ```get```</span>
+
+下面例子中, p 和 q是相互独立的创建的, 各自的计数器都是1, 当q所在block结束时, q被destroyed -> free the memory to which q points. makes p into a **dangling pointer**. 意味着attempt to use p is undefined. Moreover, <span style="background-color:#FFFF00">when p is destroyed, the pointer to that memory will be deleted a second time.</span>
+```c++
+shared_ptr<int> p(new int(42)); // reference count is 1
+
+int *q = p.get(); // ok: but don't use q in any way that might delete its pointer
+
+{ 
+    // undefined: 两个独立的shared_ptr指向相同的内存
+    
+    shared_ptr<int>(q);
+
+} // block ends, q is destroyed, and the memory to which q points is freed
+
+int foo = *p; // undefined; the memory to which p points was freed
+
+```
+
+
+**(6). Smart Pointers and Exceptions**
+
+-  <span style="background-color:#FFFF00">Need to ensure that resources are properly freed if an exception occurs</span>. One easy way to make sure resources are freed is to **use smart pointers**.
+-  When we use a smart pointer, the smart pointer class <span style="color:red">**ensures that memory is freed**</span> when it is no longer needed even if the <span style="color:red">block is exited prematurely</span>:
+    - When a function is exited, 正常处理结束或者发生了异常, 无论哪种情况 all the local objects are destroyed
+   - 如果使用built-in pointer 管理内存, 在```new```之后对应的```delete```发生异常, 内存不会自动释放
+- <span style="color:red">classes</span> that are designed to be <span style="color:red">used by both C and C++</span> generally <span style="color:red">require</span> the user to specifically <span style="color:red">free any resources</span> that are used.
+
+下面第一个例子 即使有异常, 内存会自动被释放, 第二个例子, 如果异常在```new```和 ```delete```之间且异常未被catch, <span style="color:red">this memory can never be freed</span>
+```c++
+void f()
+{
+shared_ptr<int> sp(new int(42)); // allocate a new object
+
+// code that throws an exception that is not caught inside f 
+
+} // 函数结束时 shared_ptr 自动释放内存
+
+
+void f()
+{
+int *ip = new int(42); // dynamically allocate a new object
+
+ // code that throws an exception that is not caught inside f
+
+delete ip; // free the memory before exiting
+
+}
+
+```
+
+<span style="color:red">Classes that **allocate resources**—and that **do not define destructors** to free those resources</span>—can be subject to the same kind of <span style="color:red">errors that arise when we use **dynamic memory**</span>. 比如下面例子如果connection had a destructor, that destructor would automatically close the connection when f completes.问题与memory leak 几乎是等价的.  解决方法用```shared_ptr``` + ```delete```, 定义一个函数代替```delete```, <span style="color:red">即使发生异常, 也可以正确的关闭</span>
+
+```c++
+struct destination; // 表示我们正在连接什么
+
+struct connection; // 表示我们连接所需要的信息
+
+ connection connect(destination*); //打开连接 
+ 
+ void disconnect(connection); // 关闭连接
+ 
+ void f(destination &d /* other parameters */)
+{
+// 获得连接，接住使用完后要关闭它
+
+connection c = connect(&d);
+
+// use the connection
+
+// 如果在f退出前忘记调用disconnect, 就无法关闭c了
+}
+
+//解决方法
+
+void end_connection(connection *p) { disconnect(*p); }
+
+void f(destination &d /* other parameters */)
+{
+    connection c = connect(&d);
+    shared_ptr<connection> p (&c, end_connection);
+    //使用连接
+
+    //当f 退出时（即使是由于异常退出）, connection会被正确关闭
+}
+
+```
+
+
+**Smart Pointer Pitfalls**
+1. 不使用相同的built-in pointer value to initialize more than one smart pointer 
+2. 不delete ```get``` 返回的指针
+3. Don’t use ```get()``` to initialize or ```reset``` another smart pointer.
+4. If you use a pointer returned by ```get()```, remember that the <span style="color:red">pointer</span> will <span style="color:red">become **invalid** when the last corresponding smart pointer goes away.</span>
+5. 如果使用smart pointer to manage a resource other <span style="background-color:#FFFF00">a resource other than memory allocated by new, remember to pass a deleter</span>
+
+
+
+#### (c). unique_ptr
+
+
 
 
 
