@@ -5899,7 +5899,7 @@ shared_ptr<double> p1; // shared_ptr that can point at a double
 shared_ptr<int> p2(new int(42)); // p2 points to an int with value 42
 
 
-shared_ptr<int>p1 = new  = new int(1024);//error: must use direct initialization
+shared_ptr<int>p1 = new int(1024);//error: must use direct initialization
 
 shared_ptr<int> p2(new int(1024)); // ok: uses direct initialization
 
@@ -6087,7 +6087,7 @@ void f(destination &d /* other parameters */)
 2. 不delete ```get``` 返回的指针
 3. Don’t use ```get()``` to initialize or ```reset``` another smart pointer.
 4. If you use a pointer returned by ```get()```, remember that the <span style="color:red">pointer</span> will <span style="color:red">become **invalid** when the last corresponding smart pointer goes away.</span>
-5. 如果使用smart pointer to manage a resource other <span style="background-color:#FFFF00">a resource other than memory allocated by new, remember to pass a deleter</span>
+5. 如果使用smart pointer to manage <span style="background-color:#FFFF00">a resource other than memory allocated by new, remember to pass a deleter</span>
 
 
 
