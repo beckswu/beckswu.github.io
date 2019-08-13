@@ -5936,6 +5936,7 @@ reset + unique
 
 ```c++
 if (!p.unique()) //true 表示p不是唯一控制underlying object的
+    
     p.reset(new string(*p)); // 我们不是唯一用户, 分配新的拷贝
 
 *p += newVal; // now that 我们知道自己是唯一用户, okay to change this object
@@ -6075,6 +6076,7 @@ void f(destination &d /* other parameters */)
     //使用连接
 
     //当f 退出时（即使是由于异常退出）, connection会被正确关闭
+    
 }
 
 ```
