@@ -5891,7 +5891,7 @@ void StrBlob::check(size_type i, const string & msg) const {
     - a function that <span style="color:red">returns a shared_ptr **cannot implicitly convert** a plain pointer</span> in its return statement
 - <span style="color:red">a pointer used to initialize a smart pointer must point to **dynamic memory**</span> because, by default, smart pointers <span style="color:red">use ```delete``` to **free the associated object**</span>.
 - ```reset``` 通常与 ```unique``` 一起使用, 控制多个shared_ptr 共享的对象. <span style="background-color:#FFFF00">Before changing the **underlying object**, we check whether we’re the only user</span>. If not, we <span style="background-color:#FFFF00">**make a new copy** before making the change</span>, 详见下面例子
-
+- <span style="color:red">**当用shared_ptr with dynamic allocated array, 必须用deleter**, 否则删除的只是array的第一个元素</span>
 
 ```c++
 shared_ptr<double> p1; // shared_ptr that can point at a double 
@@ -5944,7 +5944,12 @@ if (!p.unique()) //true 表示p不是唯一控制underlying object的
 ```
 
 
+当用shared_ptr with dynamic allocated array, 必须用deleter
 
+
+```c++
+shared_ptr<Dog>p1(new Dog[3], [](Dog * p){delete[] p;});
+```
 
 
 **Don’t Mix Ordinary Pointers and Smart Pointers**
@@ -6092,6 +6097,208 @@ void f(destination &d /* other parameters */)
 
 
 #### (c). unique_ptr
+
+- Unlike ```shared_ptr```, <span style="background-color:#FFFF00">**only one unique_ptr**</span> at a time can point to a <span style="background-color:#FFFF00">given object</span> 只能有一个指定给定对象
+- <span style="color:red">The object</span> to which a ```unique_ptr``` points <span style="color:red">is destroyed when the ```unique_ptr``` is destroyed</span>
+- Unlike ```shared_ptr,``` there is <span style="background-color:#FFFF00">no library function comparable to ```make_shared``` </span> that returns a ```unique_ptr```. 当定义```unique_ptr``` 时, 需要将其绑定到一个```new``` 返回的指针上
+- As with ```shared_ptrs```, we must use the <span style="color:red">direct form of initialization</span>:
+- <span style="background-color:#FFFF00">不能copy unique_ptr</span>, cannot assign 一个 unique_ptr 给另一个 unique_ptr
+  - 虽然不能copy, 但可以调用```release```(返回当前保存的指针 并将其设为null， 切断unique_ptr和它原来管理的对象联系) or ```reset```
+    - release 返回的通常用来<span style="color:red">initialize or assign 另一个smart pointer</span>
+- one exception to the rule that we cannot copy a unique_ptr: We can <span style="color:red">copy or assign a unique_ptr that is about to be destroyed</span> . 最常见的例子是 when we return a unique_ptr from a function:
+  - 较早版本有个```auto_ptr```, 具有unique_ptr 部分特性, 但是不能在容器中保存```auto_ptr```, 也不能返回```auto_ptr```. 虽然```auto_ptr```仍是标准库的一部分, 但程序应该使用```unique_ptr```
+- Differ from shared_ptr, we must supply the deleter type inside the angle brackets for unique_ptr
+
+unique_ptr Operations 
+
+| Syntax | Description | 
+| --- | :--- | 
+| ```unique_ptr<T>u1```  | **Null** unique_ptr that can point to objects of type T. u1 will <span style="color:red">use ```delete``` to free its pointer</span>  |
+| ```unique_ptr<T,D>u2``` | u2 will use a <span style="color:red">callable object of type D to free its pointer</span> | 
+| ```unique_ptr<T,D>u(d)``` | **Null** unique_ptr that point to objects of type T that <span style="color:red">uses d</span>, which must be an object of type D <span style="color:red"> inplace of ```delete```</span> | 
+| ```u = nullptr``` | <span style="color:red">Deletes</span> the object to which u points, <span style="color:red">makes u null</span> |
+| ```T* p = u.release()``` | <span style="color:red">Relinquishes control</span> of the pointer u had held; <span style="color:red">**returns the pointer** u had held</span> and <span style="color:red">**makes u null**</span> | 
+| ```u.reset()``` <br/> ```u.reset(q)``` <br/> ```u.reset(nullptr)``` | <span style="color:red">Deletes the object to which u points</span>; If the **built-in pointer** q is supplied, <span style="color:red">makes u point to that object</span>. Otherwise makes u null | 
+
+```c++
+unique_ptr<double> p1; // unique_ptr that can point at a double 
+
+unique_ptr<int> p2(new int(42)); // p2 points to int with value 42
+
+unique_ptr<string> p1(new string("Stegosaurus")); 
+unique_ptr<string> p2(p1); // error: no copy for unique_ptr 
+
+unique_ptr<string> p3;
+p3 = p2; // error: no assign for unique_ptr
+
+````
+
+reset / release
+```c++
+// transfers ownership from p1 to p2 
+
+unique_ptr<string> p2(p1.release()); // release makes p1 null
+
+unique_ptr<string> p3(new string("Trex"));
+
+// 将所有权从p3 转移给 q2
+
+p2.reset(p3.release()); // reset 释放了p2原来的内存, 将p3指针所有权转移给p2 并将p3设置为空,
+
+```
+
+
+copy unique pointer from function return. 下面两个例子, compiler knows 返回的对象将要被销毁, 在此情况下, the compiler does a special kind of “copy” which we’ll discuss in § 13.6.2.
+
+```c++
+unique_ptr<int> clone(int p) {
+// ok: explicitly create a unique_ptr<int> from int*
+
+    return unique_ptr<int>(new int(p));
+}
+
+//can return a copy of local object
+
+unique_ptr<int> clone(int p) { 
+    unique_ptr<int> ret(new int (p)); 
+    // . . .
+    
+    return ret;
+}
+
+```
+
+deleter
+
+```c++
+// p points to an object of type objT and uses an object of type delT to free that object
+
+// it will call an object named fcn of type delT 
+
+unique_ptr<objT, delT> p (new objT, fcn);
+
+void f(destination &d /* other needed parameters */)
+{
+    connection c = connect(&d); // open the connection 
+    
+    // when p is destroyed, the connection will be closed
+
+    unique_ptr<connection, decltype(end_connection)*> p(&c, end_connection);
+    // when f exits, even if by an exception, the connection will be properly closed 
+    
+}
+```
+
+
+#### (d). weak_ptr
+
+- A weak_ptr  is a smart pointer that <span style="background-color:#FFFF00">does not control the lifetime of the object</span> to which it points. Instead, a weak_ptr <span style="background-color:#FFFF00">points to an object that is **managed by a shared_ptr**</span>
+  - <span style="color:red">Binding</span> a **weak_ptr** to a **shared_ptr** does <span style="color:red">not change the reference count</span> of that **shared_ptr**. 当最后一个指向对象的 shared_ptr 被销毁,对象就被deleted. That <span style="color:red">object will be deleted</span> even if there are<span style="color:red"> weak_ptrs pointing to it</span>—hence the name weak_ptr, which captures the idea that a weak_ptr shares its object “weakly.”
+- <span style="color:red">创建weak_ptr 需要shared_ptr 来初始化</span>
+- Because the <span style="color:red">object might no longer exist</span>, we <span style="color:red">cannot use a weak_ptr to access</span> its object directly. To access that object, we <span style="color:red">must call ```lock```</span>. The lock function checks whether the object to which the weak_ptr points still exists.如果存在，lock <span style="color:red">returns a shared_ptr to the shared object</span>, 也保证所指向的底层对象也会存在
+
+
+
+| Syntax | Description | 
+| --- | :--- | 
+| ```weak_ptr<T>w```  |  Null weak_ptr that can point at objects of type T | 
+| ```weak_ptr<T>w(sp)``` | weak_ptr that <span style="background-color:#FFFF00">points to the same object as the shared_ptr sp</span>. T must be convertible to the type to which sp points. |
+| ```w = p``` | <span style="background-color:#FFFF00">**p can be shared_ptr or a weak_ptr**</span>. After the assignment w shares ownership with p | 
+| ```w.reset()``` | Makes w null |
+| ```w.use_count()``` | **The number of shared_ptrs** that share ownership with w | 
+| ```w.expired()``` | Returns true if ```w.use_count()``` is zero, false otherwhise |
+| ```w.lock()``` |  If <span style="background-color:#FFFF00">expired</span> is <span style="background-color:#FFFF00">true</span>, <span style="background-color:#FFFF00">returns a null shared_ptr</span>; <span style="background-color:#FFFF00">otherwise returns a shared_ptr to the object</span> to which w points |
+
+注意当绑定p 到 wp, <span style="color:red">use count 不变</span>
+```c++
+auto p = make_shared<int>(42); 
+weak_ptr<int>wp(p); // wp weakly shares with p; use count in p is unchanged
+
+```
+
+use ```lock```, 下面语句中np访问对象是安全的 
+```c++
+if (shared_ptr<int> np = wp.lock()) {   // true if np is not null
+
+// inside the if, np shares its object with p 
+
+}
+
+
+应用 define a companion pointer class for our StrBlob class, 注意下面class StrBlobPtr 不能绑定到const StrBlob 对象, 因为 that <span style="color:red">the constructor takes a reference to a nonconst object</span> of type StrBlob.
+
+```c++
+class StrBlobPtr; //对于StrBlob中的友元声明来说, 前置声明是必要的
+
+class StrBlob{//具体定义在上面的shared_ptr,这里加了个friend class
+
+    friend class StrBlobPtr; //因为StrBlobPtr 要access StrBlob private member Data
+
+    StrBlobPtr begin() {return StrBlobPtr(*this); }
+    StrBlobPtr end() {
+        auto ret =  StrBlobPtr(*this, data->size()); 
+        return ret;
+    }
+};
+
+class StrBlobPtr{
+public:
+    StrBlobPtr(): cur(0) {} 
+    StrBlobPtr(StrBlob & a, size_t sz = 0): wptr(a.data), curr(sz) {}
+    std::string& deref() const; 
+    StrBlobPtr& incr(); //前缀递增
+
+private:
+    std::shared_ptr<std::vector<std::string>> check(std::size_t, const std::string&) const;
+    //保存一个weak_ptr, 意味着底层vector可能被销毁
+
+    std::weak_ptr<std::vector<std::string>> wptr;
+
+    std::size_t curr; //在数组中当前位置
+
+};
+
+//StrBlobPtr check 与 StrBlob check不同，需要检查指针是否存在
+
+std::shared_ptr<std::vector<std::string>> StrBlobPtr::check(
+    std::size_t i, const std::string& msg) const
+{
+    auto ret = wptr.lock(); //vector还存在吗？
+
+    if(!ret) throw std::runtime_error("unbound StrBlobPtr");
+    if(i>=ret->size())
+        throw std::out_of_range(msg);
+    return ret; //返回指向vector的shared_ptr
+}
+
+std::string& StrBlobPtr::deref() const{
+    auto p = check(curr, "deference past end");
+    return (*p)[curr]; //(*p)解引用获取vector
+}
+
+StrBlobPtr& StrBlobPtr::incr(){
+    // if curr already points past the end of the container, can't increment it 
+    
+    check(curr, "increment past end of StrBlobPtr"); 
+    
+    ++curr; // advance the current state
+
+    return *this;
+}
+```
+
+
+#### (e). Dynamic Arrays
+
+- ```new``` and ```delete``` operators <span style="background-color:#FFFF00">**allocate** objects **one at time**</span> 一次只能分配释放一个
+- 例如vector 和string, 有时候需要一次为很多对象分配内存. C++ 定义了两种 <span style="color:red">**an array of objects** at once</span>(一次分配一个对象数组)
+    - ```new``` :
+    - ```allocator``` let us <span style="color:red">**separate** allocation from initialzation</span>. Use ```allocator``` better performance and more flexible memory management
+
+
+
+
+
 
 
 
