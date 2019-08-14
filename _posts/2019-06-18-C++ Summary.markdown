@@ -6294,6 +6294,74 @@ StrBlobPtr& StrBlobPtr::incr(){
 - 例如vector 和string, 有时候需要一次为很多对象分配内存. C++ 定义了两种 <span style="color:red">**an array of objects** at once</span>(一次分配一个对象数组)
     - ```new``` :
     - ```allocator``` let us <span style="color:red">**separate** allocation from initialzation</span>. Use ```allocator``` better performance and more flexible memory management
+- Most applications should <span style="color:red">use a library container rather than dynamically allocated arrays</span>. Using a container is easier, <span style="color:red">less</span> likely to contain <span style="color:red">memory- management bugs</span>, and is likely to give <span style="color:red">better performance</span>.
+    -  Classes that use the container 可以copy, assignment, and destruction. Classes that allocate dynamic arrays <span style="color:red">must define their own versions</span> of these operations to manage the associated memory
+
+**(1). new and Arrays**
+
+- ```new``` <span style="background-color:#FFFF00">**allocates** the requested number of objects</span> and (assuming the allocation succeeds) returns <span style="background-color:#FFFF00">**a pointer to the first one**</span>
+  - <span style="color:red">can also use **type alias**</span> to represent an array type
+- <span style="color:red">**Allocating an Array** Yields **a Pointer** to the Element Type</span>(not array type): 当我们用```new``` 来allocate 一个数组时, 并<span style="color:red">没有得到一个array type</span>. we get <span style="color:red">a pointer to the element type of the array</span>
+  - 不能call ```begin```, ```end``` on a dynamic array (因为这些function use the array dimension(part of array's type) to return pointers). 同时也不能用 a range ```for``` 来process the elements in a (so-called) dynamic array
+- By default, objects allocated by ```new```—whether allocated as <span style="color:red"> a single object or in an array</span>—are  <span style="color:red">**default initialized**</span>. 可以对数组中元素进行value initialization, 方法是size后面 加一个空括号
+  - 新标准下, 可以provide <span style="color:red">a braced list of element initializers</span>. 如果<span style="color:red">fewer initializers</span> than elements, <span style="color:red">remaining elements are value initialized</span>.  If there are <span style="color:red">more initializers</span> than the given size, then the new expression <span style="color:red">fails and **no storage is allocated**</span>. In this case, ```new``` throws an exception of type ```bad_array_new_length```(in ```new``` header).
+  - Although we can use <span style="color:red">**empty parentheses** to **value initialize**</span> the elements of an array, we <span style="color:red">cannot supply an element initializer</span> inside the parentheses. So <span style="color:red">cannot use ```auto``` to allocate an array </span>
+- It Is  <span style="color:red">Legal to Dynamically **Allocate an Empty Array**</span>
+  -  When we use ```new``` to allocate an array of **size zero**, <span style="color:red">new returns **a valid, nonzero pointer**</span>. That pointer is guaranteed to be <span style="color:red">distinct from any other pointer returned by ```new```</span>. 就像off-the-end pointer for a zero-element array. can use this pointer in ways that we use an off-the-end iterator
+     -  The pointer <span style="color:red">**cannot be dereferenced**</span>—after all, it points to no element
+
+
+对于type alias 即使没有方括号, the compiler <span style="color:red">executes this expression using ```new[]```</span>. Compiler executes as if we write ```int *p = new int[42];```
+```c++
+// call get_size 确定分配多少个int
+
+int *pia = new int[get_size()]; // pia points to the first of these ints
+
+//type alias
+typedef int arrT[42]; // arrT names the type array of 42 ints
+
+int *p = new arrT; // allocates an array of 42 ints; p points to the first one
+
+```
+
+initialize
+
+```c++
+int* pia = new int[10];  //10个未初始化的int
+
+int *pia2 = new int[10](); //10个值初始化为0的int
+
+string *psa = new string[10];//10个空string
+
+string *psa2 = new string[10](); // 10个空string
+
+
+//可以提供braced list of initializer
+
+//10个int 分别对应 corresponding initializer
+
+int *pia3 = new int[10]{0,1,2,3,4,5,6,7,8,9};
+
+// block of ten strings; the first four are initialized from the given initializers
+
+// remaining elements are value initialized
+
+string *psa3 = new string[10]{"a", "an", "the", string(3,'x')};
+```
+
+size zero: 对于下面的p 如果n = 0, ```p``` 可以加 0, 也可以用 ```p-p = 0``` （subtract the pointer from itself, yielding zero). for loop 条件会失败,  loop 不会执行
+
+```c++
+
+size_t n = get_size(); // get_size returns the number of elements needed 
+
+int* p = new int[n]; // allocate an array to hold the elements
+
+for (int* q = p; q != p + n; ++q)
+    /* process the array */ ;
+```
+
+
 
 
 
