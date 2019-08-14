@@ -6218,12 +6218,12 @@ weak_ptr<int>wp(p); // wp weakly shares with p; use count in p is unchanged
 
 use ```lock```, 下面语句中np访问对象是安全的 
 ```c++
-if (shared_ptr<int> np = wp.lock()) {   // true if np is not null
+if ( (shared_ptr<int> np = wp.lock()) ) {   // true if np is not null
 
 // inside the if, np shares its object with p 
 
 }
-
+```
 
 应用 define a companion pointer class for our StrBlob class, 注意下面class StrBlobPtr 不能绑定到const StrBlob 对象, 因为 that <span style="color:red">the constructor takes a reference to a nonconst object</span> of type StrBlob.
 
@@ -6269,11 +6269,13 @@ std::shared_ptr<std::vector<std::string>> StrBlobPtr::check(
     if(i>=ret->size())
         throw std::out_of_range(msg);
     return ret; //返回指向vector的shared_ptr
+    
 }
 
 std::string& StrBlobPtr::deref() const{
     auto p = check(curr, "deference past end");
     return (*p)[curr]; //(*p)解引用获取vector
+    
 }
 
 StrBlobPtr& StrBlobPtr::incr(){
@@ -6303,7 +6305,7 @@ StrBlobPtr& StrBlobPtr::incr(){
   - <span style="color:red">can also use **type alias**</span> to represent an array type
 - <span style="color:red">**Allocating an Array** Yields **a Pointer** to the Element Type</span>(not array type): 当我们用```new``` 来allocate 一个数组时, 并<span style="color:red">没有得到一个array type</span>. we get <span style="color:red">a pointer to the element type of the array</span>
   - 不能call ```begin```, ```end``` on a dynamic array (因为这些function use the array dimension(part of array's type) to return pointers). 同时也不能用 a range ```for``` 来process the elements in a (so-called) dynamic array
-- By default, objects allocated by ```new```—whether allocated as <span style="color:red"> a single object or in an array</span>—are  <span style="color:red">**default initialized**</span>. 可以对数组中元素进行value initialization, 方法是size后面 加一个空括号
+- By default, objects allocated by ```new```—whether allocated as <span style="color:red"> a single object or in an array</span>—are  <span style="color:red">**default initialized**</span>. 可以对数组中元素进行**value initialization**, 方法是size后面 <span style="color:red">加一个空括号</span>
   - 新标准下, 可以provide <span style="color:red">a braced list of element initializers</span>. 如果<span style="color:red">fewer initializers</span> than elements, <span style="color:red">remaining elements are value initialized</span>.  If there are <span style="color:red">more initializers</span> than the given size, then the new expression <span style="color:red">fails and **no storage is allocated**</span>. In this case, ```new``` throws an exception of type ```bad_array_new_length```(in ```new``` header).
   - Although we can use <span style="color:red">**empty parentheses** to **value initialize**</span> the elements of an array, we <span style="color:red">cannot supply an element initializer</span> inside the parentheses. So <span style="color:red">cannot use ```auto``` to allocate an array </span>
 - It Is  <span style="color:red">Legal to Dynamically **Allocate an Empty Array**</span>
