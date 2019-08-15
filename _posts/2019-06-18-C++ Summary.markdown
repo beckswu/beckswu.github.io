@@ -6367,7 +6367,6 @@ string *psa3 = new string[10]{"a", "an", "the", string(3,'x')};
 size zero: 对于下面的p 如果n = 0, ```p``` 可以加 0, 也可以用 ```p-p = 0``` （subtract the pointer from itself, yielding zero). for loop 条件会失败,  loop 不会执行
 
 ```c++
-
 size_t n = get_size(); // get_size returns the number of elements needed 
 
 int* p = new int[n]; // allocate an array to hold the elements
@@ -6397,7 +6396,7 @@ delete [] p; // brackets are necessary because we allocated an array
 - When a ```unique_ptr``` points to an array, we <span style="color:red">cannot use the dot and arrow member access operators</span> 因为<span style="color:red">unique_ptr points to an array, not an object </span>. 
 -  when a <span style="color:red">unqiue_ptr points to an array</span>, we <span style="color:red">can use the subscript operator</span> to access the elements(**return the object** not array) in the array, <span style="color:red">不能使用deference operator</span> 去access 第一个元素
 - Unlike unique_ptr, <span style="color:red">shared_ptrs provide no direct support for managing a dynamic array</span>. If we want to use a shared_ptr to manage a dynamic array, we must <span style="color:red">provide our own deleter</span>
-    - 如果没有提供 deleter, the code would be **undefined**.: 跟我们使用动态数组, ```delete```时忘记加```[]``` 是一样的问题
+    - 如果没有提供 deleter, the code would be **undefined**: 跟我们使用动态数组, ```delete```时忘记加```[]``` 是一样的问题
 - <span style="background-color:#FFFF00">no subscript operator for shared_ptrs</span>, and the smart pointer types do not support pointer arithmetic. 因此访问数组中元素必须<span style="color:red">用```get``` 获取一个**built-in pointer**</span>
 
 unique_ptrs to Arrays
@@ -6414,7 +6413,7 @@ The brackets in the type specifier (```<int[]>```) say that up points not to an 
 ```c++
 unique_ptr<int[]>up(new int[10]); //up 指向10个未初始化的int
 
-up.release)(); // automatically uses delete[] to destroy its pointer
+up.release(); // automatically uses delete[] to destroy its pointer
 
 ```
 
@@ -6465,7 +6464,7 @@ delete[] p; // p 指向第一个数组, 记得用delete[] 来释放
 - define in ```memory``` header, let use separate allocation from construction. It <span style="background-color:#FFFF00">provides type-aware allocation of **raw**, **unconstructed**, memory<span>.
 - define **allocator**, 需要specify type. 
 - When an allocator object allocates memory, it <span style="background-color:#FFFF00">**allocates memory**</span> that is <span style="background-color:#FFFF00">**appropriately sized**</span> and <span style="background-color:#FFFF00">**aligned to hold objects**</span> of the given type:
-- It is an <span style="color:red">**error** to use raw memory</span> in which an object has <span style="color:red">not been constructed</sapn>
+- It is an <span style="color:red">**error** to use raw memory</span> in which an object has <span style="color:red">not been constructed</span>
   - We <span style="color:red">must ```construct``` objects in order to use memory returned by allocate</span>. Using unconstructed memory in other ways is undefined.
 - When we’re finished using the objects, we <span style="color:red"> must ```destroy``` the elements we constructed</span>, which we do by calling ```destroy``` on each constructed element
   - <span style="background-color:#FFFF00">只能 destroy elements that are actually **constructed**</span>.
@@ -6478,7 +6477,7 @@ delete[] p; // p 指向第一个数组, 记得用delete[] 来释放
 | ```a.allocate(n) ``` | <span style="background-color:#FFFF00">Allocate **raw**, **unconstructed** memory to hold n objects</span> of type T | 
 | ```a.deallocate(p, n) ``` | <span style="background-color:#FFFF00">Deallocates memory that n objects</span> of type T starting at the addresss in ```T*``` pointer p; <span style="color:red">p must be a pointer previously **returned by allocate**, and n must be the **size requested** when p was created</span>. The user must <span style="color:red">run ```destory```</span> on any objects that were constructed in this memory <span style="color:red">before calling ```deallocated```</span>  | 
 | ```a.construct(p, args) ``` |  <span style="background-color:#FFFF00">p</span> must be a pointer to type T that <span style="background-color:#FFFF00">**points to raw memory**</span>; args are passed to constructor for type T, which is used to construct an object in the memory pointer to by p  |
-| ```a.destroy(p) ``` | Runs the destructor on object pointed to by the the ```T*``` pointer p | 
+| ```a.destroy(p) ``` | Runs the destructor on object pointed to by the the ```T*``` pointer p, 需要一个一个删除 | 
 
 
 下面例子分配n个未初始化的string
@@ -6507,6 +6506,7 @@ cout << *q << endl; // disaster: q points to unconstructed memory!
 
 
 //必须删除用完的元素
+
 while (q != p)
     alloc.destroy(--q); // free the strings we actually allocated
 
@@ -6517,7 +6517,7 @@ alloc.deallocate(p, n);
 
 
 **Algorithms to Copy and Fill Uninitialized Memory**
-
+- allocator的 ```construct```只能一个一个construct, 不能批量construct, ```uninitialized_copy``` 和 ```uninitialized_fill_n``` 可以<span style="background-color:#FFFF00">批量</span>  construct
 -  The <span style="background-color:#FFFF00">destination iterator</span> passed to ```uninitialized_copy``` must denote <span style="background-color:#FFFF00">**unconstructed memory**</span>.  Unlike copy, uninitialized_copy constructs elements in its destination.
 -  Like ```copy```, ```uninitialized_copy``` <span style="color:red">returns its (incremented) **destination** iterator</span>. ```uninitialized_copy``` returns a pointer positioned <span style="color:red">**one element past** the last constructed element</span>.
 
@@ -6525,7 +6525,7 @@ alloc.deallocate(p, n);
 | --- | :--- | 
 | ```uninitialized_copy(b,e,b2) ```  | Copies elements from the input range denoted by iterators b and e into <span style="background-color:#FFFF00">**unconstructed, raw memory**</span> denoted by the iterator b2. The memory denoted by <span style="background-color:#FFFF00">b2 must be large enough</span> to hold a copy of the elements in the input range |
 | ```uninitialized_copy_n(b,n,b2) ```  | <span style="color:red">Copies n elements starting from iterator b into **raw memory** starting at b2</span> | 
-| ```uninitialized_fill(b,e,t) ```  | Constructed objects in the range of **raw memory** denoted by iterators b and e as a copy of t (从b到e 值均为tt的拷贝) |
+| ```uninitialized_fill(b,e,t) ```  | Constructs objects in the range of **raw memory** denoted by iterators b and e as a copy of t (从b到e 值均为tt的拷贝) |
 | ```uninitialized_fill_n(b,n,t) ```  | Constructs an unsigned number n objects starting at iterator b. b must denote <span style="color:red">**unconstructed, raw memory** large enough</span> to hold the given number of objects |
 
 
