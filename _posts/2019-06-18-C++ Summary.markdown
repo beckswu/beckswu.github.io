@@ -6133,6 +6133,16 @@ p3 = p2; // error: no assign for unique_ptr
 
 ````
 
+```nullptr``` 没有 allocate memory 不能dereference
+
+```
+unique_ptr<int>pt;
+*pt = 0;//error 因为nullptr 并没有allocate memory
+
+unique_ptr<int>pt(new int(0));
+*pt = 0;
+    
+```
 reset / release
 ```c++
 // transfers ownership from p1 to p2 
@@ -6305,13 +6315,16 @@ StrBlobPtr& StrBlobPtr::incr(){
   - <span style="color:red">can also use **type alias**</span> to represent an array type
 - <span style="color:red">**Allocating an Array** Yields **a Pointer** to the Element Type</span>(not array type): 当我们用```new``` 来allocate 一个数组时, 并<span style="color:red">没有得到一个array type</span>. we get <span style="color:red">a pointer to the element type of the array</span>
   - 不能call ```begin```, ```end``` on a dynamic array (因为这些function use the array dimension(part of array's type) to return pointers). 同时也不能用 a range ```for``` 来process the elements in a (so-called) dynamic array
-- By default, objects allocated by ```new```—whether allocated as <span style="color:red"> a single object or in an array</span>—are  <span style="color:red">**default initialized**</span>. 可以对数组中元素进行**value initialization**, 方法是size后面 <span style="color:red">加一个空括号</span>
+- By default, objects allocated by ```new```—whether allocated as <span style="color:red"> a single object or in an array</span>—are  <span style="background-color:#FFFF00">**default initialized**(没有default constructor 不能dynamically allocated as array)</span>. 可以对数组中元素进行**value initialization**, 方法是size后面 <span style="color:red">加一个空括号</span>
   - 新标准下, 可以provide <span style="color:red">a braced list of element initializers</span>. 如果<span style="color:red">fewer initializers</span> than elements, <span style="color:red">remaining elements are value initialized</span>.  If there are <span style="color:red">more initializers</span> than the given size, then the new expression <span style="color:red">fails and **no storage is allocated**</span>. In this case, ```new``` throws an exception of type ```bad_array_new_length```(in ```new``` header).
   - Although we can use <span style="color:red">**empty parentheses** to **value initialize**</span> the elements of an array, we <span style="color:red">cannot supply an element initializer</span> inside the parentheses. So <span style="color:red">cannot use ```auto``` to allocate an array </span>
 - It Is  <span style="color:red">Legal to Dynamically **Allocate an Empty Array**</span>
   -  When we use ```new``` to allocate an array of **size zero**, <span style="color:red">new returns **a valid, nonzero pointer**</span>. That pointer is guaranteed to be <span style="color:red">distinct from any other pointer returned by ```new```</span>. 就像off-the-end pointer for a zero-element array. can use this pointer in ways that we use an off-the-end iterator
      -  The pointer <span style="color:red">**cannot be dereferenced**</span>—after all, it points to no element
-
+- To <span style="color:red">free a dynamic array</span>, we use a special form of ```delete``` - 在指针前加上一个空方括号
+    - Elements in an array are <span style="background-color:#FFFF00">destroyed in **reverse order**</span>. That is, the last element is destroyed first, then the second to last, and so on.
+    - 当 ```delete``` a pointer to an array, empty bracket pair is essential: 指示compiler <span style="color:red">此指针指向一个对象数组的第一个元素</span>. <span style="color:red">如果忽略方括号 or 在删除a pointer to an object(not array)时候provide 方括号, behavior is undefined</span>.
+    - The compiler is <span style="color:red">unlikely to warn</span> us if we <span style="color:red">forget the brackets when we delete a pointer to an array</span> or if we <span style="color:red">use them when we delete a pointer to an object</span>. Instead, our program is apt to misbehave without warning during execution(行为异常).
 
 对于type alias 即使没有方括号, the compiler <span style="color:red">executes this expression using ```new[]```</span>. Compiler executes as if we write ```int *p = new int[42];```
 ```c++
@@ -6363,19 +6376,284 @@ for (int* q = p; q != p + n; ++q)
     /* process the array */ ;
 ```
 
+delete 
+
+```c++
+delete p; //p must point to a dynamically allocated object or be null
+
+delete [] pa; // pa must point to a dynamically allocated array or be null
+
+typedef int arrT[42];
+int *p = new arrT; // allocates an array of 42 ints; p points to the first one
+
+delete [] p; // brackets are necessary because we allocated an array
+
+```
+
+**(2). Smart Pointers and Dynamic Arrays**
+
+- To use a unique_ptr to manage a dynamic array, we <span style="color:red">must include a pair of empty brackets</span> after the object type
+    - when <span style="color:red">destroys</span> the pointer it manages, it will <span style="color:red">automatically use ```delete[]```</span>.
+- When a ```unique_ptr``` points to an array, we <span style="color:red">cannot use the dot and arrow member access operators</span> 因为<span style="color:red">unique_ptr points to an array, not an object </span>. 
+-  when a <span style="color:red">unqiue_ptr points to an array</span>, we <span style="color:red">can use the subscript operator</span> to access the elements(**return the object** not array) in the array, <span style="color:red">不能使用deference operator</span> 去access 第一个元素
+- Unlike unique_ptr, <span style="color:red">shared_ptrs provide no direct support for managing a dynamic array</span>. If we want to use a shared_ptr to manage a dynamic array, we must <span style="color:red">provide our own deleter</span>
+    - 如果没有提供 deleter, the code would be **undefined**.: 跟我们使用动态数组, ```delete```时忘记加```[]``` 是一样的问题
+- <span style="background-color:#FFFF00">no subscript operator for shared_ptrs</span>, and the smart pointer types do not support pointer arithmetic. 因此访问数组中元素必须<span style="color:red">用```get``` 获取一个**built-in pointer**</span>
+
+unique_ptrs to Arrays
+
+| Syntax | Description | 
+| --- | :--- | 
+| ```unique_ptr<T[]> u ```  | u can point to a dynamically allocated array of type T |
+| ```unique_ptr<T[]> u(p) ``` | u points to the dynamically allocated array to which the **built-in pointer** p pointers. p must be convertible to ```T*``` | 
+| ```u[i]``` |  <span style="color:red">**Returns the object** at position i</span> in the array that u owns. <span style="color:red">**u must point to an array**</span> | 
 
 
 
+The brackets in the type specifier (```<int[]>```) say that up points not to an int but to an array of ints. 当销毁它的管理指针时候, 会自动call ``delete[]```
+```c++
+unique_ptr<int[]>up(new int[10]); //up 指向10个未初始化的int
+
+up.release)(); // automatically uses delete[] to destroy its pointer
+
+```
+
+```c++
+for (size_t i = 0; i != 10; ++i)
+    up[i] = i; // 为每个元素赋予一个新的值
+
+```
+
+为了使用shared_ptr 来管理动态数组, 必须提供一个动态数组
+```c++
+shared_ptr<int>sp(new int[10], [](int *p){delete[] p;});
+sp.reset(); //uses the lambda we supplied that uses delete[] to free the array
+
+```
+
+shared_ptrs don't have subscript operator and don't support pointer arithmetic 
+```c++
+for (size_t i = 0; i != 10; ++i)
+    *(sp.get() + i) = i; // use get to get a built-in pointer
+
+```
+
+#### (f). Allocator Class
+
+- ```new``` combines <span style="color:red">**allocating memory with constructing object(s)**</span> in that memory. Similarly, <span style="color:red">**delete combines destruction with deallocation**</span>.  Combining initialization with allocation is usually what <span style="background-color:#FFFF00">we want when we allocate a single object</span>. 
+    - 当分配一大块内存时, we often plan to construct objects in that memory <span style="color:red">as needed</span>. we’d like to <span style="color:red">decouple memory allocation from object construction</span>. means that we can allocate memory in large chunks and <span style="color:red">pay the overhead of constructing</span> the objects only when we actually <span style="color:red">need to create them</span>.
 
 
+比如下面例子```new``` 分配了 n 个string, 但是可能不需要n个string, 少量就满足了, 这样可能创建了一些永远得不到的对象. 而且<span style="background-color:#FFFF00">每个元素被赋值两次</span>, 第一次在default initialized, 第二次在assign 时候
+```c++
+string *const p = new string[n]; // construct n empty strings
+  
+string s;
+string *q = p; //q指向p的第一个元素
+
+while (cin >> s && q != p +n)
+    *q++ = s; //赋予一个新值
+
+const size_t size = q - p; //记住我们读取了几个string
+
+delete[] p; // p 指向第一个数组, 记得用delete[] 来释放
+
+```
+
+**Allocator**
+
+- define in ```memory``` header, let use separate allocation from construction. It <span style="background-color:#FFFF00">provides type-aware allocation of **raw**, **unconstructed**, memory<span>.
+- define **allocator**, 需要specify type. 
+- When an allocator object allocates memory, it <span style="background-color:#FFFF00">**allocates memory**</span> that is <span style="background-color:#FFFF00">**appropriately sized**</span> and <span style="background-color:#FFFF00">**aligned to hold objects**</span> of the given type:
+- It is an <span style="color:red">**error** to use raw memory</span> in which an object has <span style="color:red">not been constructed</sapn>
+  - We <span style="color:red">must ```construct``` objects in order to use memory returned by allocate</span>. Using unconstructed memory in other ways is undefined.
+- When we’re finished using the objects, we <span style="color:red"> must ```destroy``` the elements we constructed</span>, which we do by calling ```destroy``` on each constructed element
+  - <span style="background-color:#FFFF00">只能 destroy elements that are actually **constructed**</span>.
+  - 当元素被销毁, , we can either <span style="color:red">reuse the memory to hold other object</span> or <span style="color:red">return the memory to the system</span>. We free the memory by calling ```deallocate```
+    - pass给```deallocate```的指针<span style="color:red">不能为空(null)</span>; it <span style="color:red">must point to memory allocated by ```allocate```(分配内存的起点)</span>. Moreover, the size argument passed to deallocate must be <span style="color:red">the same size</span> as used in the <span style="color:red">call to allocate that obtained the memory</span> to which the pointer points. 如果size少了, 不会报错，会内存泄漏
+
+| Syntax | Description | 
+| --- | :--- | 
+| ```allocator<T> a ```  | Defines an ```allocator``` object named a that can allocate memory for objects of type T |
+| ```a.allocate(n) ``` | <span style="background-color:#FFFF00">Allocate **raw**, **unconstructed** memory to hold n objects</span> of type T | 
+| ```a.deallocate(p, n) ``` | <span style="background-color:#FFFF00">Deallocates memory that n objects</span> of type T starting at the addresss in ```T*``` pointer p; <span style="color:red">p must be a pointer previously **returned by allocate**, and n must be the **size requested** when p was created</span>. The user must <span style="color:red">run ```destory```</span> on any objects that were constructed in this memory <span style="color:red">before calling ```deallocated```</span>  | 
+| ```a.construct(p, args) ``` |  <span style="background-color:#FFFF00">p</span> must be a pointer to type T that <span style="background-color:#FFFF00">**points to raw memory**</span>; args are passed to constructor for type T, which is used to construct an object in the memory pointer to by p  |
+| ```a.destroy(p) ``` | Runs the destructor on object pointed to by the the ```T*``` pointer p | 
 
 
+下面例子分配n个未初始化的string
+
+```c++
+allocator<string>alloc; // object that can allocate strings
+
+auto const p = alloc.allocate(n); //分配n个unconstructed strings
+
+```
+
+<span style="color:red">The memory an allocator allocates is **unconstructed**</span>. We use this memory by constructing objects in that memory. ```construct``` 接受0个或多个argument(must match constructor for that class) 用来initialize object. error use unconstructed memory; 用完对象后, 必须用destory 来销毁他们
+
+```c++
+auto q = p; // q will point to one past the last constructed element 
+
+alloc.construct(q++); // *q is the empty string 
+
+alloc.construct(q++, 10, 'c'); // *q is cccccccccc 
+
+alloc.construct(q++, "hi"); // *q is hi!
+
+cout << *p << endl; // ok: uses the string output operator
+
+cout << *q << endl; // disaster: q points to unconstructed memory!
 
 
+//必须删除用完的元素
+while (q != p)
+    alloc.destroy(--q); // free the strings we actually allocated
 
 
+//free memory and return the memory to the system
+alloc.deallocate(p, n);
+```
 
 
+**Algorithms to Copy and Fill Uninitialized Memory**
+
+-  The <span style="background-color:#FFFF00">destination iterator</span> passed to ```uninitialized_copy``` must denote <span style="background-color:#FFFF00">**unconstructed memory**</span>.  Unlike copy, uninitialized_copy constructs elements in its destination.
+-  Like ```copy```, ```uninitialized_copy``` <span style="color:red">returns its (incremented) **destination** iterator</span>. ```uninitialized_copy``` returns a pointer positioned <span style="color:red">**one element past** the last constructed element</span>.
+
+
+| --- | :--- | 
+| ```uninitialized_copy(b,e,b2) ```  | Copies elements from the input range denoted by iterators b and e into <span style="background-color:#FFFF00">**unconstructed, raw memory**</span> denoted by the iterator b2. The memory denoted by <span style="background-color:#FFFF00">b2 must be large enough</span> to hold a copy of the elements in the input range |
+| ```uninitialized_copy_n(b,n,b2) ```  | <span style="color:red">Copies n elements starting from iterator b into **raw memory** starting at b2</span> | 
+| ```uninitialized_fill(b,e,t) ```  | Constructed objects in the range of **raw memory** denoted by iterators b and e as a copy of t (从b到e 值均为tt的拷贝) |
+| ```uninitialized_fill_n(b,n,t) ```  | Constructs an unsigned number n objects starting at iterator b. b must denote <span style="color:red">**unconstructed, raw memory** large enough</span> to hold the given number of objects |
+
+
+分配一个比vector中元素大一倍的动态内存(allocated memory), 将原来vector中元素拷贝到前一半空间, 对后一半空间给定值进行填充
+```c++
+// allocate twice as many elements as vi holds
+
+auto p = alloc.allocate(vi.size() * 2);
+
+// construct elements starting at p as copies of elements in vi
+
+auto q = uninitialized_copy(vi.begin(), vi.end(), p);
+
+uninitialized_fill_n(q, vi.size(), 42);  // initialize the remaining elements to 42
+
+```
+
+例子： 给一个文本, 给一个单词, 打印出这个单词在文本中出现多少回，在第几行，第几行的文本
+
+![](/img/post/C++/shared_ptr_eg.PNG)
+- 设计两个class ```TextQuery``` 和 ```QueryResult```
+    - 用 ```shared_ptr``` 用来传递 ```set``` (这个string 在第几行出现) 和 ```vector<string>``` (整个file 文本)  避免拷贝. 
+    - ```query```是```const``` function: ```cons```t function 巧妙使用, 因为不会改变class obejct
+    - ```auto &lines = wm[word];``` 用了 ```&```. ```wm[word]``` 返回lvalue reference, 但是 ```auto``` 对reference deduce 是value, 为了keep reference 加上 ```&```, 注意```lines``` 是 shared_ptr, ```if(!lines)``` 判断shared_ptr是否为空
+    - ``` static shared_ptr<set<line_no>> nodata(new set<line_no>);``` 定义一个局部static 对象, 指向空的行号set 的shared_ptr，避免多次定义一样的nodata 
+    - ```for (auto num : *qr.lines) ``` 解引用因为 ```qr.lines```是shared_ptr, ```*(qr.file->begin() + num)```, ```qr.file```也是shared_ptr
+
+```c++
+void runQueries(ifstream &infile){
+    TextQuery tq(infile); /
+    
+    / iterate with the user: prompt for a word to find and print results
+    while (true) {
+        cout << "enter word to look for, or q to quit: "; string s;
+        if (!(cin >> s) || s == "q") break;
+        print(cout, tq.query(s)) << endl;
+    }
+}
+
+class QueryResult; // 为了定义函数query 返回类型， 这个定义是必须的
+
+class TextQuery {
+    public:
+        using line_no = std::vector<std::string>::size_type; 
+        TextQuery(std::ifstream&);
+        QueryResult query(const std::string&) const;
+    private:
+        std::shared_ptr<std::set<line_no>>> wm;
+        std::shared_ptr<std::vector<std::string>> file; // input file
+        
+        // map of each word to the set of the lines in which that word appears 
+        
+        std::map<std::string,
+            std::shared_ptr<std::set<line_no>>> wm;
+};
+
+TextQuery::TextQuery(ifstream &is): file(new vector<string>)
+{
+    string text;
+    while (getline(is, text)) {
+        file->push_back(text);  
+        int n = file->size() - 1; //保存当前行号
+
+        istringstream line(text);  //将文本分解为单词
+
+        string word; 
+
+        while (line >> word) {
+            
+            auto &lines = wm[word]; // lines is a shared_ptr
+
+            if (!lines) // that pointer is null the first time we see word
+
+                lines.reset(new set<line_no>); // allocate a new  set
+                
+            lines->insert(n); // insert this line number
+        
+        }
+    }
+}
+
+class QueryResult {
+    friend std::ostream& print(std::ostream&, const QueryResult&);
+public:
+    QueryResult(std::string s, std::shared_ptr<std::set<line_no>> p,
+                std::shared_ptr<std::vector<std::string>> f):sought(s), lines(p), file(f) { }  
+private: 
+    std::string sought; //查询单词
+
+    std::shared_ptr<std::set<line_no>> lines; //出现的行号
+
+    std::shared_ptr<std::vector<std::string>> file; // input file 
+
+};    
+
+
+QueryResult TextQuery::query(const string &sought) const{
+    //如果未找到sought, 将返回一个指向此set的指针
+
+    static shared_ptr<set<line_no>> nodata(new set<line_no>); 
+    //使用find 而不是下标运算 表示避免将单词添加到wm 中
+    
+    auto loc = wm.find(sought);
+    if (loc == wm.end())
+        return QueryResult(sought, nodata, file); // not found
+    
+    else
+        return QueryResult(sought, loc->second, file);
+}
+
+string make_plural(size_t ctr, const string& word, const string& ending){
+    return (ctr>1) ? word: word + ending;
+}
+
+ostream &print(ostream & os, const QueryResult &qr)
+{
+    os << qr.sought << " occurs " << qr.lines->size() << " "
+        << make_plural(qr.lines->size(), "time", "s") << endl; 
+    // print each line in which the word appeared
+    
+        for (auto num : *qr.lines) 
+            // don't confound the user with text lines starting at 0
+
+             os << "\t(line " << num + 1 << ") "
+                 << *(qr.file->begin() + num) << endl;
+    return os;
+}
+```
 
 
 
