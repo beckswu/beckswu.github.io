@@ -6661,6 +6661,149 @@ ostream &print(ostream & os, const QueryResult &qr)
 ## 13. Copy Control
 
 
+#### (a). Copy, Assign, and Destroy
+
+- A constructor is the copy constructor if its <span style="background-color:#FFFF00">**first parameter is a reference to the class**</span> type and any additional parameters have default values
+  - 通常是 a reference to const
+  - 通常copy constructor is not <span style="color:red">**explicit**</span>
+  - When not define a copy constructor, the compiler **synthesizes** one for us. Unlike the synthesized default constructor, <span style="color:red">a copy constructor is synthesized even if we define other constructors</span> 即使有其他的constructor, compiler也可能定义个copy constructor for us
+- The compiler <span style="background-color:#FFFF00">copies each **nonstatic** member</span> in turn <span style="background-color:#FFFF00">from the given object into the one being created</span>. The type of each member determines how that member is copied
+  - class member 是class type, 则由copy constructor for that class 进行拷贝
+  - Although we cannot directly copy an array, <span style="background-color:#FFFF00">the synthesized copy constructor copies</span> members of array by <span style="background-color:#FFFF00">copying each element</span>. 如果array elements 是class type, 用class的copy constructor.
+-  **copy initialization** requires either the copy constructor or the move constructor.
+   -  <span style="color:red">copy constructor’s own parameter must be a **reference**</span>: 否则调用永远不会成功, 因为一直自己copy 自己 parameter
+   -  **Copy initialization** 不仅在我们用```=```定义变量时发生, 在下面情况也发生:
+       - <span style="background-color:#FFFF00">```insert``` 和 ```push``` 是**copy initialization**, whereas ```emplace``` 是 **direct initialization**</span>
+       - 对于function call, <span style="color:red">**parameters** that have a **nonreference type**</span>, 对于 function return <span style="color:red">when a function has a **nonreference return type**：are **copy initialized**</span>
+       - <span style="color:red">**Brace initialize**</span> the elements in an array or the members of an <span style="color:red">**aggregate class**</span>
+   - 对于有<span style="color:red">**explicit**</span> 限定的constructor, <span style="color:red">不能进行类型转换的copy construct</span>. matters direct initialization or copy construction
+   - During copy initialization(implicit type conversion), the compiler is permitted (but not obligated) to <span style="color:red">skip the copy/move constructor and create the object directly</span>(<span style="background-color:#FFFF00">不同type assignment initialization 可以跳过copy/move constructor 直接通过constructor to create object; 相同type assignment initialization 会通过copy constructor</span>). That is, the compiler is permitted to rewrite
+     - 即使忽略了copy/move constructor, 但是<span style="background-color:#FFFF00">copy/move constructor 必须exist(自己定义or compiler generated) and must be accessible (not private) in proram</span>
+     - 下面例子很重要, 
+  
+Synthesized Copy constructor 会copy array element 
+```c++
+struct test{
+    test(const test& t){this->a = t.a;
+        cout <<"in "<<t.a<<endl;;
+    }
+    test(int num){
+        a = num;
+    }
+    int a;
+};
+
+class Ani{
+public:
+    test array[2];
+    Ani(): array{test(10),test(15)}{}
+};
+
+Ani a;
+Ani b = a; 
+//print in 10
+
+//print in 15 
+
+```
+
+```c++
+string dots(10, '.'); // direct initialization 
+
+string s(dots);  // direct initialization 
+
+string s2 = dots;  // copy initialization 
+
+string null_book = "9-999-99999-9"; // copy initialization 
+
+string nines = string(100, '9'); // copy initialization
+
+```
+
+**Constraints on Copy Initialization**
+
+```c++
+vector<int> v1(10); // ok: direct initialization
+
+vector<int> v2 = 10; // error: constructor that takes a size is explicit
+
+void f(vector<int>); // f's parameter is copy initialized
+
+f(10); // error: can't use an explicit constructor to copy an argument
+
+f(vector<int>(10)); // ok: directly construct a temporary vector from an int
+
+```
+
+**The Compiler Can Bypass the Copy Constructor**
+```c++
+string null_book = "9-999-99999-9"; // copy initialization into
+
+string null_book("9-999-99999-9"); // compiler omits the copy constructor
+
+```
+- 例子一, implicit type conversion, 用的是constructor,  跳过copy/move constructor, 
+  - <span style="background-color:#FFFF00">不同type assignment initialization 可以跳过copy/move constructor 直接通过constructor to create object; </span>
+  -  <span style="background-color:#FFFF00">相同type assignment initialization 会通过copy constructor</span>
+- 例子二: 因为copy constructor 是private(inaccessible), 不能copy
+```
+//case 1
+
+struct str{
+    str(const str& l){
+        cout <<" goin "<<l.a<<endl;
+        this->a = l.a;
+    }
+    str(string a){
+        this->a = a;
+    }
+    string a;
+};
+
+string dog = "dog";
+str a =dog; //call constructor
+
+str b = a; //call copy constructor
+
+//case 2
+
+struct str{
+    str(string a){
+        this->a = a;
+    }
+    string a;
+private:
+    str(const str& l) = default
+};
+string dog = "dog";
+str a =dog;//error cannot copy 
+
+```
+
+**(2).The Copy-Assignment Operator**
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
