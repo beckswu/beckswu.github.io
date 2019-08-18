@@ -6664,9 +6664,9 @@ ostream &print(ostream & os, const QueryResult &qr)
 #### (a). Copy, Assign, and Destroy
 
 - A constructor is the copy constructor if its <span style="background-color:#FFFF00">**first parameter is a reference to the class**</span> type and any additional parameters have default values
-  - 通常是 a reference to const
+  - first parameter 通常是 a reference to const
   - 通常copy constructor is not <span style="color:red">**explicit**</span>
-  - When not define a copy constructor, the compiler **synthesizes** one for us. Unlike the synthesized default constructor, <span style="color:red">a copy constructor is synthesized even if we define other constructors</span> 即使有其他的constructor, compiler也可能定义个copy constructor for us
+  - When not define a copy constructor, the compiler <span style="color:red">**synthesizes**</span> one for us. Unlike the synthesized default constructor, <span style="color:red">a copy constructor is synthesized even if we define other constructors</span> 即使有其他的constructor, compiler也可能定义个copy constructor for us
 - The compiler <span style="background-color:#FFFF00">copies each **nonstatic** member</span> in turn <span style="background-color:#FFFF00">from the given object into the one being created</span>. The type of each member determines how that member is copied
   - class member 是class type, 则由copy constructor for that class 进行拷贝
   - Although we cannot directly copy an array, <span style="background-color:#FFFF00">the synthesized copy constructor copies</span> members of array by <span style="background-color:#FFFF00">copying each element</span>. 如果array elements 是class type, 用class的copy constructor.
@@ -6676,7 +6676,7 @@ ostream &print(ostream & os, const QueryResult &qr)
        - <span style="background-color:#FFFF00">```insert``` 和 ```push``` 是**copy initialization**, whereas ```emplace``` 是 **direct initialization**</span>
        - 对于function call, <span style="color:red">**parameters** that have a **nonreference type**</span>, 对于 function return <span style="color:red">when a function has a **nonreference return type**：are **copy initialized**</span>
        - <span style="color:red">**Brace initialize**</span> the elements in an array or the members of an <span style="color:red">**aggregate class**</span>
-   - 对于有<span style="color:red">**explicit**</span> 限定的constructor, <span style="color:red">不能进行类型转换的copy construct</span>. matters direct initialization or copy construction
+   - 对于有<span style="color:red">**explicit**</span> 限定的constructor, <span style="color:red">不能进行类型转换的copy construct</span>. 可以进行initialization 比如:```vector<int>(10);```, 但不可以 ```vector<int>v = 10;
    - During copy initialization(implicit type conversion), the compiler is permitted (but not obligated) to <span style="color:red">skip the copy/move constructor and create the object directly</span>(<span style="background-color:#FFFF00">不同type assignment initialization 可以跳过copy/move constructor 直接通过constructor to create object; 相同type assignment initialization 会通过copy constructor</span>). That is, the compiler is permitted to rewrite
      - 即使忽略了copy/move constructor, 但是<span style="background-color:#FFFF00">copy/move constructor 必须exist(自己定义or compiler generated) and must be accessible (not private) in proram</span>
      - 下面例子很重要, 
@@ -6746,6 +6746,7 @@ string null_book("9-999-99999-9"); // compiler omits the copy constructor
   - <span style="background-color:#FFFF00">不同type assignment initialization 可以跳过copy/move constructor 直接通过constructor to create object; </span>
   -  <span style="background-color:#FFFF00">相同type assignment initialization 会通过copy constructor</span>
 - 例子二: 因为copy constructor 是private(inaccessible), 不能copy
+  
 ```
 //case 1
 
@@ -6782,6 +6783,115 @@ str a =dog;//error cannot copy
 
 **(2).The Copy-Assignment Operator**
 
+- To be consistent with assignment for the built-in types, <span style="background-color:#FFFF00">**assignment operators** usually **return a reference** to their left-hand operand</span>. the library generally requires that types stored in a <span style="color:red">**container** have assignment operators that **return a reference** to the left-hand operand</span>.
+- the compiler <span style="color:red">generates a **synthesized copy- assignment operator**</span> for a class if the class <span style="color:red">does not define</span> its own
+- <span style="background-color:#FFFF00">assigns **each nonstatic member** of the right-hand object to</span> the corresponding member of the <span style="background-color:#FFFF00">left-hand object<span style="background-color:#FFFF00"> using the copy-assignment operator for the type of that member.
+
+
+**(3). Destructor**
+- destructors do whatever work is needed to <span style="color:red">**free the resources** </span> used by an object and <span style="color:red">destroy the **nonstatic data members** of the object</span>
+- <span style="color:red">takes no parameters, it cannot be overloaded</span>. <span style="background-color:#FFFF00">always only **one destructor** for a given class
+- In a destructor, the function body is executed first and then the members are destroyed. <span style="background-color:#FFFF00">Members are destroyed in **reverse order**</span> from the order in which they <span style="background-color:#FFFF00">were initialized</span>.
+- Members of class type are destroyed by running the member’s own destructor. <span style="color:red">**The built-in types(包括了smart pointer) do not have destructors**</span>, so nothing is done to destroy members of built-in type
+- <span style="background-color:#FFFF00">The destructor is **not run** when a **reference or a pointer** to an object goes out of scope</span>.
+- The compiler defines a <span style="color:red">**synthesized destructor**</span> for any class that does <span style="color:red">not define</span> its own destructor
+    - 如果destructor 不是用来阻止对象被摧毁, the <span style="background-color:#FFFF00">**synthesized destructor**</span> has an <span style="background-color:#FFFF00">empty function body</span>.
+    - Members are destroyed as part of the implicit destruction phase that follows the destructor body(<span style="color:red">在destructor 完成之后, member call 他们自己的destructor, 比如string call 自己destructor to free</span>)
+
+
+**(4). The Rule of Three/Five**
+-  If the class needs a destructor, it almost surely needs a copy constructor and copy-assignment operator as well.
+- 当需要copy constructor时候, 也需要copy assignment operator, 反之亦然. (比如copy 是为了生成一个独一无二的序号)
+- When we specify ```= default``` on the declaration of the member <span style="background-color:#FFFF00">inside the class body</span>, the synthesized function is **implicitly inline**. If do not want the synthesized member to be an inline function, we can <span style="background-color:#FFFF00">specify ```= default``` on the member’s definition</span>(在class 外面定义时声明 ```=default```)
+  - We can <span style="background-color:#FFFF00">use ```= default``` only on member functions</span> that <span style="background-color:#FFFF00">**have a synthesized version**</span> (i.e., the default constructor or a copy-control member).
+- **Preventing Copies** 对于不能copy 的class i.e IO class： 以免多个对象写入或者读取相同的IO缓冲
+    1. Defining a Function as ```Deleted```: 
+       -  Unlike ```= default```, <span style="color:red">```= delete``` must appear on the **first declaration** of a deleted function</span>, 函数第一次声明的时候就要加```=delete```, 不能像```= default```, 还可以定义在外部
+       -  Unlike ```= default```(只能用于default constructor or copy-control member that the compiler can synthesize), we <span style="color:red">can specify ```= delete``` **on any function**</span>
+       -  we did  <span style="color:red">`not delete the destructor</span>: 因为If the destructor is deleted, then there is no way to destroy objects of that type. 同样 The compiler will not let us define variables or create temporaries of a type that has a deleted destructor。 If a member(member是class type, 假如有deleted destructor) of that class can’t be destroyed, the object/class as a whole can’t be destroyed.
+          -  It is not possible to define an object or delete a pointer to a **dynamically allocated object** of a type with a deleted destructor(因为无法删除).
+    2. 
+
+
+如果只定义了destructor, 而没有定义copy constructor 和 copy-assignmnet operator 是错误的. 比如下面例子, 使用了synthesized versions of the copy constructor and copy-assignment operator，造成错误是多高额```HasPtr``` 指向相同的内存, 比如```ret``` 和 ```hp```, 两个对象包含same pointer value. <span style="color:red">The code will delete pointer twice, which is an **error**</span> 
+
+```c++
+class HasPtr { 
+public:
+    HasPtr(const std::string &s = std::string()): ps(new std::string(s)), i(0) { }
+    ~HasPtr() { delete ps; }
+    // WRONG: HasPtr needs a copy constructor and copy-assignment operator 
+
+};
+
+HasPtr f(HasPtr hp) // HasPtr passed by value, so it is copied
+{
+    HasPtr ret = hp; // copies the given HasPtr
+
+    return ret; // ret and hp are destroyed
+
+}
+
+HasPtr p("some values");
+f(p); // when f completes, the memory to which p.ps points is freed 
+
+// 因为pass by value, value is deleted after function completed
+
+HasPtr q(p); // now both p and q point to invalid memory!
+
+```
+
+
+在function 内部声明 ```=default``` 是inline, 如果在function 外面声明```=default``` 不是inline 
+```
+class Sales_data { 
+public:
+    // copy control; use defaults 
+    
+    Sales_data() = default;
+    Sales_data(const Sales_data&) = default; 
+    Sales_data& operator=(const Sales_data &); 
+    ~Sales_data() = default;
+    // other members as before
+};
+
+Sales_data& Sales_data::operator=(const Sales_data&) = default;
+```
+
+阻止拷贝:
+```
+struct NoCopy {
+    NoCopy() = default; // use the synthesized default constructor 
+
+    NoCopy(const NoCopy&) = delete; // no copy
+    
+    NoCopy &operator=(const NoCopy&) = delete; // no assignment 
+    
+    ~NoCopy() = default; // use the synthesized destructor
+
+};
+```
+
+destructor 是 deleted,  
+```c++
+struct NoDtor {
+    NoDtor() = default; // use the synthesized default constructor
+
+    ~NoDtor() = delete; // we can't destroy objects of type NoDtor 
+
+};
+NoDtor nd; // error: NoDtor destructor is deleted
+
+NoDtor *p = new NoDtor(); // ok: but we can't delete p 
+
+delete p; // error: NoDtor destructor is deleted
+
+```
+
+**The Copy-Control Members May Be Synthesized as Deleted**
+- The <span style="background-color:#FFFF00">**synthesized destructor**</span> is defined as <span style="background-color:#FFFF00">**deleted**</span> if <span style="color:red">data member 的 class 的**destructor** is **deleted** or is **inaccessible**</span> 
+- The <span style="background-color:#FFFF00">**synthesized copy constructor**</span> is defined as <span style="background-color:#FFFF00">**deleted**</span> if 有class <span style="color:red">member的**copy constructor**</span> deleted or inaccessible or class 有<span style="color:red">member 有deleted or inaccessible **destructor**</span> 
+- 
 
 
 
@@ -6810,9 +6920,14 @@ str a =dog;//error cannot copy
 
 
 
+***
+<br/> <br/> <br/>
 
 
+## 14. overloaded operators
 
+- When an operator is a member function, the <span style="background-color:#FFFF00">**left-hand operand**</span> is bound to the implicit <span style="background-color:#FFFF00">**this**</span> parameter. The <span style="background-color:#FFFF00">**right-hand operand**</span> is passed as an <span style="background-color:#FFFF00">**explicit parameter**(传递到function)</span>.
+- To be consistent with assignment for the built-in types, <span style="background-color:#FFFF00">**assignment operators** usually **return a reference** to their left-hand operand</span>. 
 
 
 
