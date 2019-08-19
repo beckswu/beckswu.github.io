@@ -6845,7 +6845,7 @@ HasPtr q(p); // now both p and q point to invalid memory!
 
 
 在function 内部声明 ```=default``` 是inline, 如果在function 外面声明```=default``` 不是inline 
-```
+```c++
 class Sales_data { 
 public:
     // copy control; use defaults 
@@ -6861,7 +6861,7 @@ Sales_data& Sales_data::operator=(const Sales_data&) = default;
 ```
 
 阻止拷贝:
-```
+```c++
 struct NoCopy {
     NoCopy() = default; // use the synthesized default constructor 
 
@@ -7047,7 +7047,8 @@ HasPtr& HasPtr::operator=(const HasPtr &rhs)
     ++*rhs.use; // increment the use count of the right-hand operand
 
     if (--*use == 0) { // then decrement this object's counter
-        / free this object's allocated members
+    
+        // free this object's allocated members
 
         delete ps; 
         delete use;
