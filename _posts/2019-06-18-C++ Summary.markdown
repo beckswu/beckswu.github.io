@@ -6677,7 +6677,7 @@ ostream &print(ostream & os, const QueryResult &qr)
        - 对于function call, <span style="color:red">**parameters** that have a **nonreference type**</span>, 对于 function return <span style="color:red">when a function has a **nonreference return type**：are **copy initialized**</span>
        - <span style="color:red">**Brace initialize**</span> the elements in an array or the members of an <span style="color:red">**aggregate class**</span>
    - 对于有<span style="color:red">**explicit**</span> 限定的constructor, <span style="color:red">不能进行类型转换的copy construct</span>. 可以进行initialization 比如:```vector<int>(10);```, 但不可以 ```vector<int>v = 10;```
-   - During copy initialization(implicit type conversion), the compiler is permitted (but not obligated) to <span style="color:red">skip the copy/move constructor and create the object directly</span>(<span style="background-color:#FFFF00">不同type assignment initialization 可以跳过copy/move constructor 直接通过constructor to create object; 相同type assignment initialization 会通过copy constructor</span>). That is, the compiler is permitted to rewrite
+   - During copy initialization(implicit type conversion), the compiler is permitted (but not obligated) to <span style="color:red">skip the copy/move constructor and create the object directly</span>(<span style="background-color:#FFFF00">不同type assignment initialization 是type conversion via 没有explicit 修饰的type conversion constructor; 相同type assignment initialization 会通过copy constructor</span>). That is, the compiler is permitted to rewrite
      - 即使忽略了copy/move constructor, 但是<span style="background-color:#FFFF00">copy/move constructor 必须exist(自己定义or compiler generated) and must be accessible (not private) in program</span>
      - 下面例子很重要, 
   
