@@ -7320,7 +7320,7 @@ void StrVec::reallocate(){
 
 
 
-#### (e). Rvalue References**
+#### (e). Rvalue References
 
 - An <span style="color:red">**rvalue reference**</span> is a reference that must be <span style="color:red">bound</span> to an <span style="color:red">**rvalue**</span>.
 - important property: that rvalue reference <span style="color:red">只能 bound to an object that is about to be **destroyed**</span>
@@ -7380,9 +7380,12 @@ int &&rr3 = std::move(rr1);
 ```
 
 ---
-- moving, rather than copying, the object can <span style="background-color:#FFFF00">provide a significant performance boost</span>.
+
+- moving, rather than copying, the object can <span style="background-color:#FFFF00">provide a significant performance boost</span>
 - A second reason to move rather than copy occurs in classes such as the <span style="background-color:#FFFF00">**IO** or **unique_ptr**</span> classes. 这些class <span style="color:red"> resources 不能shared. 因此objects of these types 不能被copies 但可以move </span>
+
 ---
+
 
 #### (f). Move Constructor and Move Assignment
 
