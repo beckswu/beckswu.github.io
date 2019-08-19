@@ -6802,16 +6802,16 @@ str a =dog;//error cannot copy
 **(4). The Rule of Three/Five**
 -  If the class needs a destructor, it almost surely needs a copy constructor and copy-assignment operator as well.
 - 当需要copy constructor时候, 也需要copy assignment operator, 反之亦然. (比如copy 是为了生成一个独一无二的序号)
-- When we specify ```= default``` on the declaration of the member <span style="background-color:#FFFF00">inside the class body</span>, the synthesized function is **implicitly inline**. If do not want the synthesized member to be an inline function, we can <span style="background-color:#FFFF00">specify ```= default``` on the member’s definition</span>(在class 外面定义时声明 ```=default```)
+- When we specify ```= default``` on the declaration of the member <span style="background-color:#FFFF00">inside the class body</span>, the synthesized function is **implicitly inline**. If do not want the synthesized member to be an inline function, we 也可以  <span style="background-color:#FFFF00">specify ```= default``` on the member’s definition</span>(在class 外面定义时声明 ```=default```)
   - We can <span style="background-color:#FFFF00">use ```= default``` only on member functions</span> that <span style="background-color:#FFFF00">**have a synthesized version**</span> (i.e., the default constructor or a copy-control member).
 - **Preventing Copies** 对于不能copy 的class i.e IO class： 以免多个对象写入或者读取相同的IO缓冲
     1. Defining a Function as ```Deleted```: 
        -  Unlike ```= default```, <span style="color:red">```= delete``` must appear on the **first declaration** of a deleted function</span>, 函数第一次声明的时候就要加```=delete```, 不能像```= default```, 还可以定义在外部
        -  Unlike ```= default```(只能用于default constructor or copy-control member that the compiler can synthesize), we <span style="color:red">can specify ```= delete``` **on any function**</span>
-       -  we did  <span style="color:red">`not delete the destructor</span>: 因为If the destructor is deleted, then there is no way to destroy objects of that type. 同样 <span style="background-color:#FFFF00">不能create objects has a deleted destructor</span>。 If a member(member是class type, 假如有deleted destructor) of that class can’t be destroyed, the object/class as a whole can’t be destroyed.
+       -  we did  <span style="color:red">not delete the destructor</span>: 因为If the destructor is deleted, then there is no way to destroy objects of that type. 同样 <span style="background-color:#FFFF00">不能create objects has a deleted destructor</span>。 If a member(member是class type, 假如有deleted destructor) of that class can’t be destroyed, the object/class as a whole can’t be destroyed.
           -  It is not possible to define an object or delete a pointer to a **dynamically allocated object** of a type with a deleted destructor(因为无法删除).
     2. **private Copy Control**:
-        - 当 <span style="background-color:#FFFF00">**czopy constructor** and **copy-assignment operator** are **private**</span>, <span style="color:red">user 不能 copy such objects</span>. However, <span style="color:red">**friends and members** of the class can still make copies</span>
+        - 当 <span style="background-color:#FFFF00">**copy constructor** and **copy-assignment operator** are **private**</span>, <span style="color:red">user 不能 copy such objects</span>. However, <span style="color:red">**friends and members** of the class can still make copies</span>
           - 为 <span style="color:red">阻止friends and members of class still make copies</span>, 我们<span style="background-color:#FFFF00">declare these members as private but do **not define** them</span>.
         - User code 尝试copy flagged as error at **compile time**, <span style="color:red">compies made in member functions or friends(声明但不定义)</span> will result in an <span style="color:red">error at **link time**</span>
 
