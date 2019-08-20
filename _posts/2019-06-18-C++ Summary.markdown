@@ -6815,7 +6815,7 @@ str a =dog;//error cannot copy
           - 为 <span style="color:red">阻止friends and members of class still make copies</span>, 我们<span style="background-color:#FFFF00">declare these members as private but do **not define** them</span>.
         - User code 尝试copy flagged as error at **compile time**, <span style="color:red">compies made in member functions or friends(声明但不定义)</span> will result in an <span style="color:red">error at **link time**</span>
 
-如果只定义了destructor, 而没有定义copy constructor 和 copy-assignmnet operator 是错误的. 比如下面例子, 使用了synthesized versions of the copy constructor and copy-assignment operator，造成错误是多高额```HasPtr``` 指向相同的内存, 比如```ret``` 和 ```hp```, 两个对象包含same pointer value. <span style="color:red">The code will delete pointer twice, which is an **error**</span> 
+如果只定义了destructor, 而没有定义copy constructor 和 copy-assignmnet operator 是错误的. 比如下面例子, 使用了synthesized versions of the copy constructor and copy-assignment operator，造成错误是多个```HasPtr``` 指向相同的内存, 比如```ret``` 和 ```hp```, 两个对象包含same pointer value. <span style="color:red">The code will delete pointer twice, which is an **error**</span> 
 
 ```c++
 class HasPtr { 
@@ -6946,11 +6946,13 @@ private:
 HasPtr& HasPtr::operator=(const HasPtr &rhs)
 {
     auto newp = new string(*rhs.ps); // copy the underlying string
+    
     delete ps;  // free the old memory
 
     ps = newp; // copy data from rhs into this object
 
     i = rhs.i;  // return this object
+    
     return *this;
 }
 ```
@@ -6960,7 +6962,7 @@ Key Concept: Assignment Operators
 - Most <span style="background-color:#FFFF00">**assignment operators** share work with the **destructor** and **copy constructor**</span>
 - copy assignment 最后返回reference, 否则如果return value, 需要call copy constructor 还有call destructor to destory temporary value 
 - Good Pattern: 
-    1. copy right0hand operand into a local temporary.
+    1. copy right-hand operand into a local temporary.
     2. step1 完成后, safe to destory existing member of left-hand operand. 
     3. copy the date from temporary into members of left-hand operand. 
 
@@ -7000,11 +7002,13 @@ Reference counting works as follows:
 1. 每一个constructor (copy constructor 除外) creates a counter.<span style="color:red">记录多少个objects share state</span> with the object we are creating. When we create an object， initialize the counter as 1
 2. copy constructor not allocate a new counter; copies the data members of its given object, including the counter 并 递增reference counter
 3. destructor 递减counter, 如果count 变成0, destructor deletes that state
-4. copy assignment <span style="background-color:#FFFF00">递减左侧对象的counter, 递增右侧对象的counter</span>, 如果left-hand operand goes to zero. destory the state of left-hand operand. 通过先增加右侧, 再减少左侧的counter, 这样子保证不会先在左侧reference count等于0时 free memory
+4. copy assignment 递减左侧对象的counter, 递增右侧对象的counter, 如果left-hand operand goes to zero. destory the state of left-hand operand. <span style="background-color:#FFFF00">通过先增加右侧, 再减少左侧的counter</span>, 这样子保证不会先在左侧reference count等于0时 free memory
 
 e.g. reference count. 注意
 - 意destructor 不能随便删除, 只有counter go to zero, then free the memory of both ```ps``` and ```use``` point. 
 - copy assignment operator 增加右侧运算对象计数器, 减少左侧对象计数器, 如果左侧计数器等于0，delete/free memory. 而且要能handle self-assignment.
+
+下面是很好的例子, 注意什么时候删除pointer
 
 ```c++
 class HasPtr { 
@@ -7078,6 +7082,7 @@ v1 v1 = v2;
 v2 = temp; 
 
 //pointer 
+
 string *temp = v1.ps; // copy constructor
 
 //assignment operator
@@ -7091,9 +7096,9 @@ v2.ps = temp;
 - override the default behavior of ```swap``` by defining a version of swap that operates on our class.
 - **declaring** ```swap``` as a **friend**</span> to give it access to HasPtr’s (private) data members.
 - <span style="background-color:#FFFF00">**optimize**</span> our code, we’ve <span style="color:red">defined swap as an **inline**</span> function
-- Unlike the copy-control members, <span style="background-color:#FFFF00">```swap```</span> is never necessary. However, defining swap can be an important optimization for classes that allocate resources.
+- <span style="color:red">Unlike the copy-control members, <span style="background-color:#FFFF00">```swap```</span> is never necessary. However, defining swap can be an important optimization for classes that allocate resources.
 - if a class has a member that <span style="color:red">has its own type-specific ```swap``` function, calling ```std::swap``` would be a mistake</span>.
-  - 下面例子有正确的使用方法: <span style="background-color:#FFFF00">type-specific version of swap 是better match than std</span>. 因此当没有type-specific version of swap, then—assuming there is <span style="color:red">a **using declaration** for swap</span> in scope—calls to swap will <span style="color:red">use the version in ```std```</span.
+  - 下面例子有正确的使用方法: <span style="background-color:#FFFF00">type-specific version of swap 是better match than std</span>. 因此当没有type-specific version of swap, then—assuming there is <span style="color:red">a **using declaration** for swap</span> in scope—calls to swap will <span style="color:red">use the version in ```std```</span>.
   
 ```c++
 class HasPtr {
@@ -7107,6 +7112,7 @@ inline void swap(HasPtr &lhs, HasPtr &rhs) {
     swap(lhs.ps, rhs.ps); // swap the pointers, not the string data 
     
     swap(lhs.i, rhs.i); // call std::swap, 因为built-in 么有type-specific version
+    
 }
 ```
 如果有自己member 的swap, 用```std::swap```是mistake(不会报错), 如果Foo has type ```HasPtr```, the library ```swap``` makes unnecessary copies of the strings managed by ```HasPtr```. 下面例子中为什么```swap``` not hid declaraction for the ```HasPtr```的```swap```, 在18.2.3中讲解
@@ -7121,6 +7127,7 @@ void swap(Foo &lhs, Foo &rhs)
 }
 
 //正确方式
+
 void swap(Foo &lhs, Foo &rhs)
 {
     using std::swap;//表示只有当没有type-specific swap时候,才会用std::swap的
@@ -7128,6 +7135,7 @@ void swap(Foo &lhs, Foo &rhs)
     std::swap(lhs.h, rhs.h); //uses the HasPtr version of swap
 
     // swap other members of type Foo
+    
 }
 ```
 
@@ -7179,7 +7187,7 @@ HasPtr& HasPtr::operator=(HasPtr rhs)
 
 
 下面code
-- allocator allocate是raw/unconstructed emory, 必须call ```construct``` 去construct an object in that memory, ```construct``` 会用到```first_freee``` 并递增```first_free```(递增得到next, unconstructed element)
+- allocator allocate是raw/unconstructed memory, 必须call ```construct``` 去construct an object in that memory, ```construct``` 会用到```first_free``` 并递增```first_free```(递增得到next, unconstructed element)
 - ```uninitialized_copy``` <span style="background-color:#FFFF00">返回时一个指针 指向one element past the last constructed element</span>
 - Moving, Not Copying, Elements during Reallocation. Before 写 reallocate, function 应该做:
     1.  Allocate memory for a new, larger array of strings
@@ -7326,8 +7334,11 @@ void StrVec::reallocate(){
 - important property: that rvalue reference <span style="color:red">只能 bound to an object that is about to be **destroyed**</span>
     - 因此可以自由将rvalue reference 移动到另一个对象中
 - an <span style="background-color:#FFFF00">**lvalue**</span> expression refers to an object’s <span style="background-color:#FFFF00">**identity**</span> whereas an <span style="background-color:#FFFF00">**rvalue**</span> expression refers to an <span style="background-color:#FFFF00">object’s **value**</span>
-- <span style="background-color:#FFFF00">**r-value reference <-x-  lvalue**  <span style="color:red">can bind an **rvalue reference** to 要求conversion的expression,to literals, 或者返回 rvalue 的 expression, 但lvalue reference 不能绑定到这些表达式; 反过来 但是 **rvalue-reference**不能绑定到一个**lvalue**</span>
+- <span style="background-color:#FFFF00">rvalue reference 只能接 rvalue </span>
+- <span style="background-color:#FFFF00">**r-value reference <-x-  lvalue**</span>:  <span style="color:red">can bind an **rvalue reference** to 要求conversion的expression,to literals, 或者返回 rvalue 的 expression, 但lvalue reference(不算const) 不能绑定到这些表达式; 反过来 但是 **rvalue-reference**不能绑定到一个**lvalue**</span>
 - <span style="background-color:#FFFF00">**rvalue-reference <-x- rvalue reference**</span> <span style="color:red">不能绑定  **rvalue reference**</span> to a variable defined as an <span style="color:red">**rvalue reference**</span> type.
+- <span style="background-color:#FFFF00">**lvalue-reference <-x- rvalue **</span> 
+不可以比如```int & r = i*42; ```
 
 例子:
 - return lvalues 表达式的例子: along with the <span style="color:red">assignment, subscript, dereference, and **prefix** increment/decrement operators</span>
