@@ -7473,10 +7473,12 @@ StrVec &StrVec::operator=(StrVec &&rhs) noexcept
     - can move member of a class type 如果该class 定义了 move operation 
 - <span style="background-color:#FFFF00">**move operation** is never implicitly defined as a ```deleted``` function</span>. 但是如果我们explicit ask compiler to gerenerate a move operation by using ```=default```, compiler unable to move member, then move operation 被定义成 ```deleted```. 除了一个important exception, rules for when a synthesized move operation 被定义成 ```deleted``` 跟 copy operation 类似的原则: (deleted or inaccessible as **DI**)
     -   Unlike the copy constructor, the <span style="background-color:#FFFF00">**move constructor** is defined as ```deleted```</span> 如果class <span style="color:red">有member defines own copy constructor</span> 但是没有定义 move constructor, 或者 class member 的 class 没有定义copy constructor 并且<span style="color:red">compiler 不能sythesize a move constructor</span> (对move-assignment 同理) 
-    - The <span style="color:red">**move constructor**</span> or <span style="color:red">**move-assignment operator**</span> is defined as <span style="color:red">**deleted**</span>, 如果class memmber 的class <span style="color:red">有move constructor or move assignment 是DI的</san>
+    - The <span style="color:red">**move constructor**</span> or <span style="color:red">**move-assignment operator**</span> is defined as <span style="color:red">**deleted**</span>, 如果class memmber 的class <span style="color:red">有move constructor or move assignment 是DI的</span>
     - Like the copy constructor, the <span style="color:red">move constructor is defined as deleted if the destructor is DI</span>.
     - Like the copy-assignment operator, <span style="color:red">**move-assignment operator** 定义成 **deleted** 如果 class 有 const or reference member </span>
     - <span style="background-color:#FFFF00">如果class 定义了move constructor or move assigment operator, 则他的copy constructor 和 copy-assignment operator for that class 都被定义成了 deleted</span> 
+- class 定义了move constructor and move-assignment operator 应该avoid overhead 由copy resource 产生的. 一般说如果定义了一个copy-control members, 就应该定义所有5个操作(copy constructor, copy/move constructor, copy/move assignment operator)
+
 
 ```c++
 // the compiler will synthesize the move operations for X and hasX 
@@ -7509,6 +7511,174 @@ struct hasY {
 };
 hasY hy, hy2 = std::move(hy); // error: move constructor is deleted
 ```
+
+
+-  When a class has both a **move constructor** and a **copy constructor**, the compiler uses ordinary function matching to determine which constructor to use
+    - rvalue will call move constructor, 因为move constructor is better match 不用conversion
+    - 如果没有move constructor, will call copy constructor 
+- If a class has a <span style="color:red">**usable** copy constructor and no **move constructor**</span>, objects will be <span style="color:red">“moved” by the copy constructor</span>. Similarly for the <span style="color:red">copy-assignment operator and move-assignment</span>(如果没有move assignment 用copy-assignment).
+
+第一个例子, v2是lvalue, 使用copy-assignment operator(因为对于move assignment operator <span style="background-color:#FFFF00">不能bind rvalue reference to an lvalue</span>). 第二个例子, ```getVec``` 返回时rvalue, 赋值是move-assignment operator. assign rvalue (实际上viable for both move-assignment and copy assignment. 但是<span style="background-color:#FFFF00">calling copy assignment 需要conversion to ```const```</span>, whereas ```StrVec&&``` is exact match )
+
+```c++
+StrVec v1, v2;
+v1 = v2; // v2 is an lvalue; copy assignment
+
+StrVec getVec(istream &); // function getVec returns an rvalue
+v2 = getVec(cin); // getVec(cin) is an rvalue; move assignment
+
+```
+
+下面例子call copy constructor, 因为没有move constructor available 
+```c++
+class Foo {
+public:
+    Foo() = default;
+    Foo(const Foo&); // copy constructor
+
+// other members, but Foo does not define a move constructor
+
+};
+Foo x;
+Foo y(x); //copy constructor; x is an lvalue 
+
+Foo z(std::move(x)); //copy constructor, 因为没有available move constructor 
+
+//can convert Foo&& to const Foo&
+
+```
+
+- **Move constructor** 设置pointer to zero, to ensure that it is safe to destory moved-from object. function 不会throw exception, 因此mark as ```noexcept```
+- Assignment operator 的parameter has a nonreference parameter, which means the parameter is **copy initialized**: <span style="background-color:#FFFF00">**lvalue are copies and rvalue are moved**</span>. 因此 <span style="color:red">single assignment operator</span> acts as both the <span style="color:red"> **copy-assignment** and **move- assignment** operator</span>
+  - Regardless of whether the copy or move constructor was used, the body of the assignment operator <span style="color:red"> **swaps** the state of the two operands</span>.
+
+```c++
+class HasPtr { 
+public:
+    // added move constructor
+    
+    HasPtr(HasPtr &&p) noexcept : ps(p.ps), i(p.i) {p.ps = 0;}
+
+    // assignment operator is both the move- and copy-assignment operator 
+
+    HasPtr& operator=(HasPtr rhs)
+        { swap(*this, rhs); return *this; } 
+};
+
+hp = hp2; // hp2 is an lvalue; copy constructor used to copy 
+
+hp2 hp = std::move(hp2); // move constructor moves hp2
+
+```
+
+用rvalue reference call pointer ```&```
+```c++
+Message::Message(Message &&m): contents(std::move(m.contents)) 
+//move constructor 
+
+{
+    move_Folders(&m); // moves folders and updates the Folder pointers
+}
+
+Message& Message::operator=(Message &&rhs)
+{
+    if (this != &rhs) { // direct check for self-assignment
+
+        remove_from_Folders(); //用于销毁左侧运算对象的旧状态
+
+        contents = std::move(rhs.contents); // move assignment
+
+        move_Folders(&rhs); // reset the Folders to point to this Message
+
+    } 
+    return *this;
+}
+```
+
+**(4). Move Iterators**
+
+-Ordinarily, <span style="color:red">an **iterator** dereference operator returns an **lvalue** reference</span> to the element. Unlike other iterators, <span style="color:red">the dereference operator of a **move iterator** yields an **rvalue** reference</span>.
+- transform an ordinary iterator to a move iterator by calling the library ```make_move_iterator``` function
+- <span style="color:red">library makes **no guarantees** about which algorithms can be used with move iterators</span> and which cannot. 只有确信当在算法运行完 不再访问它时(在用它为其他的赋值, 或者pass给user的function), 才能pass move iterator
+- 如果小心使用```move``` 可以大幅度提高性能, 如果随意在普通用户代码中使用```move```, 很可能导致难以查找的错误, 而难以提高性能
+
+下面例子用到 **move iteartors**, dereference operator yields an **rvalue** reference, construct will use the **move constructor** to construct the elements
+
+
+```c++
+void StrVec::reallocate()
+{
+    // allocate space for twice as many elements as the current size
+
+    auto newcapacity = size() ? 2 * size() : 1;
+     auto first = alloc.allocate(newcapacity);
+    // move the elements 
+    
+    auto last = uninitialized_copy(make_move_iterator(begin()), 
+        make_move_iterator(end()), first); 
+    free();  // free the old space
+
+    elements = first; // update the pointers 
+    
+    first_free = last;
+    cap = elements + newcapacity;
+}
+```
+
+
+
+
+**(5).  Rvalue References and Member Functions**
+
+- 如果一个函数同时提供了<span style="background-color:#FFFF00">copy and move 两个版本</span>,可以获益
+    - 一个版本是 take an lvalue reference to ```const T&```
+    - 另一个版本是 takes an rvalue reference to nonconst ```T &&```  and will be run when we pass a modifiable rvalue. This version is free to steal resources from its parameter
+- 一般来说，<span style="background-color:#FFFF00">不用为function 定义 ```const X&&``` or a plain ```X&```</span>. 通常we pass an <span style="color:red">rvalue reference</span> when want to steal from argument. <span style="color:red">the argument must not be ```const```</span>. 类似的, 拷贝对象不应该改变被copied的对象, no need to define a version that take a plain ```X&``` parameter.
+
+比如 the library containers that define push_back provide two versions:
+- 版本一: can pass any object that can be converted to tye X
+- 版本二: pass only an **rvalue** that is not ```const```
+
+```c++
+void push_back(const X&); // copy: binds to any kind of X
+
+void push_back(X&&); // move: binds only to modifiable rvalues of type X
+
+```
+
+两个版本的```push_back``` 区别在于 rvalue reference version 的 ```push_back``` call ```move``` to pass parameter to ```construct```, <span style="background-color:#FFFF00">```construct``` 通过第二个和第二个之后的参数来确定用哪个constructor</span>, 因为```move``` returns an rvalue reference, type of argument to ```construct``` is ```string&&```. 因此string 的 move constructor will be sued to construct a new last element
+```c++
+
+void StrVec::push_back(const string& s)
+{
+    chk_n_alloc(); // ensure that there is room for another element
+
+    // construct a copy of s in the element to which first_free points
+    
+    alloc.construct(first_free++, s);
+    } 
+void StrVec::push_back(string &&s)
+{
+    chk_n_alloc(); // reallocates the StrVec if necessary
+    
+    alloc.construct(first_free++, std::move(s));
+}
+
+
+StrVec vec; 
+string s = "some string or another";
+vec.push_back(s); // calls push_back(const string&) 
+
+vec.push_back("done"); // calls push_back(string&&)
+
+```
+
+
+
+
+
+
+
 
 
 
