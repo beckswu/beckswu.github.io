@@ -3117,7 +3117,7 @@ struct X {
 A name used in the body of a member function is resolved as follows:(一般不建议use the name of another member as the name for function parameter, 不建议使用成员的名字用作函数参数)
 1. 首先在member function内部寻找(在name 被使用之前部分)
 2. 如果没有找到, 再到class 内部继续寻找declaration. All the members of the class are considered (class所有成员都被考虑)
-3. 如果没有找打, look for a declaration that is in scope before the member function defintiion. (在函数定义前的作用域, 因为函数可能定义在class外部(in file) ) 
+3. 如果没有找到, look for a declaration that is in scope before the member function defintiion. (在函数定义前的作用域, 因为函数可能定义在class外部(in file) ) 
 
 当compiler 处理dummy_fcn 的乘法时， 首先寻找 ```height```  in the scope of that function. 从parameter中找到
 ```c++
@@ -6800,6 +6800,7 @@ str a =dog;//error cannot copy
 
 
 **(4). The Rule of Three/Five**
+-  copy / move constructor, copy / move assignment operator, destructor, 对于前四个, 如果除它外有任何一个定义了, compiler都不会synthesize， destructor 只有 当base destructor 是private 时候才不会生成. 比如 如果定义了destructor, 其他四个compiler都不会生成. 同样如果定义了 move assignment, ( copy/move constructor, copy assignment 也都不会生成), 但destructor 会生成
 -  If the class needs a destructor, it almost surely needs a copy constructor and copy-assignment operator as well.
 - 当需要copy constructor时候, 也需要copy assignment operator, 反之亦然. (比如copy 是为了生成一个独一无二的序号)
 - When we specify ```= default``` on the declaration of the member <span style="background-color:#FFFF00">inside the class body</span>, the synthesized function is **implicitly inline**. If do not want the synthesized member to be an inline function, we 也可以  <span style="background-color:#FFFF00">specify ```= default``` on the member’s definition</span>(在class 外面定义时声明 ```=default```)
@@ -7699,6 +7700,172 @@ vec.push_back(s); // calls push_back(const string&)
 vec.push_back("done"); // calls push_back(string&&)
 
 ```
+
+
+**(6).Rvalue and Lvalue Reference Member Functions**
+
+- can <span style="background-color:#FFFF00">call a **member function**</span> on an object, <span style="color:red">regardless</span> of whether that object is an <span style="color:red">lvalue or an rvalue</span>
+- 还可以对rvalue 进行赋值 一个rvalue 
+- **reference qualifier**: replace ```&``` or ```&&``` after parameter list (像class 的const 定义类似), ```&``` 表示只能是lvalue call it , ```&&``` 表示只能是rvalue call it: 
+    - 与```noexcept```类似, <span style="background-color:#FFFF00">**reference qualifier** 必须同时出现于function **declaration** 和 **definition** 中</span>
+    - 一个function <span style="background-color:#FFFF00">可以**同时**有**const** 和 **reference qualifier**</span>. <span style="color:red">但reference qualifier 必须跟在 ```const``` 后面</span>
+- 就像 ```const``` function 可以被overload, overload a function based on its **reference qualifer**. 我们<span style="background-color:#FFFF00">可以综合 **reference qualifier** 和 **const** 来区分一个成员函数的重载版本 </span>
+    - const function version 通过一个有const, 一个没有const 来区分, 但是对于如果想用<span style="background-color:#FFFF00">**reference qualifier** 区分</span> function(两个或两个以上有same name and same parameter list), <span style="color:red">必须
+provide a reference qualifier 在所有的functions or 所有都不提供 </span>
+
+可以call lvalue or rvalue 的member function `
+
+```c++
+string s1 = "a value", s2 = "another"; 
+auto n = (s1 + s2).find('a'); //ok
+
+s1 + s2 = "wow!";//ok, 对一个rvalue 进行赋值
+
+```
+
+reference qualifier 
+
+```c++
+class Test{
+public:
+    Test(int a_): a(a_){}
+    int a;
+    void getR() &&  {
+        cout << " only rvalue can call "<<endl;
+    }
+    void getL() & {
+        cout << " only lvalue can call "<<endl;
+    }
+};
+
+auto rval = [] () -> Test { return Test(8); };
+//也可以写成 auto rval = [] { return Test(8); };
+    
+Test lval(10);
+rval().getR();//okay
+
+lval.getR(); //error
+
+lval.getL(); //okay
+
+```
+
+
+另一个例子
+
+```c++
+class Foo {
+public:
+    lvalues Foo &operator=(const Foo&) &; // may assign only to modifiable, 
+    
+    //只能是lvalue 在左侧的 assignment 
+
+ };
+
+Foo &Foo::operator=(const Foo &rhs) &
+{
+    // do whatever is needed to assign rhs to this object
+    return *this;
+}
+
+Foo &retFoo(); //function returns a reference (lvalue)
+
+Foo retVal(); //function returns by value (rvalue)
+
+Foo i, j; // i, j are lvalues
+
+i=j; // okay: i is lvalue 
+
+retFoo() = j; // okay: retFoo() is lvalue
+
+retVal() = j; // error: retVal() returns an rvalue
+
+i = retVal(); // ok: we can pass an rvalue as the right-hand operand to assignment
+
+```
+
+<span style="background-color:#FFFF00">reference qualifier 必须跟在const 的后面</span>
+
+```c++
+class Foo {
+public:
+    Foo someMem() & const; // error: const qualifier must come first
+    
+    Foo anotherMem() const &; // ok: const qualifier comes first 
+
+};
+```
+
+
+reference qualifier overload
+```c++
+class Foo { 
+public:
+    Foo sorted() &&; // // may run on modifiable rvalues 
+
+    Foo sorted() const &; // 可用于任何类型的 Foo
+
+private:
+    vector<int> data;
+};
+
+// this object is an rvalue, so we can sort in place
+
+Foo Foo::sorted() &&
+{
+    sort(data.begin(), data.end());
+    return *this;
+} 
+
+// this object is either const or it is an lvalue; either way we can't sort in place 
+
+//lvalue 是因为改了这个，可能改变其他对象的值，改不会报错
+
+Foo Foo::sorted() const & {
+    Foo ret(*this); // make a copy 
+    
+    sort(ret.data.begin(), ret.data.end()); // sort the copy 
+    
+    return ret; // return the copy
+
+}
+
+retVal().sorted(); // retVal() is an rvalue, calls Foo::sorted() && 
+
+retFoo().sorted(); // retFoo() is an lvalue, calls Foo::sorted() const &
+
+```
+
+overload const reference 必须都加上 或者都不加上: 对于sorted function, 两个都没有加上 reference qualifier 是okay 的. 
+```c++
+class Foo { 
+public:
+    Foo sorted() &&;
+    Foo sorted() const; // error: must 加上 reference qualifier
+
+    // Comp 用来比较int 值
+
+    using Comp = bool(const int&, const int&);
+    Foo sorted(Comp*); // ok: different parameter list
+
+    Foo sorted(Comp*) const; // ok: neither version is reference qualified
+
+};
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
