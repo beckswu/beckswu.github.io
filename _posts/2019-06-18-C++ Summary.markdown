@@ -7892,7 +7892,78 @@ public:
 ## 14. overloaded operators
 
 - When an operator is a member function, the <span style="background-color:#FFFF00">**left-hand operand**</span> is bound to the implicit <span style="background-color:#FFFF00">**this**</span> parameter. The <span style="background-color:#FFFF00">**right-hand operand**</span> is passed as an <span style="background-color:#FFFF00">**explicit parameter**(传递到function)</span>.
-- To be consistent with assignment for the built-in types, <span style="background-color:#FFFF00">**assignment operators** usually **return a reference** to their left-hand operand</span>. 
+- An operator function must either be <span style="background-color:#FFFF00">a member of a class</span> or <span style="background-color:#FFFF00">have at least one parameter of class type</span>:
+    - 意味着我们不能改变built-in type operator 含义
+- 只能重载已有的operator, 不能加新的operator, 比如不可以overload ```**``` 去执行幂操作
+- 对于重载运算符, precedence and associativity (优先率 和 结合律) 应保持一致, 比如 ``` x == y + z; ``` 永远等价于 ``` x == (y + z)```
+- 有四个 ```+,-,*,&``` 既可以是一元也可以是二元运算，根据number of parameters 腿短定义是哪个
+- call operator function 可以直接用 operator ```data1 + data2;``` 也可以像普通function 一样 call overloaded operator function.```operator+(data1, data2); data1.operator+=(data2);```. <span style="color:red">两种调用方法等价的</span>
+- <span style="background-color:#FFFF00">the comma, address-of, logical AND, and logical OR operators should not be overloaded</span>.
+    - 因为运算符指定了运算顺序, 而operator overloading 是一个function call, 运算顺序可能会变了
+    - overloaded versions of ```&&``` or ```||``` operators do not preserve short-circuit evaluation properties of the built-in operators. 用户发现他们熟悉的求值规则不见了
+    - 因为这些运算符有了内置的含义，如果重载, behave differently from their normal meanings.
+
+![](/img/post/C++/operator_overloading.PNG)
+
+error 去redefine built-in operators
+```c++
+// error: cannot redefine the built-in operator for ints 
+
+int operator+(int, int);
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
