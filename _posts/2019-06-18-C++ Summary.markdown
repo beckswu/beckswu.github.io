@@ -3010,12 +3010,17 @@ void do_display(std::ostream &os) const {os << contents;} //inline implicitly
 };
 ```
 
+
+
+#### (d). Class Scope
+
+
 **Class Types**: 
 - Every class defines a unique type, <span style="color:red">即使两个different types define the same members 他们也是不同类型的</span>. The members of each class are distinct from the members of any other class (or any other scope).
 - 声明class/struct <span style="color:red">object</span> 也可以用 ```class Screen a```
 - 可以只声明class 而不定义class, like ```class Screen;```, 这种声明叫做**forward declaration**, 但在它声明之后 定义之前是一个**incomplete type**, 因为<span style="color:red">不清楚它包含哪些成员</span>
-  - **imcomplete type** can be used in limited ways: define <span style="color:red">pointers</span> or <span style="color:red">references</span> to such types, 也可以定义functions that use an incomplete type as a <span style="color:red">parameter</span> or <span style="color:red">return type </span>
-- <span style="background-color:#FFFF00">A class 必须被defined 而不仅仅是声明before we creats objects of that type</span>. 因为compiler 需要know storage such objects need. 同理, a class 必须被定义before access a member of the type by using reference or pointer. 如果不定义, compiler cannot know 它有什么member
+  - **imcomplete type** can be used in limited ways: define <span style="color:red">**pointers**</span> or <span style="color:red">**references**</span> to such types, 也可以定义functions that use an incomplete type as a <span style="color:red">**parameter**</span> or <span style="color:red">**return type** </span>
+- <span style="background-color:#FFFF00">A class 必须被defined 而不仅仅是声明before we creats objects of that type, acccess member type by using reference or pointer</span>. 因为compiler 需要know storage such objects need, 还 need to know 它有什么member
 - <span style="background-color:#FFFF00">A class member 可以有pointers or references of its own type. 因为class is considered declared (not yet defined) as soon as its class name has been seen</span>. 但是 <span style="color:red">a class cannot have members of its own type</span> 因为compiler 需要知道storage data memebers require, class is not defined until its class body is complete,
 
 ```c++
@@ -3040,12 +3045,10 @@ class Sales_data item1; // equivalent declaration
 ```
 
 
-
-#### (d). Class Scope
 - class 外部访问public data/function，只能通过object, reference, pointer; <span style="color:red">type members(typedef) from the class 可以访问 using the scope operator.</span>
 - 在class 外部定义function, 
    - 需要provide class name :: function name. function定义就可以随便用class member without using class name (因为everyname is seen in class scope)
-   - function return type 声明在 class name 前, so any return type is outside scope, 因此<span style="color:red">return type需要specify class name, 如果return type is defined inside class</span>
+   - function return type 声明在 class name 前, so any return type is outside scope, 因此<span style="color:red">**return type需要specify class name**, 如果return type is defined inside class</span>
 
 ```c++
 class Window_mgr { 
@@ -3064,11 +3067,11 @@ Window_mgr::ScreenIndex Window_mgr::addScreen(const Screen &s)
 2. 如果名字没有发现, look in the enclosing scope（继续查找外层作用域)
 3. if no declaration found, program is error
 
-class defintion are processed in order of : 
+**class defintion are processed in order of** : 
 1. memeber declarations are compiled (先编译成员声明)
 2. function bodies/definitions are processed and compiled only after the entire class has been seen (<span style="background-color:#FFFF00">直到class全部可见后,编译函数体</span>)
 
-- 因为函数体直到class 可见后 才compiled. 所以function 可以用任何name defined inside the class. 假如function definition 和member declaration 同时进行, function只能用已经被看见的名字
+- <span style="background-color:#FFFF00">因为函数体直到class 可见后 才compiled. 所以function 可以用任何name defined inside the class</span>. 假如function definition 和member declaration 同时进行, function只能用已经被看见的名字
 - <span style="color:red">上面的two-step process 只适用于member function bodies</span>, Names used in declarations, 包括了<span style="background-color:#FFFF00">return type and types in parameter list 必须被看见before they are used</span>. 否则会报错
 - <span style="color:red">tips:</span>: 定义type names (typedef, using) 通常在class beginning, 这样any member that uses that type will be seen after the type name has been already been defined
 
