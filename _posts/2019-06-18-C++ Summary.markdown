@@ -2812,12 +2812,17 @@ std::istream &read(std::istream&, Sales_data&);
 
 **const Member Functions**
 - ```const``` is to modify the type of the implicit ```this``` pointer, 表示 <span style="background-color:#FFFF00">```this``` is a pointer to ```const```</span>. Member function that use ```const```被称为<span style="color:red">const member functions</span>
-- 不能在const function中call nonconst member function, 因为<span style="background-color:#FFFF00">Cannot bind ```this```（this 没有low level const） to a ```const``` object (```this```没有lower const, lower const -> no lower const的 不可以) </span>. 
-    - 比如```const A a; a.get();//error when get is not const function``` 
-    - 所以把不改变object 的<span style="background-color:#FFFF00">function 设置成const, 可以提高函数灵活性</span>
-- const function 中只能call const 的function 
-- const object 只能call const function 不能call nonconst function, <span style="background-color:#FFFF00">**Objects** that are const, and **references** or **pointers** to const objects, may call only const member functions.</span> 
-- const function 表示```this``` is a pointer to ```const```, <span style="background-color:#FFFF00">const member functions cannot change the object on which they are called</span>. 因此const function 不能write to data members of the objects 只能read
+   - <span style="background-color:#FFFF00">const member functions cannot change the object on which they are called</span>. 因此const function 不能write to data members of the objects 只能read
+- const function call 总结:
+   - <span style="background-color:#FFFF00">不能在const function中call nonconst member function, 只能call const 的function</span>. 因为Cannot bind ```this```（this 没有low level const） to a ```const``` object (```this```没有lower const, lower const -> no lower const的 不可以) . 
+       - 比如```const A a; a.get();//error when get is not const function``` 
+       - 所以把不改变object 的<span style="color:red">function 设置成const, 可以提高函数灵活性</span>
+   - <span style="color:red"> const object</span> 只能<span style="background-color:#FFFF00">call const function</span> 不能call nonconst function, <span style="background-color:#FFFF00">**Objects**</span> that are <span style="background-color:#FFFF00">**const**</span>, and <span style="background-color:#FFFF00">**references** or **pointers** to const objects</span>, may call <span style="background-color:#FFFF00">only const member functions.</span> 
+- <span style="background-color:#FFFF00"> const member function that returns ```*this```</span> as a reference should have a return type ```const class & ```., 不能返回nonconst reference (因为```this``` is  a const reference, cannot convert to a const reference to nonconst reference ).
+   - 但是如果不是返回```this```, 不必是const reference, 比如可以返回普通reference like ``` int&```(但若外面接用non const reference, 不能更改这个int, 因为是const function返回值, 不能更改object state)
+- <span style="background-color:#FFFF00">可以overload function 基于是不是const </span> (match rule 跟function overloading match rule 类似)
+  - <span style="color:red">const object 只能call const function, 不能call nonconst function</span>
+  - <span style="color:red">nonconst object 可以call non-const 也可以call const version， 但是nonconst version 是better match(因为exact match 优于const version)</span>
 
 **Defining a Function to Return “This” Object**: 下面例子```total``` 被绑定到```this```, ```rhs``` 被绑定到```trans```上, 
 
@@ -2837,86 +2842,9 @@ total.combine(trans);
 ```
 
 
-#### (b), Friend and Encapsulation
-
-A class may contain zero or more access specifiers(private, public), and there are no restrictions on how often an access specifier may appear.
-
-The only difference between using class and using struct to define a class is the default access level and 继承是public and private. 
-
-定义private encapsulation 的优点:
-- 通过定义data private, 作者可以自由修改数据,只要interface 不变，用户代码不变，但是如果the data are public, then any code that used the old data members 也许brokern. 需要rewrite any code that relied on old representation 后才能使用
-- 另一个定义private 优点.data are protected from mistakes that users might introduce, 防止因为用户原因数据被破坏, 如果发现bug corrupt object state, 发现bug位置是本地, 就去implementation差错, 而不用看用户的code, 降低了维护的难度
-
-
-**friend**: 
-- A class can allow another class or function to <span style="background-color:#FFFF00">access its nonpublic members</span> by making that class or function a **friend**. 
-- o <span style="background-color:#FFFF00">**Friend declarations**</span> may appear only inside a class definition. 友元声明只能在class 内部 (好的编程习惯是: 集中在程序开始或者结尾集中定义友元)
-- <span style="color:red">如果Friend function定义在class 内部是**inline function**</span>
-- <span style="background-color:#FFFF00">friend declaraction 仅仅specifies access, 而不是general declaration of the function</span>, 如果我们想要users able to call friend function. usually **declare each friend (outside the class)** in the same header as the class itself. 
-
-
-
-
-**Friend Class**: 
-- <span style="background-color:#FFFF00">friendship is not transitive</span>, 比如下面例子中 假如```Window_mgr```有自己的friends, those friends 没有access to ```Screen```
-- 还用只声明一个class 的function 有friend 权限, Making a member function a friend 需要仔细设计程序, 下面例子中
-  - 首先定义class ```Window_mgr```. 其中声明但不定义```clear``` functinon，
-  - 再定义class ```Screen```, including a friend declaration for ```clear```
-  - 最后define ```clear``` 此时才可以使用```Screen```的成员
-- friend / nonmember function 不需要在 用到他们的friend declaraction 声明之前, 当一个<span style="background-color:#FFFF00">名字appear in a friend declaration</span>, 这个名字是<span style="background-color:#FFFF00">implicitly assumed to be part of the surrounding scope</span>(在友元中出现的名字,是被假设可见的); 但反过来不行, friend 即使define in the class,<span style="background-color:#FFFF00"> 我们也必须提供一个declaration outside the class</span> itself to make that function visible. <span style="color:red">一个友元的outside declaration 必须在call 友元function 前的member function前面</span>, 所以用到友元的function 最好放在class 外面定义 (some compilers do not enforce the lookup rules for friends）
-
-```c++
-class Screen{
-    friend class Window_mrg; 
-    //Window_mrg可以access Screen Class的所有数据
-
-
-    friend void Window_mgr::clear(ScreenIndex); 
-    //只声明class 一个clear function 有friend 权限, 但是clear需要declare before Class Screen 
-
-}
-```
-
-下面函数
-```c++
-extern std::ostream& storeOn(std::ostream &, Screen &);//声明成友元
-
-extern BitMap& storeOn(BitMap &, Screen &); 
-//接受BitMap & 的storeOn, 对Screen 没有访问权限对private / public
-
-class Screen {
-// ostream version of storeOn may access the private parts of Screen objects
-
-friend std::ostream& storeOn(std::ostream &, Screen &);
-};
-```
-
-friend function scope
-```c++
-struct X {
-    friend void f() { /* friend function can be defined in the class */ }
-    
-    X() { f(); } // error: no declaration for f void g();
-
-    void h();
-};
-void X::g() { return f(); } // error: f hasn't been declared
-
-void f(); // declares the function defined inside X 
-
-void X::h() { return f(); } // ok: declaration for f is now in scope
-
-```
-
-
-#### (c). Additional Class Features
-
 - inline member functions should be defined in the same header as the corresponding class definition
 - **mutable Data Members**: <span style="background-color:#FFFF00">a mutable data member is never const even when it is a member of a const object(即使是const 对象成员,也不是const), a const member function of class may change a mutable member </span>
-- <span style="background-color:#FFFF00"> const member function that returns ```*this``` as a reference should have a return type ```const class & ```.</span>, 不能返回nonconst reference (因为```this``` is  a const reference, cannot convert to a const reference to nonconst reference )
-- <span style="background-color:#FFFF00">可以overload function 基于是不是const </span> (match rule 跟function overloading match rule 类似)
-  - <span style="color:red">const object 只能call const function, 不能call nonconst function</span>
-  - <span style="color:red">nonconst object 可以call non-const 也可以call const version， 但是nonconst version 是better match(因为exact match 优于const version)</span>
+
 
 下面初始化Screen, class 内部初始化要么使用```=``` 在class内部初始化, or the direct form of initialization using ```{}```
 ```c++
@@ -3012,8 +2940,80 @@ void do_display(std::ostream &os) const {os << contents;} //inline implicitly
 ```
 
 
+#### (b), Friend and Encapsulation
 
-#### (d). Class Scope
+A class may contain zero or more access specifiers(private, public), and there are no restrictions on how often an access specifier may appear.
+
+The only difference between using class and using struct to define a class is the default access level and 继承是public and private. 
+
+定义private encapsulation 的优点:
+- 通过定义data private, 作者可以自由修改数据,只要interface 不变，用户代码不变，但是如果the data are public, then any code that used the old data members 也许brokern. 需要rewrite any code that relied on old representation 后才能使用
+- 另一个定义private 优点.data are protected from mistakes that users might introduce, 防止因为用户原因数据被破坏, 如果发现bug corrupt object state, 发现bug位置是本地, 就去implementation差错, 而不用看用户的code, 降低了维护的难度
+
+
+**friend**: 
+- A class can allow another class or function to <span style="background-color:#FFFF00">access its nonpublic members</span> by making that class or function a **friend**. 
+- <span style="background-color:#FFFF00">**Friend declarations**</span> may appear only inside a class definition. 友元声明只能在class 内部 (好的编程习惯是: 集中在程序开始或者结尾集中定义友元)
+- <span style="color:red">如果Friend function定义在class 内部是**inline function**</span>
+- <span style="background-color:#FFFF00">friend declaraction 仅仅specifies access, 而不是general declaration of the function</span>, 如果我们想要users able to call friend function. usually **declare each friend (outside the class)** in the same header as the class itself.
+   - <span style="color:red">一个友元的outside declaration 必须在call 友元 的member function前面</span>, 所以用到友元的function 最好放在class 外面定义 (some compilers do not enforce the lookup rules for friends）
+
+
+
+
+**Friend Class**: 
+- <span style="background-color:#FFFF00">friendship is not transitive</span>, 比如下面例子中 假如```Window_mgr```有自己的friends, those friends 没有access to ```Screen```
+- 还用只声明一个class 的function 有friend 权限, Making a member function a friend 需要仔细设计程序, 比如下面例子中, ```clear``` 是 ```Window_mgr``` member 但用到 ```Screen``` 的 member
+  - 首先定义class ```Window_mgr```. 其中声明但不定义```clear``` functinon，
+  - 再定义class ```Screen```, including a friend declaration for ```clear```
+  - 最后define ```clear``` 此时才可以使用```Screen```的成员
+- Classes and nonmember functions need not have been declared before they are used in a friend declaration. When a name first appears in a friend declaration, that name is implicitly assumed to be part of the surrounding scope
+
+```c++
+class Screen{
+    friend class Window_mgr; 
+    //Window_mrg可以access Screen Class的所有数据
+
+
+    friend void Window_mgr::clear(ScreenIndex); 
+    //只声明class 一个clear function 有friend 权限, 但是clear需要declare before Class Screen 
+
+}
+```
+
+下面函数
+```c++
+extern std::ostream& storeOn(std::ostream &, Screen &);//声明成友元
+
+extern BitMap& storeOn(BitMap &, Screen &); 
+//接受BitMap & 的storeOn, 对Screen 没有访问权限对private / public
+
+class Screen {
+// ostream version of storeOn may access the private parts of Screen objects
+
+friend std::ostream& storeOn(std::ostream &, Screen &);
+};
+```
+
+friend function scope
+```c++
+struct X {
+    friend void f() { /* friend function can be defined in the class */ }
+    
+    X() { f(); } // error: no declaration for f;
+
+    void h();
+};
+void X::g() { return f(); } // error: f hasn't been declared
+
+void f(); // declares the function defined inside X 
+
+void X::h() { return f(); } // ok: declaration for f is now in scope
+
+```
+
+
+#### (c). Class Scope
 
 
 **Class Types**: 
@@ -3212,7 +3212,7 @@ void Screen::setHeight(pos var) {
 
 
 
-#### (e). Constructors Revisited
+#### (d). Constructors
 
 
 **Constructors** 
@@ -3588,7 +3588,7 @@ Initializers for all nonstatic data members that are not named by a member initi
    - Calling any constructors
    - Converting any expressions to data member types
 
-#### (f). Static Members
+#### (e). Static Members
 
 - static member can be public or private. The type of ```static``` data member can be ```const```, reference, array, class type. 
 - private static member 只能被member function call, 可以用来初始化static variable(见下面例子),不能被outside class用
