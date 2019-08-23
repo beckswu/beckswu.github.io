@@ -3590,11 +3590,11 @@ Initializers for all nonstatic data members that are not named by a member initi
 
 - static member can be public or private. The type of ```static``` data member can be ```const```, reference, array, class type. 
 - private static member 只能被member function call, 可以用来初始化static variable(见下面例子),不能被outside class用
-- <span style="background-color:#FFFF00">**static members**</span> of a class exist <span style="background-color:#FFFF00">**outside any object**</span>.Object do not contain data associated with static data members. static member functions 不与对象绑定(bound)在一起.  
+- <span style="background-color:#FFFF00">**static members**</span> of a class exist <span style="background-color:#FFFF00">**outside any object**</span>.Object do not contain data associated with static data members. static member functions 不与对象绑定(bound)在一起. 只能是单向的: 从normal function 中call static varaibles/function 不可以从static function中call normal varaibles 
    - <span style="background-color:#FFFF00">static member function 不能declared as **const** function</span>. 
    - static member functions <span style="color:red">don't have ```*this``` pointer.不能用```*this```在static member 中</span>, This restriction适用于explicit use of ```this``` and implicit use of ```this``` by calling a nonstatic member.
    - <span style="color:red">static function 中不能call nonstatic variable 或者 nonstatic function</span>
-   - <span style="color:red">但member function 可以用static function/variable</span> (without scope operator)
+   - <span style="color:red">但member function 可以用static function/variable</span> (without scope operator) 
 - can use scope operator to access static member ```Account::initRate```, 也可以通过object, reference, pointer of class type to access 
 - <span style="color:red">member function can use static member directly</span> without scope operator
 
