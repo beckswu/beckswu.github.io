@@ -54,8 +54,8 @@ Sequential Container
 - STL Array 不为空, default initialzer member是class, 必须有default constructor 
 - assignment operator invalidate iterators, but swap not (internal structure swap)
 - Assign 可以用于different but compatible type
-- const object 的iterator, is const iterator 
 - iterator constructor 不需要type exact match 比如double 到int
+- const object 的iterator, is const iterator 
 - deque add / remove element 从两边只invalidate iterator, 不invalidate reference 
 - vector/string add invalidate all, delete 对删除之前的没有影响
 - capacity (size before allocate) vs size 区别
@@ -7962,16 +7962,16 @@ int operator+(int, int);
 
 比如 加号(```string``` 和 ```const char*``` )被定义成了 string member function then. 相反如果定义成nonmember function, ```"hi" + s``` 等于 ```operator+("hi",s)```, 唯一的requirement是至少一个运算对象是class type, and both operands can converted to string 
 
-```
+```c++
 string s = "world";
-stringt=s+"!"; // ok 
+string t = s+"!"; // ok 
 
 string u = "hi" + s; // would be an error if + were a member of string
 
 ```
 
 
-####(b). Input and Output Operators
+#### (b). Input and Output Operators
 
 - input and output function 必须是 <span style="background-color:#FFFF00">**nonmember function**</span>. 不能是member of own class. 因为如果是class member, 必须属于istream or ostream 类, 但是those class 是part of standard library, 不能加members to IO class  
 - 如果 input and output access nonpublic data, <span style="background-color:#FFFF00">**declared** it as **friends**</span>
@@ -7996,7 +7996,7 @@ ostream & operator << (ostream & os, const Sales_data & item){
 
 - first parameter is <span style="background-color:#FFFF00">**reference to stream**</span> from which it is to read. 
 - 第二个 parameter 是 a <span style="background-color:#FFFF00">**reference to nonconst object**</span> which to read. 不是const 因为要read data into this object. 
-- - return its ```istream``` **reference** parameter
+  - return its ```istream``` **reference** parameter
 - <span style="background-color:#FFFF00">**Input operators**</span> must deal with the <span style="color:red">possibility</span> that the <span style="color:red">input might fail</span>; output operators generally don’t bother.
 - 当读取操作发生错误时, 输入运算符应该负责从错误中恢复, to protect a user that ignores the posssibility of an input error, won't generate misleading results
   - 如果错误发生错误, 应当set IO state```failbit```, ```eofbit```(file was exhausted), ```badbit```(stream corrupted). 
@@ -8134,7 +8134,7 @@ if (svec.size() && svec[0].empty()) {
 #### (f). Increment and Decrement Operators
 
 - 因为 increment (++) 和 decrement (--)  change the state of the object on which they operate, our preference is to make them <span style="background-color:#FFFF00">**member functions**</span>
-- <span style="color:red">prefix</span>> return a <span style="color:red">**reference**</span>, <span style="color:red">postfix</span>> return a <span style="color:red">**value**</span>
+- <span style="color:red">prefix</span> return a <span style="color:red">**reference**</span>, <span style="color:red">postfix</span> return a <span style="color:red">**value**</span>
   - To be consistent with the built-in operators, the <span style="color:red">**postfix operators**</span> should <span style="color:red">return the **old**</span> (unincremented or undecremented) value. That value is <span style="color:red">returned as a **value**</span>, not a reference.
 - 区分prefix and postfix:
   - ```postfix``` version 有一个<span style="background-color:#FFFF00">**extra(unused, so not give it a name) parameter** of type ```int```</span>. When we <span style="color:red">use a **postfix operator**</span>, the compiler supplies <span style="color:red">**0** as the **argument** for this parameter</span>, 尽管可以使用这个extra 0, 但实际不这么做
@@ -8156,6 +8156,7 @@ public:
 };
 
 // prefix: return a reference to the incremented/decremented object 
+
 StrBlobPtr& StrBlobPtr::operator++()
 {
     // if curr already points past the end of the container, can't increment it 
