@@ -46,6 +46,23 @@ public:
 
 ***
 
+Sequential Container
+
+- list /forward 不支持random access, 花销大
+- forward_list no size operation, no back, 但有end 
+- STL Array support copy constructor/assignment, brace assignment/initilization, 但没有begin end, no iterator constructor
+- STL Array 不为空, default initialzer member是class, 必须有default constructor 
+- assignment operator invalidate iterators, but swap not (internal structure swap)
+- Assign 可以用于different but compatible type
+- const object 的iterator, is const iterator 
+- iterator constructor 不需要type exact match 比如double 到int
+- deque add / remove element 从两边只invalidate iterator, 不invalidate reference 
+- capacity (size before allocate) vs size 区别
+- const char * -> string 必须null terminated
+- insert 在p前插入, 返回插入第一个元素, erase 返回删除后一个元素的
+
+***
+
 ## 2. Variable and Basic Types
 
 <span style="background-color: #FFFF00">**Initialization is not assignment**</span>. Initialization happens when a variable is given a value *when it is created*.(创建变量时 赋予它一个初始值). **Assignment** obliterates an object's current value and replaces that value with a new one (
@@ -4183,8 +4200,7 @@ swap(svec1, svec2);
 - **Relational Operators**:(>, >=, <=, <=, ==, !=), 必须保证right- and left-hand operands 必须是<span style="background-color:#FFFF00">**same kind of container**</span> and hold elements of <span style="background-color:#FFFF00">**same type**</span> (e.g. 不能拿```vector<int>``` compare to ```list<int>```), 比较two container 实际上是perform pariwise comparision of the elements, 与string比较方式类似
     - 两个container size 一样, element也一样，则相等, 否则不等
     - 两个container size 不一样, 但是较小的每个元素 和size 较大都一样, 则较大size 的大
-    - size 不同, size小的容器 每个元素大于较大容器对应元素, 较小容器大
-    - If neither container is an initial subsequence of the other, 取决于第一个不一样的element 
+     - If neither container is an initial subsequence of the other, 取决于第一个不一样的element 
 - 只有当type 定义了relational operator 才可以进行比较. 比如```vector<Sales_data> storeA, storeB; if (storeA < storeB);``` 有可能是error,如果```Sales```没有定义 ```<``` operator
 
 
@@ -4208,11 +4224,6 @@ v1 == v2 // false; v2 has fewer elements than v1
 **(1).Add, Access, Delete**
 - 像一个```vector``` or ```string``` 添加元素可能会引起entire object to be reallocated. <span style="background-color:#FFFF00">Reallocating an object requires allocating new memory and moving elements from the old space to the new.</span>
 - ```array```不支持任何 add /delete operation 因为会改变size
--  ``forward_list```
-    - 没有```back```,因为不支持```reverse_iterator```, 
-    -  也不能```--```递减```forward_list```的iterator, 但可以call ```forward_list```的```end()```
-    - 不支持```push_back``` 
-    - 有自己的```insert``` and ```emplace```
 - ```emplace(front, back)```construct elements in the container. The arguments must match a constructor for the element type. 
 - The Access Members <span style="background-color:#FFFF00">Return **References**</span> (```back()```, ```front()```, ```c[n]```, ```c.at(n)```), e.g. ```auto & v = c.back(); v = 1024;```, 
     -  ```at```与下标的区别是如果越界, ```at```throw out_of_range error 如果invalid, （subscript operator 不会check index）
@@ -4228,7 +4239,7 @@ v1 == v2 // false; v2 has fewer elements than v1
 |  |```vector```, ```string``` 不支持```push_front``` and ```emplace_front```  |
 | ```c.push_back(t)``` <br/>  ```c.emplace_back(arg)``` | 在尾部创建一个值为t或者由args 创建的元素 |
 | ```c.push_front(t)``` <br/>  ```c.emplace_front(arg)``` | |
-| ```c.insert(p,t)``` <br/>  ```c.emplace(p,args)``` | p is iterator, 在p之前插入，返回iterator 指向新添加元素 |
+| ```c.insert(p,t)``` <br/>  ```c.emplace(p,args)``` | p is iterator, <span style="color:red">**在p之前插入**</span>，返回iterator 指向新添加元素 |
 | ```c.insert(p,n,t)```  | <span style="color:red">**在p之前**</span>,, 插入n个t, 返回指向<span style="color:red">新添加的**第一个**元素的iterator,</span> 若n为0, 返回p |
 | ```c.insert(p,b,e)```  | <span style="color:red">**在p之前**</span>,, 插入由iteartor b 和e返回内的元素, 返回指向<span style="color:red">新添加的**第一个**元素的iterator</span>, 若range 为空, 返回p |
 | ```c.insert(p,il)```  | il是一个braced list of element values. 在p之前插入, 返回指向<span style="color:red">新添加的**第一个**元素的iterator</span>, 若列表为空, 返回p |
@@ -4308,7 +4319,7 @@ while (ivec.size() != ivec.capacity())
     ivec.push_back(0);
 ```
 
-#### (d). nvalidate Iterators
+#### (d). Invalidate Iterators
 
 - Invalidate iterator, pointer, or reference is serious <span style="color:red">run-time error</span>
 - After Options that add elements: (Iterators, pointers, and references aka IPR)
@@ -4319,7 +4330,7 @@ while (ivec.size() != ivec.capacity())
 - After we remove element
   -  **list**, **forward_list** IPR 都 remain valid 
   -  对于 **deque**, remove elements  in the middle IPR都invalid; <span style="background-color:#FFFF00">如果删除是back or front, begin/off-the-end itertor(end) is invaldiated, front/back的reference, pointer有效, 其他middle的IPR 都有效 （unaffected) </span>
-  -  IPR to **vector** or **string** remain valid对于删除元素之前的, 注意: 当我们删除元素时, off-the-end iterator is always invalidated when we remove elements
+  -  IPR to **vector** or **string** remain <span style="background-color:#FFFF00">valid对于**删除元素之前**</span>的, 注意: 当我们删除元素时, off-the-end iterator is always invalidated when we remove elements
 - Avoid Storing the Iterator Returned from end 因为add / remove elements 总会把```vector``` or ```string``` 的```end``` iterator invalid
 
 
@@ -4377,18 +4388,24 @@ while (begin != v.end()) {
 ```
 
 
-#### (e).Specialized forward_list Operations
+#### (e).Forward_list Operations
 
 ![](/img/post/C++/forward_list.png)
+
+-  ``forward_list```
+    - 没有```back```,因为不支持```reverse_iterator```, 
+    -  也不能```--```递减```forward_list```的iterator, 但可以call ```forward_list```的```end()```
+    - 不支持```push_back``` 
+    - 有自己的```insert``` and ```emplace```
 
 因为```forward_list``` 是single linked list, 如果add/remove element 需要访问前一个元素(prepocessor),但是forward_list是单向,不能访问前一个元素, 所以定义insert emplace, erase 都是after, e.g. 我们想删除```elem3``` 需要call ```erase_after``` on iterator ```elem2```. To support 这种操作, ```forward_list``` 也定义了一个```before_begin``` returns off-the-begining (首前) iterator
 
 | Syntax | Description | 
 | --- | :--- | 
 | ```c.before_begin()``` <br/> ```c.cbefore_begin()```  | 不存在的元素在列表首前, <span style="color:red">不能用dereferenced</span> |
-| ```c.insert_after(p,t)``` <br/> ```c.insert_after(p,n,t)```  <br/> ```c.insert_after(p,b,e)```  <br/> ```c.insert_after(p,il)```  | p is iterator, t is object, n is count, b 和 e是iterator, il is braced list. <span style="color:red">返回last insert element</span> 如果range is empty returns p, <span style="color:red">Undefined if p 是off-the-end iterator (end)</span>  |
-| ```c.emplace_after(p.args)``` | 返回the iterator to new element, Undefined if p 是off-the-end iterator (end) |
-| ```c.erase_after(p)``` <br/>  ```c.erase_after(b,e)``` | 删除p后面的一个elements or 删除(b,e)之间的元素 (不包括b,e). 返回an iterator to the eement after the one deleted, or 返回off-the-end iterator(如果不存在这样的element), Undefined if p 是off-the-end iterator (end) |
+| ```c.insert_after(p,t)``` <br/> ```c.insert_after(p,n,t)```  <br/> ```c.insert_after(p,b,e)```  <br/> ```c.insert_after(p,il)```  | p is iterator, t is object, n is count, b 和 e是iterator, il is braced list. <span style="color:red">返回**last insert** element</span> 如果range is empty returns p, <span style="color:red">Undefined if p 是off-the-end iterator (end)</span>  |
+| ```c.emplace_after(p, args)``` | 返回the iterator to new element, Undefined if p 是off-the-end iterator (end) |
+| ```c.erase_after(p)``` <br/>  ```c.erase_after(b,e)``` | 删除p后面的一个elements or 删除(b,e)之间的元素 (不包括b,e). <span style="color:red">返回an iterator to the element **after the one deleted**</span>, or 返回off-the-end iterator(如果不存在这样的element), Undefined if p 是off-the-end iterator (end) |
 
 当删除elements in ```forward_list``` 必须关注两个iterator, the one we checking and the one to that element's predecessor.
 
@@ -4520,7 +4537,7 @@ auto last_pos = river.rfind("is"); // returns 4
     - e.g. 假定```deq```是一个```deque<int>```, ```stack<int>stk(deq);``` 从deq拷贝元素到stk,
     - e.g. override default container type by naming a sequential container as a second type argument. ```stack<string, vector<string>>str(svec)```
 - <span style="background-color:#FFFF00">All adpator 需要the ability to add / remove elements. 因为they cannot be built on ```array```. 同样的, 我们也不能用```forward_list```, 因为adaptor需要具有add, remove, access the last element (back) ability. </span>
-- ```stack```仅需要有```back```, ```push_back```, ```pop_back```,所以用于除了```array``` 和 ```forward_list```以外所有容器
+- ```stack```仅需要有```back```, ```push_back```, ```pop_back```,所以用于除了```array``` 和 ```forward_list```以外所有容器 (list. deque,vector,string)
 - ```queue```需要有```back```,```push_back```, ```front```, ```push_front```的能力,所以只能建立在```list``` or ```deque```上而不能在```vector```上. 
 - ```priority_queue``` 需要有random access in addition to ```front```, ```pusk_back```, ```pop_back```, 所以只能用于```vector``` or ```deque```, 不能用于```list```
 - 每一个container adpator defines 自己的操作类型 in terms of 底层容器的操作类型. 只能使用adaptor自己的操作类型,不能用underlying container type的操作类型. 
