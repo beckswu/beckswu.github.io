@@ -7898,7 +7898,7 @@ public:
 ## 14. overloaded operators
 
 - When an operator is a member function, the <span style="background-color:#FFFF00">**left-hand operand**</span> is bound to the implicit <span style="background-color:#FFFF00">**this**</span> parameter. The <span style="background-color:#FFFF00">**right-hand operand**</span> is passed as an <span style="background-color:#FFFF00">**explicit parameter**(传递到function)</span>.
-- An operator function must either be <span style="background-color:#FFFF00">a member of a class</span> or <span style="background-color:#FFFF00">have at least one parameter of class type</span>:
+- An operator function must either be <span style="background-color:#FFFF00">a member of a class</span> or <span style="background-color:#FFFF00">have **at least one parameter** of class type</span>:
     - 意味着我们不能改变built-in type operator 含义
 - 只能重载已有的operator, 不能加新的operator, 比如不可以overload ```**``` 去执行幂操作
 - 对于重载运算符, precedence and associativity (优先率 和 结合律) 应保持一致, 比如 ``` x == y + z; ``` 永远等价于 ``` x == (y + z)```
@@ -7908,6 +7908,7 @@ public:
     - 因为运算符指定了运算顺序, 而operator overloading 是一个function call, 运算顺序可能会变了
     - overloaded versions of ```&&``` or ```||``` operators do not preserve short-circuit evaluation properties of the built-in operators. 用户发现他们熟悉的求值规则不见了
     - 因为这些运算符有了内置的含义，如果重载, behave differently from their normal meanings.
+- 如果一个class 定义了 ```==``` operator, 通常也应该定义 ```!=``` as well, 同样如果一个class定义了 ```<``` operator, 也应该定义 all relational operators
 
 ![](/img/post/C++/operator_overloading.PNG)
 
@@ -7918,39 +7919,307 @@ error 去redefine built-in operators
 int operator+(int, int);
 ```
 
+**Guideline of whether make the operator a class member or ordinary nonmember function**
+
+1. assignment ```=```, subscript ```[]```, call ```()```, and member access arrow ```->```` must defined as <span style="background-color:#FFFF00">**members**</span>
+2. compound-assignement operators 比如```+=``` 应该是 <span style="background-color:#FFFF00">**members**</span>
+3. Operators that change the state of their object or that are closely tied to their given type—such as **increment**, **decrement**, and **dereference**—usually should be <span style="background-color:#FFFF00">**members**</span>.
+4. Symmetric operators(provide **mixed-type** expression)—those that might convert either operand, such as the **arithmetic**, **equality**, **relational**, and **bitwise** operators—usually should be defined as ordinary <span style="background-color:#FFFF00">**nonmember functions**</span>. 希望还有混合类型的symmetric operator 比如 把 int 加上 double, 因为int 可以在 加号左侧 右侧都可以, 
+
+比如 加号(```string``` 和 ```const char*``` )被定义成了 string member function then. 相反如果定义成nonmember function, ```"hi" + s``` 等于 ```operator+("hi",s)```, 唯一的requirement是至少一个运算对象是class type, and both operands can converted to string 
+
+```
+string s = "world";
+stringt=s+"!"; // ok 
+
+string u = "hi" + s; // would be an error if + were a member of string
+
+```
 
 
+####(b). Input and Output Operators
+
+- input and output function 必须是 <span style="background-color:#FFFF00">**nonmember function**</span>. 不能是member of own class. 因为如果是class member, 必须属于istream or ostream 类, 但是those class 是part of standard library, 不能加members to IO class  
+- 如果 input and output access nonpublic data, <span style="background-color:#FFFF00">**declared** it as **friends**</span>
+
+**(1). Overloading the Output Operator <<**
+
+- first parameter of an output operator is a <span style="background-color:#FFFF00">reference to a nonconst **ostream** object</span>. <span style="color:red">nonconst 原因是 write to stream changes its state<span>. 而reference 是因为IO对象 不能copy
+- 第二个paramemter 通常是 a reference to const class type that we want to print. const 是避免改变object
+- return its ```ostream``` **reference** parameter
+- The output operators for the built-in types do little **formatting**. <span style="color:red">尤其不会打印换行符</span>. 让user control the detials of their output 
 
 
+例子
+```c++
+ostream & operator << (ostream & os, const Sales_data & item){
+    os << item.isbn() <<" "<<item.revenue;
+    return os;
+}
+```
+
+**(2). Overloading the Input Operator >>**
+
+- first parameter is <span style="background-color:#FFFF00">**reference to stream**</span> from which it is to read. 
+- 第二个 parameter 是 a <span style="background-color:#FFFF00">**reference to nonconst object**</span> which to read. 不是const 因为要read data into this object. 
+- - return its ```istream``` **reference** parameter
+- <span style="background-color:#FFFF00">**Input operators**</span> must deal with the <span style="color:red">possibility</span> that the <span style="color:red">input might fail</span>; output operators generally don’t bother.
+- 当读取操作发生错误时, 输入运算符应该负责从错误中恢复, to protect a user that ignores the posssibility of an input error, won't generate misleading results
+  - 如果错误发生错误, 应当set IO state```failbit```, ```eofbit```(file was exhausted), ```badbit```(stream corrupted). 
+
+下面例子, 如果IO错误(比如输入不是数字, 或者hit end-of-file or some other error on input stream), 则运算符将非定对象重置为empty ```Sales_data```
+```c++
+istream operator>>(istream & is, Sales_data & item){
+    double price; 
+    is >> item.bookNo >> item.units_sold >> price;
+    if (is) // check that the inputs succeeded 
+        
+        item.revenue = item.units_sold * price;
+    else
+        item = Sales_data(); // input failed: give the object the default 
+    
+    return is;
+}
+```
+
+#### (c). Arithmetic and Relational Operators
+
+- we define the <span style="background-color:#FFFF00">**arithmetic** and **relational** operators as **nonmember functions**</span>, 允许左侧和右侧运算对象 转换. 
+- Operators 不应该change state of either operand, so parameter is <span style="background-color:#FFFF00">**references to const**</span>
+- 如果定义了**arithmetic operator**, 通常也应该<span style="background-color:#FFFF00">define **compound assignment operator**</span>, 通常更<span style="color:red">**efficient**</span> to define arithmetic operator to use compound assignment 
+
+arithmetic operator: use compound-assignment operator
+
+```c++
+Sales_data
+operator+(const Sales_data &lhs, const Sales_data &rhs)
+{
+    Sales_data sum = lhs; // copy data members from lhs into 
+
+    sum sum += rhs; 
+    return sum;
+}
+```
+
+**1. Equality Operators**
+
+- 如果class 需要判断两个object 是否相等，应该定义 ```==``` 而不是member function 
+- operator should be <span style="color:red">**transitive**</span>, 如果 ```a==b```, ```b==c``` 则 ```a==c```
+- 如果定义了 ```==``` operator, 也应该定义 ```!=``` operator 
+- 相等和不等operator 应该把工作委托(delegate)给另外一个. 表示<span style="color:red">只有相等 or 不等 其中一个 实际比较 work</span>, 另一个call that does the real work 
+
+下面例子展示了只有相等 或 不等一个do the real work
+```c++
+bool operator==(const Sales_data &lhs, const Sales_data &rhs)
+{
+  
+  return lhs.isbn() == rhs.isbn() && lhs.units_sold == rhs.units_sold &&
+    lhs.revenue == rhs.revenue;
+} 
+bool operator!=(const Sales_data &lhs, const Sales_data &rhs)
+{
+    return !(lhs == rhs);   
+}
+
+```
+
+**2. Relational Operators**
+
+- 定义了equality operator, 也应该定义relation operators， 因为<span style="color:red">一些**container** 用到了 operator ```<```</span>
+- Ordinarily the relational operators should:
+    1. <span style="color:red">**Define an ordering**</span> relation that is **consistent** with requirement for as a key to an <span style="color:red">**associative container**</span> 
+    2.  Define a relation that is **consistent** with ```==``` if the class has both operators. 如果 two objects are ```!=```, one object should ```<``` the other
+- If a single logical definition for ```<``` exists(如果存在唯一一种逻辑可靠的 ```<```定义), classes usually should define the ```<``` operator. However, if the class also has ```==```, define ```<``` only if the definitions of ```<``` and ```==``` yield consistent results.
 
 
+#### (d). Assignment Operators
+
+- 除了copy assignment 和 move assignment operators 把同一类的赋值, 也可以定义additional assignment operators that allow 别的类型作为 right-hand operand 
+- library (e.g.```vector```) classs 还定义了 a braced list of elements ```vector<string> v = {"a", "an", "the"};```
+- Assignment operators can be overloaded. <span style="background-color:#FFFF00">**Assignment operators**</span>, regardless of parameter type, must be defined as <span style="background-color:#FFFF00">**member functions**</span>.  ordinarily <span style="background-color:#FFFF00">**compound-assignment operators** 也应该定义成 **member function**</span>
+
+```c++
+class StrVec { 
+public:
+    StrVec &operator=(std::initializer_list<std::string>);
+    //其他成员和上面定义一样
+};
+
+StrVec & StrVec::operator=(std::initializer_list<string>il){
+    auto data = alloc_n_copy(il.begin(), il.end());
+    free();
+    elements = data.first;
+    first_free = cap = data.second;
+    return *this;
+}
+```
+
+compound-assignment operator
+```c++
+Sales_data& Sales_data::operator+=(const Sales_data &rhs)
+{
+    units_sold += rhs.units_sold; 
+    revenue += rhs.revenue; 
+    return *this;
+}
+```
+
+#### (e). Subscript Operator
 
 
+- define the subscript operator ```operator[]```
+- The <span style="background-color:#FFFF00">**subscript operator**</span> must be a <span style="background-color:#FFFF00">**member function**</span>.
+- To be compatible with the ordinary meaning of subscript, the subscript operator usually <span style="color:red">returns a **reference** to the element</span> that is fetched.
+    - 因为返回时reference, 所以 subscript 可以是assignment 的either side. 
+    - good idea to define both <span style="color:red">**const** and **nonconst** version of **subscript operator**</span>. (因为可以下表运算结果reference可以是 赋值运算任意一边)
+
+不能对返回const reference 的subscript operator 进行赋值运算
+```c++
+class StrVec { 
+public:
+    std::string& operator[](std::size_t n) { return elements[n]; }
+    const std::string& operator[](std::size_t n) const { return elements[n]; }
+
+private:
+    std::string *elements; // pointer to the first element in the array 
+
+};
+
+const StrVec cvec = svec; // copy elements from svec into cvec
+
+if (svec.size() && svec[0].empty()) {
+    svec[0] = "zero"; // ok: subscript returns a reference to a string
+
+    cvec[0] = "Zip"; // error: subscripting cvec returns a reference to const 
+
+}
+
+```
 
 
+#### (f). Increment and Decrement Operators
+
+- 因为 increment (++) 和 decrement (--)  change the state of the object on which they operate, our preference is to make them <span style="background-color:#FFFF00">**member functions**</span>
+- <span style="color:red">prefix</span>> return a <span style="color:red">**reference**</span>, <span style="color:red">postfix</span>> return a <span style="color:red">**value**</span>
+  - To be consistent with the built-in operators, the <span style="color:red">**postfix operators**</span> should <span style="color:red">return the **old**</span> (unincremented or undecremented) value. That value is <span style="color:red">returned as a **value**</span>, not a reference.
+- 区分prefix and postfix:
+  - ```postfix``` version 有一个<span style="background-color:#FFFF00">**extra(unused, so not give it a name) parameter** of type ```int```</span>. When we <span style="color:red">use a **postfix operator**</span>, the compiler supplies <span style="color:red">**0** as the **argument** for this parameter</span>, 尽管可以使用这个extra 0, 但实际不这么做
+  - The <span style="color:red">**postfix**</span> versions have to <span style="color:red">**remember** the current state</span> of the object <span style="color:red">before incrementing</span> the object
+  - <span style="color:red">Prefix 需要check if increment/decrement is safe</span> and either throw exception or increment/decrement, <span style="background-color:#FFFF00">Postfix 不需要explicitly check,因为postfix 内call prefix which do the check</span>.
 
 
+**Defining Prefix Increment/Decrement Operators**
+
+increment check 如果```currr```已经到达了```vector```的末尾, check 将抛出异常。Decrement 如果```curr``` 已经是0了, 那么传递给```check```的值是一个非常大的positive 无效的value
+```c++
+class StrBlobPtr { 
+public:
+// increment and decrement 
+    
+    StrBlobPtr& operator++(); 
+    StrBlobPtr& operator--(); // other members as before
+
+};
+
+// prefix: return a reference to the incremented/decremented object 
+StrBlobPtr& StrBlobPtr::operator++()
+{
+    // if curr already points past the end of the container, can't increment it 
+    
+    check(curr, "increment past end of StrBlobPtr"); 
+    ++curr; 
+    return *this;
+}
+StrBlobPtr& StrBlobPtr::operator--()
+{
+    // / if curr is zero, decrementing it will yield an invalid subscript
+    --curr; 
+
+    check(curr, "decrement past begin of StrBlobPtr"); 
+    return *this;
+}
+
+```
+
+<span style="background-color:#FFFF00">postfix version don't check increment because prefix version 内check the increment</span>
+```c++
+StrBlobPtr StrBlobPtr::operator++(int)
+{
+    // no check needed here; the call to prefix increment will do the check 
+
+    StrBlobPtr ret = *this; // save the current value
+
+    ++*this; // advance one element; prefix ++ checks the increment
+
+    return ret; // return the saved state
+
+} 
+StrBlobPtr StrBlobPtr::operator--(int)
+{
+    // no check needed here; the call to prefix decrement will do the check 
+
+    StrBlobPtr ret = *this; // save the current value
+
+    --*this; // move backward one element; prefix -- checks the decrement
+
+    return ret; // return the saved state 
+
+}
+```
+
+<span style="background-color:#FFFF00">**Calling the Postfix Operators Explicitly**</span>
+```c++
+StrBlobPtr p(a1); // p points to the vector inside a1 
+
+p.operator++(0); // call postfix operator++ 
+
+p.operator++(); // call prefix operator++
+
+```
+
+#### (g). Member Access Operators
+
+- The dereference (```*```) and arrow (```->```) operators are often used in classes that represent iterators and in smart pointer classes
+- <span style="background-color:#FFFF00">**Operator arrow**</span> must be a <span style="background-color:#FFFF00">**member**</span>(function). The <span style="background-color:#FFFF00">**dereference operator**</span> is not required to be a member but usually should be a<span style="background-color:#FFFF00"> **member**</span> as well.
+- When we write ```point->mem```, <span style="background-color:#FFFF00">```point``` must be a **pointer** to a class</span> object or it must be an object of a class with an overloaded operator```->```. 根据point类型不同, writing ```point->mem``` is equivalent to
+    1. ```(*point).mem;```. point is a built-in <span style="background-color:#FFFF00">**pointer**</span> type 
+        - 先 dereference point and fetch from resulting object.  如果```point```没有 member named ```mem```, code is in error 
+    2. ```point.operator()->mem;``` point is an object of <span style="background-color:#FFFF00">**class**</span> type
+        - 如果 ```point``` is an object of a class that defines ```operator->```, 则使用 ```pointer.operator -> () ``` 来fetch ```mem```. 如果result is pointer, 重复step 1. 如果result is overloadede ```operator->()```, this step is repeatede on that object. process continues 直到 indicated member is return or some error 
 
 
+值得注意
+-  <span style="color:red">**deference**</span> 返回时 <span style="color:red">**reference**</span>, 而 <span style="color:red">**arrow**</span> 返回是 <span style="color:red">**pointer**</span>
+- 两个function 是```const``` member, 因为fetch an element 不改变state of a ```StrBlobPtr```. 这些operator 返回reference or pointer to nonconst string, 因为```StrBlobPtr```(它的constructor是 ```StrBlob &```) 绑定的是nonconst 的 ```StrBlob```
 
+```c++
+class StrBlobPtr { 
+public:
+    std::string& operator*() const
+    { 
+        auto p = check(curr, "dereference past end");
+        return (*p)[curr]; // (*p) is the vector to which this object points
 
+    } 
+    
+    std::string* operator->() const
+    { 
+        // delegate the real work to the dereference operator 
 
+        return & this->operator*();
+    }
+};
 
+StrBlob a1 = {"hi", "bye", "now"};
+StrBlobPtr p(a1); // p 指向a1中的vector
 
+*p = "okay"; // assigns to the first element in a1
 
+cout << p->size() << endl; // prints 4, the size of the first element in a1
 
+cout << (*p).size() << endl; // equivalent to p->size()
 
-
-
-
-
-
-
-
-
-
-
-
+```
 
 
 
