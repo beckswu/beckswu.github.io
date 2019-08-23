@@ -3088,7 +3088,7 @@ class Account {
 };
 ```
 
-**(2).Type Names Are Special**: 一般来说, inner scope can redefine a name from an outer scope (out scope names is hidden). 但是对于type 不行, <span style="color:red">class inner scope cannot redefine a typename </span> 如果这个type 被member function parameter/return 使用(typedef redefine 可以在VS中, 但不适用于linux) 
+**(2).Type Names Are Special**: 一般来说, inner scope can redefine a name from an outer scope (out scope names is hidden). 但是对于type 不行, <span style="color:red">class inner scope **cannot redefine a typename** </span> 如果这个type 被member function parameter/return 使用(typedef redefine 可以在VS中, 但不适用于linux) 
 
 ```c++
 typedef double Money;
@@ -3219,21 +3219,20 @@ void Screen::setHeight(pos var) {
 - constructor  run whenever an object of a class type is created.只要class的对象被创建, 就会执行constructor
 - Unlike other member functions, <span style="background-color:#FFFF00">constructor 不能被declared as const</span>. <span style="color:red">When we create a **const** object of a class type, the object 直到constructure completes the object's initialization 才获得constness 属性 </span>. constructors initialize const objects during their construction.
 - Classes control default initialization by defining a special constructor, known as the **default constructor**: is one that takes no arguments.
-  - <span style="background-color:#FFFF00">**default constructor** 是constructor work without any argument(either no parameters, or all parameters have default values)</span>; 错误的概念是constructor with no parameters; 比如```dog(string name = “Bob”); ```属于can work without any argument, 但有default parameter
-  - 如果没有explicitly define any constructors, <span style="color:red">compiler will implicitly define and generate the default constructor</span> known as the <span style="background-color:#FFFF00">**synthesized default constructor**</span>, 对于大多数class, this synthesized constructor initializes each data member as follows: 
-    - 如果there is an in-class initializer, 用default constructor without parameters initialize member(如果存在class的初始值,用初始值初始化成员) 比如class 中```string a = "dog";```
-    - Otherwise, default-initialize the member(否则, 默认初始化成员),比如class 中```string a;``` 默认初始化为空
-    -  如果不支持默认初始化, your default constructor should use the **constructor initailizer list** to initialize every member of the class (e.g. ```sale(): a(0) {}```)
-  - ```Sales_data() = default;``` 让compiler generate default constructor: <span style="color:red">The = default can appear with the declaration inside the class body or on the definition outside the class body(既可以和声明出现在class 内部, 也可以作为定义出现在class 外部)</span>. <span style="background-color:#FFFF00">如果用```=default``` inside class, the default constructor will be **inlined**. 如果出现在definition outside the class, the member will not be inlined by default </span>
+  - <span style="background-color:#FFFF00">**default constructor** 是constructor work without any argument(either no parameters, or all parameters have default values)</span>; 错误的概念是constructor with no parameters; 比如```dog(string name = “Bob”); ```
+  - 如果没有explicitly define any constructors, <span style="color:red">compiler will implicitly define and generate **synthesized default constructor**</span>, 对于大多数class, this synthesized constructor initializes each data member as follows: 
+    - 如果there is an in-class initializer, 用default constructor 用初始值初始化成员 比如class 中```string a = "dog";```
+    - Otherwise, default-initialize the member,比如class 中```string a;``` 默认初始化为空
+    -  如果不支持默认初始化, your default constructor should use the <span style="background-color:#FFFF00">**constructor initailizer list**</span> to initialize every member of the class (e.g. ```sale(): a(0) {}```)
 - constructor 不应该override in-class initializers except to use a different initial value.
 
 **Some Classes Cannot Rely on the Synthesized Default Constructor**
 - <span style="color:red">只有我们没有声明任何的constructor，compiler 才会generates **synthesized default constructor**, 如果有自己定义constructor， 除非自己定义default constructor, 否则不会生成
-- 第二原因是: synthesized default constructor does the wrong thing, 比如数组或者指针对象被默认初始化, 他们值是未定义的. 所以当class has compound type (pointer or array) or built-in 应该有自己定义的constructor, 否则有 undefined value 
-  - <span style="color:red">Classes that have members of built-in or compound type usually should rely on the synthesized default constructor only if all such members have in-class initializers.</span>
-- 第三个原因是: some classes must define their own default constructor <span style="color:red">是因为有时候compiler is unable to systhesize one</span>. 比如一个class has member which is class type, and that class doesn't have a default constructor, then compiler can't initialize that memeber, 对于这个种情况, 必须定义自己的constructor
+- 第二原因是: synthesized default constructor does the wrong thing, 比如数组或者指针对象被默认初始化, 他们值是未定义的
+  - Classes that have members of built-in or compound 只当有 in-class initializers 才 should rely on the synthesized default constructor。
+- <span style="color:red">有时候compiler is unable to systhesize one</span>. 比如一个class has member 没有default constructor, or const, reference 没有in-class initializer
 
-如果我们不定义Copy, Assignment, and Destruction, compiler也许会synthesize them for us. <span style="color:red">对于class的vector or string, compiler generated 的 copy, assignment, destructor works correctly</span>, 因为we copy or assign an object that has a vector member, the vector class takes care of copying or assigning the element. 当object is destroyed, the vector member is destroyed which 反过来destroys the elements in vector.
+<span style="color:red">library 比如vector or string, compiler generated 的 copy, assignment, destructor works correctly</span>, 因为the vector class takes care of copying or assigning the element. 当object is destroyed, the vector member is destroyed which 反过来destroys the elements in vector.
 
 
 **(1). Constructor Initializer List**
@@ -3262,11 +3261,10 @@ class data{
 ```
 
 - <span style="color:red">必须用**constructor initializer list**  to provide values for members that are const, reference, or a class type that does have a default constructor</span>,const, reference 是必须initialized的
-  - <span style="background-color:#FFFF00"> 如果member 有 const or reference, 不会有default constructor, 必须要Initialized using constructor initialization list</span>
-  -  **constructor initializer list** specifies only the values used to initialize the members, not the order. **constructor initializer list**没有说明初始化的order
+  - 如果member 有  <span style="background-color:#FFFF00">const or reference</span>, 不会有default constructor, 必须要<span style="background-color:#FFFF00">Initialized using constructor initialization list</span>
 -  <span style="background-color:#FFFF00">class members are initialized 与他们在class 出现的顺序一致, **constructor initializer list** order 不会影响他们实际初始化的顺序</span>
    -  一般顺序不matter, 但是如果一个成员用另一个成员初始化后的值, order 就matter了 (有些compiler 会有warning)
-   -  最好write **constructor initializer** in the same order as members are declared in class. 其次避免using members to initialize other members
+   -  最好write **constructor initializer** in the <span style="color:red">**same order** as members are declared</span> in class. 其次避免using members to initialize other members
  
 ```c++
 class ConstRef { 
