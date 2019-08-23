@@ -4024,9 +4024,9 @@ for (const auto &entry : people) {
 ## 9. Sequential Containers
 
 
-sequential containers 为user 提供 control the order in which the elements are stored and accessed. Order 取决于元素加入容器(container)时的位置. By contrast, the ordered and unordered associative containers store theire elements based on the value of a key
+**sequential containers** 为user 提供 control the order in which the elements are stored and accessed. Order 取决于元素加入容器(container)时的位置. By contrast, the ordered and unordered **associative containers** store theire elements based on the value of a key
 
-#### (1). Overview
+#### (a). Overview
 
 | Type | Description | 
 | --- | :--- | 
@@ -4037,61 +4037,37 @@ sequential containers 为user 提供 control the order in which the elements are
 | array |  <span style="color:red"> **Fixed-size** array. Supports fast random access. **Cannot add or remove elements** |
 | string | A specialized container, similar to vector that contains characters. Fast random ccess. Fast insert/delete at the back |
 
-- the new library containers are <span style="color:red">dramatically faster</span> than previous release. <span style="background-color:#FFFF00">Modern C++ programs should use library containers</span> 而不是原始的数据结构, 例如build-in 数据
+- the new library containers are <span style="color:red">dramatically faster</span> than previous release. <span style="background-color:#FFFF00">Modern C++ programs should use library containers</span>
 - 除了```array``` which is fixed-size, 剩下的container provide efficient, flexible memory management, growing and shrinking the size.
 - **string** and **vector** hold their elements in <span style="background-color:#FFFF00">contiguous memory</span>.由下标计算其地址很快, 但是一次插入或者删除后,<span style="background-color:#FFFF00">需要移动插入/删除位置之后的所有元素, 来保持连续存储(maintain contiguity)</span>; 而且添加一个元素可能需要分配额外的存储空间. At the case, every element must be moved into the new storage. 
-- **list** and **forward list** designed to fast to add / remove element anywhere in container. 作为代价，不支持random access. 而且与**string**,  **deque**
-,**array** 相比, memory 开销(overhead) 也很大
-- **forward_list** and **array** types were added by new standard. 与build-in array相比, An **array** 是更安全容易使用的. 与build-in array一样,是fixed size的,不支持add/remove element.
-- **forward_list**  不支持```size``` operation 因为storing or computing its size 多出额外的开销compaed to handwritten list.
+- **list** and **forward list** designed to fast to add / remove element anywhere in container. 作为代价，<span style="color:red">**不支持random access**</span>. 而且与**string**,  **deque**
+,**array** 相比, <span style="color:red">memory 开销(overhead) 也很大</span>
+-  与build-in array相比, An **array** 是更安全容易使用的. 与build-in array一样,是fixed size的,不支持add/remove element.
+- **forward_list**  不支持```size``` operation 因为storing or computing its size 多出额外的开销compared to handwritten list.
 
 
 **Deciding Which Sequential Container to Use**
-- 通常```vector```是最好的容器
-    - 如果需要add elements in middle. common to add all elements in **vector** and call ```sort```
-- If your program has lots of small elements and space overhead matters, don’t use list or forward_list.
-- If the program requires random access to elements, use a **vector** or a **deque**.
+- If your program has lots of small elements and <span style="color:red"space overhead matters, don’t use **list** or **forward_list**</span>.
 - If the program needs to insert or delete elements：
    - Insert/Delete in the  <span style="color:red"> middle</span> of the container, use a **list** or **forward_list**.
    - Insert/Delete elements at the  <span style="color:red"> front and the back</span>, but not in the middle, use a **deque**.
    - Insert into the  <span style="color:red"> middle</span>, consider using a **list** for the input phase. Once the input is complete, copy the list into a **vector**.
-- 如果程序需要random access , insertion and deletion. 决定取决于 <span style="color:red"> Random Access VS Insertion/Deletion </span> the relative cost of accessing the elements in a **list** or **forward_list** VS the code of inserting or deleting elements in a **vector** or **deque**
+- 如果程序需要random access , insertion and deletion. 决定取决于 <span style="color:red"> Random Access VS Insertion/Deletion </span>  relative cost of accessing elements in a **list** or **forward_list** VS  cost of inserting/ deleting in **vector** or **deque**
 - 如果不确定使用哪个, 可以在程序中只使用 operations common to both **vector** and **list**. <span style="background-color:#FFFF00">**Use iterators, not subscripts and avoid random access to elements**</span>
 
 #### (b). Container Library Overview
 
-- Constructor:
-   - Can use constructor that takes a size argument if the element type is built-in type or a class type that has a  <span style="color:red"> **default constructor**</span> 例如: ```vector<int> a(10)``` 默认初始化了10个0
-   - <span style="color:red">如果没有default constructor type, we cannot construct such containers using only an element count</span>
-   - The constructors that <span style="background-color:#FFFF00">take a size are valid only for sequential containers</span>; they are not supported for the associative containers.
-- <span style="color:red">**Array**: size is part of its type</span>. 当define array, 需要specify element type and size ```array<int, 42>```. **Array** 不支持normal container constructor 因为这些constructor need the size of the container. 
-    - 不像其他container, <span style="color:red">A default-constructed array is not empty: It has as many elements as its size(elements are default initialized)</span>
+**(1). Array**
+
+- <span style="color:red">**Array**: size is part of its type</span>. 当define array, 需要specify element type and size ```array<int, 42>```. 
+- 不支持normal container constructor 因为这些constructor need the size of the container. 
+    - 不像其他container, <span style="color:red">A default-constructed array is not empty: It has as many elements as its size(elements are **default initialized**)</span>
     - 如果提供initializer,必须提供equal or less than size. 如果fewer initializers than size, remaining value是value initialized. <span style="background-color:#FFFF00">如果array element type is class type, class 必须有default constructor.</span>
-    - array 支持copy assignment constructor, 只要type (size, element type) matches, ```array<int, 10>a3(a2);```
-    - array 不支持 braced list assignment(新版C++17支持), 但支持braced list initialization ```array<int,10>a1; a1 = {0}; ```
-    - array 不支持 iterator constructor (no ```begin```, ```end```), ```Assign``` function 
-- Assignment related operations invalidate iterators, references, and pointer into the left-hand container。除了string 和array 外, 而```swap``` 操作不会导致iterator, 引用，指针失效
-- Excepting array, swap does not copy, delete, or insert any elements and is <span style="background-color:#FFFF00">guaranteed to run in constant time</span>.
-    - elements themselves are not swapped; internal data structures are swapped.
-    - <span style="background-color:#FFFF00">但是swap arrays 会真正交换他们的element</span>, 因为swap two arrays require 的时间与array 中数目成正比. 因此After swap, pointers, references, and iterators remain <span style="color:red">bound to the same element</span> they denoted before the swap, . 但是<span style="color:red">值已经与另一个array中交换了</span>(e,g,iterator 指向一样的```ivec[1]```,只是```ivec[1]```的值已经换成另一个了)
-- 在library 有both mmber and nonmember version of ```swap```，好习惯是使用nonmember version of ```swap```
-- **Relational Operators**:(>, >=, <=, <=, ==, !=), 必须保证right- and left-hand operands 必须是same kind of container and hold elements of same type (e.g. 不能拿```vector<int>``` compare to ```list<int>```), 比较two container 实际上是perform pariwise comparision of the elements, 与string比较方式类似
-    - 两个container size 一样, element也一样，则相等, 否则不等
-    - 两个container size 不一样, 但是较小的每个元素 和size 较大都一样, 则较大size 的大
-    - size 不同, size小的容器 每个元素大于较大容器对应元素, 较小容器大
-    - If neither container is an initial subsequence of the other, 取决于第一个不一样的element 
-- 只有当type 定义了relational operator 才可以进行比较. 比如```vector<Sales_data> storeA, storeB; if (storeA < storeB);``` 有可能是error,如果```Sales```没有定义 ```<``` operator
+    - array 支持<span style="background-color:#FFFF00">**copy assignment** 和 **copy construct**</span>, 只要type (size, element type) matches, ```array<int, 10>a3(a2);```
+    - array 支持 braced list assignment(新版C++17支持), 也支持braced list initialization ```array<int,10>a1; a1 = {0}; ```
+    - array <span style="background-color:#FFFF00">不支持 iterator constructor</span> (Array没有no ```begin```, ```end```), ```Assign``` function 
 
-
-```c++
-// assume noDefault is a type without a default constructor
-
-vector<noDefault> v1(10, init); // ok: element initializer supplied 
-
-vector<noDefault> v2(10); // error: must supply an element initializer
-
-```
-
+ 
 Array initialization
 ```c++
 array<int, 10> ia3 = {42}; // ia3[0] is 42, remaining elements are 0
@@ -4109,16 +4085,38 @@ array<int, 10> a2 = {0}; // elements all have value 0
 
 a1 = a2; // replaces elements in a1
 
-a2 = {0}; // error: cannot assign to an array from a braced list
+a2 = {0}; // okay: assign to an array from a braced list C++17
+
+```   
+
+- The constructors that <span style="background-color:#FFFF00">take a size are valid only for sequential containers</span>; they are not supported for the associative containers. e.g. ```vector<int> a(10)```
+
+
+
+
+
+```c++
+// assume noDefault is a type without a default constructor
+
+vector<noDefault> v1(10, init); // ok: element initializer supplied 
+
+vector<noDefault> v2(10); // error: must supply an element initializer
 
 ```
 
-Containner Assignment Operatior, <span style="background-color:#FFFF00">Assign operations not valid for associative containers or array。 Assignment related operations invalidate iterators, references, and pointer into the left-hand container。除了string 和array 外,而```swap``` 操作不会导致iterator, 引用，指针失效 </span>
+
+**(2). Containner Assignment Operatior**
+
+- <span style="background-color:#FFFF00">**Assign operations**</span> not valid for associative containers or array。 Assignment related operations <span style="background-color:#FFFF00">**invalidate** iterators</span>, references, and pointer into the left-hand container。除了string 和array 外,而<span style="background-color:#FFFF00">```swap``` 操作不会导致iterator, 引用，指针失效 </span>
+- Excepting array, swap does not copy, delete, or insert any elements and is <span style="background-color:#FFFF00">guaranteed to run in constant time</span>.
+    - elements themselves are not swapped; internal data structures are swapped.
+    - <span style="background-color:#FFFF00">但是swap arrays 会真正交换他们的element</span>, 因为swap two arrays require 的时间与array 中数目成正比. 因此After swap, pointers, references, and iterators remain <span style="color:red">bound to the same element</span> they denoted before the swap, . 但是<span style="color:red">值已经与另一个array中交换了</span>(e,g,iterator 指向一样的```ivec[1]```,只是```ivec[1]```的值已经换成另一个了)
+- 在library 有both mmber and nonmember version of ```swap```，好习惯是使用nonmember version of ```swap```
 
 | Syntax | Description | 
 | --- | :--- | 
 | ```c1 = c2``` | Replace element in ```c1``` with copies of elements in ```c2```, ```c1``` 与```c2```类型必须一样 |
-| ```c = {a,b,c}``` | Replace elements in ```c1``` with copies of elements in initializer list (<span style="color:red">not valid for array</span>) |
+| ```c = {a,b,c}``` | Replace elements in ```c1``` with copies of elements in initializer list  |
 | ```swap(c1,c2)```<br/> ``` c1.swap(c2)``` | <span style="background-color:#FFFF00">Swap 会比copy elements 快的多</span> | 
 | ```seq.assgin(b,e)``` | Replaces elements in seq with those range denoted by iterators ```b``` and ```e``` |
 | ```seq.assign(il)``` | Replaces elements in seq with those in **initializer list** ```il``` |
@@ -4180,7 +4178,16 @@ vector<string> svec2(24); // vector with 24 elements
 swap(svec1, svec2);
 ```
 
-**比较container**
+**(3).比较container**
+
+- **Relational Operators**:(>, >=, <=, <=, ==, !=), 必须保证right- and left-hand operands 必须是same kind of container and hold elements of same type (e.g. 不能拿```vector<int>``` compare to ```list<int>```), 比较two container 实际上是perform pariwise comparision of the elements, 与string比较方式类似
+    - 两个container size 一样, element也一样，则相等, 否则不等
+    - 两个container size 不一样, 但是较小的每个元素 和size 较大都一样, 则较大size 的大
+    - size 不同, size小的容器 每个元素大于较大容器对应元素, 较小容器大
+    - If neither container is an initial subsequence of the other, 取决于第一个不一样的element 
+- 只有当type 定义了relational operator 才可以进行比较. 比如```vector<Sales_data> storeA, storeB; if (storeA < storeB);``` 有可能是error,如果```Sales```没有定义 ```<``` operator
+
+
 ```c++
 vector<int> v1 = { 1, 3, 5, 7, 9, 12 };
 vector<int> v2 = { 1, 3, 9 };
