@@ -57,6 +57,7 @@ Sequential Container
 - const object 的iterator, is const iterator 
 - iterator constructor 不需要type exact match 比如double 到int
 - deque add / remove element 从两边只invalidate iterator, 不invalidate reference 
+- vector/string add invalidate all, delete 对删除之前的没有影响
 - capacity (size before allocate) vs size 区别
 - const char * -> string 必须null terminated
 - insert 在p前插入, 返回插入第一个元素, erase 返回删除后一个元素的
