@@ -8256,6 +8256,282 @@ cout << (*p).size() << endl; // equivalent to p->size()
 
 ```
 
+#### (h). Function-Call Operator
+
+-  overload the <span style="background-color:#FFFF00">**call operator**</span> allow objects of its type to be used as <span style="background-color:#FFFF00">**a function**</span>
+    - 可以<span style="color:red">store state, **more flexible**</span> than ordinary functions.
+    - <span style="color:red">**Objects**</span> of classes that define the <span style="color:red">**call operator**</span> are referred to as <span style="background-color:#FFFF00">**function objects**</span>.
+- The **function-call operator** must be a <span style="background-color:#FFFF00">**member function**</span>, can <span style="color:red">define multiple versions of the call operator</span>, each of which must <span style="color:red">differ as to the **number** or **types** of their **parameters**</span>.
+- **Function objects**(定义了function-call operator) are most often used as arguments to the <span style="background-color:#FFFF00">**generic algorithms**</span>,
+- **Lambdas Are Function Objects**
+    - 除了function objects, 也可将<span style="color:red">**lambda function**</span> 用于 <span style="color:red">**generic algorithms**</span>. 
+    - When we write a lambda, the compiler translates that expression into an <span style="color:red">**unnamed object** of an **unnamed class**</span> . <span style="color:red">The classes generated</span>  from a lambda <span style="color:red">contain an **overloaded function-call operator**</span> (parameter list and function body are the same as lambda)
+        - by default, <span style="color:red">**lambdas** may not change their captured variables</span>.As a result, by default, the function-call operator in a class generated from a lambda is a <span style="color:red">const member function</span>. If the lambda is declared as <span style="color:red">mutable</span>, then the call operator is <span style="color:red">not const</span>
+    - 当lambda captures a varaibles by <span style="background-color:#FFFF00">**reference**</span>, 是由程序确保lambda <span style="color:red">执行时引用所引对象确实存在</span>. Therefore,  the compiler is permitted to <span style="color:red">**use the reference directly** without storing that reference</span> as a data member in the generated class.
+    - 当lambda <span style="background-color:#FFFF00">**captures by value**</span> are copied into the lambda. As a result, <span style="color:red">classes generated</span> from lambdas that capture variables by value<span style="color:red"> have data members corresponding to each such variable</span>. These classes also have a <span style="color:red">**constructor** to **initialize** these data members</span> from the value of the captured variables. 
+    - <span style="color:red">Classes generated from a lambda </span> expression have a <span style="background-color:#FFFF00">deleted default constructor, deleted assignment operators, and a default destructor</span>. Whether the class has a <span style="background-color:#FFFF00">defaulted or deleted **copy/move constructor** depends in the usual ways on the types of the captured data members</span>
+
+下面例子 function call operator returns its absolute value 
+```c++
+struct absInt {
+    int operator()(int val) const {
+        return val < 0 ? -val : val;
+    }
+};
+
+int i = -42;
+absInt absObj; 
+int ui = absObj(i); // passes i to absObj.operator()
+
+```
+
+
+Function-object classes often contain data members that are used to <span style="background-color:#FFFF00">**customize** the operations in the call operator</span>. 下面的```for_each``` 会initialize from cerr and a new line character.
+
+```c++
+class PrintString{
+public:
+    PrintString(ostream &o = cout, char c = ' '): os(o), sep(c) { }
+    void operator()(const string &s) const { os << s << sep;
+private: 
+    ostream &os;
+    char sep;
+};
+
+PrintString printer; // uses the defaults; prints to cout 
+
+printer(s); // prints s followed by a space on cout
+
+PrintString errors(cerr, '\n');
+
+errors(s); // prints s followed by a newline on cerr
+
+for_each(vs.begin(), vs.end(), PrintString(cerr, '\n'));
+
+```
+
+
+**1. Lambdas Are Function Objects**
+
+```c++
+stable_sort(words.begin(), words.end(),
+        [](const string &a, const string &b)
+        {return a.size() < b.size(); });
+
+//acts like an unnamed object of a class that would look something like
+
+class ShorterString {
+public:
+bool operator()(const string &s1, const string &s2)
+    const{ return s1.size() < s2.size(); } 
+};
+
+//We can rewrite the call to stable_sort to use this class instead of the lambda expression:
+
+stable_sort(words.begin(), words.end(), ShorterString());
+```
+
+Lambda capture by value, class generated 需要有constructor.  This <span style="background-color:#FFFF00">**synthesized class** does not have a default constructor</span>, 需要提供argument 
+```c++
+auto wc = find_if(words.begin(), words.end(),
+    [sz](const string &a) {return s.zie() >= sz;});
+
+//would generate a class that looks something like
+
+class SizeComp {
+    SizeComp(size_t n): sz(n) { } // parameter for each captured variable
+    
+    // call operator with the same return type, parameters, and body as the lambda 
+
+    bool operator()(const string &s) const { return s.size() >= sz; }
+private:
+    size_t sz; // a data member for each variable captured by value 
+
+};    
+
+// to use this class, must pass an argument: 
+
+auto wc = find_if(words.begin(), words.end(), SizeComp(sz));
+```
+
+
+
+**2. Library-Defined Function Objects**
+
+- standard library defines a set of classes that represent the arithmetic, relational, and logical operators. <span style="color:red">每一个class 定义了call operator</span>. 比如 ```add```, ```modulus(%)```, ```equal_to``` 
+- <span style="background-color:#FFFF00">**library function objects** guarantees work for **pointers**</span>. 比如sort pointers <span style="background-color:#FFFF00">based on their address in memory</span>.  Although it would be <span style="color:red">**undefined** for us to do so **directly**</span>, we can do so through one of the **library function objects**
+- <span style="color:red">**associative containers** use ```less<key_type>``` to order their elements</span>. 比如可以define ```set``` of pointers or use a pointer as key in ```map``` without specify ```less``` directly.
+
+```c++
+plus<int> intAdd; // function object that can add two int values 
+
+negate<int> intNegate; // function object that can negate an int value 
+
+// uses intAdd::operator(int, int) to add 10 and 20
+
+int sum = intAdd(10, 20); //30
+
+sum = intAdd(10, intNegate(10)); // sum = 0
+
+```
+
+
+![](/img/post/C++/functor.PNG)
+
+使用function-object classes <span style="color:red">**override** the default operator used by an algorithm</span>. 比如: sort 用的default operator ```<``` which sorts the sequence into ascending order. To sort into descending order, pass ```greater```
+
+```c++
+sort(svec.begin(), svec.end(), greater<string>());
+```
+
+function-objects 可以用pointer比较 addresss in memory 
+```c++
+vector<string *> nameTable; 
+// 老版error, 新版不是error : the pointers in nameTable are unrelated, so < is undefined 
+
+sort(nameTable.begin(), nameTable.end(),
+    [](string *a, string *b) { return a < b; });
+
+// ok: library guarantees that less on pointer types is well defined 
+
+sort(nameTable.begin(), nameTable.end(), less<string*>());
+```
+
+
+**3. Callable Objects and function**
+
+- callable objects： **functions** and **pointers to functions**, **lambdas**, objects created by **bind**, and **classes** that overload the **function-call operator**(他们彼此间type 不一样).
+- two callable objects(Different types) with <span style="color:red">**different types** may share the **same call signature**</span>. 比如用```map<string, int(*)(int,int)>``` <span style="color:red">不能存储 callable objects with different type but the same **callable signature**</span>
+- 解决上面的问题可以用 ```funtion``` defined in ```functional``` header
+  - **call signature** inside angle brackets: 比如```function<int(int, int)>```
+  - We cannot (directly) store the name of an **overloaded function** in an object of type function. 比如说一样的名字，但是属于不同类
+    - One way to resolve the ambiguity is to <span style="color:red">store a **function pointer**</span>(因为function pointer 带着类型) instead of the name of the function:
+    - 另外一种方法, we can <span style="color:red">use a unamed **lambda**</span> to disambiguate
+
+<center>Operations on ```function```</center>
+
+| Syntax | Description | 
+| --- | :--- | 
+| ```function<T> f ```  | f is <span style="background-color:#FFFF00">**null function** object</span> that can <span style="background-color:#FFFF00">**store callable objects**</span> with a <span style="background-color:#FFFF00">**call signature** </span>that equaivalent to function type T (i.e. T is ```retType (args)``` )
+| ```function<T> f(nullptr)``` | Explicityly construct a null function | 
+| ```function<T> f(obj);``` | stores a <span style="background-color:#FFFF00">**copy**</span> of the callable obj in f |
+| ```f``` | Use f as a condition; true if ```f``` <span style="color:red">holds a **callable object**</span>; false otherwise |
+| ```f(args)``` Calls he object in f passing args | 
+| | 下面是 Types defined as member of ```function<T>``` |
+| ```result_type``` | The <span style="background-color:#FFFF00">type **returned**</span> by this function types's callable object  |
+| ```argument_type``` <br/> ```first_argument_type```  <br/> ```second_argument_type```  | Types defined when T has <span style="color:red">exactly one or two arguments</span>. 如果T只有一个argument, 则argument_type 是该类型同义词; 如果T有两个argument, 则```first_argument_type``` 和```second_argument_type``` 分别代表两个argument type |
+
+
+
+ two callable objects with <span style="color:red">**different types** may share the **same call signature**</span> as if they had the same type. 比如call signature ```int(int, int)```, 下面的例子```add```, ```mod``` 和 ```div``` 都是接受两个ints, return 一个 int
+
+```c++
+// ordinary function
+int add(int i, int j) { return i + j; }
+
+// lambda, which generates an unnamed function-object class
+
+auto mod = [](int i, int j) { return i % j; }; 
+
+// function-object class
+struct div {
+    int operator()(int denominator, int divisor) {
+        return denominator / divisor;
+    }
+};
+```
+
+我们希望<span style="background-color:#FFFF00">define a **function table** to store "points" to these callable</span>, 当需要特定操作, look in table to find function to call, 比如定义 ```map``` 如下, 可以加入```add```, 但是不能加入```mod``` or ```div```, ```mod``` is a lambda, and each <span style="color:red">lambda has its own **class type**</span>
+
+```c++
+// maps an operator to a pointer to a function taking two ints and returning an int 
+
+map<string, int(*)(int,int)> binops;
+// ok: add is a pointer to function of the appropriate type 
+
+binops.insert({"+", add}); //
+
+binops.insert({"%", mod}); // error: mod is not a pointer to function
+
+```
+
+function example
+
+```c++
+function<int(int, int)> f1 = add; // function pointer 
+
+function<int(int, int)> f2 = div(); // object of a function-object class
+
+function<int(int, int)> f3 = [](int i, int j) { return i * j; }; // lambda
+
+cout << f1(4,2) << endl; // prints 6
+
+cout << f2(4,2) << endl; // prints 2 
+
+cout << f3(4,2) << endl; // prints 8
+
+```
+
+可以用function type  redefine our map
+
+```c++
+// table of callable objects corresponding to each binary operator 
+
+// all the callables must take two ints and return an int
+
+// an element can be a function pointer, function object, or lambda 
+
+map<string, function<int(int, int)>> binops = {
+    {"+", add}, // function pointer
+
+    {"-", std::minus<int>()}, // library function object
+ 
+    {"*", [](int i, int j) { return i * j; }}, // unnamed lambda 
+    
+    {"%", mod}, // named lambda object
+
+     {"/", div()} }; // user-defined function object
+
+binops["+"](10, 5); // calls add(10, 5)
+
+binops["-"](10, 5); // uses the call operator of the minus<int> object
+
+binops["/"](10, 5); // uses the call operator of the div  object
+
+binops["*"](10, 5); // calls the lambda function object 
+
+binops["%"](10, 5); // calls the lambda function object
+
+```
+
+
+We cannot (directly) store the name of an overloaded function in an object of type function, 比如下面有两个add, 放进去的add 不知道哪个add
+
+```c++
+int add(int i, int j) { return i + j; }
+Sales_data add(const Sales_data&, const Sales_data&); 
+map<string, function<int(int, int)>> binops;
+binops.insert( {"+", add} ); // error: which add?
+
+//用function pointer store 消除问题
+
+int (*fp)(int,int) = add; // pointer to the version of add that takes two ints
+
+binops.insert( {"+", fp} ); // ok: fp points to the right version of add
+
+
+//另一种方法用lambda:
+
+// ok: use a lambda to disambiguate which version of add we want to use 
+
+binops.insert( {"+", [](int a, int b) {return add(a, b);} } );
+```
+
+
+
+
+
+
 
 
 
