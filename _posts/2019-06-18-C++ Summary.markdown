@@ -8792,25 +8792,99 @@ int i = s3 + 0; // error: ambiguous
 <br/> <br/> <br/>
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## (15). Object-Oriented Programming
 
 
+#### (a). OOP: An Overview
+
+- Object-oriented programming key ideas is: **data abstraction**, **inheritance** and **dynamic binding**.
+    - **data abstraction**: define classes that separate interface from implementation. 
+    - **Inheritance**: define classes that model relationship among similar types
+    - **dynamic binding**: use objects of these types(similar types) while ignoring the details of how they differ 
+
+**Inheritance**:
+- a **base class** at the root of the hierarchy, from which the other classes inherit, directly or indirectly. These inheriting classes are known as **derived classes**. 
+  - base class: 定义 common members. derived clas define memeber that are specific to derived class
+- A derived class must specify the class(es) from which it intends to inherit. It does so in a class <span style="color:red">**derivation list**</span> (继承了哪个class, 是public, private, protected):  a colon followed by a comma-separated list of base classes each of which may have an optional access specifier
+- 在 derived class **virtual** function, <span style="color:red">keyword **virtual** 加不加都可以</span>
+- new standard lets a derived class explicitly note that it intends a member function to<span style="color:red"> **override** a virtual that it inherits</span>. It does so by <span style="color:red">specifying override after its parameter list</span>
 
 
+**Dynamic Binding**:
 
+the decision as to which <span style="color:red">version to run depends on the type of the argument</span>, <span style="color:red">在run time 选择函数版本</span>. Therefore, <span style="background-color:#FFFF00">**dynamic binding**</span> is sometimes known as <span style="background-color:#FFFF00">**run-time binding**</span>.
 
+use the same code to process objects of either type ```Quote``` or ```Bulk_quote``` interchangeably. item is reference ```const Quote &``` , can call this on either a ```Quote``` object or ```Bulk_quote``` object. 因为```net_price``` 是virtual function, ther <span style="color:red">**version**</span> of ```net_price``` that <span style="color:red">is **run** will depend on</span> the type of the object that <span style="color:red">we pass</span> to print_total
 
+```c++
+class Quote { 
+public:    
+     std::string isbn() const;
+    virtual double net_price(std::size_t n) const;
+};
+class Bulk_quote : public Quote { // Bulk_quote inherits from Quote
 
+    double net_price(std::size_t) const override;
+};
 
+double print_total(ostream &os, const Quote &item, size_t n)
+{
+// depending on the type of the object bound to the item parameter 
 
+// calls either Quote::net_price or Bulk_quote::net_price 
 
+double ret = item.net_price(n);
+    os << "ISBN: " << item.isbn() // calls Quote::isbn
 
+    << " # sold: " << n << " total due: " << ret << endl; 
+    return ret;
+}
+print_total(cout, basic, 20); // calls Quote version of net_price 
 
+print_total(cout, bulk, 20); // calls Bulk_quote version of net_price
 
+```
 
+#### (b). Defining Base and Derived Classes
 
-
-
+- <span style="color:red">**Base classes** ordinarily should define a **virtual destructor**</span>. Virtual destructors are needed even if they do no work.
+- a **base class** must distinguish the functions it expects its derived classes to override (**virtual**) VS expects its derived classes to inherit without change(直接继承不要改变的).
+- When we <span style="color:red">call a **virtual function** through a **pointer** or **reference**</span>, the <span style="color:red">call will be **dynamically bound**</span>. Depending on the type of the object to which the reference or pointer is bound, the version in the base class or in one of its derived classes will be executed.
+-  <span style="background-color:#FFFF00">Any **nonstatic member** function, other than a constructor, 可以是 virtual</span>. <span style="color:red">**virtual** 只能用于the declaration inside the class</span>, outside class定义时不能用
+    - virtual function in base class is  <span style="color:red">**implicitly virtual** in derived classes</span>
+    - Member functions <span style="color:red">not declared virtual are **resolved** at **compile time**</span>
 
 
 
