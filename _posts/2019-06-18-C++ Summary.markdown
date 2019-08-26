@@ -7973,7 +7973,7 @@ string u = "hi" + s; // would be an error if + were a member of string
 
 #### (b). Input and Output Operators
 
-- input and output function 必须是 <span style="background-color:#FFFF00">**nonmember function**</span>. 不能是member of own class. 因为如果是class member, 必须属于istream or ostream 类, 但是those class 是part of standard library, 不能加members to IO class  
+- input and output function 必须是 <span style="background-color:#FFFF00">**nonmember function**</span>. 不能是member of own class. 因为如果是class member(left side is IO), 必须属于istream or ostream 类, 但是those class 是part of standard library, 不能加members to IO class  
 - 如果 input and output access nonpublic data, <span style="background-color:#FFFF00">**declared** it as **friends**</span>
 
 **(1). Overloading the Output Operator <<**
