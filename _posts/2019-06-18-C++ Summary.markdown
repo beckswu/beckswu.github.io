@@ -8168,9 +8168,10 @@ StrBlobPtr& StrBlobPtr::operator++()
 StrBlobPtr& StrBlobPtr::operator--()
 {
     // / if curr is zero, decrementing it will yield an invalid subscript
+    
     --curr; 
-
-    check(curr, "decrement past begin of StrBlobPtr"); 
+    check(-1, "decrement past begin of StrBlobPtr"); //check if -1>=curr(unsigned), 如果大于throw error 
+    
     return *this;
 }
 
@@ -8216,15 +8217,40 @@ p.operator++(); // call prefix operator++
 
 - The dereference (```*```) and arrow (```->```) operators are often used in classes that represent iterators and in smart pointer classes
 - <span style="background-color:#FFFF00">**Operator arrow**</span> must be a <span style="background-color:#FFFF00">**member**</span>(function). The <span style="background-color:#FFFF00">**dereference operator**</span> is not required to be a member but usually should be a<span style="background-color:#FFFF00"> **member**</span> as well.
-- When we write ```point->mem```, <span style="background-color:#FFFF00">```point``` must be a **pointer** to a class</span> object or it must be an object of a class with an overloaded operator```->```. 根据point类型不同, writing ```point->mem``` is equivalent to
-    1. ```(*point).mem;```. point is a built-in <span style="background-color:#FFFF00">**pointer**</span> type 
-        - 先 dereference point and fetch from resulting object.  如果```point```没有 member named ```mem```, code is in error 
-    2. ```point.operator()->mem;``` point is an object of <span style="background-color:#FFFF00">**class**</span> type
-        - 如果 ```point``` is an object of a class that defines ```operator->```, 则使用 ```pointer.operator -> () ``` 来fetch ```mem```. 如果result is pointer, 重复step 1. 如果result is overloadede ```operator->()```, this step is repeatede on that object. process continues 直到 indicated member is return or some error 
+- When we write ```point->mem```, <span style="background-color:#FFFF00">```point``` must be a **pointer** to a class</span> object or class with an overloaded operator```->```. 根据point类型不同, writing ```point->mem``` resolve 步骤是:
+    1. ```(*point).mem;```. point is <span style="background-color:#FFFF00">**pointer**</span> type 
+    2. ```point.operator->()mem;``` point is an object of <span style="background-color:#FFFF00">**class**</span> type
+        - 如果 ```point``` is class that defines ```operator->```, 则使用 ```pointer.operator->() ``` 来fetch ```mem```. 如果result is pointer, go step 1. 如果result 不是poitner, 继续step2 直到fetch的是pointer type or some error 
 
+比如下面例子, 最好获得是size的number, 不建议这么做, 因为breaks encapsulation
+```c++
+struct size {
+    int width, height;
+    size() : width(640), height(480) { }
+};
+
+struct metrics {
+    size s;
+    size const* operator ->() const {
+        return &s;
+    }
+};
+
+struct screen {
+    metrics m;
+    metrics operator ->() const {
+        return m;
+    }
+};
+
+int main() {
+    screen s;
+    std::cout << s->width << "\n";
+}
+```
 
 值得注意
--  <span style="color:red">**deference**</span> 返回时 <span style="color:red">**reference**</span>, 而 <span style="color:red">**arrow**</span> 返回是 <span style="color:red">**pointer**</span>
+-  <span style="color:red">**deference**</span> 返回时 <span style="color:red">**reference**</span>, 而 <span style="color:red">**arrow**</span> 一般返回是 <span style="color:red">**pointer**</span>
 - 两个function 是```const``` member, 因为fetch an element 不改变state of a ```StrBlobPtr```. 这些operator 返回reference or pointer to nonconst string, 因为```StrBlobPtr```(它的constructor是 ```StrBlob &```) 绑定的是nonconst 的 ```StrBlob```
 
 ```c++
