@@ -8218,7 +8218,7 @@ p.operator++(); // call prefix operator++
 - The dereference (```*```) and arrow (```->```) operators are often used in classes that represent iterators and in smart pointer classes
 - <span style="background-color:#FFFF00">**Operator arrow**</span> must be a <span style="background-color:#FFFF00">**member**</span>(function). The <span style="background-color:#FFFF00">**dereference operator**</span> is not required to be a member but usually should be a<span style="background-color:#FFFF00"> **member**</span> as well.
 - When we write ```point->mem```, <span style="background-color:#FFFF00">```point``` must be a **pointer** to a class</span> object or class with an overloaded operator```->```. 根据point类型不同, writing ```point->mem``` resolve 步骤是:
-    1. 如果 ```point``` 是span style="background-color:#FFFF00">**pointer**</span> type ,则用```(*point).mem;```.
+    1. 如果 ```point``` 是<span style="background-color:#FFFF00">**pointer**</span> type ,则用```(*point).mem;```.
     2. 如果```point```是class type with overloaded operator```->``` 则用 ```point.operator->()mem;```   来fetch ```mem```
         - 如果operator```->```function return pointer type, goto step 1
         - 如果返回的 ```res``` 是class, 继续step2,  ```point.operator->()mem``` 转化为  ```res.operator->()mem;``` 直到fetch的是pointer type or some error 
@@ -8229,14 +8229,12 @@ struct size {
     int width, height;
     size() : width(640), height(480) { }
 };
-
 struct metrics {
     size s;
     size const* operator ->() const {
         return &s;
     }
 };
-
 struct screen {
     metrics m;
     metrics operator ->() const {
@@ -8285,17 +8283,17 @@ cout << (*p).size() << endl; // equivalent to p->size()
 
 #### (h). Function-Call Operator
 
--  overload the <span style="background-color:#FFFF00">**call operator**</span> allow objects of its type to be used as <span style="background-color:#FFFF00">**a function**</span>
+-  overload the <span style="background-color:#FFFF00">**call operator**</span> allow objects to be used as <span style="background-color:#FFFF00">**function**</span>
     - 可以<span style="color:red">store state, **more flexible**</span> than ordinary functions.
-    - <span style="color:red">**Objects**</span> of classes that define the <span style="color:red">**call operator**</span> are referred to as <span style="background-color:#FFFF00">**function objects**</span>.
-- The **function-call operator** must be a <span style="background-color:#FFFF00">**member function**</span>, can <span style="color:red">define multiple versions of the call operator</span>, each of which must <span style="color:red">differ as to the **number** or **types** of their **parameters**</span>.
+    - <span style="color:red">**Objects**</span> of classes that define the <span style="color:red">**call operator**</span> 被叫做 <span style="background-color:#FFFF00">**function objects**</span>.
+- The **function-call operator** must be a <span style="background-color:#FFFF00">**member function**</span>, can <span style="color:red">define 多个 call operator</span>, each of which must <span style="color:red">differ as to the **number** or **types** of their **parameters**</span>.
 - **Function objects**(定义了function-call operator) are most often used as arguments to the <span style="background-color:#FFFF00">**generic algorithms**</span>,
 - **Lambdas Are Function Objects**
     - 除了function objects, 也可将<span style="color:red">**lambda function**</span> 用于 <span style="color:red">**generic algorithms**</span>. 
     - When we write a lambda, the compiler translates that expression into an <span style="color:red">**unnamed object** of an **unnamed class**</span> . <span style="color:red">The classes generated</span>  from a lambda <span style="color:red">contain an **overloaded function-call operator**</span> (parameter list and function body are the same as lambda)
-        - by default, <span style="color:red">**lambdas** may not change their captured variables</span>.As a result, by default, the function-call operator in a class generated from a lambda is a <span style="color:red">const member function</span>. If the lambda is declared as <span style="color:red">mutable</span>, then the call operator is <span style="color:red">not const</span>
+        - by default, <span style="color:red">**lambdas** 不能改变 captured variables</span>.As a result, the function-call operator in class generated from lambda is <span style="color:red">const member function</span>. If lambda declared as <span style="color:red">mutable</span>, then call operator is <span style="color:red">not const</span>
     - 当lambda captures a varaibles by <span style="background-color:#FFFF00">**reference**</span>, 是由程序确保lambda <span style="color:red">执行时引用所引对象确实存在</span>. Therefore,  the compiler is permitted to <span style="color:red">**use the reference directly** without storing that reference</span> as a data member in the generated class.
-    - 当lambda <span style="background-color:#FFFF00">**captures by value**</span> are copied into the lambda. As a result, <span style="color:red">classes generated</span> from lambdas that capture variables by value<span style="color:red"> have data members corresponding to each such variable</span>. These classes also have a <span style="color:red">**constructor** to **initialize** these data members</span> from the value of the captured variables. 
+    - 当lambda <span style="background-color:#FFFF00">**captures by value**</span> are copied into the lambda. These classes have a <span style="color:red">**constructor** to **initialize** these data members</span> from captured values, so class <span style="background-color:#FFFF00">**store**</span> these values in class. 
     - <span style="color:red">Classes generated from a lambda </span> expression have a <span style="background-color:#FFFF00">deleted default constructor, deleted assignment operators, and a default destructor</span>. Whether the class has a <span style="background-color:#FFFF00">defaulted or deleted **copy/move constructor** depends in the usual ways on the types of the captured data members</span>
 
 下面例子 function call operator returns its absolute value 
@@ -8431,11 +8429,11 @@ sort(nameTable.begin(), nameTable.end(), less<string*>());
 - two callable objects(Different types) with <span style="color:red">**different types** may share the **same call signature**</span>. 比如用```map<string, int(*)(int,int)>``` <span style="color:red">不能存储 callable objects with different type but the same **callable signature**</span>
 - 解决上面的问题可以用 ```funtion``` defined in ```functional``` header
   - **call signature** inside angle brackets: 比如```function<int(int, int)>```
-  - We cannot (directly) store the name of an **overloaded function** in an object of type function. 比如说一样的名字，但是属于不同类
+  - We cannot (directly) store the name of an **overloaded function** in an object of type function. 比如说一样的名字，但是属于不同类, 具体看下面例子
     - One way to resolve the ambiguity is to <span style="color:red">store a **function pointer**</span>(因为function pointer 带着类型) instead of the name of the function:
     - 另外一种方法, we can <span style="color:red">use a unamed **lambda**</span> to disambiguate
 
-<center>Operations on ```function```</center>
+<center>Operations on function</center>
 
 | Syntax | Description | 
 | --- | :--- | 
@@ -8454,6 +8452,7 @@ sort(nameTable.begin(), nameTable.end(), less<string*>());
 
 ```c++
 // ordinary function
+
 int add(int i, int j) { return i + j; }
 
 // lambda, which generates an unnamed function-object class
@@ -8461,6 +8460,7 @@ int add(int i, int j) { return i + j; }
 auto mod = [](int i, int j) { return i % j; }; 
 
 // function-object class
+
 struct div {
     int operator()(int denominator, int divisor) {
         return denominator / divisor;
@@ -8560,17 +8560,17 @@ binops.insert( {"+", [](int a, int b) {return add(a, b);} } );
 **1. Conversion Operators**
 
 
-- We can use <span style="color:red">**non-explicit constructor**</span> that can be called with <span style="color:red">**one argument** defines an **implicit conversion**</span>. Such constructors convert an object from the argument’s type to the class type. 也可以定义<span style="color:red">conversion from the class</span>; define a conversion from a class type by defining a <span style="color:red">**conversion operator**</span>.
-- ```operator type() const;```:  **conversion operator** is a member function that <span style="color:red">converts a value of a **class type** to a value of some other type(**不能是void, 也不能是array or function type**)</span>. Conversions to <span style="background-color:#FFFF00">**pointer types**—both **data** and **function pointers**—and to **reference**</span> types <span style="color:red">are allowed</span>.
+- We can use <span style="color:red">**non-explicit constructor**</span> that can be called with <span style="color:red">**one argument** defines an **implicit conversion**</span>. Convert object from argument’s type to class type. 也可以定义<span style="color:red">conversion from the class</span>; define a conversion from a class type by defining a <span style="color:red">**conversion operator**</span>.
+- ```operator type() const;```:  **conversion operator** is a member function that <span style="color:red">converts a value of a **class type** to a value of some other type(**不能是void, 也不能是array or function type**)</span>. Conversions to <span style="background-color:#FFFF00">**pointer types**(**data** or **function pointers**) 或者 **reference**</span> types 是可以的
 - Conversion operators have <span style="color:red">**no return type and no parameters**</span>
 - Must be <span style="color:red">defined as **member** functions</span>
 - **Conversion operations** ordinarily should <span style="background-color:#FFFF00">**not change** the object they are converting</span>. As a result, conversion operators usually should be <span style="background-color:#FFFF00">defined as **const** members</span>.
-- Compiler 只能apply 一步conversion at a time, 但是<span style="color:red">**implicit user-defined conversion** can be preceded or followed by a standard conversion</span>(built-in conversion，而 ```const char*``` 到 string 不算built-in) 
+- Compiler 只能apply 一步conversion at a time, 但是<span style="color:red">**implicit user-defined conversion** can be preceded or followed by a standard conversion</span>(built-in conversion double to int，而 ```const char*``` 到 string 不算built-in) 
 - Caution: Avoid Overuse of Conversion Functions: 如果不存一对一mapping 关系的时候不要定义
     - 一般很少提供类型转换，但是一个例外是 <span style="background-color:#FFFF00">for classes to define conversions to bool</span>. 但早期的版本 因为bool 算arithmetic type, 会导致convert to bool 再convert to arithmetic, 导致意想不到的结果,
     - **explicit** Conversion Operators: 为防止上面说的情况发生, 不会发生自动转换. The compiler <span style="background-color:#FFFF00">won’t (generally) use an **explicit conversion operator** for **implicit conversions**</span>. <span style="background-color:#FFFF00">must do so explicitly through a cast. </span>
         - 这个规定存在一个例外，<span style="color:red">如果表达式被用作条件</span>,  <span style="color:red">an **explicit conversion** will be used **implicitly** to convert an expression used as</span>
-            - THe condition of an ```if```, ```while``` or ```do``` statement, condition expression in a ```for``` statement, 
+            - The condition of an ```if```, ```while``` or ```do``` statement, condition expression in a ```for``` statement, 
             - An operand to the logical NOT (```!```), OR (```||```), or AND (```&&```) operators or 条件逻辑表达式 (```?:```) operator
 
 
@@ -8596,23 +8596,23 @@ si + 3; // implicitly converts si to int followed by integer addition
 
 ```
 
-Although the compiler will apply only one user-defined conversion at a time. an implicit user-defined conversion can be preceded or followed by a standard (built-in) conversion. 比如下面例子 可以<span style="color:red">pass any arithmetic type to the SmalInt constructor</span>.  <span style="color:red">也可以将SmallInt 转换成int 然后 convert int 到其他arithmetic type</span>
+Although compiler apply only **one** user-defined conversion at a time. an implicit user-defined conversion can be preceded or followed by a standard (built-in) conversion. 比如下面例子 可以<span style="color:red">pass any 算数类型 to the SmalInt constructor</span>.  <span style="color:red">也可以将SmallInt 转换成int 然后 convert int 到其他arithmetic type</span>
 
 ```c++
-// the double argument is converted to int using the built-in conversion 
+//built in conversion double -> int
 
-SmallInt si = 3.14; // calls the SmallInt(int) constructor
+SmallInt si = 3.14; // calls SmallInt(int) constructor
 
 // the SmallInt conversion operator converts si to int;
 
-si + 3.14; // that int is converted to double using the built-in conversion
+si + 3.14; // int 再用 built-in conversion to double 
 
 ```
 
 
 
 
-Because conversion operators are implicitly applied, there is no way to pass arguments to these functions. Hence, conversion operators 不能有parameter. 尽管也不能提供return type, conversion function must return a value of its corresponding type:
+Conversion operation no return type, no parameter list, always const function
 
 ```c++
 class SmallInt; 
@@ -8622,13 +8622,16 @@ operator int(SmallInt&); //error: nonmember
 class SmallInt { 
 public:
     int operator int() const; //error: 有return type 
+    
     operator int(int = 0) const; //error: parameter list 不为空
+    
     operator int*() const { return 42; } // error: 42 is not a pointer
+    
 };
 ```
 
-一些早期的版本bool 算arithmetic type (所以转换成bool 又转换成 成arithmetic type ), 所以class 可以convert to bool (not explicit) 有意想不到的后果, 比如```ifstream``` had convertion to bool. 尝试用 output operator on an input stream, 因为没有 ```<<``` 定义 给 ```istream```, <span style="color:red">应该有error</span>, 但是use bool conversion operator to <span style="color:red">**convert cin to bool. 导致 bool to int**</span>. 所以 42 会shift left 1 or 0 
-```c+=
+一些早期的版本bool 算arithmetic type (所以转换成bool -> arithmetic type ), 所以class convert to bool (not explicit) 有意想不到的后果, 比如```ifstream``` had convertion to bool. 尝试用 output operator on an input stream, 因为没有 ```<<``` 定义 给 ```istream```, <span style="color:red">应该有**error**</span>, 但是use bool conversion operator to <span style="color:red">**convert cin to bool. 导致 bool to int**</span>. 所以 42 会shift left 1 or 0 
+```c++
 int i = 42;
 cin << i; // this code would be legal if the conversion to bool were not explicit!
 
@@ -8645,7 +8648,7 @@ static_cast<int>(si) + 3; // ok: explicitly request the conversion
 
 ```
 
-早期版本IO通过定义了向 ```void*```类型转换，避免以上问题( convert to ```void *``` which is nullptr if the stream operation failed, and non-null if the stream is still good.), C++11 通过explicit conversion to bool. THe condition in ```while``` 执行了input operator reads value and return ```cin```. ```cin``` <span style="background-color:#FFFF00">**implicitly converted** by the istream **operator bool** conversion function</span>, return true if conditon state of cin is good, and false otherwise
+早期版本IO通过定义了向 ```void*```类型转换，避免以上问题( convert to ```void *``` which is nullptr if the stream operation failed, and non-null if the stream is still good.), C++11 通过explicit conversion to bool. The condition in ```while``` 执行了input operator reads value and return ```cin```. ```cin``` <span style="background-color:#FFFF00">**implicitly converted** by the istream **operator bool** conversion function</span>, return true if conditon state of cin is good, and false otherwise
 ```c++
 while (std::cin >> value)
 ```
@@ -8667,21 +8670,22 @@ cout << a.operator string()<<endl; //ok
 **2. Avoiding Ambiguous Conversions**
 
 
-- If a class<span style="color:red"> has one or more conversions</span>, it is important to ensure that there is <span style="color:red">only one way to convert</span> from the class type to the target type. 
-    - 两种方式multiple conversion paths: 第一种provide mutual conversion (<span style="background-color:#FFFF00">**converting constructor and conversion operator**</span>), 比如 A -> B, B -> A. 第二种是:  <span style="background-color:#FFFF00">**define multiple conversions**</span> from or to types that are themselves related by conversions. 比如 定义了 A -> int, A -> double, 那么 A —> double, 可以是一步conversion from A, 也可以是 A -> int -> double, <span style="color:red">不能用**cast** 来解决</span>, have the same ambiguity
-    - 如果定义了多种方式conversions, <span style="color:red">之所以ambiguity, 因为conversions have the **same rank**</span>.  <span style="color:red">the **rank** of the standard conversion</span>, if any, preceding or following the conversion function, is used to <span style="color:red">select the best match</span>
+- If a class<span style="color:red"> has one or more conversions</span>, <span style="color:red"> **Important**</span> to ensure <span style="color:red">only **one way convert**</span> from  class type to target type. 两种方式multiple conversion paths (都很可能产生ambiguity)
+   - 第一种provide mutual conversion (<span style="background-color:#FFFF00">**converting constructor and conversion operator**</span>), 比如 A -> B, B -> A. 
+      - 比如 ```Foo``` has a constructor from ```Bar```, 不要给 ```Bar``` conversion operator to ```Foo```
+   - 第二种是:  <span style="background-color:#FFFF00">**define multiple conversions**</span> from or to types that are themselves related by conversions(比如 two arithmetic types). 
+      - <span style="color:red">Do not define overloaded versions</span> of conversion constructor that take arithmetic types. 比如 定义了 int to ```Foo```, 不要定义```double``` to ```Foo```
+       - <span style="color:red">Do not define conversion operators to more than one arithmetic type</span>. Let the standard conversions provide conversions to the other arithmetic types. 比如定义了 ```Foo``` to ```int```, 不要定义 ```Foo``` to ```double```
+    - 如果定义了多种方式conversions, <span style="color:red">之所以ambiguity, 因为conversions have the **same rank**</span><span style="color:red">(the **rank** of standard conversion)</span>
+    - 如果有ambiguity, 不能用**cast** 解决问题
 - **Caution: Conversions and Operators**
-  - Ordinarily, it is a <span style="color:red"> **bad idea**</span> to define classes with <span style="color:red"> **mutual conversions**(define mutually converting classess)</span> or to <span style="color:red"> define conversions to or from two arithmetic types</span>.  
-    - 比如 ```Foo``` has a constructor from ```Bar```, 不要给 ```Bar``` conversion operator to ```Foo```
-  - <span style="background-color:#FFFF00">Avoid conversions to the **built-in arithmetic types**</span>. 如果定义了 conversion to an arithmetic type, then
-    - <span style="color:red">Do not define overloaded versions</span> of the operators that take arithmetic types. 比如 定义了 int to ```Foo```, 不要定义```double``` to ```Foo```
-    - <span style="color:red">Do not define a conversion to more than one arithmetic type</span>. Let the standard conversions provide conversions to the other arithmetic types. 比如定义了 ```Foo``` to ```int```, 不要定义 ```Foo``` to ```double```
-  - **The easiest rule of all**: With the exception of <span style="background-color:#FFFF00">an **explicit** conversion to bool</span>, <span style="color:red">avoid defining conversion functions and limit nonexplicit constructors</span> to those that are “obviously right.”
-- Needing to <span style="color:red">use a constructor or a **cast** to **convert an argument**</span> in a call to an <span style="color:red">**overloaded function**</span> frequently is  **bad design**</span>. 注意下面例子
-  - <span style="background-color:#FFFF00">Call to an **overloaded function**</span>, if two (or more) <span style="color:red"> **different** user-defined conversions provide a viable match</span>(比如是 ```short``` to ```Foo``` 还是 ```double``` to ```Bar```时候), the conversions are considered equally good ambiguity, <span style="background-color:#FFFF00">**rank** of any standard conversion 不会被考虑</span>. 只有当**同一个** user-defined conversion时候(比如是 ```short``` to ```Foo``` 还是 ```double``` to ```Foo```时候), **rank** of standard conversion 才 被考虑
+  - Ordinarily, it is a <span style="color:red"> **bad idea**</span> to define classes with <span style="color:red"> **mutual conversions**</span> or to <span style="color:red"> define conversions to or from two arithmetic types</span>.  
+  - **The easiest rule of all**: 除了可以定义 <span style="background-color:#FFFF00">an **explicit** conversion to bool</span>, <span style="color:red">avoid defining conversion functions and limit nonexplicit constructors</span>.
+- Need to <span style="color:red">use a constructor or a **cast** to **convert an argument**</span> in a call to an <span style="color:red">**overloaded function**</span> frequently is  <span style="color:red">**bad design**</span>. 注意下面例子
+  - <span style="background-color:#FFFF00">Call to an **overloaded function**</span>, if two (or more) <span style="color:red"> 转化为不同type的 都行可行的 (比如 10, ```short``` to ```Foo``` 还是 ```double``` to ```Bar```), 是<span style="color:red">**ambiguity**</span>, <span style="background-color:#FFFF00">**rank** of any standard conversion 不会被考虑</span>. 只有当**同一个**  type user-defined conversion时候(比如是 ```short``` to ```Foo``` 还是 ```double``` to ```Foo```时候), **rank** of standard conversion 才 被考虑
 
 
-下面例子obtain A 可以从 A的constructor or B's conversion operator. <span style="color:red">the compiler doesn’t know which conversion to run</span>; the call to f is <span style="color:red">**ambiguous**</span>. the call is in <span style="color:red">**error**</span>. 不能用 **cast** 来解决ambiguity
+下面例子obtain A 可以从 A的constructor or B's conversion operator. the call to f is <span style="color:red">**ambiguous**</span>.  <span style="color:red">**error**</span>. 不能用 **cast** 来解决ambiguity
 ```c++
 struct B;//根据compile 顺序, 需要首先declare
 
@@ -8711,7 +8715,7 @@ A a2 = f(A(b)); // ok: use A's constructor
 
 ```
 
-<span style="color:red">**Ambiguities**</span> also occur when a class <span style="color:red">**defines multiple conversions** to (or from) types that are themselves related by conversions</span>. 比如下面例子定义constructor from two arithmetic types and conversion operators to two different arithmetic types. 
+<span style="color:red">**Ambiguities**</span> 
 
 - 当call ```f2```时候,两个类型转换都可以使用, 不管是long double -> int or long double -> double 而且哪个转换没有比另一个更好,  the call is <span style="color:red">**ambiguous**</span>.  
 - initialize a2 from long。 <span style="color:red">Neither constructor is an **exact match** for long</span>. long -> double followed by ```A(double)``` or long -> int, followed by ```A(int)```.  the call is <span style="color:red">**ambiguous**</span>.  
@@ -8747,7 +8751,7 @@ A a3(s); // uses A::A(int)
 
 **Overloaded Functions and Converting Constructors**
 
-Choosing among multiple conversions is further complicated when we call an **overloaded function**. 如果两个或多个类型转换都提供了同一种可行的匹配，这些类型转换一样好. 下面例子<span style="color:red">**ambiguity**</span> 因为<span style="color:red">overload functions take parameters 的class type  定义了一样的 converting constructor </span>
+when we call an **overloaded function**. 如果两个或多个类型转换都提供了同一种可行的匹配，这些类型转换一样好. 下面例子<span style="color:red">**ambiguity**</span> 因为<span style="color:red">overload functions take parameters 的class type  定义了一样的 converting constructor </span>
 
 ```c++
 struct C { 
@@ -8784,8 +8788,7 @@ manip2(10); // manip2(C(10) or manip2(E(double(10)))
 **3. Function Matching and Overloaded Operators**
 
 - Providing both <span style="background-color:#FFFF00">**conversion functions** to an **arithmetic type** and **overloaded operators** for the same class type may lead to ambiguities</span> between the overloaded operators and the built-in operators.
-- The <span style="color:red">set of candidate functions</span> for an operator used in an expression can <span style="background-color:#FFFF00">contain both nonmember and member functions</span>.
-- When we <span style="color:red">call a **named function**</span>, <span style="color:red">**member** and **nonmember functions** with the same name do not overload</span> one another, 因为syntax 不同(call member type 需要through object, reference or pointer of such object). 但是When we use an <span style="color:red">**overloaded operator** </span> in an expression, there is <span style="color:red">nothing to indicate</span> whether we’re <span style="color:red">using a **member** or **nonmember** function</span>. 
+- When we <span style="color:red">call a **named function**</span>, <span style="color:red">**member** and **nonmember functions** with the same name 不会 overload</span>, 因为syntax 不同(call member type 需要through object, reference or pointer). 但是call <span style="color:red">**overloaded operator** </span>, <span style="color:red">nothing to indicate</span> whether <span style="color:red">using a **member** or **nonmember** function</span>. 
 
 the expression ```a sym b``` might be, 第一种是member function, 第二种是nonmember function.<span style="background-color:#FFFF00"> 不像普通function calls, 我们不能区分whether we're calling a nonmember or member function</span> . 
 ```c++
