@@ -8218,9 +8218,10 @@ p.operator++(); // call prefix operator++
 - The dereference (```*```) and arrow (```->```) operators are often used in classes that represent iterators and in smart pointer classes
 - <span style="background-color:#FFFF00">**Operator arrow**</span> must be a <span style="background-color:#FFFF00">**member**</span>(function). The <span style="background-color:#FFFF00">**dereference operator**</span> is not required to be a member but usually should be a<span style="background-color:#FFFF00"> **member**</span> as well.
 - When we write ```point->mem```, <span style="background-color:#FFFF00">```point``` must be a **pointer** to a class</span> object or class with an overloaded operator```->```. 根据point类型不同, writing ```point->mem``` resolve 步骤是:
-    1. ```(*point).mem;```. point is <span style="background-color:#FFFF00">**pointer**</span> type 
-    2. ```point.operator->()mem;``` point is an object of <span style="background-color:#FFFF00">**class**</span> type
-        - 如果 ```point``` is class that defines ```operator->```, 则使用 ```pointer.operator->() ``` 来fetch ```mem```. 如果result is pointer, go step 1. 如果result 不是poitner, 继续step2 直到fetch的是pointer type or some error 
+    1. 如果 ```point``` 是span style="background-color:#FFFF00">**pointer**</span> type ,则用```(*point).mem;```.
+    2. 如果```point```是class type with overloaded operator```->``` 则用 ```point.operator->()mem;```   来fetch ```mem```
+        - 如果operator```->```function return pointer type, goto step 1
+        - 如果返回的 ```res``` 是class, 继续step2,  ```point.operator->()mem``` 转化为  ```res.operator->()mem;``` 直到fetch的是pointer type or some error 
 
 比如下面例子, 最好获得是size的number, 不建议这么做, 因为breaks encapsulation
 ```c++
