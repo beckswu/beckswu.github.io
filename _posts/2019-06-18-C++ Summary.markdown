@@ -64,6 +64,31 @@ Sequential Container
 
 ***
 
+14: Operator Overloading
+
+- overloading parameter must at least one is class type 
+- assignment, subscript, call```()```, access arrow, dereference, increment, decrement, compound-assignment```+=``` must be member functions
+- input / output IO must be nonmember (因为如果是class member, left-hand operand是IO, must be IO class, 但是IO不能添加member)
+- input 传入nonconst object, ouput 传入 const object
+- assignment operator 可以把不同的类赋值, 比如赋值```initializer_list```
+- subscript operator 最好定义 const 和 nonconst version (因为有可能可以改变值)
+- postfix return value and use extra int call prefix ```p.operator++();```  postfix ```p.operator++(0);```
+- prefix 需要检查 increment safe or not, postfix use prefix 
+- ```operator->()``` 如果不返回pointer, 会持续recursion fetch result 是 pointer type. 当是pointer, 返回```&this->operator*()``` 
+- 可以定义多个call operator, 参数类型 数量不同
+- library function objects (like ```less<key_type>```, 比较地址) work for **pointers** 
+- Lambda call operator default const function, 如果定义mutable, 不是const function 
+- lambda function, compiler 是 unnamed object of unnamed class 含有 function-call operator, capture by values store value 但caputre by reference 不store
+- 不能把一样名字的function overload(名字一样,signature 不一样的) 放进 ```function```
+- conversion operator ```operator type()``` no parameter 和 return type, type 不能是array, void, function type 
+- conversion operator should be const 不能改变object
+- conversion operator(只能一步) 但 之前或者之后可以有 build-in conversion， 实现多步转换 
+- explicit conversion operator:除了判断条件会implicit转换, 不允许implicit conversion,  只能用static_cast
+- 不要定义mutual converion 比如 A constructor take B, B conversion operator 到 A, 也不要定义到多个算数类型转换 比如 A->int, A->double; int ->A, double -> A,
+- 如果到多个type conversion 都available, 不会有rank 比较, 只有到一个type 的多个conversion 才会进行rank比较 
+
+***
+
 ## 2. Variable and Basic Types
 
 <span style="background-color: #FFFF00">**Initialization is not assignment**</span>. Initialization happens when a variable is given a value *when it is created*.(创建变量时 赋予它一个初始值). **Assignment** obliterates an object's current value and replaces that value with a new one (
@@ -8219,7 +8244,7 @@ p.operator++(); // call prefix operator++
 - <span style="background-color:#FFFF00">**Operator arrow**</span> must be a <span style="background-color:#FFFF00">**member**</span>(function). The <span style="background-color:#FFFF00">**dereference operator**</span> is not required to be a member but usually should be a<span style="background-color:#FFFF00"> **member**</span> as well.
 - When we write ```point->mem```, <span style="background-color:#FFFF00">```point``` must be a **pointer** to a class</span> object or class with an overloaded operator```->```. 根据point类型不同, writing ```point->mem``` resolve 步骤是:
     1. 如果 ```point``` 是<span style="background-color:#FFFF00">**pointer**</span> type ,则用```(*point).mem;```.
-    2. 如果```point```是class type with overloaded operator```->``` 则用 ```point.operator->()mem;```   来fetch ```mem```
+    2. 如果```point```是<span style="background-color:#FFFF00">**class**</span> type with overloaded operator```->``` 则用 ```point.operator->()mem;```   来fetch ```mem```
         - 如果operator```->```function return pointer type, goto step 1
         - 如果返回的 ```res``` 是class, 继续step2,  ```point.operator->()mem``` 转化为  ```res.operator->()mem;``` 直到fetch的是pointer type or some error 
 
@@ -8671,7 +8696,7 @@ cout << a.operator string()<<endl; //ok
 
 
 - If a class<span style="color:red"> has one or more conversions</span>, <span style="color:red"> **Important**</span> to ensure <span style="color:red">only **one way convert**</span> from  class type to target type. 两种方式multiple conversion paths (都很可能产生ambiguity)
-   - 第一种provide mutual conversion (<span style="background-color:#FFFF00">**converting constructor and conversion operator**</span>), 比如 A -> B, B -> A. 
+   - 第一种provide mutual conversion (<span style="background-color:#FFFF00">**converting constructor and conversion operator**</span>)
       - 比如 ```Foo``` has a constructor from ```Bar```, 不要给 ```Bar``` conversion operator to ```Foo```
    - 第二种是:  <span style="background-color:#FFFF00">**define multiple conversions**</span> from or to types that are themselves related by conversions(比如 two arithmetic types). 
       - <span style="color:red">Do not define overloaded versions</span> of conversion constructor that take arithmetic types. 比如 定义了 int to ```Foo```, 不要定义```double``` to ```Foo```
@@ -8682,7 +8707,7 @@ cout << a.operator string()<<endl; //ok
   - Ordinarily, it is a <span style="color:red"> **bad idea**</span> to define classes with <span style="color:red"> **mutual conversions**</span> or to <span style="color:red"> define conversions to or from two arithmetic types</span>.  
   - **The easiest rule of all**: 除了可以定义 <span style="background-color:#FFFF00">an **explicit** conversion to bool</span>, <span style="color:red">avoid defining conversion functions and limit nonexplicit constructors</span>.
 - Need to <span style="color:red">use a constructor or a **cast** to **convert an argument**</span> in a call to an <span style="color:red">**overloaded function**</span> frequently is  <span style="color:red">**bad design**</span>. 注意下面例子
-  - <span style="background-color:#FFFF00">Call to an **overloaded function**</span>, if two (or more) <span style="color:red"> 转化为不同type的 都行可行的 (比如 10, ```short``` to ```Foo``` 还是 ```double``` to ```Bar```), 是<span style="color:red">**ambiguity**</span>, <span style="background-color:#FFFF00">**rank** of any standard conversion 不会被考虑</span>. 只有当**同一个**  type user-defined conversion时候(比如是 ```short``` to ```Foo``` 还是 ```double``` to ```Foo```时候), **rank** of standard conversion 才 被考虑
+  - <span style="background-color:#FFFF00">Call to an **overloaded function**</span>, if two (or more) <span style="color:red"> 转化为不同type的 都可行的</span> (比如 10, ```short``` to ```Foo``` 还是 ```double``` to ```Bar```), 是<span style="color:red">**ambiguity**</span>, <span style="background-color:#FFFF00">**rank** of any standard conversion 不会被考虑</span>. 只有当**同一个**  type user-defined conversion时候(比如是 ```short``` to ```Foo``` 还是 ```double``` to ```Foo```时候), **rank** of standard conversion 才 被考虑
 
 
 下面例子obtain A 可以从 A的constructor or B's conversion operator. the call to f is <span style="color:red">**ambiguous**</span>.  <span style="color:red">**error**</span>. 不能用 **cast** 来解决ambiguity
