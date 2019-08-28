@@ -8889,14 +8889,6 @@ int i = s3 + 0; // error: ambiguous
     - **Inheritance**: define classes that model relationship among similar types
     - **dynamic binding**: use objects of these types(similar types) while ignoring the details of how they differ 
 
-**Inheritance**:
-- a **base class** at the root of the hierarchy. Inheriting classes are known as **derived classes**. 
-  - base class: 定义 common members. derived clas define memeber that are specific to derived class
-- A derived class must specify the class(es) from which it inherit. It does so in <span style="color:red">**derivation list**</span> (继承了哪个class, 是public, private, protected):  a colon followed by a comma-separated list of base classes each of which may have an optional access specifier
-- 在 derived class **virtual** function, <span style="color:red">keyword **virtual** 加不加都可以</span>
-- new standard lets a derived class explicitly note that function <span style="color:red"> **override** a virtual that it inherits</span> by <span style="color:red">specifying override after its **parameter list**, or **const**  keymember or **reference qualifier**</span>
-
-
 **Dynamic Binding**:
 
 the decision as to which <span style="color:red">version to run depends on the type of the argument</span>, <span style="color:red">在run time 选择函数版本</span>. Therefore, <span style="background-color:#FFFF00">**dynamic binding**</span> is sometimes known as <span style="background-color:#FFFF00">**run-time binding**</span>.
@@ -8934,22 +8926,46 @@ print_total(cout, bulk, 20); // calls Bulk_quote version of net_price
 
 #### (b). Defining Base and Derived Classes
 
-- <span style="color:red">**Base classes** ordinarily should define a **virtual destructor**</span>. Virtual destructors are needed even if they do no work.
+
+
+
+
+base class:
 - a **base class** must distinguish the functions it expects its derived classes to override (**virtual**) VS expects its derived classes to inherit without change(直接继承不要改变的).
-- When we <span style="color:red">call a **virtual function** through a **pointer** or **reference**</span>, the <span style="color:red">call will be **dynamically bound**</span>. Depending on the type of the object to which the reference or pointer is bound, the version in the base class or in one of its derived classes will be executed.
--  <span style="background-color:#FFFF00">Any **nonstatic member** function, other than a constructor, 可以是 virtual</span>. <span style="color:red">**virtual** 只能用于the declaration inside the class</span>, outside class定义时不能用
-    - virtual function in base class is  <span style="color:red">**implicitly virtual** in derived classes</span>
-    - Member functions <span style="color:red">not declared virtual are **resolved** at **compile time**</span>
-- Standard 没有说明how derived objects 怎么存储, The base and derived parts of an object are not guaranteed to be stored contiguously
-- The fact that a <span style="background-color:#FFFF00">derived object contains subobjects for its base classes</span> is key to how inheritance works.
+- <span style="color:red">A **base class** must be **defined**, not just declared, before we can use it as a **base class**</span>: 因为derived class 可能contains and use memeber it inherits from base class. 使用这些 members, derived lass must know what they are. 所以重要的implication是: <span style="color:red">**impossible to derive a class from itself**</span>
+
+derived class:
+- Derived Classes <span style="background-color:#FFFF00">**声明**时候 不用include its **derivation list**</span>. 比如 ```class Foo;``` ok的, 但 ```class Foo: public bar;``` 是error的
+- A derived class must specify the class(es) from which it inherit. It does so in <span style="color:red">**derivation list**</span> (继承了哪个class, 是public, private, protected):  a colon followed by a comma-separated list of base classes each of which may have an optional access specifier
+- new standard lets a derived class explicitly note that function <span style="color:red"> **override** a virtual that it inherits</span> by <span style="color:red">specifying override after its **parameter list**, or **const**  keymember or **reference qualifier**</span>
 - 尽管derived class contains member from inheritance from base, 但<span style="color:red">cannot directly initialize those members</span>. a <span style="color:red">derived class must use a **base-class constructor** to initialize</span> its base-class part. Base-class part initialized along witht data members of derived class, during the initialization phase of the constructor 
     - The <span style="background-color:#FFFF00">**base class** is initialized first</span>, and then the members of the derived class are initialized in the order in which they are declared in the class.
     - 遵循base-class interface: 即使可以通过inheritance 给public/protected data 赋值, 最好还是通过base-class constructor initialize member(should respect the interface of its base class)
-- Derived Classes <span style="background-color:#FFFF00">**声明**时候 不用include its **derivation list**</span>. 比如 ```class Foo;``` ok的, 但 ```class Foo: public bar;``` 是error的
-- <span style="color:red">A class must be **defined**, not just declared, before we can use it as a **base class**</span>: 因为derived class 可能contains and use memeber it inherits from base class. 使用这些 members, derived lass must know what they are. 所以重要的implication是: <span style="color:red">**impossible to derive a class from itself**</span>
-- 可以Preventing Inheritance:通过定义 class as **final**: ```class NoDerived final ```
 
-<span style="background-color:#FFFF00">**derived-to-base** conversion</span>.  the compiler will <span style="color:red">apply</span> the derived-to-base conversion <span style="background-color:#FFFF00">**implicitly**</span>.  We can <span style="background-color:#FFFF00">use an object of derived type or a **reference** to a derived type</span> when a <span style="color:red">**reference to the base type**</span> is required. Similarly, we can use <span style="color:red">a pointer to a derived type</span> where a <span style="color:red">**pointer to the base type**</span> is required  下面例子可以用reference 去access derived type 上面function 例子也是take reference as parameter
+inheritance:
+- The fact that a <span style="background-color:#FFFF00">derived object contains subobjects for its base classes</span> is key to how inheritance works.
+- 可以Preventing Inheritance:通过定义 class as **final**: ```class NoDerived final ```
+- Standard 没有说明how derived objects 怎么存储, The base and derived parts of an object are not guaranteed to be stored contiguously
+- a **base class** at the root of the hierarchy. Inheriting classes are known as **derived classes**. 
+  - base class: 定义 common members. derived clas define memeber that are specific to derived class
+- A <span style="color:red">**direct base**</span> class is named in the derivation list. An **indirect base**</span> is one that a derived class inherits through its direct base class.  <span style="color:red">**The most derived object**</span> contains a subobject for its **direct base** and for each of its **indirect bases**.  
+
+virtual:
+- When we <span style="color:red">call a **virtual function** through a **pointer** or **reference**</span>, the <span style="color:red">call will be **dynamically bound**</span>. Depending on reference or pointer 绑定 object type, the version in the base class or in one of its derived classes will be executed.
+-  <span style="background-color:#FFFF00">Any **nonstatic member** function, other than a constructor, 可以是 virtual</span>. <span style="color:red">**virtual** 只能用于the declaration inside the class</span>, outside class定义时不能用
+    - virtual function in base class is  <span style="color:red">**implicitly virtual** in derived classes</span>. 在 derived class **virtual** function, <span style="color:red">keyword **virtual** 加不加都可以</span>
+    - Member functions <span style="color:red">not declared virtual are **resolved** at **compile time**</span>
+
+
+ 
+
+<span style="background-color:#FFFF00">**derived-to-base** conversion</span>.  
+
+the compiler will <span style="color:red">apply</span> the derived-to-base conversion <span style="background-color:#FFFF00">**implicitly**</span>.  We can <span style="background-color:#FFFF00">use an object of derived type or a **reference** to a derived type</span> when a <span style="color:red">**reference to the base type**</span> is required. Similarly, we can use <span style="color:red">a pointer to a derived type</span> where a <span style="color:red">**pointer to the base type**</span> is required  下面例子可以用reference 去access derived type 上面function 例子也是take reference as parameter   
+
+
+
+
 
 ```c++
 Quote item; 
@@ -8980,7 +8996,7 @@ class Quote; // declared but not defined
 class Bulk_quote : public Quote { ... };
 ```
 
-一个class 可以同时是base class, 也可以是 derived class. 下面例子 Base is a **direct base** to D1 and an **indirect base** to D2. A **direct base** class is named in the derivation list. An **indirect base** is one that a derived class inherits through its direct base class.  **The most derived object** contains a subobject for its **direct base** and for each of its **indirect bases**.
+一个class 可以同时是base class, 也可以是 derived class. 下面例子 Base is a **direct base** to D1 and an **indirect base** to D2. 
 ```c++
 classBase{/* ... */};
 class D1: public Base { /* ... */ }; 
@@ -9036,7 +9052,7 @@ class Derived : public Base {
 **2. Conversions and Inheritance**
 
 - Ordinarily, we can <span style="color:red">bind a reference or a pointer</span> only to an object that has <span style="color:red">the same type as the corresponding reference or pointer</span> or to a type that involves an acceptable <span style="color:red">const conversion</span>
-    - class type 有个例外: <span style="background-color:#FFFF00">bind a **pointer or reference** to a base-class type to an object of a type **derived** from that base class</span>
+    - class type 有个例外: <span style="background-color:#FFFF00">bind a **pointer or reference** to a **base-class** type to an object of a type **derived** from that base class</span>
         - derived to base conversion 之所以存在因为没诶一个derived class 都包含base-class part (用base class type 的reference or pointer 可以绑定到上面)
         - 但是反过来对于base-class, <span style="background-color:#FFFF00">没有这个保证</span>, A base-class object can <span style="color:red">exist either as an **independent object** or as part of a derived object</span>. 如果base object is not part of derived object 只有member defined in base, 没有member defined by derived class
         - cannot convert from base(a base pointer or reference is bound to a derived object) to derived 当使用绑定derived 的base reference/pointer 去convert to derived 是不可以的
@@ -9448,6 +9464,7 @@ public:
 - 前三条语句都是通过pointers to base class call 的. 因为 ```fcn``` 是virtual, compile run time 根据pointer bound的对象 决定哪个version to call. ```bp2``` underlying object 是 ```D1```. class 没有override ```fcn``` function that takes no argument. 所以call Base 的version 
 - 接下来三条 calls are through pointers with differing types. ```bp2->f2(); ``` is illegal 因为没有 ```f2()``` in Base. 
 - 最后三组, <span style="color:red">**dynamic type** doesn't matter when call a nonvirtual function</span>. The version that is called <span style="color:red">depends only on the **static type**</span> of the pointer.
+
 ```c++
 Base bobj; D1 d1obj; D2 d2obj;
 Base *bp1 = &bobj, *bp2 = &d1obj, *bp3 = &d2obj; 
@@ -9480,6 +9497,7 @@ p3->fcn(42); // statically bound, calls D2::fcn(int)
 #### (g). Constructors and Copy Control
 
 **1. Virtual Destructors**
+- <span style="color:red">**Base classes** ordinarily should define a **virtual destructor**</span>. Virtual destructors are needed even if they do no work.
 - **destructor** is run when we delete a pointer to a **dynamically allocated** object
 - 有可能 <span style="color:red">**static type** of pointer 与 **dynamic types** of pointer 指向 不同object 的情况(inheritance) </span>. 需要run proper **destructor** by defining the destructor as **virtual** in the base class
 - Like any other virtual, the **virtual** nature of the destructor is **inherited**
