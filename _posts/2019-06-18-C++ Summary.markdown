@@ -8892,8 +8892,7 @@ int i = s3 + 0; // error: ambiguous
 **Dynamic Binding**:
 
 the decision as to which <span style="color:red">version to run depends on the type of the argument</span>, <span style="color:red">在run time 选择函数版本</span>. Therefore, <span style="background-color:#FFFF00">**dynamic binding**</span> is sometimes known as <span style="background-color:#FFFF00">**run-time binding**</span>.
-   - **dynamic binding** happens when a **virtual** member function is called through a **reference** or a **pointer** to a base-class type
-use the same code to process objects of either type ```Quote``` or ```Bulk_quote``` interchangeably. item is reference ```const Quote &``` , can call this on either a ```Quote``` object or ```Bulk_quote``` object. 因为```net_price``` 是virtual function, ther <span style="color:red">**version**</span> of ```net_price``` that <span style="color:red">is **run** will depend on</span> the type of the object that <span style="color:red">we pass</span> to print_total
+   - **dynamic binding** happens when a **virtual** member function is called through a **reference** or a **pointer** to a base-class type. 比如下面例子 Use the same code to process objects of either type ```Quote``` or ```Bulk_quote``` interchangeably. item is reference ```const Quote &``` , 可以是  ```Quote``` object or ```Bulk_quote``` object. 因为```net_price``` 是virtual function, ther <span style="color:red">**version**</span> of ```net_price``` that <span style="color:red">is **run** will depend on</span> the type of the object that <span style="color:red">we pass</span> to ```print_total```
 
 ```c++
 class Quote { 
@@ -8937,18 +8936,16 @@ base class:
 derived class:
 - Derived Classes <span style="background-color:#FFFF00">**声明**时候 不用include its **derivation list**</span>. 比如 ```class Foo;``` ok的, 但 ```class Foo: public bar;``` 是error的
 - A derived class must specify the class(es) from which it inherit. It does so in <span style="color:red">**derivation list**</span> (继承了哪个class, 是public, private, protected):  a colon followed by a comma-separated list of base classes each of which may have an optional access specifier
-- new standard lets a derived class explicitly note that function <span style="color:red"> **override** a virtual that it inherits</span> by <span style="color:red">specifying override after its **parameter list**, or **const**  keymember or **reference qualifier**</span>
 - 尽管derived class contains member from inheritance from base, 但<span style="color:red">cannot directly initialize those members</span>. a <span style="color:red">derived class must use a **base-class constructor** to initialize</span> its base-class part. Base-class part initialized along witht data members of derived class, during the initialization phase of the constructor 
     - The <span style="background-color:#FFFF00">**base class** is initialized first</span>, and then the members of the derived class are initialized in the order in which they are declared in the class.
     - 遵循base-class interface: 即使可以通过inheritance 给public/protected data 赋值, 最好还是通过base-class constructor initialize member(should respect the interface of its base class)
 
 inheritance:
 - The fact that a <span style="background-color:#FFFF00">derived object contains subobjects for its base classes</span> is key to how inheritance works.
-- 可以Preventing Inheritance:通过定义 class as **final**: ```class NoDerived final ```
 - Standard 没有说明how derived objects 怎么存储, The base and derived parts of an object are not guaranteed to be stored contiguously
 - a **base class** at the root of the hierarchy. Inheriting classes are known as **derived classes**. 
   - base class: 定义 common members. derived clas define memeber that are specific to derived class
-- A <span style="color:red">**direct base**</span> class is named in the derivation list. An **indirect base**</span> is one that a derived class inherits through its direct base class.  <span style="color:red">**The most derived object**</span> contains a subobject for its **direct base** and for each of its **indirect bases**.  
+- A <span style="color:red">**direct base**</span> class is named in the derivation list. An span style="color:red">**indirect base**</span> is one that a derived class inherits through its direct base class.  <span style="color:red">**The most derived object**</span> contains a subobject for its **direct base** and for each of its **indirect bases**.  
 
 
 a derived-class constructor uses its <span style="background-color:#FFFF00">**constructor initializer list** to pass arguments to a base-class constructor</span>
@@ -9025,7 +9022,7 @@ class Derived : public Base {
 #### (c). Derived-to-Base Conversion
 
 - Ordinarily, we can <span style="color:red">bind a reference or a pointer</span> only to an object that has <span style="color:red">the same type as the corresponding reference or pointer</span> or to a type that involves an acceptable <span style="color:red">const conversion</span>
-    - class type 有个例外: <span style="background-color:#FFFF00">bind a **pointer or reference** to a **base-class** type to an object of a type **derived** from that base class</span>. 只能convert base to derived, 不能convert derived to base.
+    - class type 有个例外: <span style="background-color:#FFFF00">bind a **pointer or reference** to a **base-class** type to an object of a type **derived** from that base class</span>. 只能derived-to-base, 不能convert base to derived.
     	- the compiler will <span style="color:red">apply</span> the derived-to-base conversion <span style="background-color:#FFFF00">**implicitly**</span>.  
         - derived to base conversion 之所以存在因为每一个derived class 都包含base-class part (用base class type 的reference or pointer 可以绑定到上面)
         - 但是反过来对于base-class, <span style="background-color:#FFFF00">没有这个保证</span>, A base-class object can <span style="color:red">exist either as an **independent object** or as part of a derived object</span>. 如果base object is not part of derived object 只有member defined in base, 没有member defined by derived class
@@ -9033,7 +9030,7 @@ class Derived : public Base {
     - important implication: When we use a <span style="background-color:#FFFF00">**reference (or pointer) to a base-class type**, we don’t know the actual type</span> of the object to which the pointer or reference is bound. 可以是base 也可以是derived 的type
     - 因为assignment operator, copy constructor 接受const **reference** of class type, the <span style="background-color:#FFFF00">**derived-to-base conversion**</span> lets us <span style="background-color:#FFFF00">pass a derived object</span> to a <span style="background-color:#FFFF00">**base-class copy/move operation**</span>. <span style="background-color:#FFFF00">Only the **base-class part** of the derived object is **copied**, **moved**, or **assigned**</span>. The **derived part** of the object is **ignored** (忽略 derived class 部分被 **sliced down**(切掉了).)
     - Like built-in pointers, the  <span style="background-color:#FFFF00">**smart pointer** classes support the **derived-to-base conversion**</span>—we can store a pointer to a derived object in a smart pointer to the base type.
-- 没有conversion from a derived-class type to the base- class type. 但是possible convert an object of a derived class to base-class type. However, such conversions may not behave as we might want.
+- 没有conversion from a **base-to-derived** class type. 但是possible convert an object of a derived class to base-class type. However, such conversions may not behave as we might want.
    - 如果当我们知道conversion is safe from base to derived, 可以用<span style="background-color:#FFFF00"> ```static_cast``` override the compiler</span>
   
 
@@ -9101,22 +9098,23 @@ item = bulk; // calls Quote::operator=(const Quote&)
 
 #### (d). Virtual / Polymorphism 
 
-
-
-virtual:
+**Virtual**
 - When we <span style="color:red">call a **virtual function** through a **pointer** or **reference**</span>, the <span style="color:red">call will be **dynamically bound**</span>. Depending on reference or pointer 绑定 object type, the version in the base class or in one of its derived classes will be executed.
 -  <span style="background-color:#FFFF00">Any **nonstatic member** function, other than a constructor, 可以是 virtual</span>. <span style="color:red">**virtual** 只能用于the declaration inside the class</span>, outside class定义时不能用
     - virtual function in base class is  <span style="color:red">**implicitly virtual** in **all derived classes**</span>. 在 derived class **virtual** function, <span style="color:red">keyword **virtual** 加不加都可以</span>
     - Member functions <span style="color:red">not declared virtual are **resolved** at **compile time**</span>
+
 - derived class override inherited virtual function <span style="color:red">必须有一样的**parameter type** as the base-class function </span>
     - return type 一般也要match, 一个例外是 <span style="background-color:#FFFF00">return a **reference** / **pointer**</span> to types that are themselves  <span style="color:red">related by inheritance</span>.  比如 ```D``` 继承 ```B```, ```B``` 的virtual 返回 ```B*```, ```D``` virtual 可以返回 ```D*```,   并且在return type<span style="color:red">**derived-to-base conversion** from D to B is **accessible**</span>
+    - ```override```: explicitly note that function <span style="color:red"> **override** a virtual that it inherits</span>. <span style="color:red">compiler will **reject**</span> a program if a function <span style="color:red">marked ```override``` does not override</span> an existing virtual function
+    - override 只能用于 virtual function
+    - ```final```: 
+     	- Preventing Inheritance. 通过定义 class as **final**: ```class NoDerived final ```
+	    - 把function 定义成 **final** 表示不能再override, 比如 C 继承 B， B继承A, B override 的virtual from A as final 表示 C中不能再override 这个function
+    - ```final``` 和 ```override``` 都 specify parameter list, const,  reference qualifier 之后
  - 可以redefine a function in derived class the same name as virtual in base class 但是 <span style="color:red">不同的 parameter list</span>. Compiler 会认为这个function 不是override base class virtual function 
-  - 若用 ```override``` <span style="color:red">, compiler will **reject**</span> a program if a function <span style="color:red">marked ```override``` does not override</span> an existing virtual function
-  - override 只能用于 virtual function
-  - 把function 定义成 **final** 表示不能再override, 比如 C 继承 B， B继承A, B override 的virtual from A as final 表示 C中不能再override 这个function
-  - final 和 override 都在 parameter list (包括了 const 和 reference qualifier ) 之后
 - Virtual functions that have <span style="color:red">**default arguments** should use the same values in the base and derived classes</span>.
-  - default argument bind at compiled time, derived 的default argument 不会override base 的default
+  -  <span style="background-color:#FFFF00">default argument bind at compiled time</span>, derived 的default argument 不会override base 的default
 - 有些情况<span style="background-color:#FFFF00">prevent dynamic binding</span> of a call to virtual function, 可以force call to use 特定的virtual(不用derived 用base的), 可以用**scope operator**. This call will be <span style="background-color:#FFFF00">**resolved at compile time**</span>.
     - 一般情况只有<span style="color:red">**member functions** or **friends**</span> 才用scope operator 回避dynamic binding
     -  The most common case is when a <span style="color:red">derived-class virtual function calls the version from the base class</span>. base-class version might do work <span style="color:red">**common** to all types</span> in the hierarch. Derived classes would do whatever additional work
