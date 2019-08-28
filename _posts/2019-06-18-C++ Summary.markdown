@@ -8936,9 +8936,11 @@ base class:
 derived class:
 - Derived Classes <span style="background-color:#FFFF00">**声明**时候 不用include its **derivation list**</span>. 比如 ```class Foo;``` ok的, 但 ```class Foo: public bar;``` 是error的
 - A derived class must specify the class(es) from which it inherit. It does so in <span style="color:red">**derivation list**</span> (继承了哪个class, 是public, private, protected):  a colon followed by a comma-separated list of base classes each of which may have an optional access specifier
+- <span style="color:red">A derived class constructor initializes its **direct base** class only</span>. 比如 C继承B, B继承A, 那么 C 只用initialize B 的constructor, 不用initialize A 的, A 的constructor 由 B 来initialize
 - 尽管derived class contains member from inheritance from base, 但<span style="color:red">cannot directly initialize those members</span>. a <span style="color:red">derived class must use a **base-class constructor** to initialize</span> its base-class part. Base-class part initialized along witht data members of derived class, during the initialization phase of the constructor 
     - The <span style="background-color:#FFFF00">**base class** is initialized first</span>, and then the members of the derived class are initialized in the order in which they are declared in the class.
     - 遵循base-class interface: 即使可以通过inheritance 给public/protected data 赋值, 最好还是通过base-class constructor initialize member(should respect the interface of its base class)
+    
 
 inheritance:
 - The fact that a <span style="background-color:#FFFF00">derived object contains subobjects for its base classes</span> is key to how inheritance works.
@@ -9107,18 +9109,18 @@ item = bulk; // calls Quote::operator=(const Quote&)
 - derived class override inherited virtual function <span style="color:red">必须有一样的**parameter type** as the base-class function </span>
     - return type 一般也要match, 一个例外是 <span style="background-color:#FFFF00">return a **reference** / **pointer**</span> to types that are themselves  <span style="color:red">related by inheritance</span>.  比如 ```D``` 继承 ```B```, ```B``` 的virtual 返回 ```B*```, ```D``` virtual 可以返回 ```D*```,   并且在return type<span style="color:red">**derived-to-base conversion** from D to B is **accessible**</span>
     - ```override```: explicitly note that function <span style="color:red"> **override** a virtual that it inherits</span>. <span style="color:red">compiler will **reject**</span> a program if a function <span style="color:red">marked ```override``` does not override</span> an existing virtual function
-    - override 只能用于 virtual function
+        - override 只能用于 virtual function
     - ```final```: 
-     	- Preventing Inheritance. 通过定义 class as **final**: ```class NoDerived final ```
+    	- Preventing Inheritance. 通过定义 class as **final**: ```class NoDerived final ```, class 不能再被 inherited
 	    - 把function 定义成 **final** 表示不能再override, 比如 C 继承 B， B继承A, B override 的virtual from A as final 表示 C中不能再override 这个function
-    - ```final``` 和 ```override``` 都 specify parameter list, const,  reference qualifier 之后
+    - ```final``` 和 ```override``` 都 span style="background-color:#FFFF00">specify parameter list, const,  reference qualifier 之后</span>
  - 可以redefine a function in derived class the same name as virtual in base class 但是 <span style="color:red">不同的 parameter list</span>. Compiler 会认为这个function 不是override base class virtual function 
 - Virtual functions that have <span style="color:red">**default arguments** should use the same values in the base and derived classes</span>.
   -  <span style="background-color:#FFFF00">default argument bind at compiled time</span>, derived 的default argument 不会override base 的default
 - 有些情况<span style="background-color:#FFFF00">prevent dynamic binding</span> of a call to virtual function, 可以force call to use 特定的virtual(不用derived 用base的), 可以用**scope operator**. This call will be <span style="background-color:#FFFF00">**resolved at compile time**</span>.
     - 一般情况只有<span style="color:red">**member functions** or **friends**</span> 才用scope operator 回避dynamic binding
     -  The most common case is when a <span style="color:red">derived-class virtual function calls the version from the base class</span>. base-class version might do work <span style="color:red">**common** to all types</span> in the hierarch. Derived classes would do whatever additional work
-    -  If a derived virtual function that intended to <span style="color:red">call its base-class version omits the scope operator</span>, the call will be resolved at run time as a call to the derived version itself, resulting in an <span style="color:red">infinite recursion</span>
+    -  If a derived virtual function that intended to <span style="color:red">call its base-class version omits the scope operator</span>, the call will be resolved at run time as a call to the derived version itself, resulting in an <span style="color:red">**infinite recursion**</span>
 -  <span style="background-color:#FFFF00">**virtual functions** must always be define</span>. <span style="color:red">因为**dynamic binding**不知道call 哪个function at **runtime**.  <span style="background-color:#FFFF00">通常上, 如果我们不需要哪个function, 无须定义</span>. 
 
 
@@ -9126,7 +9128,7 @@ item = bulk; // calls Quote::operator=(const Quote&)
 
 **Polymorphism**
 - The key idea behind OOP is **polymorphism**(from Green meaning "**many forms**"). inheritance as **polymorphic** types. we can use the “many forms” of these types while <span style="color:red">ignoring the differences among them</span>. The fact that the **static** and **dynamic** types of references and pointers can differ is the cornerstone(根本所在) of how C++ supports polymorphism.
-  - 比如使用 reference or pointer to the base class, 不知道type(base type or derived type) until runtime. 如通过 pointer or reference call virtual function. The version of  virtual function 由 the reference or pointer 绑定对象的真实类型决定
+  - 比如使用 reference or pointer to the base class, 不知道type(base type or derived type) until <span style="background-color:#FFFF00">**runtime**</span>. 如通过 <span style="background-color:#FFFF00">**pointer or reference of base class call virtual function**</span>. The version of  virtual function 由 the reference or pointer 绑定对象的真实类型决定
   - On the other hand,calls to  <span style="background-color:#FFFF00">**nonvirtual functions** through pointer/reference </span> or calls to  <span style="background-color:#FFFF00">any function (virtual or not) on an **object**(plain—nonreference and nonpointer—type) </span> are <span style="background-color:#FFFF00">bound at **compile time**</span>.
 
 下面例子中case3 比较重要, 因为only copy derived 中的base-class 的part. case3中```base``` is <span style="color:red">plain (non pointer and non reference) that call is bound at compile time</span>. We can <span style="color:red">change the value</span> (i.e., the contents) of the object that base represents, but there is <span style="color:red">**no way to change the type**</span> of that object. 因此<span style="color:red">call is resolved at **compile time**</span> 
@@ -9192,7 +9194,6 @@ double undiscounted = baseP->Quote::net_price(42);
 - A class containing (or <span style="color:red">**inheriting without overridding**</span>) a pure virtual function is an abstract base class
     - Abstract class <span style="color:red">定义了interface</span> for subsequent classes to override, 但不能create objects
 - 不能 create objects of a type that is an **abstract base class**.: abstract class 的constructor 是用于derived class的constructor 来 construct abstract class 的 member
-- <span style="color:red">A derived class constructor initializes its **direct base** class only</span>. 比如 C继承B, B继承A, 那么 C 只用initialize B 的constructor, 不用initialize A 的, A 的constructor 由 B 来initialize
 - **refactoring**:   redesigning a class hierarchy to move operations and/or data from one class to another, 是common in OO application.  即使改变了继承体系, 那么使用 derived class代码无须改变, 但是必须recompile any code that uses those classes.
 
 
@@ -9200,14 +9201,14 @@ double undiscounted = baseP->Quote::net_price(42);
 #### (f). Access Control and Inheritance
 
 - Like public, <span style="color:red">**protected** members are accessible to **members** and **friends**</span> of classes derived from this class.
-- A <span style="color:red">**derived class member**</span> or <span style="color:red">**friend**</span> may access the <span style="color:red">**protected members of the base**</span> class only through a <span style="color:red">**derived object**</span>. The derived class has no special access to the protected members of base-class objects.
--  **derivation access specifier** has no effect on whether members (and friend) of derived class access member of **direct base class**. It is to <span style="color:red">control the access that users of the derived class</span>  -including other classes derived from the derived class—have to the members inherited from Base.
-    - 如果是protected inherited, derived class的 member and friend 可以使用 base 的 public/protected, 不能访问base 的private,  但是user 不能使用public 的public/protected
+- 在derived class 的<span style="color:red">**derived class member**</span>中 access <span style="color:red">**base protected members**</span> 可以通过<span style="color:red">**derived object**</span>access, 而不能通过 base-class objects.
+-  **derivation access specifier** 不控制derived class members/functions 如何使用 **direct base class**. 而是控制 <span style="color:red">users of the derived class</span>  -including derived class的inherit class or objects—怎么使用direct base classes.
+    - 比如 protected inherited, derived class的 member and friend 可以使用 base 的 public/protected, 但不能访问base 的private,  但是user 不能使用base 的public/protected
 - Whether the <span style="color:red">**derived-to-base conversion** 是否 **accessible** 取决</span>于which code try to use conversion 和 <span style="color:red">**access specifier**</span>
 
 
 
-下面的friend 定义在derived 中 access base member 的protected member 只能用derived class object 而不能用base class object, 原因是friend 定义在derived 中 而不是定义在base 中. 如果可以access base class 的 protected member 通过base class object, 就即使不是friend 也有更改它的风险, 所以prevent such usage, 禁止这么做
+下面证明了: friend 定义在derived 中 access base member 的protected  只能用derived class object 而不能用base class object, 原因是friend 定义在derived 中 而不是定义在base 中. 如果可以access base class 的 protected member 通过base class object, 就即使不是friend 也有更改它的风险, 所以prevent such usage, 禁止这么做
 
 ```c++
 class Base { 
@@ -9227,6 +9228,7 @@ class Sneaky : public Base {
 void clobber(Sneaky &s) { s.j = s.prot_mem = 0; }
 
 // error: clobber can't access the protected members in Base
+
 void clobber(Base &b) { b.prot_mem = 0; }
 ```
 
@@ -9243,14 +9245,14 @@ Whether <span style="background-color:#FFFF00">**derived-to-base conversion**</s
 
 **Friendship and Inheritance**
 
-- <span style="background-color:#FFFF00">**friendship is not transitive, friendship is not inherited**</span>. Transitive 表示 B 是 A 的友元, C是B的友元, 但是 C 不能访问A. **Inherited**: 可以通过friend 的 inherited class 访问 base class member(下面例子). The accesst to Base objects 是embedded in object derived from Base
+- <span style="background-color:#FFFF00">**friendship is not transitive, friendship is not inherited**</span>. Transitive 表示 B 是 A 的友元, C是B的友元, 但是 C 不能访问A. **Inherited**: 可以通过friend 的 inherited class 访问 base class member(下面例子). The access to Base objects 是embedded in object derived from Base
     - <span style="color:red">base class 的friends 没有access to members of its derived class</span>
     - <span style="color:red">derived class 的 friends 没有acess to the base class</span>
 - 当一个class(A) make another class(B) friend, 只能是another class (B) 访问 这个class (A), 两个friend 的 base class, derived class 都没有对彼此(A,B)的 special access
 - 如果想<span style="background-color:#FFFF00">**change access level**</span> of a name that derived class inherits. 可以这么做by providing a <span style="background-color:#FFFF00">**using declaration**</span> (using declaration <span style="color:red">**accessibility 取决于 access specifier**</span> )
     - 比如using declaration is <span style="color:red">**private**</span>, name is accessible to <span style="color:red">**members** and **friends** only</span>
     - using declaration is <span style="color:red">**public**</span>, name is available to <span style="color:red">**all users of the class**</span>
-    - using declaration is <span style="color:red">**protect**</span>, name is available to <span style="color:red">**memeber, friends, drived classes**</span>
+    - using declaration is <span style="color:red">**protect**</span>, name is available to <span style="color:red">**memeber, friends, derived classes**</span>
 
 
 
@@ -9265,7 +9267,7 @@ protected:
     int prot_mem;
 };
 class Sneaky: public Base{
-
+    int j;
 };
 class Pal { 
 public:
@@ -9289,7 +9291,6 @@ class D2 : public Pal {
         { return b.prot_mem; } // error: friendship doesn't inherit
 
 };
-
 ```
 
 **change access level**: 下面例子 因为use **private inheritance**. 所以```size``` and ```n``` 是 private members of ```Derived```. The <span style="color:red">**using declarations** adjust the **accessibility**</span> of these members.
@@ -9327,22 +9328,22 @@ class D2 : Base { /* ... */ }; // private inheritance by default
 
 #### (g). Class Scope under Inheritance
 
-- 每一个class 都define 了自己的scope. <span style="color:red">在nheritnace, scope of derived class nested inside scope of base classes</span>. 
+- 每一个class 都define 了自己的scope. <span style="color:red">在inheritnace, scope of derived class nested inside scope of base classes</span>. 
     - 如果在当前class scope 内 a name unresolved, 会继续search for a definition in enclosing base-class scopes.
 - <span style="background-color:#FFFF00">**Name Lookup Happens at Compile Time**</span>: The **static type** of an object, reference, or pointer <span style="color:red">determines which members of that object are visible</span>. 即使当dynamic types 出现时, 仍用static type determines what members can be used. 看下面例子
-- Name Collisions: a derived class can **reuse**(redefine) a name defined in one of its direct or indirect base classes. <span style="color:red">Names defined in an inner scope (e.g., a derived class) hide name in the outer scope(base class)</span>
+- Name Collisions: a derived class can **reuse**(redefine) a name defined in direct or indirect base classes. <span style="color:red">Names defined in an inner scope (e.g., a derived class) hide name in the outer scope(base class)</span>
     - <span style="background-color:#FFFF00">use a hidden base-class member by using the **scope operator**</span>: can <span style="color:red">**overrides the normal lookup**</span> and directs the compiler to <span style="color:red">look for in the scope of class Base</span>.
     - 除了override virtual, derived class 不应该reuse names defined in its base class.
-    - 如果Derived class override function from base, 但也<span style="color:red">想要base all overloaded instances of that function available(而不是hide) in derived class cope</span>, 不用把base 每个function 重新写, 可以提供 <span style="color:red">**using declaration**</span>, specifies only a name, 不需要parameter list.
+    - 如果Derived class override function from base, 但也<span style="color:red">想要base all overloaded instances of that function available(而不是hide) in derived class cope</span>, 可以提供 <span style="color:red">**using declaration**</span>, specifies only a name, 不需要parameter list.
 
 **Name Lookup and Inheritance**: Given call ```p->mem()```, following 4 steps happen: <span style="background-color:#FFFF00">**Name lookup before Type Checking**</span>
 1. determine the static type of ```p```, 因为我们call member, type 必须是class type 
-2. Look for ```mem``` in class that correponds to static type of ```p```. 如果```mem``` 没有找到, look in direct class, chain of classes 直到 ```mem``` 被发现. 如果```mem``` 没有被发现, call won't compile
+2. Look for ```mem``` in class that correponds to **static type** of ```p```. 如果```mem``` 没有找到, look in direct class, chain of classes 直到 ```mem``` 被发现. 如果```mem``` 没有被发现, call won't compile
 3. 一旦```mem``` 被找到, do the normal <span style="color:red">**type checking**</span> to see if call is legal given  the definition that was found
 4. 假设call is legal, compiler generate code, 取决于if call is virtual or not
     - 如果 ```mem``` is <span style="color:red">**virtual**</span> and call is made through **reference** or **pointer**, compiler gnerates code to <span style="color:red">determine at run time which version to run 基于 **dynamic type**</span> of the object
-    - 如果 call is nonvirtual, or if the <span style="color:red">call is on object 而不是reference or pointer</span>, comiler gnerates a <span style="color:red">normal function call</span>, 即使是pointer 和 reference, 也是由static type 决定call 哪个version 
-- 注意:  <span style="background-color:#FFFF00">**Name lookup before Type Checking**</span>: 如果a member in a derived class (i.e., in an inner scope) <span style="background-color:#FFFF00">**has the same name** as a base- class member</span>(i.e., a name defined in an outer scope), <span style="color:red">derived member 会hides base-class member 在derived class scope 内(即使function have different parameter lists is different for derived class and base class)</span>
+    - 如果 call is nonvirtual, or if the <span style="color:red">call is on object 而不是reference or pointer</span>, compiler gnerates a <span style="color:red">normal function call</span>, 即使是pointer 和 reference, 也是由**static type** 决定call 哪个versio
+- 注意:  <span style="background-color:#FFFF00">**Name lookup before Type Checking**</span>: 如果a member in a derived class (i.e., in an inner scope) <span style="background-color:#FFFF00">**has the same name** as a base- class member</span>(i.e., a name defined in an outer scope), <span style="color:red">derived member 会 **hides** base-class member 在derived class scope 内(即使function have different parameter lists is different for derived class and base class)</span>
     - 但是<span style="color:red">可以用**scope operator** call base class version </span>
     - 如果<span style="color:red">base 和 derived 的 virtual function 的parameter list 不同</span>, no way to call derived version through a reference or pointer to base class 
 
@@ -9404,7 +9405,7 @@ Derived d(42);
 cout << d.get_mem() << endl; // prints 42
 ```
 
-可以use scope operator to use 被隐藏的base-class member, 比如 .The <span style="background-color:#FFFF00">scope operator **overrides the normal lookup**</span> and directs the compiler to look for ```mem`` starting in the scope of class Base.
+可以use scope operator to use 被隐藏的base-class member, 比如 .The <span style="background-color:#FFFF00">scope operator **overrides the normal lookup**</span> and directs the compiler to look for ```mem``` starting in the scope of class Base.
 
 ```c++
 struct Derived : Base {
@@ -9434,7 +9435,7 @@ d::Base.memfcn();// ok: calls Base::memfcn
 
 ```
 
-```D1``` 的 ```fcn``` 并没有覆盖 ```Base``` 的virtual (<span style="color:red">**不是override, 而是hide** ```fcn```</span), 因为是<span style="background-color:#FFFF00">parameter list 不同</span>. D1 有两个函数```fcn```, 一个是从 Base 继承的virtual, 一个是自己定义nonvirtual and takes an int parameter. 
+```D1``` 的 ```fcn``` 并没有覆盖 ```Base``` 的virtual (<span style="color:red">**不是override, 而是hide** ```fcn```</span>), 因为是<span style="background-color:#FFFF00">parameter list 不同</span>. D1 有两个函数```fcn```, 一个是从 Base 继承的virtual, 一个是自己定义nonvirtual and takes an int parameter. 
 
 ```c++
 class Base { 
@@ -9460,11 +9461,12 @@ public:
     int fcn(); // overrides virtual fcn from Base 
     
     void f2(); // overrides virtual f2 from D1
+    
 };
 ```
 
 - 前三条语句都是通过pointers to base class call 的. 因为 ```fcn``` 是virtual, compile run time 根据pointer bound的对象 决定哪个version to call. ```bp2``` underlying object 是 ```D1```. class 没有override ```fcn``` function that takes no argument. 所以call Base 的version 
-- 接下来三条 calls are through pointers with differing types. ```bp2->f2(); ``` is illegal 因为没有 ```f2()``` in Base. 
+- 接下来三条 calls are through pointers with differing types. ```bp2->f2(); ``` is illegal 因为没有 static type of ```bp2``` is ```Base```, no ```f2()``` in Base. 
 - 最后三组, <span style="color:red">**dynamic type** doesn't matter when call a nonvirtual function</span>. The version that is called <span style="color:red">depends only on the **static type**</span> of the pointer.
 
 ```c++
