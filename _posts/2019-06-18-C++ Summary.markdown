@@ -3001,6 +3001,22 @@ The only difference between using class and using struct to define a class is th
 - <span style="background-color:#FFFF00">friend declaraction 仅仅specifies access, 而不是general declaration of the function</span>, 如果我们想要users able to call friend function. usually **declare each friend (outside the class)** in the same header as the class itself.
    - <span style="color:red">一个友元的outside declaration 必须在call 友元 的member function前面</span>, 所以用到友元的function 最好放在class 外面定义 (some compilers do not enforce the lookup rules for friends）
 
+friend function 最好定义在class 外面, 定义在内部, 有的compiler 也可以pass, 算是declaration. Class Friend Function 不能通过class access
+```c++
+class Derived  {
+protected:
+   int j = 5;
+public:
+   friend void get(Derived& d) {
+      cout << d.i << endl;
+   }
+};
+Derived i;
+d.get(i);//error 
+
+get(i); //okay
+
+```
 
 
 
@@ -9343,7 +9359,7 @@ class D2 : Base { /* ... */ }; // private inheritance by default
 4. 假设call is legal, compiler generate code, 取决于if call is virtual or not
     - 如果 ```mem``` is <span style="color:red">**virtual**</span> and call is made through **reference** or **pointer**, compiler gnerates code to <span style="color:red">determine at run time which version to run 基于 **dynamic type**</span> of the object
     - 如果 call is nonvirtual, or if the <span style="color:red">call is on object 而不是reference or pointer</span>, compiler gnerates a <span style="color:red">normal function call</span>, 即使是pointer 和 reference, 也是由**static type** 决定call 哪个versio
-- 注意:  <span style="background-color:#FFFF00">**Name lookup before Type Checking**</span>: 如果a member in a derived class (i.e., in an inner scope) <span style="background-color:#FFFF00">**has the same name** as a base- class member</span>(i.e., a name defined in an outer scope), <span style="color:red">derived member 会 **hides** base-class member 在derived class scope 内(即使function have different parameter lists is different for derived class and base class)</span>
+5. 注意:  <span style="background-color:#FFFF00">**Name lookup before Type Checking**</span>: 如果a member in a derived class (i.e., in an inner scope) <span style="background-color:#FFFF00">**has the same name** as a base- class member</span>(i.e., a name defined in an outer scope), <span style="color:red">derived member 会 **hides** base-class member 在derived class scope 内(即使function have different parameter lists is different for derived class and base class)</span>
     - 但是<span style="color:red">可以用**scope operator** call base class version </span>
     - 如果<span style="color:red">base 和 derived 的 virtual function 的parameter list 不同</span>, no way to call derived version through a reference or pointer to base class 
 
@@ -9431,7 +9447,7 @@ d.memfcn(10); // calls Derived::memfcn
 
 d.memfcn(); // error: memfcn with no arguments is hidden d.Base::memfcn(); 
 
-d::Base.memfcn();// ok: calls Base::memfcn
+d.Base::memfcn();// ok: calls Base::memfcn
 
 ```
 
