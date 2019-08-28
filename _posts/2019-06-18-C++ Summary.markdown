@@ -89,6 +89,24 @@ Sequential Container
 
 ***
 
+15.Object-Oriented Programming
+
+- final, override 在parameter list, const, qualifier reference 之后
+- virtual function in base class 是 implicit virtual in all derived class
+- derived virtual function 跟base 不同signiture, 是不override base的
+- 用scope operator prevent dynamic binding, 如果derived class 应该call base virtual, but fail to provide ```baseP->Base::fuc()```, infinite recursion
+- object access virtual, pointer/reference access nonvirtual  bound at compile time, 只有pointer/reference access virtual run time
+- pure virtual function 可以被定义, 但只能定义在class外面
+- user 的 derived-to-base conversion 必须是public inheritance, derived的member and friend 无所谓, derived of derived可以用derived-to-base conversion 必须是public/protected的
+- friend 不是 transitive 和 inheritance 的 (清楚这个概念)
+- Derived class中 friend function, access base 的protected (base protected 也是derived protected) 成员能通过 derived-class object access, 不能通过base-class object
+- class friend function 可以从class 的 derived class 中获取class member， 但不能获取derived member 
+- Name Lookup before type checking 
+- 可以用using declaration ```Derived d; d.Base::memfcn();``` change access level (base protected 变成 derived 的 public, base 的被hide了)
+- <span style="color:red">At Compile time: static type 决定什么member can be used</span> (也是virtual function定义在base 和 derived原因). 如果Derived 有 function ```fcn``` 而 Base 中没有, then ```Base *p = &d; p->fcn();```是error的， 因为static search scope, ```fcn``` 不在 ```Base``` 中
+
+***
+
 ## 2. Variable and Basic Types
 
 <span style="background-color: #FFFF00">**Initialization is not assignment**</span>. Initialization happens when a variable is given a value *when it is created*.(创建变量时 赋予它一个初始值). **Assignment** obliterates an object's current value and replaces that value with a new one (
@@ -9513,6 +9531,35 @@ p3->fcn(42); // statically bound, calls D2::fcn(int)
 
 ```
 
+下面例子okay的, 注意顺序, 
+1. 声明Derived, 因为Base 中的friend  用到derived类
+2. 定义Base 类, 因为只有Base定义了, 才能作为Base Class 用于Derived class
+3. Derived Class 再 friend function 前, 因为friend function 用到了 derived function 的member
+4. 因为```get``` 是Base friend, 所以可以access Base的中所有member, 即使是通过Derived class 来access的, 但是不可以通过Derived class 访问Derived 的member
+
+```c++
+class Derived;
+
+class Base {
+protected:
+   int i = 10;
+public:
+   friend void get(Derived& d);
+};
+class Derived: public Base {
+protected:
+   int j = 5;
+};
+
+void get(Derived& d) {
+   cout << " friend" << d.i << endl;
+}
+Derived i;
+get(i);
+```
+
+
+
 
 #### (h). Constructors and Copy Control
 
@@ -9522,8 +9569,7 @@ p3->fcn(42); // statically bound, calls D2::fcn(int)
 - 有可能 <span style="color:red">**static type** of pointer 与 **dynamic types** of pointer 指向 不同object 的情况(inheritance) </span>. 需要run proper **destructor** by defining the destructor as **virtual** in the base class
 - Like any other virtual, the **virtual** nature of the destructor is **inherited**
 - Executing ```delete``` on a pointer to base that points to a derived object has <span style="color:red">**undefined**</span> behavior <span style="color:red">if the base’s destructor is not virtual</span>.
-- 通常来说如果有destructor, 也需要copy and asisgnment. 但是<span style="background-color:#FFFF00">有个重要例外</span>是: 如果base class 有empty virtual destructor, 无法推断base class 需要copy or assignment
-  - base class needs a virtual destructor还有个重要影响:  <span style="background-color:#FFFF00">如果有destructor, even if use ```=default``` to use sythesize version, compiler 不会sythesize move operation for that class</span>
+- base class needs a virtual destructor还有个重要影响:  <span style="background-color:#FFFF00">如果有destructor, even if use ```=default``` to use sythesize version, compiler 不会sythesize **move operation** (copy 是 deprecated) for that class</span>
 
 ```c++
 class Quote { 
