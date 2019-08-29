@@ -50,7 +50,7 @@ Sequential Container
 
 - list /forward 不支持random access, 花销大
 - forward_list no size operation, no back, 但有end 
-- STL Array support copy constructor/assignment, brace assignment/initilization, 但没有begin end, no iterator constructor
+- STL Array support copy constructor/assignment, brace assignment/initilization, 但没有member 的 begin end, no iterator constructor, 但可以用 ```array<int,10>a; begin(a); end(a);```
 - STL Array 不为空, default initialzer member是class, 必须有default constructor 
 - assignment operator invalidate iterators, but swap not (internal structure swap)
 - Assign 可以用于different but compatible type
@@ -61,6 +61,40 @@ Sequential Container
 - capacity (size before allocate) vs size 区别
 - const char * -> string 必须null terminated
 - insert 在p前插入, 返回插入第一个元素, erase 返回删除后一个元素的
+
+
+
+***
+ 
+10. Generic Algorithms
+- Algorithm never execute container operations, 不会改变size, 但是会add / remove elements using inserters
+- Algorithm not check write operations: 假设destionation 足够大hold elements, 如果空间不够, undefined behavior. 确保有足够空间用inserter
+- equal 比较两个sequences hold the same value. 可以是不同容器, 一个是vector, 一个是list
+- accumulate 可以用 ```string("")``` 作为第三个参数, 但不能用 ```""``` 因为no accumlate for ```const char*```
+- unique 因为不能改变容器大小, 返回an iterator that denotes the end of the range of the unique value
+- predicate can be returns a value used as condition
+- **callable object**: ```e(args)```
+- **lambda function**: ```[capture list] (parameter list) -> return type { function body }```
+    - capture list capture local nonstatic varaibles 比如 ```cout``` 无需 capture
+    - 可以省略 parameter list or return type 或两个都省略
+    - 不能有parameters has default value 
+- lambda capture by value: 捕获指 是 创建时 而不是调用时的值, 随后修改被调用没有影响
+    - <span style="color:red">如果想改变 capture value 的值， 加mutable, 有mutable 不能省略 parameter list 可以省略return type </span>
+    - 若value is pointer, lambda copy 值和 外面的 值 指向一个object, object 改变, value的pointer object 值也变, 要确保pointer valid when 执行lambda function
+- lambda capture by reference ```[&v1] ```, 必须确refereneced object 存在 当执行lambda function 时候
+    - capture by reference 是否可以改变取决于 object 是不是const 
+- Implicit capture: 让compiler 自己infer capture 的值, by value ```[=]```, by reference ```[&]```
+- Mix: Implicit 必须放前面, explicit 放后面, 如果第一个是by value, 第二个必须是by reference ```[=,&c]```; 如果第一个是by reference, 第二个必须是by value```[&,c]```. 比如
+- 尽量减少reference, pointer capture
+- bind: ```auto newCallable = bind(callable, arg_list); ```, 
+    - ```arg_list``` 可以有placeholder ```_1, _2``` 表示给```newCallable``` 第一/二个参数, 可以rearrange, ```_2``` 在 ```_1``` 前面
+    - using declaration is ```using std::placeholders::_1```
+    - 可以bind reference. 用```ref```, 比如IO类
+    - 可以用```bind``` 就根据一个predicate 同时来正向反向 sort, 方法是交换```_1``` 和 ```_2``` 的位置
+- Insert Iterator: takes a container yields a iterator, 当像iterator 赋值, iterator call container operations to add elements. ```it=t``` call  相应的```push```, ```insert```, ```*it, ++it, it++```没有实际意义, 有back_inserter(call ```push_back```), front_inserter (call ```push_front```)，还有```inserter```
+    - ```auto it = back_inserter(vec); ```, ```it=42``` 和 ```*it=42```是一样的 
+
+
 
 ***
 
@@ -4775,7 +4809,7 @@ std::vector<int>::iterator end_unique = std::unique (myvector.begin(), myvector.
                 end_unique                              
 ```
 
-#### (c), Customizing Operations
+#### (c), Lambda / Bind
 
 - A **predicate** is an expression that can be called and that returns a value that can be used <span style="color:red">as a condition</span>. Has two version:
     - **unary predicate**: they have a single parameter
@@ -4796,10 +4830,9 @@ std::vector<int>::iterator end_unique = std::unique (myvector.begin(), myvector.
     - parameter:
         - lambda中忽略parameter list 等于指定一个empty parameter list.
         - lambda 不能有<span style="color:red">默认参数</span>. 因此call lambda 的参数永远与lambda 的参数一样多
-    - When we define a lambda, the compiler generates a new (unnamed) class type that corresponds to that lambda, <span style="color:red">当函数传递一个lambda时, we define both a new type and an object of that type</span>: 传递的参数就是**an unnamed object** of this compiler-generated class type. 但我们跟使用```auto``` 定义一个lambda 变量的初始值时, define an **object** of the type generated from that lambda.
-        - By default, the class (generated from a lambda) contains a data member corresponding to the variables captured by the lambda
+    - When we define a lambda, <span style="color:red">the compiler generates a new (unnamed) class type that corresponds to that lambda and **an unnamed object** of that type</span>. 使用```auto``` 定义一个lambda 变量的初始值时, define an **object** of the type generated from that lambda.
         - 类似普通data members of any class, <span style="color:red">the data members of a lambda are initialized when a lambda object is created</span>.
-    - can also return a lambda from a function.  The function might directly return a **callable object** or the function might return **an object of a class that has a callable object as a data member**. 如果Function returns a lambda, 不能return a reference to a local varaibles (<span style="background-color:#FFFF00">不能有reference captures</span>)
+    - can also <span style="color:red">return **a lambda** from a function</span>.  The function might directly return a **callable object** or the function might return **an object of a class that has a callable object as a data member**(functor). 如果Function returns a lambda, 不能return a reference to a local varaibles (<span style="background-color:#FFFF00">不能有reference captures</span>)
 
 Capture: 
 - **Capture by value** ```auto f = [v1] { return v1; };```. 前提是变量必须是可以copy的，Unlike parameters, 被捕获的值是在lambda <span style="color:red">**创建时copy**</span> 而不是在被调用(call)时copy,因此随后的对其修改不会影响到lambda 内对应的值
@@ -4809,7 +4842,8 @@ Capture:
 - **Capture by Reference**: ```auto f2 = [&v1] { return v1; };```when use the variable inside the lambda body, 使用的是引用所绑定的对象, 比如返回```v1```, 返回的是```v1``` 指向对象的值
     - 必须确保 the referenced object exists at the time the lambda is executed(<span style="background-color:#FFFF00">被引用对象在lambda 执行时候是存在的)</span>.<span style="color:red">因为捕获的都是局部变量</span>. 这些变量在函数结束后就不存在了,如果lambda 可能在函数结束后执行, 捕获引用指向的局部变量已经消失
     - 捕获引用是有必要的, 比如函数接受一个```ostream```的引用,
-    - 一个variable captured by reference 是否可以改变 depends only on whether that reference refers to a ```const``` or nonconst type (如果variable 指向const object不能修改, 如果不是const 可以修改)
+    - 一个variable captured by reference 是否可以改变 depends only on whether that reference refers to a ```const``` or nonconst type (如果variable 指向const object不能修改, 如果不是const 可以修改);
+    	- ```const int a = 0; auto j = [&a] {cout << a << endl; };``` 不能在lambda 中 修改 a 的值
 - **Implicit Captures**: 可以让compiler根据lambda中代码infer which variables we use from the code. To direct the compiler to infer the capture list, we use an ```&```(capture by reference) or ```=```(capture by value) in the capture list.
 - **Mix implicit and explicit Capture**: 
     - 必须确保the first item in capture list is ```&```or ```=```
@@ -4827,7 +4861,7 @@ wc = find_if(words.begin(), words.end(),
 
 we can mix implicit and explicit captures:
 
-```x++
+```c++
 void biggies(vector<string> &words, vector<string>::size_type sz,
         ostream &os = cout, char c = ' ')
 {
@@ -4843,7 +4877,7 @@ for_each(words.begin(), words.end(),
 }
 ```
 
-**Mutable Lambdas**
+**Mutable Lambdas**: 也显示了capture by value时, 如果 值lambda 建立后, 在call function 前改变了, 不影响lambda function 内值 
 ```c++
 void fcn3()
 {
@@ -4919,7 +4953,7 @@ transform(vi.begin(), vi.end(), vi.begin(), [](int i) -> int
     -  ```newCallable``` is itself a callable object
     - ```arg_list``` is 逗号分隔的参数列表,对应给```callable```的parameter
         - 也许include names of the form ```_n```, n是整数, 这些参数是"placehorders"(in ```functional``` header),表示```newCallable``` parameters. They stand "in place of" the arguments that will be passed to ```newCallable```: ```_1``` 为```newCallable```第一个参数,```_2``` 为```newCallable```第二个参数
-        - The _n names are defined in a namespace named ```placeholders```, ```placeholders```定义在```std```中, 为了使用名字, 必须provide both namespaces. 下面例子中 calls to ```bind``` assume  the existence of appropriate using declarations, the ```using``` declaration for _1 is ```using std::placeholders::_1;```, 表示我们要使用命名```_1```
+        - The _n names are defined in a namespace named ```placeholders```(in ``std```), using declarations, for ```_1``` is ```using std::placeholders::_1;```, 表示我们要使用命名```_1```
         - Must provide a separate using declaration for each placeholder name that we use. 这么写容易出错<span style="color:red">**error-prone**</span>, 我们可以用```using namespace std::placeholders;```表示all the names from namespace accessible to our program
     - 当调用```newCallable```, ```newCallable```会调用```callable```, 并传递给它```arg_list```中的参数
 - can use bind to bind or rearrange the parameters in the given callable
@@ -4949,7 +4983,7 @@ auto wc = find_if(words.begin(), words.end(), [sz](const string &a)
 auto wc = find_if(words.begin(), words.end(), bind(check_size, _1, sz));
 ```
 
-can use bind to bind or rearrange the parameters in the given callable. 比如assume ```f``` is a callable object that has 5个参数, ```g```is the callable that takes 2 arguments, 传递给```g```的参数按安慰绑定到placeholder, 第一个参数绑定到```_1```, 第二个参数绑定到```_2```, 第一个参数将被传递给```f```的最后一个参数, 第二个参数将被传递给```f```的第三个参数
+can use bind to bind or rearrange the parameters in the given callable. 比如assume ```f``` is a callable object that has 5个参数, ```g```is the callable that takes 2 arguments, 传递给```g```的参数按顺序绑定到placeholder, 第一个参数绑定到```_1```, 第二个参数绑定到```_2```, 第一个参数将被传递给```f```的最后一个参数, 第二个参数将被传递给```f```的第三个参数
 ```c++
 // g is a callable object that takes two arguments 
 
@@ -5016,16 +5050,16 @@ for_each(words.begin(), words.end(), bind(print, ref(os), _1, ' '));
   - 如果```it``` is an iterator generated by ```inserter```, then an assignment as ```*it = val;``` 等于 ```it = c.insert(it,val); ++it;```
 
 ```c++
-list<int> 1st = {1,2,3,4};
+list<int> lst = {1,2,3,4};
 list<int> lst2, lst3; // empty lists
 
 
  // after copy completes, 1st2 contains 4 3 2 1
 
-copy(1st.cbegin(), lst.cend(), front_inserter(lst2));
+copy(lst.cbegin(), lst.cend(), front_inserter(lst2));
 // after copy completes, 1st3 contains 1 2 3 4
 
-copy(1st.cbegin(), lst.cend(), inserter(lst3, lst3.begin()));
+copy(lst.cbegin(), lst.cend(), inserter(lst3, lst3.begin()));
 
 //or 
 
@@ -5043,6 +5077,7 @@ copy(l.begin(), l.end(), ostream_iterator<int>(cout, ","));//print 1, 2,
 ```
 
 **back_inserter**; apply to ```fill_n```: 因为we passed an iterator returned by ```back_inserter```(back_iterator返回的迭代器), each assignment will call ```push_back``` on ```vec```
+一点主意下面例子的```copy``` 用于 ```ostream_iterator``` 而for_each 不用于 ```ostream_iterator``` 因为```for_each```最后一个argument 是 ```fn```, 要pass to argument to ```_Func(*itr);```, 而```copy``` 最后一个argument 是 ```iterator```, ``` *result = *first;``` 
 
 ```c++
 vector<int> vec; // empty vector
@@ -5065,6 +5100,57 @@ vector<int> vec; // empty vector
 fill_n(back_inserter(vec), 10, 0); // appends ten elements to vec
 
 ```
+
+**back_insert** class, C++14, ```addressof``` C++14 新feature
+```c++
+template <class Container> class back_insert_iterator :
+	public iterator<output_iterator_tag,void,void,void,void>
+{
+protected:
+  Container* container;
+public:
+   explicit back_insert_iterator (Container& x) : container(std::addressof(x)) {}
+  back_insert_iterator<Container>& operator= (const typename Container::value_type& value)
+    { container->push_back(value); return *this; }
+  back_insert_iterator<Container>& operator= (typename Container::value_type&& value)
+    { container->push_back(std::move(value)); return *this; }
+  back_insert_iterator<Container>& operator* ()
+    { return *this; }
+  back_insert_iterator<Container>& operator++ ()
+    { return *this; }
+  back_insert_iterator<Container> operator++ (int)
+    { return *this; }
+};
+```
+
+**insert_iterator**: 
+
+```c++
+template <class Container>
+  class insert_iterator :
+    public iterator<output_iterator_tag,void,void,void,void>
+{
+protected:
+  Container* container;
+  typename Container::iterator iter;
+
+public:
+  typedef Container container_type;
+  explicit insert_iterator (Container& x, typename Container::iterator i)
+    : container(std::addressof(x)), iter(i) {}
+  insert_iterator<Container>& operator= (const typename Container::value_type& value)
+    { iter=container->insert(iter,value); ++iter; return *this; }
+  insert_iterator<Container>& operator= (typename Container::value_type&& value)
+    { iter=container->insert(iter,std::move(value)); ++iter; return *this; }
+  insert_iterator<Container>& operator* ()
+    { return *this; }
+  insert_iterator<Container>& operator++ ()
+    { return *this; }
+  insert_iterator<Container> operator++ (int)
+    { return *this; }
+};
+```
+
 
 
 **(2). iostream Iterator**
