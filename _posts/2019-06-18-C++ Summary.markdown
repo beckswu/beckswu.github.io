@@ -100,8 +100,8 @@ Sequential Container
 - pure virtual function 可以被定义, 但只能定义在class外面
 - user 的 derived-to-base conversion 必须是public inheritance, derived的member and friend 无所谓, derived of derived可以用derived-to-base conversion 必须是public/protected的
 - friend 不是 transitive 和 inheritance 的 (清楚这个概念例子)
-- Derived class中 friend function, access base 的protected (base protected 也是derived protected) 成员能通过 derived-class object access, 不能通过base-class object
-- class friend function 可以从class 的 derived class 中获取class member， 但不能获取derived member 
+- <span style="color: red">Derived class中 friend function, access base 的protected (base protected 也是derived protected) 成员能通过 derived-class object access, 不能通过base-class object</span>. A derived B. B friend C, C 只能用 B 获取A的protected, public, cannot use A 取获取 A
+- <span style="color: red">class friend function 可以从class 的 derived class 中获取class member， 但不能获取derived member</span>. A friend C, A derived to B, C 中可以用 B 获取A的值
 - Name Lookup before type checking 
 - 可以用using declaration ```Derived d; d.Base::memfcn();``` change access level (base protected 变成 derived 的 public, base 的被hide了)
 - <span style="color:red">At Compile time: static type 决定什么member can be used</span> (也是virtual function定义在base 和 derived原因). 如果Derived 有 function ```fcn``` 而 Base 中没有, then ```Base *p = &d; p->fcn();```是error的， 因为static search scope, ```fcn``` 不在 ```Base``` 中
