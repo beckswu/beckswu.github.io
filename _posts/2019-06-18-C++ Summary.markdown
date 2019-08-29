@@ -105,6 +105,27 @@ Sequential Container
 - Name Lookup before type checking 
 - 可以用using declaration ```Derived d; d.Base::memfcn();``` change access level (base protected 变成 derived 的 public, base 的被hide了)
 - <span style="color:red">At Compile time: static type 决定什么member can be used</span> (也是virtual function定义在base 和 derived原因). 如果Derived 有 function ```fcn``` 而 Base 中没有, then ```Base *p = &d; p->fcn();```是error的， 因为static search scope, ```fcn``` 不在 ```Base``` 中
+- Derived-to-Base conversion 也适用于 smart pointer, 
+- 如没有virtual destructor, delete on pointer to base that points to derived object undefined
+- constructor 顺序: base -> derived. Destructor 顺序(**reverse order**) : derived -> base.
+- base constructor virtual call base version
+- Compiler treat type changes during construction or destruction. 因为base constructor run, derived 未生成, base destructor run, derived 已被摧毁
+- 1. synthesize copy constructor 自动call base defined/sythesized copy constructor. 2. user defined copy constructor 不会自动call base defined / sythesized copy constructor, 而call base default constructor. 若call base copy construction 需要显式call in derivation list (有**derived-to-base** conversion) 
+- 如果default constructor, copy/move constructor, copy/move assignment constructr 在 base class 是deleted/inaccessible, 则相应的 derived class synthesized member is deleted 因为没法call based 的
+- 如果 base destructor deleted,then derived class systhesized default,copy/move constructor is deleted
+- 如果base copy construction 被deleted, base/derived move constructor 是不能生成的
+- base 有destructor, derived/base class 没有move operation(copy operation deprecated)
+- inherit constructor:
+    - 可以inherit base constructor, 但不能inherit default, copy, and move constructor, assignment operator 因为compiler 会synthesize 如果不define
+    - using declaration for constructor, generate code,
+        - 不会change access level, derived class default intilizated 
+        - 不能specify explicit or constexpr, same as base
+        - default arguments 会生成多个递减argument
+        - 不会继承constructor with the same parameter, derived 代替base的
+    - inherit constructor 不算user-defined constructor
+- 可以定义lvalue / rvalue version of ```clone``` using reference qualifier. 
+
+
 
 ***
 
@@ -9663,9 +9684,9 @@ public:
 **3. Derived-Class Copy/Move constructor**
 
 - When a <span style="background-color:#FFFF00">**derived class**</span> defines a <span style="background-color:#FFFF00">**copy** or **move** operation</span>, that operation is responsible for copying or moving the entire object, including <span style="color:red">**base-class** members</span>
-    - 当用derived synthesized copy constructor 会call base (synthesized or defined) constructor 
-    - 当用derived defined copy constructor 但没有call base copy constructor, 会call base default constructor，因为没有explicitly 指出, 所以B 的copy constructor 会先initialize base member using base default constructor. 
-    - 当用derived defined copy constructor, <span style="color:red">**explicitly call** base copy constructor</span> putting in <span style="color:red">derived’s copy constructor **initializer list**</span> 这样initialize base member using base copy constructor. 
+    - derived <span style="color:red">**synthesized copy constructor**</span> 会自动call base (synthesized or defined) constructor 
+    - derived <span style="color:red">**defined copy constructor**</span> 但没有call base copy constructor, 会<span style="color:red">call **base default constructor**</span>，因为没有explicitly 指出, 所以B 的copy constructor 会先initialize base member using base default constructor. 
+    - derived <span style="color:red">defined copy constructor call base copy constructor</span>, <span style="color:red">**explicitly call** base copy constructor</span> in <span style="color:red">derived’s copy constructor **initializer list**</span> 这样initialize base member using base copy constructor. 
     - 如果self-define assignment operator in derived class, 同理必须**explicitly** **call copy / move assignment operator** in derived class copy/move assignment operator 
 
 ```c++
@@ -9693,9 +9714,13 @@ std::cout << "Creating B by copy" << std::endl;
 B b2(b1);
 /*
 Creating B
+
 A::Default constructor
+
 B::Default constructor
+
 Creating B by copy
+
 A::Copy constructor
 */
 ```
@@ -9727,10 +9752,15 @@ B b2(b1);
 return 0;
 /*
 Creating B
+
 A::Default constructor
+
 B::Default constructor
+
 Creating B by copy
+
 A::Default constructor
+
 B::Copy constructor
 */
 ```
@@ -9762,10 +9792,15 @@ std::cout << "Creating B by copy" << std::endl;
 B b2(b1);
 /*
 Creating B
+
 A::Default constructor
+
 B::Default constructor
+
 Creating B by copy
+
 A::Copy constructor
+
 B::Copy constructor
 */
 ```
@@ -9790,8 +9825,9 @@ public:
 
     /* initializers for members of D */ { /* ... */ }
  };
-
-D 的assignment operator, 注意因为是<span style="color:red">self-define assignment operator 并不会自动call base class synthesized/self-define assignment operator</span>,
+``` 
+ 
+D 的<span style="color:red">**assignment operator**</span>, 注意因为是<span style="color:red">self-define assignment operator 并不会自动call base class synthesized/self-define assignment operator</span>,
 ```c++
 // Base::operator=(const Base&) is not invoked automatically 
 
@@ -9845,7 +9881,7 @@ inherited constructor has **the same property**</span>
 
 #### (j). Containers and Inheritance
 
-不能push object in vector, 比如Quote 是 Bulk_quote 的base, 让 ```vector``` 存```Quote```, 但是当push ```Bulk_quote``` 进vector, vector 存放的就不在是 ```Bulk_quote``` object, 因为<span style="color:red">进行了 **derived-to-base** conversion and derived part is ignored</span>
+不能push object in vector, 比如Quote 是 Bulk_quote 的base, 让 ```vector``` 存```Quote```, 但是当push ```Bulk_quote``` 进vector, vector 存放的就不在是 ```Bulk_quote``` object, 因为<span style="color:red">进行了 **derived-to-base** conversion(在copy constructor, not pointer/reference) and derived part is ignored</span>
 ```c++
 vector<Quote> basket; 
 basket.push_back(Quote("0-201-82470-1", 50));
@@ -9945,7 +9981,7 @@ void add_item(Quote&& sale); // move the given object
 - 解决上面的问题可以定义 **clone function**
 - we have a **copy** and a **move** version of ```add_item```, we defined <span style="color:red">**lvalue** and **rvalue** versions of **clone**</span>. lvalue reference member copies itself into that newly allocated object; rvalue reference member moves its own data. 
 - Like ```add_item```, ```clone``` is overloaded based on whether its is called on **lvalue** or **rvalue**
-    - 需要注意的是 rvalue verson 的 ```sale``` 是<span style="color:red">**rvalue rference**</span>, 但<span style="color:red">```sale``` is **lvalue**</span>. 所以可以call ```move``` to bind an rvalue reference to ```sale```
+    - 需要注意的是 rvalue verson 的 ```sale``` 是<span style="color:red">**rvalue reference**</span>, 但<span style="color:red">```sale``` is **lvalue**</span>. 所以可以call ```move``` to bind an rvalue reference to ```sale```
 - ```clone``` function is vritual. Whether ```Quote``` or ```Bulk_quote``` function is run, 取决于 **dynamic type** of ```sale```. 无论是copy or move, ```clone``` 返回a pointer to newly allocated object. 因为<span style="color:red">```shared_ptr``` support **derived-to-base conversion**</span>, we can bind a ```shared_ptr<Quote>``` to a ```Bulk_quote*```
 
 
