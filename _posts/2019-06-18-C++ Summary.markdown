@@ -91,6 +91,7 @@ Sequential Container
 
 15.Object-Oriented Programming
 
+- **dynamic-binding**: decision as to which version to run depends on the type of the argument, 在run time 选择函数版本 (when a virtual member function is called through a reference or a pointer to a base-class type)
 - final, override 在parameter list, const, qualifier reference 之后
 - virtual function in base class 是 implicit virtual in all derived class
 - derived virtual function 跟base 不同signiture, 是不override base的
@@ -110,7 +111,7 @@ Sequential Container
 - constructor 顺序: base -> derived. Destructor 顺序(**reverse order**) : derived -> base.
 - base constructor virtual call base version
 - Compiler treat type changes during construction or destruction. 因为base constructor run, derived 未生成, base destructor run, derived 已被摧毁
-- 1. synthesize copy constructor 自动call base defined/sythesized copy constructor. 2. user defined copy constructor 不会自动call base defined / sythesized copy constructor, 而call base default constructor. 若call base copy construction 需要显式call in derivation list (有**derived-to-base** conversion) 
+- <span style="color: red">1. synthesize copy constructor 自动call base defined/sythesized copy constructor. 2. user defined copy constructor 不会自动call base defined / sythesized copy constructor, 而call base default constructor. 若call base copy construction 需要显式call in derivation list (有**derived-to-base** conversion)</span> 
 - 如果default constructor, copy/move constructor, copy/move assignment constructr 在 base class 是deleted/inaccessible, 则相应的 derived class synthesized member is deleted 因为没法call based 的
 - 如果 base destructor deleted,then derived class systhesized default,copy/move constructor is deleted
 - 如果base copy construction 被deleted, base/derived move constructor 是不能生成的
@@ -9169,7 +9170,7 @@ item = bulk; // calls Quote::operator=(const Quote&)
     - ```final```: 
     	- Preventing Inheritance. 通过定义 class as **final**: ```class NoDerived final ```, class 不能再被 inherited
 	    - 把function 定义成 **final** 表示不能再override, 比如 C 继承 B， B继承A, B override 的virtual from A as final 表示 C中不能再override 这个function
-    - ```final``` 和 ```override``` 都 span style="background-color:#FFFF00">specify parameter list, const,  reference qualifier 之后</span>
+    - ```final``` 和 ```override``` 都 <span style="background-color:#FFFF00">specify parameter list, const,  reference qualifier 之后</span>
  - 可以redefine a function in derived class the same name as virtual in base class 但是 <span style="color:red">不同的 parameter list</span>. Compiler 会认为这个function 不是override base class virtual function 
 - Virtual functions that have <span style="color:red">**default arguments** should use the same values in the base and derived classes</span>.
   -  <span style="background-color:#FFFF00">default argument bind at compiled time</span>, derived 的default argument 不会override base 的default
