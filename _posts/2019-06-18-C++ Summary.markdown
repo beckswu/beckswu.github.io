@@ -97,7 +97,8 @@ Sequential Container
 - derived virtual function 跟base 不同signiture, 是不override base的
 - 用scope operator prevent dynamic binding, 如果derived class 应该call base virtual, but fail to provide ```baseP->Base::fuc()```, infinite recursion
 - object access virtual, pointer/reference access nonvirtual  bound at compile time, 只有pointer/reference access virtual run time
-- static type vs dynamic type 
+- static type vs dynamic type: static type known at compile time. dynamic type know at run time. static type of a pointer or reference to a base class may differ from its dynamic type.
+- 只有reference/pointer call virtual function 才是runtime 决定的, reference/pointer call nonvirtual or object call virtual 都是compile time bound 
 - pure virtual function 可以被定义, 但只能定义在class外面
 - user 的 derived-to-base conversion 必须是public inheritance, derived的member and friend 无所谓, derived of derived可以用derived-to-base conversion 必须是public/protected的
 - friend 不是 transitive 和 inheritance 的 (清楚这个概念例子)
@@ -118,7 +119,7 @@ Sequential Container
 - base 有destructor, derived/base class 没有move operation(copy operation deprecated)
 - inherit constructor:
     - 可以inherit base constructor, 但不能inherit default, copy, and move constructor, assignment operator 因为compiler 会synthesize 如果不define
-    - using declaration for constructor, generate code,
+    - using declaration for constructor, generate code, ```using Base::Base``` 继承base all constructors
         - 不会change access level, derived class default intilizated 
         - 不能specify explicit or constexpr, same as base
         - default arguments 会生成多个递减argument
