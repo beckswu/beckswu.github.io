@@ -96,9 +96,10 @@ Sequential Container
 - derived virtual function 跟base 不同signiture, 是不override base的
 - 用scope operator prevent dynamic binding, 如果derived class 应该call base virtual, but fail to provide ```baseP->Base::fuc()```, infinite recursion
 - object access virtual, pointer/reference access nonvirtual  bound at compile time, 只有pointer/reference access virtual run time
+- static type vs dynamic type 
 - pure virtual function 可以被定义, 但只能定义在class外面
 - user 的 derived-to-base conversion 必须是public inheritance, derived的member and friend 无所谓, derived of derived可以用derived-to-base conversion 必须是public/protected的
-- friend 不是 transitive 和 inheritance 的 (清楚这个概念)
+- friend 不是 transitive 和 inheritance 的 (清楚这个概念例子)
 - Derived class中 friend function, access base 的protected (base protected 也是derived protected) 成员能通过 derived-class object access, 不能通过base-class object
 - class friend function 可以从class 的 derived class 中获取class member， 但不能获取derived member 
 - Name Lookup before type checking 
@@ -9590,30 +9591,22 @@ delete itemP;  // destructor for Bulk_quote called
 
 ```
 
-**3.Synthesized Copy Control and Inheritance**
+**2.Synthesized Copy Control and Inheritance**
 
-- Base-class 先constructor, then derived object constructor. <span style="color:red">当base-class constructor executing, derived part is unititialized</span>. 当derived object are **destroyed** in **reverse order**, <span style="color:red">当base-class destructor run, derived part 已经被destoryed</span>
+- <span style="color:red">constructor 顺序: base -> derived. Destructor 顺序(**reverse order**) : derived -> base</span>. 当base-class constructor executing, derived part unititialized. 当base-class destructor run, derived part 已经被destoryed
     - 所以在base class destructor execute member, the object is **incomplete**, 因为derived part 已经被删除
     - To accommodate this incompleteness, the compiler treats the object <span style="color:red">**type changes** during construction or destruction</span>. If a constructor or destructor calls a **virtual**, the **version** that is run is the one 与call 的 constructor/destructor 类型相同.
         - 在base constructor 里call virtual function, call base class version. 因为base class members 的还没有生成 
-- Derived-class constructor initializes the base-class of derived object 和 its own members. When a <span style="background-color:#FFFF00">**derived class**</span> defines a <span style="background-color:#FFFF00">**copy** or **move** operation</span>, that operation is responsible for copying or moving the entire object, including <span style="color:red">**base-class** members</span>
-    - 比如 C 继承 B, B 继承A, the synthesized C 的copy constructor uses the synthesized B 的copy constructor, 再用 synthesized A 的copy constructor.
--  If we want copy (or move) the base-class part, we must <span style="color:red">**explicitly** use the **copy (or move) constructor**</span> for the base class in the <span style="color:red">derived’s constructor **initializer list**</span>. 必须explicitly 放在derivation list, 否则不会自动call. 同理必须**explicitly** **call copy / move assignment operator** in derived class copy/move assignment operator
-- derived class **destructor** 只负责clean 自己的, 不用负责clean base class (implicitly destoryed, base class 是virtual destructor). <span style="color:red">顺序是与初始化顺序相反, 先run derrived destructor, then base-class destructor</span>
-- Class <span style="background-color:#FFFF00">*可以继承**base constructor**</span>, 但 <span style="color:red">**cannot inherit** the default, copy, and move constructors</span>. If the derived class does not directly define these constructors, the compiler synthesizes them 
-    - inherit base-class constructor by providing a <span style="color:red">**using declaraction**</span> that names its (direct) base class
-    - 通常情况下using declaration only <span style="color:red">makes a name **visible** in the current scope</span>. When applied to a <span style="color:red">**constructor**, a **using declaration** causes the compiler to **generate code**</span>. 因此对于<span style="color:red">每一个constructor in base</span>, compiler generates a constructor in derived that <span style="color:red">has the same parameter list</span>
-        - These compiler-generated constructors have the form ```derived(parms) : base(args) { }```
-        - 如果derived class 有任何data members of its own, 都**default initialized**
+- derived class **destructor** 只负责clean 自己的, 不用负责clean base class (implicitly destoryed, base class 是virtual destructor). 
+
     
-copy control:
-- If the <span style="background-color:#FFFF00">**default constructor**, **copy constructor**, **copy-assignment operator**, or **destructor**</span> in the **base class** is **deleted** or **inaccessible**</span> , then the corresponding member in the <span style="color:red">derived class</span>  is defined as <span style="color:red">**deleted**</span> , because the compiler can’t use the base-class member to construct, assign, or destroy the base-class part of the object.
-- If the <span style="background-color:#FFFF00">**base class** has an **inaccessible** or **deleted destructor**</span>, then the <span style="color:red">**synthesized default and copy constructors** in the **derived classes** are defined as **deleted**</span>, because there is no way to destroy the base part of the derived object.
-- The compiler will not **synthesize a deleted move operation**. If we use ```= default``` to **request a move operation**, it will be a **deleted** function in the derived if move 在base is deleted or inaccessible, because the base class part cannot be moved.
-- The **move constructor** is deleted if the **base class destructor** is **deleted** or **inaccessible**.
+**copy control**:
+- If the <span style="background-color:#FFFF00">**default constructor**, **copy constructor**, **copy-assignment operator**, **move constructor**, **move-assignment operator**, or **destructor**</span> in the <span style="background-color:#FFFF00"> **base class** is **deleted** or **inaccessible**</span> , then the corresponding member in the <span style="color:red">derived class</span>  is defined as <span style="color:red">**deleted**</span> , because the compiler can’t use the base-class member to construct, assign, or destroy the base-class part of the object.
+- If the <span style="background-color:#FFFF00">**base class** has an **inaccessible** or **deleted destructor**</span>, then the <span style="color:red">**synthesized default and copy/move constructors** in the **derived classes** are defined as **deleted**</span>, because there is no way to destroy the base part of the derived object.
 
 
-下面因为copy constructor defined, 不会生成move constructor for class B, 因为 B 不能copy or move
+
+下面因为copy constructor defined, <span style="background-color:#FFFF00">不会生成move constructor</span> for class B, 因为 B 不能copy or move
 ```c++
 class B{
 public:
@@ -9632,7 +9625,7 @@ D d3(std::move(d)); // error: implicitly uses D's deleted copy constructor
 
 ```
 
-因为大多数base class 定义了 virtual destructor. 因此 base classes 不会生成 move operations (copy operations deprecated). base class 没有move operation, derived class 也没有 synthesized. 因此, 如果定义move, 也应该定义copy, 因为只定义move, copy 不会生成. 下面例子
+因为大多数base class 定义了 virtual destructor. 因此 base classes 不会生成 move operations (copy operations deprecated). 从而derived class 也不 synthesized.如果定义move, 也应该定义copy, 因为只定义move, copy 不会生成. 下面例子
 ```Quote``` objects will be memberwise **copied**, **moved**, **assigned**, and **destroyed**. Moreover, classes derived from ```Quote``` will automatically obtain synthesized move operations as well
 
 ```c++
@@ -9653,7 +9646,131 @@ public:
 
 };
 ```
-当定义copy or move constructor for derived class, 必须<span style="color:red">use **base-class constructor**</span> to initialize base part of the object. 注意下面 ```Base(d)``` pass ```D``` object to base-class constructor 是 **derived-to-base conversion**. 因为base class copy constructor 接受是 const reference and copy the base part of ```d```. 假如copy constructor 忽略 base initializer ```Base(d)```, 那么Base 的 **default constructor** 用于 initialize base part. 很奇怪Base 是默认成员, 但是 derived 是copy 值
+
+```
+
+**Derived-Class Destructor**
+
+```c++
+class D: public Base { 
+public:
+    // Base::~Base invoked automatically
+    
+    ~D() { /* do what it takes to clean up derived members*/ }
+};
+```
+
+**3. Derived-Class Copy/Move constructor**
+
+- When a <span style="background-color:#FFFF00">**derived class**</span> defines a <span style="background-color:#FFFF00">**copy** or **move** operation</span>, that operation is responsible for copying or moving the entire object, including <span style="color:red">**base-class** members</span>
+    - 当用derived synthesized copy constructor 会call base (synthesized or defined) constructor 
+    - 当用derived defined copy constructor 但没有call base copy constructor, 会call base default constructor，因为没有explicitly 指出, 所以B 的copy constructor 会先initialize base member using base default constructor. 
+    - 当用derived defined copy constructor, <span style="color:red">**explicitly call** base copy constructor</span> putting in <span style="color:red">derived’s copy constructor **initializer list**</span> 这样initialize base member using base copy constructor. 
+    - 如果self-define assignment operator in derived class, 同理必须**explicitly** **call copy / move assignment operator** in derived class copy/move assignment operator 
+
+```c++
+//derived synthesized copy constructor
+
+class A {
+public:
+    A() {
+        std::cout << "A::Default constructor" << std::endl;
+    }
+    A(const A& rhs) {
+        std::cout << "A::Copy constructor" << std::endl;
+    }
+};
+class B : public A {
+public:
+    B() {
+        std::cout << "B::Default constructor" << std::endl;
+    }
+};
+
+std::cout << "Creating B" << std::endl;
+B b1;
+std::cout << "Creating B by copy" << std::endl;
+B b2(b1);
+/*
+Creating B
+A::Default constructor
+B::Default constructor
+Creating B by copy
+A::Copy constructor
+*/
+```
+
+
+```c++
+class A {
+public:
+    A() {
+        std::cout << "A::Default constructor" << std::endl;
+    }
+    A(const A& rhs) {
+        std::cout << "A::Copy constructor" << std::endl;
+    }
+};
+class B : public A {
+public:
+    B() {
+        std::cout << "B::Default constructor" << std::endl;
+    }
+    B(const B& rhs) {
+        std::cout << "B::Copy constructor" << std::endl;
+    }
+};
+std::cout << "Creating B" << std::endl;
+B b1;
+std::cout << "Creating B by copy" << std::endl;
+B b2(b1);
+return 0;
+/*
+Creating B
+A::Default constructor
+B::Default constructor
+Creating B by copy
+A::Default constructor
+B::Copy constructor
+*/
+```
+
+```c++
+class A {
+public:
+    A() {
+        std::cout << "A::Default constructor" << std::endl;
+    }
+    A(const A& rhs) {
+        std::cout << "A::Copy constructor" << std::endl;
+    }
+};
+
+class B : public A {
+public:
+    B() {
+        std::cout << "B::Default constructor" << std::endl;
+    }
+    B(const B& rhs):A(rhs) {
+        std::cout << "B::Copy constructor" << std::endl;
+    }
+};
+
+std::cout << "Creating B" << std::endl;
+B b1;
+std::cout << "Creating B by copy" << std::endl;
+B b2(b1);
+/*
+Creating B
+A::Default constructor
+B::Default constructor
+Creating B by copy
+A::Copy constructor
+B::Copy constructor
+*/
+```
+
+注意下面 ```Base(d)``` pass ```D``` object to base-class constructor 是 **derived-to-base conversion**. 因为base class copy constructor 接受是 const reference and copy the base part of ```d```. 假如copy constructor 忽略 base initializer ```Base(d)```, 那么Base 的  <span style="color:red">**default constructor**</span> 用于 initialize base part. 
 
 ```c++
 class Base{/* ... */}; 
@@ -9673,9 +9790,8 @@ public:
 
     /* initializers for members of D */ { /* ... */ }
  };
-```
 
-D 的assignment operator, 注意<span style="color:red">assignment operator 并不会自动call base class assignment operator</span>, 都可以call base class 的assignment operator 无论base 的是 自己定义的 还是synthesized的
+D 的assignment operator, 注意因为是<span style="color:red">self-define assignment operator 并不会自动call base class synthesized/self-define assignment operator</span>,
 ```c++
 // Base::operator=(const Base&) is not invoked automatically 
 
@@ -9691,18 +9807,14 @@ D &D::operator=(const D &rhs)
 }
 ```
 
-**Derived-Class Destructor**
 
-```c++
-class D: public Base { 
-public:
-    // Base::~Base invoked automatically
-    
-    ~D() { /* do what it takes to clean up derived members*/ }
-};
-```
 
-**Inherited Constructors**: 一个class 可以继承constructor(provide using declaration), 但<span style="color:red">不能继承default, copy and move constructors</span>
+### (i). Inherited Constructors: 
+- Class <span style="background-color:#FFFF00">*可以继承**base constructor**</span>, 但 <span style="color:red">**cannot inherit** the default, copy, and move constructors</span>. If the derived class does not directly define these constructors, the compiler synthesizes them 
+    - inherit base-class constructor by providing a <span style="color:red">**using declaraction**</span> that names its (direct) base class
+    - 通常情况下using declaration only <span style="color:red">makes a name **visible** in the current scope</span>. When applied to a <span style="color:red">**constructor**, a **using declaration** causes the compiler to **generate code**</span>. 因此对于<span style="color:red">每一个constructor in base</span>, compiler generates a constructor in derived that <span style="color:red">has the same parameter list</span>
+        - These compiler-generated constructors have the form ```derived(parms) : base(args) { }```
+        - 如果derived class 有任何data members of its own, 都**default initialized**
 
 ```c++
 class Bulk_quote : public Disc_quote { 
@@ -9718,17 +9830,20 @@ Bulk_quote(const std::string& book, double price, std::size_t qty, double disc):
     Disc_quote(book, price, qty, disc) { }
 ```
 
+
+
 **Characteristics of an Inherited Constructor**
 - Unlike using declarations for ordinary members, a constructor using declaration <span style="background-color:#FFFF00">does not **change the access level**</span> of the inherited constructor(s). 比如regardless of where the using declaration, base 的private constructor 在derived 还是private, base 的 protected constructor 在 derived 还是 protected 
 -  a using declaration <span style="background-color:#FFFF00">**can’t specify explicit or constexpr**</span>. If a constructor in the base is explicit or constexpr , the <span style="color:red">
 inherited constructor has **the same property**</span>
-- If a base-class constructor has <span style="background-color:#FFFF00">**default arguments**</span>, those arguments <span style="background-color:#FFFF00"are not **inherited**</span>. Instead, the derived class gets <span style="color:red">**multiple inherited constructors**</span> in which each parameter with a  <span style="color:red">default argument is **successively omitted**</span>. 比如base class 有一个constructor with two parameters, second has default-value, 在derived class 将会有两个constructors, 一个with both parameters (第二个没有default), 另一个只有一个parameters(left-most, non-defaulted parameter) 
+- If a base-class constructor has <span style="background-color:#FFFF00">**default arguments**</span>, those arguments <span style="background-color:#FFFF00">are not **inherited**</span>. Instead, the derived class gets <span style="color:red">**multiple inherited constructors**</span> in which each parameter with a  <span style="color:red">default argument is **successively omitted**</span>. 
+    - 比如base class 有一个constructor with two parameters, second has default-value, 在derived class 将会有两个constructors, 一个with both parameters (第二个没有default), 另一个只有一个parameters(left-most, non-defaulted parameter) 
 - derived class 会继承大多数base constructor,但有两个例外
     - 例外一: <span style="color:red">derived class defines a constructor with **the same parameters** as base class</span>, base 这些constructor 不会继承, <span style="color:red">derived defined constructor 会 代替 base 的</span>
     - 例外二: <span style="background-color:#FFFF00">**default**, **copy**, and **move constructor** 不会被inherited</span>. 这些函数不被继承, 而<span style="color:red">按照规则被synthesize</span>  
 - <span style="background-color:#FFFF00">**Inherited constructor** 不被 treat as **user-defined** constructor</span>, 因为class <span style="color:red">只包括了 inherited constructor 会有 synthesized default constructor</span>
 
-#### (i). Containers and Inheritance
+#### (j). Containers and Inheritance
 
 不能push object in vector, 比如Quote 是 Bulk_quote 的base, 让 ```vector``` 存```Quote```, 但是当push ```Bulk_quote``` 进vector, vector 存放的就不在是 ```Bulk_quote``` object, 因为<span style="color:red">进行了 **derived-to-base** conversion and derived part is ignored</span>
 ```c++
@@ -9805,6 +9920,7 @@ double Basket::total_receipt(ostream &os) const {
 
     }    
     os << "Total Sale: " << sum << endl; // print the final overall total
+
     return sum;
 
 }
@@ -9859,6 +9975,7 @@ public:
     { items.insert(std::shared_ptr<Quote>(sale.clone())); }
     
     void add_item(Quote&& sale) // move the given object 
+    
     { items.insert(
         std::shared_ptr<Quote>(std::move(sale).clone())); } // other members as before
 
