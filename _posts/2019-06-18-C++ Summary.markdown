@@ -10139,6 +10139,317 @@ public:
 ```
 
 
+**15.9. Text Queries Revisited**
+
+把之前的shared_ptr 做了下更改加上了```get_file``` function 和 ```begin```, ```end``` iterator
+
+```c++
+//顺序 先run TextQuery query 然后再print result 
+
+ifstream is("file.txt");
+TextQuery tq(is);
+QueryResult qr = tq.query("has");
+print(cout, qr);
+
+class QueryResult
+{
+     friend ostream& print(ostream&, const QueryResult&);
+public:
+     using line_no = vector<string>::size_type;
+     QueryResult(string s, shared_ptr<set<line_no>>p, shared_ptr<vector<string>>f) :
+	 sought(s), lines(p), file(f) {}
+     shared_ptr<vector<string>>get_file() const {
+	return file;
+     }
+     set<line_no>::const_iterator cbegin() const { return lines->cbegin();}
+     set<line_no>::iterator begin() { return lines->begin(); }
+     set<line_no>::const_iterator cend() const { return lines->cend(); }
+     set<line_no>::iterator end() { return lines->end(); }
+     string sought;
+     shared_ptr<set<line_no>>lines;
+     shared_ptr<vector<string>>file;
+};
+
+string make_plural(size_t ctr, const string& word, const string& ending) {
+     return ctr > 1 ? word : word + ending;
+}
+
+
+ostream& print(ostream& os, const QueryResult& qr) {
+     os << qr.sought << " occurs " << qr.lines->size()
+	<< " " << make_plural(qr.lines->size(), "time", "s") << endl;
+
+     for (auto num : *qr.lines) 
+	 os << "(line " << num + 1 << " " << (*qr.file)[num] << endl;
+     return os;
+}
+
+class TextQuery
+{
+public:
+     TextQuery(ifstream&);
+     QueryResult query(const string&) const;
+private:
+     using line_no = vector<string>::size_type;
+     shared_ptr<vector<string>>file;
+     map <string, shared_ptr<set<line_no>>>wm;
+};
+
+TextQuery::TextQuery(ifstream& is):file(new vector<string>) {
+    string text;
+    while (getline(is,text)) {
+	int n = file->size();
+	file->push_back(text);
+	istringstream line(text);
+	string word;
+	while (line >> word) {
+	     auto& lines = wm[word]; 
+	     if (!lines) 
+	          lines.reset(new set<line_no>);     
+	     lines->insert(n); 
+	}
+    }
+}
+
+QueryResult TextQuery::query(const string& sought) const {
+     static shared_ptr<set<line_no>>empty = make_shared<set<line_no>>();
+     auto loc = wm.find(sought);
+     if (loc == wm.end())
+	return QueryResult(sought, empty, file);
+     return QueryResult(sought, loc->second, file);
+}
+```
+
+现在像改进上面方面让他们work for some operator 比如 ```&```, ```|```, ```~```, 比如下面例子
+```
+1 has 
+2 not
+3 has
+5 not 
+6 we do
+```
+run ```Query q = Query("1") & Query("has") | ~Query("not");```返回 
+```
+(（1 & has） | ~(not)) occurs 3 time 
+(line 1) 1 has 
+(line 3) 3 has 
+(line 6) 6 we do 
+```
+
+通过定义operator overloading, 我们想让有这样的structure 
+```
+			
+		Query_base 
+		/    |      \
+               /     |        \
+	WordQuery   NotQuery   BinaryQuery
+			       /   \
+			      /     \
+			 AndQuery    orQuery 
+```
+
+Query是user call, 如果call Query时
+- 没有operator, 会initialze WordQuery 作为QueryBase(Query 的member), call eval 时 直接用``` t.query(单个word) ```, t是 TextQuery 类
+- 如果周围有operator, 会右元的operator 中定义是 初始化AndQuery, OrQuery, or NotQuery 作为QueryBase(Query 的member)
+
+因为Query 是QueryBase friend, 所以当最后eval时,call QueryBase 的private virtual 找 dynamic type(WordQuery? AndQuery? OrQuery? NotQuery?) 真正的virtual runtime version
+
+```c++
+//call 下面code 的方法是：
+
+ifstream is("file.txt");
+TextQuery tq(is);
+Query q = Query("1") & Query("has") | ~Query("not");
+QueryResult qr = q.eval(tq);
+print(cout, qr);
+
+
+//因为不能instanitate class, all members non public
+
+//member of Query will call Query_base
+
+//定义virtual private 是因为 call virtual 是右元 friend call, private 可以被access
+
+class Query_base
+{
+     friend class Query;
+protected:
+     using line_no = TextQuery::line_no;
+     virtual ~Query_base() = default;
+private:
+     virtual QueryResult eval(const TextQuery&) const = 0;
+     virtual std::string rep() const = 0;
+};
+
+
+//private constructor: 因为operator 是 friend, 可以access 
+
+class Query {
+     friend Query operator~(const Query&);
+     friend Query operator|(const Query&, const Query&);
+     friend Query operator&(const Query&, const Query&);
+public:
+     Query(const string&);
+     QueryResult eval(const TextQuery& t) const {
+          return q->eval(t);
+     }
+     std::string rep() const {
+          return q->rep();
+     }
+private:
+     Query(std::shared_ptr<Query_base>query) : q(query) {}//可以有type conversion
+     
+     shared_ptr<Query_base>q;
+};
+
+std::ostream& operator<< (ostream& os, const Query& query) {
+     os << query.rep();
+     return os;
+}
+
+
+class WordQuery :public Query_base {
+     friend class Query;
+     WordQuery(const string& s) : query_word(s) {}
+     QueryResult eval(const TextQuery& t) const override {
+          return t.query(query_word);
+     };
+     std::string rep() const override {
+          return query_word;
+     }
+     string query_word;
+};
+
+
+inline Query::Query(const std::string& s) : q(new WordQuery(s)) {}
+
+class NotQuery : public Query_base {
+     friend Query operator~(const Query&);
+     NotQuery(const Query& q) : query(q) {}
+     string rep() const { return "~(" + query.rep() + ")"; }
+     QueryResult eval(const TextQuery& t)const override;
+     Query query;
+};
+
+inline Query operator~(const Query& operand) {
+     return shared_ptr<Query_base>(new NotQuery(operand));
+}
+
+//shared_ptr<Query_base>(new NotQuery(operand)); 等同于
+
+//allocate a new NotQuery objet and 
+
+//binding the result NotQuery pointer to a shared_ptr<Query_base>
+
+//shared_ptr<Query_base> tmp ( new NotQuery(expr)); 
+
+// return Query(tmp);
+
+
+//注意: BinaryQuery 没有define eval 继承 pure Virtual. BinaryQuery是abstract class
+
+class BinaryQuery : public Query_base {
+protected:
+     BinaryQuery(const Query& l, const Query& r, string s) :
+          lhs(l), rhs(r), opSym(s) {}
+     string rep() const override {
+          return "(" + lhs.rep() + " " + opSym + "" + rhs.rep() + ")";
+     }
+     Query lhs, rhs;
+     string opSym;
+};
+
+
+
+//AndQuery 和 OrQuery 继承 BinaryQuery的rep, 但是overrides the eval function
+
+class AndQuery :public BinaryQuery {
+     friend Query operator& (const Query&, const Query&);
+     AndQuery(const Query& left, const Query& right) :
+     BinaryQuery(left, right, "&") {}
+     QueryResult eval(const TextQuery&)const override;
+};
+
+inline Query operator&(const Query& lhs, const Query& rhs) {
+     return shared_ptr<Query_base>(new AndQuery(lhs, rhs));
+}
+
+class OrQuery : public BinaryQuery {
+     friend Query operator| (const Query&, const Query&);
+     OrQuery(const Query& left, const Query& right) :
+          BinaryQuery(left, right, "|") {}
+     QueryResult eval(const TextQuery&) const override;
+};
+
+inline Query operator|(const Query& lhs, const Query& rhs) {
+      return shared_ptr<Query_base>(new OrQuery(lhs, rhs));
+}
+
+
+//Or eval function, union
+
+//因为lhs,rhs 都有一样file, get_file 来自于哪个都可以的
+
+QueryResult  OrQuery::eval(const TextQuery& text) const {
+     QueryResult right = rhs.eval(text), left = lhs.eval(text);
+     auto ret_lines = make_shared<set<line_no>>(left.cbegin(), left.cend());
+     ret_lines->insert(right.cbegin(), right.cend());
+     return QueryResult(rep(), ret_lines, left.get_file());
+}
+
+
+//And eval function, interesection
+QueryResult AndQuery::eval(const TextQuery& text) const {
+     QueryResult right = rhs.eval(text), left = lhs.eval(text);
+     auto ret_lines = make_shared<set<line_no>>(); 
+     //不可以写 shared_ptr<set<lines_no>> ret_lines 否则是未初始化的pointer
+     
+     
+     set_intersection(left.cbegin(), left.cend(), right.cbegin(), right.cend(),
+		inserter(*ret_lines, ret_lines->begin()));
+     shared_ptr<set<line_no>> rhs_ret_lines = 
+     		make_shared<set<line_no>>(right.cbegin(), right.cend());
+     return QueryResult(rep(), ret_lines, left.get_file());
+}
+
+//Not eval function,
+QueryResult NotQuery::eval(const TextQuery& text)const {
+     QueryResult result = query.eval(text);
+     auto ret_lines = make_shared<set<line_no>>();
+     auto it = result.cbegin(), end = result.cend();
+     for (size_t i = 0; i < result.get_file()->size(); i++) {
+          if (it != end && i == *it) ++it;
+	  else ret_lines->insert(i);
+     }
+     return QueryResult(rep(), ret_lines, result.get_file());
+}
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ***
 
 <br/><br/><br/>
