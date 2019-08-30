@@ -93,7 +93,18 @@ Sequential Container
     - 可以用```bind``` 就根据一个predicate 同时来正向反向 sort, 方法是交换```_1``` 和 ```_2``` 的位置
 - Insert Iterator: takes a container yields a iterator, 当像iterator 赋值, iterator call container operations to add elements. ```it=t``` call  相应的```push```, ```insert```, ```*it, ++it, it++```没有实际意义, 有back_inserter(call ```push_back```), front_inserter (call ```push_front```)，还有```inserter```
     - ```auto it = back_inserter(vec); ```, ```it=42``` 和 ```*it=42```是一样的 
-
+- type use ```istream_iterator``` reads 必须有 ```>>``` input operator defined. ```ostream_iterator``` 使用对象必须有 ```<<``` defined
+- ```istream_iterator``` lazy initialization: delay 读取, construct 不读取，只有```*it``` 才读取
+    - ```istream_iterator```默认值是off-the-end value,```ostream_iterator``` 不存在off-the-end iterator
+    - ```ofstream_iterator``` 的 ```++``` 是 read next value from input stream ```ofstream_iterator``` 的 ```++``` 没有实际作用
+    - 例子 读取到```vector```, ```stream_iterator<int>in_iter(cin),eof;vector<int> vec(in_iter, eof);```
+- ```reverse_iterator``` ```++it```移动到上一个, ```--it``` 移动到下一个
+    - 获取reverse iterator ```rbegin```, ```rend```, ```crbegin```(最后一个element位置), and ```crend```(是在begin开始前的iterator)
+    - ```base``` 是 next element to the ```reverse_iteartor``` pointing to
+- Forward Iterator 跟 Birectional iterator 比 只多了 decrement(反向), 两个都是可以read and write, multi-pass, increment
+- Input, output iterator 是 single pass 的, 用于比如find, accumulate, istream_itearator 
+- Random-access iterators: 需要const-time access to any position, 像pointer 支持subscript operator: 跟forward, birectional iterator 比多 subtraction operator, 生成distance betweeen operators 
+- 优先考虑 list 和 forward_list 自己的算法
 
 
 ***
@@ -5162,9 +5173,9 @@ public:
     - the type that an ```istream_iterator``` reads must have an input operator defined. (比如```int```, ```string``` 都有input operator defined)
     - 当我们create an ```istream_iterator```, we can bind it to a stream (绑定到流上).
     - 还可以使用默认initialize iterator constructor, which creates an iterator that we can use as the off-the-end value (可以当尾后使用的迭代器)
-    -  An iterator bound to a stream is equal to the end iterator(用默认```iostream iterator```constructor 生成的iterator) once its associated stream hits end-of-file or encounters an IO error.
+    -  An iterator bound to a stream is equal to the end iterator(用默认```iostream_iterator```constructor 生成的iterator) once its associated stream hits end-of-file or encounters an IO error.
     - ```istream_iterators``` Are Permitted to Use Lazy Evaluation: 当绑定流到 ```istream_iterator```, 不保证it will 立即 read the stream. The implementation is permitted to delay reading the stream until we use the iterator. 我们保证的是: 在一次dereference the iterator前, the stream will have been read. 
-        - 对于大多程序, 何时读取没有差别, 但是如果我们创建一个```istream+iterator```， 没有读取就销毁了, 或者我们从两个不同的对象同步读取the same stream，那么合适读取就很重要了
+        - 对于大多程序, 何时读取没有差别, 但是如果我们创建一个```istream_iterator```， 没有读取就销毁了, 或者我们从两个不同的对象同步读取the same stream，那么何时读取就很重要了
 - ```ostream_iterator```: 可以对任何具有输出运算符的(```<<```)的对象定义```ostream_iterator```,当创建```ostream_iterator```, 可以提供一个a character string as second argument, 在输出每个元素后都会打印这个字符串, 字符串必须是C-style character string (string literal or a pointer to a null terminated array)
     - 必须将```ostream_iterator``` 绑定到一个指定的流上
     - <span style="background-color:#FFFF00">There is no empty or off-the-end ostream_iterator</span>
@@ -5306,7 +5317,30 @@ cout << string(rcomma.base(), line.cend()) << endl;
 
 可以看到```base``` 和不加base指向不同元素
 
-![](/img/post/C++/iterator.PNG)
+![](/img/post/C++/iterator.png)
+
+iterator 到 reverse_iterator, reverse_iterator 会像前推一位
+```c++
+vector<int> v = { 0, 10, 20, 25,30,60};
+ostream_iterator<int>os(cout, ",");
+using RevIt = reverse_iterator<vector<int>::iterator>;
+{
+	const auto it = v.begin() + 3;
+	RevIt r_it(it);
+	cout << " base ";  *os = *it; cout << endl;
+	//print 25; 
+	
+} {
+	RevIt r_end(v.begin());
+	RevIt r_begin(v.end());
+	for (auto i = r_begin; i != r_end; i++) {
+		*os++ = *i;
+	}
+	//60,30,25,20,10,0, 
+	
+}
+```
+	
 
 
 #### (e). Structure of Generic Algorithms
@@ -5315,7 +5349,7 @@ Iterator Categories, 有五种: Each algorithm specifies what kind of iterator m
 1. **Input iterator**: Read, but not write; single pass, increment only
 2. **Output iterator**: Write, but not read; single pass, increment only
 3. **Forward iterator**: Read and write, multi-pass, increment only
-4. **Birectional iteator**: Read and write, multi-pass, increment and decrement
+4. **Birectional iterator**: Read and write, multi-pass, increment and decrement
 5. **Random-access iteator**: Read and write, multi-pass, full iterator arithmetic
 
 - The standard specifies the minimum category for each iterator parameter of the generic and numeric algorithms: 算法需要iterator 的最小类别
@@ -5331,7 +5365,7 @@ Iterator Categories, 有五种: Each algorithm specifies what kind of iterator m
 
 **Input iterator**  用于顺序访问(sequentially).  ```*it++``` is 保证 valid, 但是递增它可能导致所有其他指向流的iterator 失效, 因此no guarantee that we  can save the state of input iterator and examine an element through that saved iterator. 只能用于single-pass algorithm, 例如```find```, ```accumulate```, ```istream_iterator``` are input iterators.
 
-**Input iterator** 可以想成**Input iterator**的补集. Output iterator must provide 
+**Output iterator** 可以想成**Input iterator**的补集. Output iterator must provide 
 - Prefix and postfix increment ```++```
 - Dereference ```*``` 只能作为left-hand side of an assignment (Assigning to a dereferenced output iterator 就是 writes to the underlying element.)
  
