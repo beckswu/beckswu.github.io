@@ -66,20 +66,20 @@ Sequential Container
 
 ***
  
-10. Generic Algorithms
+10: Generic Algorithms
 - Algorithm never execute container operations, 不会改变size, 但是会add / remove elements using inserters
 - Algorithm not check write operations: 假设destionation 足够大hold elements, 如果空间不够, undefined behavior. 确保有足够空间用inserter
 - equal 比较两个sequences hold the same value. 可以是不同容器, 一个是vector, 一个是list
-- accumulate 可以用 ```string("")``` 作为第三个参数, 但不能用 ```""``` 因为no accumlate for ```const char*```
+- accumulate 可以用 ```string("")``` 作为第三个参数, 但不能用 ```""``` 因为no accumlate for ```const char*```, 因为char pointer 没有定义 ```+```
 - unique 因为不能改变容器大小, 返回an iterator that denotes the end of the range of the unique value
 - predicate can be returns a value used as condition
 - **callable object**: ```e(args)```
 - **lambda function**: ```[capture list] (parameter list) -> return type { function body }```
     - capture list capture local nonstatic varaibles 比如 ```cout``` 无需 capture
     - 可以省略 parameter list or return type 或两个都省略
-    - 不能有parameters has default value 
+    - <span style="color:red">不能有parameters has default value </span>
 - lambda capture by value: 捕获指 是 创建时 而不是调用时的值, 随后修改被调用没有影响
-    - <span style="color:red">如果想改变 capture value 的值， 加mutable, 有mutable 不能省略 parameter list 可以省略return type </span>
+    - <span style="color:red">如果想改变 capture value 的值， 加mutable, 有mutable 不能省略 parameter list. 但可以省略return type </span>
     - 若value is pointer, lambda copy 值和 外面的 值 指向一个object, object 改变, value的pointer object 值也变, 要确保pointer valid when 执行lambda function
 - lambda capture by reference ```[&v1] ```, 必须确refereneced object 存在 当执行lambda function 时候
     - capture by reference 是否可以改变取决于 object 是不是const 
@@ -89,7 +89,7 @@ Sequential Container
 - bind: ```auto newCallable = bind(callable, arg_list); ```, 
     - ```arg_list``` 可以有placeholder ```_1, _2``` 表示给```newCallable``` 第一/二个参数, 可以rearrange, ```_2``` 在 ```_1``` 前面
     - using declaration is ```using std::placeholders::_1```
-    - 可以bind reference. 用```ref```, 比如IO类
+    - 可以bind 传 reference. 用```ref```, 比如IO类
     - 可以用```bind``` 就根据一个predicate 同时来正向反向 sort, 方法是交换```_1``` 和 ```_2``` 的位置
 - Insert Iterator: takes a container yields a iterator, 当像iterator 赋值, iterator call container operations to add elements. ```it=t``` call  相应的```push```, ```insert```, ```*it, ++it, it++```没有实际意义, 有back_inserter(call ```push_back```), front_inserter (call ```push_front```)，还有```inserter```
     - ```auto it = back_inserter(vec); ```, ```it=42``` 和 ```*it=42```是一样的 
@@ -105,7 +105,6 @@ Sequential Container
 - Input, output iterator 是 single pass 的, 用于比如find, accumulate, istream_itearator 
 - Random-access iterators: 需要const-time access to any position, 像pointer 支持subscript operator: 跟forward, birectional iterator 比多 subtraction operator, 生成distance betweeen operators 
 - 优先考虑 list 和 forward_list 自己的算法
-
 
 ***
 
