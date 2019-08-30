@@ -6815,7 +6815,6 @@ class TextQuery {
         TextQuery(std::ifstream&);
         QueryResult query(const std::string&) const;
     private:
-        std::shared_ptr<std::set<line_no>>> wm;
         std::shared_ptr<std::vector<std::string>> file; // input file
         
         // map of each word to the set of the lines in which that word appears 
