@@ -166,7 +166,7 @@ Sequential Container
     - using declaration for constructor, generate code, ```using Base::Base``` 继承base all constructors
         - 不会change access level, derived class default intilizated 
         - 不能specify explicit or constexpr, same as base
-        - default arguments 会生成多个递减argument
+        - default arguments 会生成多个递减argument constructor
         - 不会继承constructor with the same parameter, derived 代替base的
     - inherit constructor 不算user-defined constructor
 - 可以定义lvalue / rvalue version of ```clone``` using reference qualifier. 
