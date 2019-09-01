@@ -9965,7 +9965,7 @@ D &D::operator=(const D &rhs)
 
 
 
-### (i). Inherited Constructors: 
+#### (i). Inherited Constructors: 
 - Class <span style="background-color:#FFFF00">*可以继承**base constructor**</span>, 但 <span style="color:red">**cannot inherit** the default, copy, and move constructors</span>. If the derived class does not directly define these constructors, the compiler synthesizes them 
     - inherit base-class constructor by providing a <span style="color:red">**using declaraction**</span> that names its (direct) base class
     - 通常情况下using declaration only <span style="color:red">makes a name **visible** in the current scope</span>. When applied to a <span style="color:red">**constructor**, a **using declaration** causes the compiler to **generate code**</span>. 因此对于<span style="color:red">每一个constructor in base</span>, compiler generates a constructor in derived that <span style="color:red">has the same parameter list</span>
@@ -10457,12 +10457,11 @@ QueryResult NotQuery::eval(const TextQuery& text)const {
 
 ## 16. Templates and Generic Programming
 
-#### (a). Defining a Template
+#### (a). Function Templates
 
 - 比如overload functions and only parameter differs. 有多个repeat function body is <span style="color:red">**error-prone**</span>
   - 比如```compare``` function 可以overload很多个**built-in** type 版本, <span style="color:red">但是cannot work 如果是user compare user-defined type(class)</span>
 
-**1.Function Templates**
 
 A template definition starts with the keyword <span style="background-color:#FFFF00">**template**</span> followed by a <span style="background-color:#FFFF00">**template parameter list**</span>, which is a <span style="background-color:#FFFF00">comma-separated list of one or more **template parameters**</span> bracketed by the less-than (<) and greater-than (>) tokens.
 
@@ -10558,7 +10557,7 @@ template <typename T> inline T min(const T&, const T&);
 inline template <typename T> T min(const T&, const T&);
 ```
 
-**2. Template Compilation**
+#### (b). Template Compilation
 
 - When the compiler sees the definition of a template, it does not generate code. <span style="color:red">**generates code** only when we instantiate a **specific** instance of the template</span>. 
     - <span style="color:red">when **use** tempalte 才generate code 而不是define 时候</span>, 这个affects how we organize our source code and when errors are detected
@@ -10603,6 +10602,223 @@ cout << compare(data1, data2) << endl; // error: no < on Sales_data
 
 
 
+#### (a). Class Template
+
+- 不同于function template, <span style="color:red">compiler **cannot deduce** class template parameter types</span> 
+    - user must specify element type is a list of <span style="background-color:#FFFF00">**explicit template arguments**</span> that are bound to the template's parameters. Compiler 用这些 template arguments to <span style="color:red">instantiate specific class</span> from template.
+        - 当compile instantiates a class from tmplate, 会 <span style="color:red">**rewrites** template</span>, <span style="color:red">replacing</span> each instance of the template parameter T by the <span style="color:red">given template argument</span>
+        - 用一个template, template argument不同, 会<span style="background-color:#FFFF00">instantiate 不同的**distinct** classes</span>. Each **instantiation** of a class template <span style="color:red">constitutes an independent class</span>. The type ```Blob<string>``` has no relationship to, or any special access to, the members of any other Blob type.
+- class template name 不是type, 当class template 被实例化, type always includes template argument(s).
+- member function:
+    - member <span style="color:red">defined **inside** the template class body are **implicitly inline**</span>
+    - 每个instantiation of class has its **own version** of each member. 因此template class function 跟他们的template class itself <span style="color:red">都有一样的**template parameters**</span>. 所以在class 外面定义function, <span style="color:red">需要用 keyword ```template``` followed by class' template parameter list</span>
+    - By default, a <span style="color:red">**member**</span> of an instantiated class template is <span style="color:red">**instantiated** only if the member is **used**</span>. member 再被用的时候才被初始化. <span style="color:red">如果function 不被用到,, it is not instantiated</span>
+        - <span style="background-color:#FFFF00">这使得也许某一type 不 meet requirement for some template's operations. 我们也可以instatntiate a class with that type</span> (比如, template 有的function 需要这个type, 有```+``` overloading, 但是没有用到这个template function, 所以没关系)
+    - 一个例外是: Inside the <span style="color:red">**scope of a class**</span> template, we may <span style="color:red">refer to the template without specifying template argument(s)</span>., 比如return type (value or reference, or inside template class function). 因为在class scope, <span style="color:red">compiler treats **references** to the template itself 就像提供了template arguments 一样</span>. 
+    - 但是<span style="color:red">在template 外面定义时候, 记得return type is **not in class scope**, 需要提供template argument</span>. we are not in the scope of the class until the class name is seen
+- template class 的声明 ```template<typename> class Blob``` 不用加T, 也可以加T ```template<typename T> class Blob``` 
+- template operator 的定义 ```template<type T> bool operator==<T>(const Blob<T>&, const Blob<T>& );``` 只能用于```T``` 类的比较
+
+e.g. 
+```c++
+template<typename T>class Blob{
+public: 
+    typedef T value_type;
+    typedef typename vector<T>::size_type size_type;
+    //constructors
+
+    Blob();
+    Blob(std::initializer_list<T>il);
+    size_type size () const {return data->size();}
+    bool empty() const {return data->empty();}
+    //add and remove elements
+
+    void push_back(const T & t) {data->push_back(t);}
+    void push_back(const T &&t) {data->push_back(std::move(t));}
+    void pop_back();
+    T& back();
+    T& operator[] (size_type i);
+private: 
+    std::shared_ptr<std::vector<T>>data;
+    void check(size_type i, const std::string& msg) const;
+};
+
+Blob<int> ia; // empty 
+
+Blob<int> Blob<int> ia2 = {0,1,2,3,4}; // Blob<int> with five elements
+
+```
+
+定义```Blob<int>``` 等同于 把所有```T``` 都换成 ```int```
+```c++
+template<> class Blob<int>{
+    typedef typename std::vector<int>::size_type size_type; Blob();
+    Blob(std::initializer_list<int> il);
+    // ...
+
+    int& operator[](size_type i);
+private:
+    std::shared_ptr<std::vector<int>> data;
+    void check(size_type i, const std::string &msg) const;
+};
+};
+```
+不同的template argument 生成不同的class, 比如下面code would trigger instantiations of two distinct classes. 
+```
+Blob<string> names; // Blob that holds strings 
+
+Blob<double> prices;// different element type
+
+```
+
+**定义template class member outside class**: 用keyword template +  template parameter, 因为每个template class instantiation 都有自己version of class. General form 如下
+```c++
+template <typename T>
+ret-type Blob<T>::member-name(parm-list)
+```
+Blob function 定义 其中 subscript operator 和 ```back``` 还可以overload const version. constructor 有default constructor 和 接受```initializer_list```
+
+```
+template<typename T>
+void Blob<T>::check（size_type i, const std::string &msg) const
+{
+    if (i >= data->size())
+        throw std::out_of_range(msg);
+}
+template <typename T> T& Blob<T>::back()
+{
+    check(0, "back on empty Blob");
+    return data->back();
+}
+template <typename T>
+T& Blob<T>::operator[](size_type i)
+{
+    check(i, "subscript out of range"); 
+    return (*data)[i];
+}
+template <typename T> void Blob<T>::pop_back()
+{
+    check(0, "pop_back on empty Blob");
+    data->pop_back();
+}
+template <typename T>
+Blob<T>::Blob(): data(std::make_shared<std::vector<T>>()) { }
+template <typename T> Blob<T>::Blob(std::initializer_list<T> il):
+data(std::make_shared<std::vector<T>>(il)) { }
+```
+
+Template member function <span style="color:red">**被实例化** 只当 程序use that member function</span>
+
+```c++
+\\instantiates Blob<int> and the initializer_list<int> constructor
+Blob<int> squares = {0,1,2,3,4,5,6,7,8,9}; 
+
+// instantiates Blob<int>::size() const
+for (size_t i = 0; i != squares.size(); ++i)
+    squares[i] = i*i; // instantiates Blob<int>::operator[](size_t)
+
+```
+one exception to the rule that we must supply template arguments when we use a class template type. Inside the scope of the class template itself, we may <span style="color:red">use the name of the template without arguments</span>. 注意return type of prefix increment/decrement 返回 ```BlobPtr``` 和 ```BlobPtr&```, 而不是 ```BlobPtr<T>&```. 
+
+```c++
+// BlobPtr throws an exception on attempts to access a nonexistent element 
+
+template <typename T> class BlobPtr{
+public:
+    BlobPtr(): curr(0) { } 
+    BlobPtr(Blob<T> &a, size_t sz = 0):
+        wptr(a.data), curr(sz) { } 
+    T& operator*() const
+    { 
+        auto p = check(curr, "dereference past end");
+        return (*p)[curr]; // (*p) is the vector to which this object points
+    } 
+    // increment and decrement
+
+    BlobPtr& operator++(); // prefix operators 
+    
+    BlobPtr& operator--();
+private:
+    // check returns a shared_ptr to the vector if the check succeeds 
+    
+    std::shared_ptr<std::vector<T>>check(std::size_t, const std::string&) const;
+
+    // store a weak_ptr, which means the underlying vector might be destroyed 
+    
+    std::weak_ptr<std::vector<T>> wptr;
+    std::size_t curr; // current position within the array
+
+};
+
+//span style="color:red">compiler treats references to the template itself 
+
+//就像提供了template arguments 一样
+
+BlobPtr& operator++(); 
+BlobPtr& operator--();
+//等同于
+BlobPtr<T>& operator++(); 
+BlobPtr<T>& operator--();
+```
+值得注意的是,return type 是outside scope of the class, 必须 specify that the return with the same type(template argument) as the class. 在function body, in scope of class and do not repeat template argument (当define ```ret```), <span style="color:red">compiler 会assumes we are using the same type as member's instantiation</span>. 
+
+```c++
+// postfix: increment/decrement the object but return the unchanged value 
+template <typename T>
+BlobPtr<T> BlobPtr<T>::operator++(int)
+{
+    // no check needed here; the call to prefix increment will do the check 
+    
+    BlobPtr ret = *this; // save the current value
+
+    ++*this; // advance one element; prefix ++ checks the increment 
+    
+    return ret; // return the saved state
+
+}
+```
+
+**Class Templates and Friends**
+- 当一个class 含有 friend declaration, class and friends 可以两个都是template, 一个是，或一个都不是. 
+    - class template 有一个 nontemplate friend 保证了 <span style="background-color:#FFFF00">friend access to all the instantiation of the class template</span>
+    - class template 有一个 template friend, 可以给all friend template 的class template access 或给 特定的 friend template 的class template access
+
+
+**One-to-One Friendship** (只能是同一个type 之间的friendship)
+
+最常见的friendship between 一个class template 和 其他的template (可以是class or function) 是建立在 friendship between instantiations of the class and its friends. 比如下面例子 ```Blob``` 有 friend ```BlobPtr``` 和 ```Blob``` equlity operator 
+
+下面例子, 
+- 需要先 声明 ```BlobPtr``` 和 ```Blob``` , 这些是 operator ```==``` 函数参数声明以及 ```Blob``` 友元声明需要的. 
+- <span style="background-color:#FFFF00">Blob **friend declaratons** use Blob's **template parameter** as their own template argument</span>. 
+- 因此friensdhip 限定在相同type 实例化 的 Blob 和 BlobPtr 相等运算运算之前. members of ```BlobPtr<char>``` 可以access nonpublic parts of ```Blob<char>```, 但是 ```Blob<char>``` 对```Blob<int>``` 没有special access 或者 其他instantiation of ```Blob``` 
+
+```
+// forward declarations needed for friend declarations in Blob
+
+template <typename> class BlobPtr;
+template <typename> class Blob; // needed for parameters in operator== 
+
+template <typename T>
+    bool operator==(const Blob<T>&, const Blob<T>&); 
+
+template <typename T> 
+class Blob {
+    // each instantiation of Blob grants access to the version of
+
+    // BlobPtr and the equality operator instantiated with the same type
+    
+    friend class BlobPtr<T>; friend bool operator==<T>
+    (const Blob<T>&, const Blob<T>&); 
+    // other members as in § 12.1.1 
+
+};
+
+Blob<char> ca; // BlobPtr<char> and operator==<char> are friends 
+
+Blob<int> ia; // BlobPtr<int> and operator==<int> are friends
+
+```
 
 
 
