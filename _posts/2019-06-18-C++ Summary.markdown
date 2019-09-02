@@ -2213,6 +2213,8 @@ print(j, end(j) - begin(j));
 
 **(6).Array Reference Parameters** 只有需要change the value, 采用Array reference, 如果不改变value, 用 pointer to const, 当有引用时, <span style="background-color:#FFFF00">只能传入与引用size 一样维度的array,**size matters**</span>, 比如下面的function, 只能传入size = 10的, <span style="color:red">只有当reference 传入时候才能用for_range loop 因为function pass的是array, 不是reference传入的 function pass的是pointer</span>  
 
+<span style="background-color:#FFFF00">**Array 被当做reference 传入 不会转换为pointer type**</span>
+
 ```c++
 void print(int (&arr)[10])
 //括号不能少
@@ -11186,6 +11188,154 @@ Blob<int> a2(vi.begin(), vi.end());
 
  Blob<string> a3(w.begin(), w.end());
 ```
+
+#### (h). Instantiations
+
+- 当template 被用的时候 才实例化, 意味着: <span style="background-color:#FFFF00">**same instantiatio**n may appear in multiple object files</span>
+    - When <span style="color:red">two or more separately compiled source files use the same template with the same template arguments</span>, 每一个soure file 中都含有template 的一个实例
+    - 在large systems,  the <span style="color:red">**overhead** of instantiating the same template in multiple files can become significant</span>
+    - 可以avoid this overhead through an **explicit instantiation**.
+        - 当<span style="color:red">
+compile 看见 **extern template declaration**, **不会generate code** for that instantiation in that file</span> 
+        -  Declaring an <span style="color:red">instantiation as **extern** 保证不会有 nonextern use</span> of that instantiation elsewhere in program. <span style="color:red">可以有多个 extern declarations for a given instantiation but **只能有一个 definition**</span> for that instantiation
+        -  因为compiler 自动instantiates a template when use it, 所以 <span style="color:red">**extern declaration** 必须出现在code 使用实例化之前</span>
+        -  file 的 ```.o``` 文件不会包括 被定义了 extern template classs的instantiation, 会包括没有被定义extern template class 的实例化. 
+        -  There <span style="color:red">must be an **explicit instantiation definition(实例化定义)** somewhere in the program</span> for every instantiation declaration.
+        -  当compiler 看见instantiation 定义(as opposed to a declaration), it generates code. 当build application, <span style="color:red">必须 link 有extern template definition 的 ```.o``` with 用到extern template的file</span> (e.g```Application.o```)
+- <span style="background-color:#FFFF00">**Instantiation Definitions Instantiate All Members**</span>: 与普通class template instantiations 不同, <span style="color:red">compiler instantiates all member of that class 因为不知道which member functions the program uses. 即使没有用到这个member, member也会被实例化</span>. 
+  - 因此, An instantiation definition can be <span style="color:red">used only for **types**</span> that can be used with <span style="color:red">**every member function**</span> of a class template.
+
+
+**An explicit instantiation**: 用下面的形式
+
+```c++
+extern template declaration; // instantiation declaration 
+
+template declaration; // instantiation definition
+
+
+//例子
+// instantion declaration and definition
+
+extern template class Blob<string>; // declaration
+
+template int compare(const int&, const int&); // definition
+
+```
+
+例子1: 比如一个```Application.cc``` file: 比如 ```sa1```,```sa2```,```i``` 的instantiation 会出现在任其他位置, 而```a1```, ```a2```实例化 会只出现在这个file (```Application.cc```). <span style="background-color:#FFFF00">```Application.o``` 会包括了 ```Blob<int>``` along with the ```initializer_list``` 和 copy constructor. 但是```compare<int>``` function 和 ```Blob<string>```class 不会instantiated in ```Application.o```</span>. <span style="color:red">```compare<int>``` 和 ```Blob<string>```的  definitions 在其他 program file 中</span> 
+
+```c++
+// Application.cc
+
+// these template types must be instantiated elsewhere in the program
+
+extern template class Blob<string>;
+extern template int compare(const int&, const int&); 
+Blob<string> sa1, sa2; // instantiation will appear elsewhere
+
+// Blob<int> and its initializer_list constructor instantiated in this file
+
+Blob<int> a1 = {0,1,2,3,4,5,6,7,8,9};
+Blob<int> a2(a1); // copy constructor instantiated in this file
+
+int i = compare(a1[0], a2[0]); // instantiation will appear elsewhere
+
+```
+
+例子2: 实例化定义
+
+```c++
+///templateBuild.cc 
+
+// instantiation file must provide a (nonextern) definition for every 
+
+// type and function that other files declare as extern
+
+template int compare(const int&, const int&);
+template class Blob<string>; // instantiates all members of the class template
+
+```
+
+
+**Efficiency and Flexibility**
+
+- smarter pointer type 展示了一个好的template design
+- Override default deleter. ```shared_ptr``` 可以 passing a callable object when we create or reset pointer. 相反 ```deleter``` 是 ```unique_ptr``` 的 type 一部分(template parameters). User 必须提供that deleter type as an explcit template argument 当定义```unique_ptr```
+- 如果访问deleter 是对性能有重要影响
+    - ```shared_ptr```
+        - ```shared_ptr``` 不 hold deleter as member 因为 type of deleter 不知道 until run time. 可以改变deleter type at ```shared_ptr``` lifetime. 可以假设 ```shared_ptr``` stores the pointer it manages in a member named```p```. deleter 通过```del``` 去access 
+        - ```del ? del(p) : delete p; // del(p) requires run-time jump to del's location```. ```del(p)``` 运行时需要跳转到 ```del```的地址
+        - <span style="color:red">deleter stored indirectly</span>, call ```del(p)``` 需要run-time jump to location stored in ```del```  to execute the code to which ```del``` points (需要一次运行时的跳转操作，转到del中保存的地址来执行)
+    - ```unique_ptr```
+        - ```unique_ptr``` template parameter 有两个，一个是type that ```unique_ptr``` manages 里一个是 表示 deleter 的type. 因为type of deleter 是 part of type or ```unique_tpr```. <span style="color:red">因此deleter type 必须known at compile time</span>
+        - <span style="color:red">deleter store directly `` in ```unique_ptr``` object, **no run-time overhead**</span>
+        - ```del(p); // no run-time overhead``` del 可以是default deleter type or user-supplied type.没关系 the code that wil be executed is known at compile time. 如果Deleter 类似于 上面```DebugDelele``` class, call 可以是 inlined at compile time 
+- Binding the deleter at **compile time**, <span style="color:red">unique_ptr **avoids the run-time cost** of an indirect call to its deleter</span>. By binding the deleter at run time, <span style="color:red">**shared_ptr** makes it easier for users to override the deleter</span>.
+
+
+#### (i). Template Argument Deduction
+
+- The process of <span style="background-color:#FFFF00">**determining the template arguments** from the function arguments</span> is known as <span style="background-color:#FFFF00">**template argument deduction**</span>.
+    - compiler 根据argument find template argument 来generate a **best match** 的 vesion of function 
+- function template argument -> parameter conversion
+    - <span style="background-color:#FFFF00">**top level const**</span> either in parameter or argument <span style="background-color:#FFFF00">都会被 **ignored**</span>
+    - const conversions: argument 是 <span style="background-color:#FFFF00">**a reference (or pointer) to nonconst object**</span> -> parameter 是 <span style="background-color:#FFFF00">**reference (or pointer) to const object**</span>
+    - <span style="background-color:#FFFF00">**如果parameter 不是 reference type**</span>, <span style="color:red">A **array** argument 将会被 convert to a **pointer** to its first element. A **function** argument will be converted to a **pointer** to the function's type.</span>
+    - Other conversions, 比如 <span style="color:red">**arithmetic conversion**, **derived-to-base conversion**, and **user-defined conversion**(通过constructor) 是不会被执行的</span>
+    - 注: <span style="color:red">**const conversions**</span> and <span style="color:red">**array or function to pointer**</span> are the only <span style="color:red">**automatic conversions**</span> for <span style="color:red">**arguments to parameters**</span> with template types.
+
+**Conversions**
+
+例子中 T 是value type, call ```fobj```, ```const string``` to value (top-level const 被忽略). call ```fref```, ```s1``` from ````string``` to ```const string&``` 是合法的. 在数组例子中, 因为size 不一样, 类型不同, 在call ```fobj```, 数组大小无关紧要, 因为会convert to pointer. 但是对于 ```fref``` 是非法的, <span style="color:red">因为parameter 是 reference, array 不会convert to pointer</span>, ```a``` 和 ```b``` 类型不一样
+
+```c++
+template <typename T> T fobj(T, T); // arguments are copied 
+
+template <typename T> T fref(const T&, const T&); // references
+
+string s1("a value");
+const string s2("another value");
+
+fobj(s1, s2); // calls fobj(string, string); const is ignored 
+
+fref(s1, s2); // calls fref(const string&, const string&)
+            
+            // uses premissible conversion to const on s1 
+
+int a[10], b[42];
+fobj(a, b); // calls f(int*, int*)
+
+fref(a, b); // error: array types don't match
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
