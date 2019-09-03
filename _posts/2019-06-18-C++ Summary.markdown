@@ -10812,7 +10812,7 @@ BlobPtr<T> BlobPtr<T>::operator++(int)
 }
 ```
 
-#### (d). Class Template Friends
+#### (d). Friends
 - 当一个class 含有 friend declaration, class and friends 可以两个都是template, 一个是，或一个都不是. 
     - class template 有一个 nontemplate friend 保证了 <span style="background-color:#FFFF00">friend access to all the instantiation of the class template</span>
     - class template 有一个 template friend, 可以给all friend template 的class template access 或给 特定的 friend template 的class template access
@@ -10922,7 +10922,7 @@ template <typename Type>class Bar{
 };
 ```
 
-#### (d). Template Type Aliases
+#### (d). Type Aliases
 
 - 可以用 ```typedef``` 在 template class refers to the <span style="color:red">**instantiated class**</span>, 比如 ```typedef Blob<string> StrBlob;```
 - 因为template 不是 type, <span style="color:red">cannot define a typedef refers to a template</span>. 不能定义 a typedef  ```typedef Blob<T> TBlob```
@@ -10944,7 +10944,7 @@ partNo<Vehicle> cars; // cars is a pair<Vehicle, unsigned>
 
 ```
 
-#### (e). Static Members Class Templates
+#### (e). Static Members
 
 - <span style="color:red">Each instantiation</span> of class has its <span style="color:red">**own instance**</span> of the <span style="color:red">**static members**</span>. 每一个class 实例都有自己的 static member 成员
 - 与其他static data member 相同, <span style="color:red">只能有一个definition of each static</span> data member of a template class. class 外定义时候需要加 ```template parameter list```， <span style="color:red">**separate** ```ctr``` will be **instantiated** for different class instances 并初始化 0</span>
@@ -11227,7 +11227,7 @@ Blob<int> a2(vi.begin(), vi.end());
 - 当template 被用的时候 才实例化, 意味着: <span style="background-color:#FFFF00">**same instantiatio**n may appear in multiple object files</span>
     - When <span style="color:red">two or more separately compiled source files use the same template with the same template arguments</span>, 每一个soure file 中都含有template 的一个实例
     - 在large systems,  the <span style="color:red">**overhead** of instantiating the same template in multiple files can become significant</span>
-    - 可以avoid this overhead through an **explicit instantiation**.
+    - 可以avoid this overhead through an **explicit instantiation** which suppress implicit instantiation. 包括了two parts: **explicit instantiation declaration** and **explicit instantiation definition** (Implicit instantiation 是：只有用到时候才instantiation )
         - 当<span style="color:red">
 compile 看见 **extern template declaration**, **不会generate code** for that instantiation in that file</span> 
         -  Declaring an <span style="color:red">instantiation as **extern** 保证不会有 nonextern use</span> of that instantiation elsewhere in program. <span style="color:red">可以有多个 extern declarations for a given instantiation but **只能有一个 definition**</span> for that instantiation
@@ -11238,6 +11238,10 @@ compile 看见 **extern template declaration**, **不会generate code** for that
 - <span style="background-color:#FFFF00">**Explicit Instantiation Definitions Instantiate All Members**</span>: 与普通class template instantiations 不同, <span style="color:red">compiler instantiates all member of that class 因为不知道which member functions the program uses. 即使没有用到这个member, member也会被实例化</span>. 
   - 因此, An instantiation definition can be <span style="color:red">used only for **types**</span> that can be used with <span style="color:red">**every member function**</span> of a class template.
 
+
+> From StackOverflow
+> <span style="color:red">**explicit instantiation** is useful **when creating library(.lib) files that uses templates** for distribution</span>, uninstantiated template definitions are not put into object (.obj) files.
+> 比如: ```std::basic_string<char,char_traits<char>,allocator<char> >``` (which is ```std::string```) so every time you use functions of std::string, <span style="color:red">the same function code doesn't need to be copied to objects</span>. The compiler only need to refer (link) those to ```libstdc++```.)
 
 **An explicit instantiation**: 用下面的形式
 
@@ -11287,6 +11291,61 @@ int i = compare(a1[0], a2[0]); // instantiation will appear elsewhere
 
 template int compare(const int&, const int&);
 template class Blob<string>; // instantiates all members of the class template
+
+```
+
+>from IBM: Implicit Instantiation:只有用到时候才初始化
+
+- ```x<int>*q```: <span style="color:red">declare a pointer to class, class的definition not needed and class 不会implcitly instantiated</span>
+- ```s->g()``` 才会实例化```X<float>``` and  ```X<float>::g()```
+- compiler 不需要下面defintion 的实例化 
+     -  <span style="background-color:#FFFF00">class X   当declare ```p```</span> 
+     - ```X<int>``` when pointer q declared
+     - ```X<float>``` when pointer s declared
+- class 会implicitly instantiate 如果有<span style="background-color:#FFFF00">**pointer conversion**</span> or <span style="background-color:#FFFF00">**pointer to member conversion**</span> or <span style="background-color:#FFFF00">当delete pointer</span>
+-  如果compiler 实例化template class 有static member, 这些static member不会被实例化. <span style="color:red">Compiler 实例化static member 只有当用static member时候</span>. Every instantiated class template specialization has its own copy of static members
+
+```c++
+template<class T> class X {
+  public:
+    X* p;
+    void f();
+    void g();
+1};
+
+X<int>* q;
+X<int> r;//实例化 X<int>
+
+X<float>* s;
+r.f(); //实例化 X<int>::f()
+
+s->g(); //实例化 X<float> and  X<float>::g()
+```
+
+会实例化如果有pointer conversion (derived-to-base), ```B<double>* r = p;``` 实例化 ```D<double>```, ```delete q``` 实例化 ```D<int>```
+```c++
+template<class T> class B { };
+template<class T> class D : public B<T> { };
+void g(D<double>* p, D<int>* q)
+{
+  B<double>* r = p;
+  delete q;
+}
+```
+
+Compiler 实例化static member 只有当用static member时候.
+
+```c++
+template<class T> class X {
+public:
+   static T v;
+};
+template<class T> T X<T>::v = 0;
+
+X<char*> a;
+X<float> b;
+X<float> c;
+a.v //实例化 static member v
 
 ```
 
