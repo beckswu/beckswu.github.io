@@ -174,6 +174,34 @@ Sequential Container
 
 
 ***
+16. Templates and Generic Programming
+
+- function template
+    - T 可以用作 return type, function parameter type, variable declaration or cast
+    - nontype parameter 是 value 而不是 type 
+- template declaration and definition in the header file. 因为template generate code when instantiation
+- function can deduce template parameter, but class cannot
+- class template member function 只有被用到才被实例化
+- 如果return type is template parameter, 定义在class 外面,not in class scope,need to specify if type defined inside class ```Blob<T>::type```
+- inside class scope, 不用specify template parameter, 因为assume we use the same type as member's instantiation
+- template parameter 会 hides any declaration of that name in outer scope
+- 如果使用default template argument, 用的时候 用```Blob<>```
+    Nontype Template Parameters
+    Compilation Errors Are Mostly Reported during Instantiation
+- 告诉compiler we use type not static member, use **typename**
+- class 的member template cannot be virtual. class template parameter come first, then member parameter list 
+-  explicit instantiation: ```extern```
+    - 当compiler 看见 ```extern``` 不会generate code
+    - file 的 ```.o``` 文件不会包括 被定义了 extern template classs的instantiation
+    - 必须link 有extern class 的定义 的```.o``` file 与 用到 extern template 的 file ```.o``` file 
+    - explicit instantiation: compiler instantiates all member of that class
+- function template argument conversion
+    - top level const ignore
+    - const conversion, 没有lower-const pointer / reference 给有lower-const pointer/reference 
+    - array/function to pointer type
+    - 不可以 arithmetic conversion, derived-to-base conversion, and user-defined conversion
+
+***
 
 ## 2. Variable and Basic Types
 
@@ -10462,13 +10490,13 @@ QueryResult NotQuery::eval(const TextQuery& text)const {
 #### (a). Function Templates
 
 - 比如overload functions and only parameter differs. 有多个repeat function body is <span style="color:red">**error-prone**</span>
-  - 比如```compare``` function 可以overload很多个**built-in** type 版本, <span style="color:red">但是cannot work 如果是user compare user-defined type(class)</span>
+  - 比如```compare``` function 可以overload很多个**built-in** type 版本, <span style="color:red">但是对于compare user-defined type(class) 无法work, 因为不知道 user 怎么定义class</span>
 
 
 A template definition starts with the keyword <span style="background-color:#FFFF00">**template**</span> followed by a <span style="background-color:#FFFF00">**template parameter list**</span>, which is a <span style="background-color:#FFFF00">comma-separated list of one or more **template parameters**</span> bracketed by the less-than (<) and greater-than (>) tokens.
 
 - Compare function 是 <span style="color:red">**reference to const**</span>. 确保types 不能被copied. 许多types, 包括built-in types 除了 ```unique_ptr``` 和 ```IO``` types 都可以copies. 不allow copy, make is faster for large objects
-- 注: 只需要定义 ```<``` operator 既可以, 无需提供 ```>```, 如果concerned **type independence** and **portability**, 应该定义function using ```less``` , 原来版本缺陷是, 如果定义pointers. <span style="color:red">如果两个pointers not point to the array, code is undefined</span>
+- 注: passing in 的 ypede只需要定义 ```<``` operator 既可以, 无需提供 ```>```, 如果concerned **type independence** and **portability**, 应该定义function using ```less``` , 原来版本缺陷是, 如果定义pointers. <span style="color:red">如果两个pointers not point to the array, code is undefined</span>
 
 ```c++
 template<typename T>
@@ -10491,7 +10519,7 @@ template <typename T> int compare(const T &v1, const T &v2)
 
 - In a template definition, the <span style="background-color:#FFFF00">**template parameter list cannot be empty**</span>.
     - When use a template, 需要 specify either <span style="color:red">**implicitly** or **explicitly**</span> - **template arguments** to bind to the **template parameter(s)**. 
-    - use name ```T``` to refer to a type. 实际type ```T``` determined at <span style="color:red">**compile time**</spanbased on how ```compare``` is used. 
+    - use name ```T``` to refer to a type. 实际type ```T``` determined at <span style="color:red">**compile time**</span> based on how ```compare``` is used. 
 - 当 function template, compiler <span style="background-color:#FFFF00">uses the arguments of the call to **deduce template arguments**</span>. 比如下面例子argument 是 ```int```. The compiler deduce ```int``` as template argument and <span style="color:red">bind that to template parameter</span> ```T```. 
     - compiler uses the deduced template parameter(s) to **instantiate** a specific version of function. 会用<span style="color:red">**actual** template arguments 代替 corresponding template parameter(s)</span>
 - <span style="color:red">**type parameter**</span>: 上面例子中的 ```T```. Type parameter 可以用作 <span style="background-color:#FFFF00">**return type**</span> or <span style="background-color:#FFFF00">**function parameter type**</span>, and for <span style="background-color:#FFFF00">**varaible declarations**</span> or <span style="background-color:#FFFF00">**casts**</span> inside the function
@@ -10499,8 +10527,8 @@ template <typename T> int compare(const T &v1, const T &v2)
 - <span style="color:red">**Nontype Template Parameters**</span>: can define templates that nontype parameters. A **nontype parameter** represents a <span style="color:red">**value**</span> rather than a type. 
     - Nontype parameter 是 <span style="color:red">specified by type name</span> 而不是 keyword class or typename 
     -  <span style="color:red">An argument **bound** to a **nontype parameter** 必须是**constant expression**</span>. Arguments bound to a pointer or reference nontype parameter must have <span style="color:red">**static lifetime**(静态生存期, 在stack上, 而不是heap)</span> 所以<span style="color:red">不能是local(nonstatic) object or a dynamic object as **nontype template argument**</span> 来作为reference or pointer 的参数. A **pointer parameter** can also be instantiated by **nullptr** or a **zero-valued constant expression**
-    - 当template is <span style="color:red">**instantiated**</span>, <span style="color:red">**nontype parameters**</span> are replaced with a **value**</span> supplied by the user or <span style="color:red">deduced by the compiler</span>. <span style="color:red">Values 必须是  **constant expression**</span>, 允许compiler to instantiate the templates during compile time.
-- function template 可以被 declared ```inline``` or ```constexpr``` 必须是 nontemplate function. ```inline``` 和 ```constexpr``` 需要在template paramerter list 之后, return type 之前
+    - 当template is <span style="color:red">**instantiated**</span>, <span style="color:red">**nontype parameters**</span> are replaced with a <span style="color:red">**value**</span> supplied by the user or <span style="color:red">deduced by the compiler</span>. <span style="color:red">Values 必须是  **constant expression**</span>, 允许compiler to instantiate the templates during compile time.
+- function template 可以被 declared ```inline``` or ```constexpr``` defined same as nontemplate function. ```inline``` 和 ```constexpr``` 需要在template paramerter list 之后, return type 之前
 - Template programs should try to minimize the number of requirements placed on the argument types. (比如定义template 不能接受pointer 就是 minimize requirement of argument types)
 
 Compiler 使用argument to deduce the type, 比如下面
@@ -10563,9 +10591,9 @@ inline template <typename T> T min(const T&, const T&);
 #### (b). Template Compilation
 
 - When the compiler sees the definition of a template, it does not generate code. <span style="color:red">**generates code** only when we instantiate a **specific** instance of the template</span>. 
-    - <span style="color:red">when **use** tempalte 才generate code 而不是define 时候</span>, 这个affects how we organize our source code and when errors are detected
-- 通常上call function, compile 只需看见declaration for the function. 同样当使用 objects of class type, class definition 必须 available, 但是definitions of member functions 不需要present, 因此defintions and function declarations in header files and class-member functions 的definition in source files.
-    - 但是template are different, To generate an instantiation, <span style="color:red">the compiler needs</span> to have the code that <span style="color:red">**defines a function template** or **class template member function**</span>. As a result, unlike nontemplate code, <span style="color:red">**Definitions** of **function templates** and** member functions** of class templates are ordinarily put into **header files**.</span>
+    - <span style="color:red">when **use** template 才generate code 而不是define 时候</span>, 这个affects how we organize our source code and when errors are detected
+- 通常上call function, compiler 只需看见declaration for the function. 同样当使用 objects of class type, class definition 必须 available, 但是definitions of member functions 不需要present, 因此defintions and function declarations in header files and class-member functions 的definition in source files.
+    - 但是template are different, To generate an instantiation, <span style="color:red">the compiler needs</span> to have the code that <span style="color:red">**defines a function template** or **class template member function**</span>. As a result, unlike nontemplate code, <span style="color:red">**Definitions** of **function templates** and **member functions** of class templates are ordinarily put into **header files**.</span>
 
 
 **Key Concept: Templates and Headers**
@@ -10609,7 +10637,7 @@ cout << compare(data1, data2) << endl; // error: no < on Sales_data
 
 - 不同于function template, <span style="color:red">compiler **cannot deduce** class template parameter types</span> 
     - user must specify element type is a list of <span style="background-color:#FFFF00">**explicit template arguments**</span> that are bound to the template's parameters. Compiler 用这些 template arguments to <span style="color:red">instantiate specific class</span> from template.
-        - 当compile instantiates a class from tmplate, 会 <span style="color:red">**rewrites** template</span>, <span style="color:red">replacing</span> each instance of the template parameter T by the <span style="color:red">given template argument</span>
+        - 当compile instantiates a class from template, 会 <span style="color:red">**rewrites** template</span>, <span style="color:red">replacing</span> each instance of the template parameter T by the <span style="color:red">given template argument</span>
         - 用一个template, template argument不同, 会<span style="background-color:#FFFF00">instantiate 不同的**distinct** classes</span>. Each **instantiation** of a class template <span style="color:red">constitutes an independent class</span>. The type ```Blob<string>``` has no relationship to, or any special access to, the members of any other Blob type.
 - class template name 不是type, 当class template 被实例化, type always includes template argument(s).
 - member function:
@@ -10664,10 +10692,9 @@ private:
     std::shared_ptr<std::vector<int>> data;
     void check(size_type i, const std::string &msg) const;
 };
-};
 ```
 不同的template argument 生成不同的class, 比如下面code would trigger instantiations of two distinct classes. 
-```
+```c++
 Blob<string> names; // Blob that holds strings 
 
 Blob<double> prices;// different element type
@@ -10718,6 +10745,7 @@ Template member function <span style="color:red">**被实例化** 只当 程序u
 Blob<int> squares = {0,1,2,3,4,5,6,7,8,9}; 
 
 // instantiates Blob<int>::size() const
+
 for (size_t i = 0; i != squares.size(); ++i)
     squares[i] = i*i; // instantiates Blob<int>::operator[](size_t)
 
@@ -10754,13 +10782,14 @@ private:
 
 };
 
-//span style="color:red">compiler treats references to the template itself 
+//compiler treats references to the template itself 
 
 //就像提供了template arguments 一样
 
 BlobPtr& operator++(); 
 BlobPtr& operator--();
 //等同于
+
 BlobPtr<T>& operator++(); 
 BlobPtr<T>& operator--();
 ```
@@ -10768,6 +10797,7 @@ BlobPtr<T>& operator--();
 
 ```c++
 // postfix: increment/decrement the object but return the unchanged value 
+
 template <typename T>
 BlobPtr<T> BlobPtr<T>::operator++(int)
 {
@@ -10804,7 +10834,7 @@ BlobPtr<T> BlobPtr<T>::operator++(int)
 下面例子, 
 - 需要先 声明 ```BlobPtr``` 和 ```Blob``` , 这些是 operator ```==``` 函数参数声明以及 ```Blob``` 友元声明需要的. 
 - <span style="background-color:#FFFF00">Blob **friend declaratons** use Blob's **template parameter** as their own template argument</span>. 
-- 因此friensdhip 限定在相同type 实例化 的 Blob 和 BlobPtr 相等运算运算之前. members of ```BlobPtr<char>``` 可以access nonpublic parts of ```Blob<char>```, 但是 ```Blob<char>``` 对```Blob<int>``` 没有special access 或者 其他instantiation of ```Blob``` 
+- 因此friensdship 限定在相同type 实例化 的 Blob 和 BlobPtr 相等运算运算之前. members of ```BlobPtr<char>``` 可以access nonpublic parts of ```Blob<char>```, 但是 ```Blob<char>``` 对```Blob<int>``` 没有special access 或者 其他instantiation of ```Blob``` 
 
 ```c++
 // forward declarations needed for friend declarations in Blob
@@ -10821,8 +10851,9 @@ class Blob {
 
     // BlobPtr and the equality operator instantiated with the same type
     
-    friend class BlobPtr<T>; friend bool operator==<T>
-    (const Blob<T>&, const Blob<T>&); 
+    friend class BlobPtr<T>; 
+    friend bool operator==<T>
+    	(const Blob<T>&, const Blob<T>&); 
     // other members as in § 12.1.1 
 
 };
@@ -10852,9 +10883,8 @@ class C{// 注意C就是个普通的class
     //所有instantiation of Pal2 都是 C的friends;
     
     //因为是all instantiation friend 不需要forward declaration 
+    
     template<typename T> friend class Pal2;
-
-
 };
 
 template<typename T>
@@ -10879,9 +10909,9 @@ class C2{ //C2 是 class template
 };
 ```
 
-**Befriending the Template’s Own Type Parameter**
+<span style="background-color:#FFFF00">**Befriending the Template’s Own Type Parameter**</span>
 
-- 可以让template type parameter be a friend. <span style="color:red">type 可以是 **built-in** type</span>/
+- 可以让template type parameter be a friend. <span style="color:red">type 可以是 **built-in** type</span>
 
 
 下面例子中, 无论是什么类型instantiate ```Bar``` is friend. 比如 ```Foo``` is friend of ```Bar<Foo>```, 即使通常上friend 是 class or function, 
@@ -10894,8 +10924,8 @@ template <typename Type>class Bar{
 
 #### (d). Template Type Aliases
 
-- 可以用 ```typedef``` 在 template class refers to the <span style="color:red">**instantiated class**</span>, 
-- 因为template 不是 type, <span style="color:red">cannot define a typedef refers to a template</span>. 不能定义 a typedef refers to ```Blob<T>```
+- 可以用 ```typedef``` 在 template class refers to the <span style="color:red">**instantiated class**</span>, 比如 ```typedef Blob<string> StrBlob;```
+- 因为template 不是 type, <span style="color:red">cannot define a typedef refers to a template</span>. 不能定义 a typedef  ```typedef Blob<T> TBlob```
 
 比如下面例子, ```twin``` 用户只需指定一次类型, 而不用指定两次, ```twin<string,string>```. Users 对于```partNo```  只能specify type for the first member 不能choice about second 
 ```c++
@@ -10916,9 +10946,9 @@ partNo<Vehicle> cars; // cars is a pair<Vehicle, unsigned>
 
 #### (e). Static Members Class Templates
 
-- <span style="color:red">Each instantiation</span> of class has its <span style="color:red">**own instance**</span> of the <span style="color:red">**static members**</span>. 每一个class 实例斗鱼自己的 static member 成员
-- 与其他static data member 相同, <span style="color:red">只能有一个definition of each static</span> data member of a template class. class 外定义时候需要加 ```template parameter list```， member name 定义包括了 member's <span style="color:red">class name with template argument</span> ```Foo<T>```, 因为当 ```Foo``` is instantiated 对一 a particular template argument type, <span style="color:red">**separate** ```ctr``` will be **instantiated** for that class type 并初始化 0</span>
-- <span style="color:red">可以access static member</span> of a class template through <span style="color:red">**an object of the class type**</span> or by <span style="color:red">using **scope operator**</span> to access member directly. Use a static member through the class, 必须refer to a **specific instantiation**</span>.
+- <span style="color:red">Each instantiation</span> of class has its <span style="color:red">**own instance**</span> of the <span style="color:red">**static members**</span>. 每一个class 实例都有自己的 static member 成员
+- 与其他static data member 相同, <span style="color:red">只能有一个definition of each static</span> data member of a template class. class 外定义时候需要加 ```template parameter list```， <span style="color:red">**separate** ```ctr``` will be **instantiated** for different class instances 并初始化 0</span>
+- <span style="color:red">可以access static member</span> through <span style="color:red">**an object of the class type**</span> or by <span style="color:red">using **scope operator**</span> to access member directly. Use a static member through the class, 必须refer to a <span style="color:red">**specific instantiation**</span>.
     - 不可以直接通过 class template 名字access static member without template argument, 比如 ```Foo::ctr```, <span style="color:red">**错误的**</span>
 
 
@@ -10956,6 +10986,7 @@ Foo<int> fi; // instantiates Foo<int> class
 
 auto ct = Foo<int>::count(); // instantiates Foo<int>::count
 
+size_t = Foo<int>::ctr; //okay
 ct = fi.count(); // uses Foo<int>::count
 
 ct = Foo::count(); // error: which template instantiation?
@@ -10969,14 +11000,14 @@ ct = Foo::count(); // error: which template instantiation?
 - Template Parameters and Scope
     - 像normal scoping rules. <span style="color:red">Name of template parameter can be used 在被declared 之后直到end of template declaration or defintion</span> 
     - <span style="background-color:#FFFF00">template parameters **hides** any declaration</span> of that name <span style="background-color:#FFFF00">in an outer scope</span>
-    - 如果一个名字被 template parameter 用了, 不同reused within the template. 所以name 不能被reused, 所以<span style="background-color:#FFFF00">**template parameter** 不能有**重名**</span>
+    - 如果一个名字被 template parameter 用了, 不可以reused within the template. 所以name 不能被reused, 所以<span style="background-color:#FFFF00">**template parameter** 不能有**重名**</span>
 - Template Declarations
     - A template <span style="background-color:#FFFF00">**declaration** must include the **template parameters**</span>
-    - 对与given template，每一个declaration and definition 必须有一样 number and kind (type or nontype) of parameters
+    - 对于given template，每一个declaration and definition 必须有一样 number and kind (type or nontype) of parameters
 - Access class Types
-    - 比如当我们用scope operator, 可以access <span style="background-color:#FFFF00">**type**</span> or <span style="background-color:#FFFF00">**static member**</span>. 但是对于template, <span style="color:red">template知道被**实例化**才知道是 type or static member</span>. 但是compiler 必须知道a name 是不是 type 才能 proess. 
+    - 比如当我们用scope operator, 可以access <span style="background-color:#FFFF00">**type**</span> or <span style="background-color:#FFFF00">**static member**</span>. 但是对于template, <span style="color:red">template直到被**实例化**才知道是 type or static member</span>. 但是compiler 必须知道a name 是不是 type 才能 process. 
         - 比如 ```T size_type *p```: compiler 需要知道我们是在define a variable named ```p``` 还是将 名为```size_type``` 的static 成员与 名为 p 的成员 想乘. 
-        - 客服上面问题, 必须显式告诉 compiler the name is type, by using keyword ```typename```. When we want to <span style="color:red">inform the compiler that a name represents a **type**</span>, we must <span style="color:red">use the keyword **typename**, not class</span>.
+        - 克服上面问题, 必须显式告诉 compiler the name is type, by using keyword ```typename```. When we want to <span style="color:red">inform the compiler that a name represents a **type**</span>, we must <span style="color:red">use the keyword **typename**, not class</span>.
 - **Default Template Arguments**: default arguments for both function and class templates   
     -  像 function default argument, 只有它<span style="color:red">**右侧所有**parameters 都是 **default argument**</span>, 它才是default argument
     - 如果使用默认的template argment, 需要用空的 bracket pair ```<>``` following the template's name
@@ -11009,11 +11040,13 @@ template <typename T> int compare(const T&, const T&);
 template <typename T> class Blob;
 
 // all three uses of calc refer to the same function template
+
 template <typename T> T calc(const T&, const T&); // declaration 
 
 template <typename U> U calc(const U&, const U&); // declaration 
 
 // definition of the template
+
 template <typename Type>
 Type calc(const Type& a, const Type& b) { /* . . . */ }
 ```
@@ -11036,7 +11069,7 @@ typename T::value_type top(const T& c)
 下面例子定义了a secnd type parameter 表示 callable object, specifies that ```compare``` will use library ```less``` function-object class, <span style="color:red">**instantiated** with the **same type** parameter</span> as ```compare```.  和 a new function parameter ```f``` that bound to a callable object.  The **default function** argument says that ```f``` will be a default-initialized object of type ```F```. function template parameter 可以被推断
 
 
-```c++t
+```c++
 // compare has a default template argument, less<T> 
 
 // and a default function argument, F()
@@ -11144,19 +11177,19 @@ void DebugDelete::operator()(string *p) const { delete p; }
 比如
 ```c++
 template <typename T> class Blob {
-    
     template <typename It> Blob(It b, It e);
     // ... 
 
 };
 
 //define outside class
+
 template <typename T> // type parameter for the class 
 
 template <typename It> // type parameter for the constructor
 
-    Blob<T>::Blob(It b, It e): data(std::make_shared<std::vector<T>>(b, e)) {
-    }
+Blob<T>::Blob(It b, It e): data(std::make_shared<std::vector<T>>(b, e)) {
+}
 
 ```
 
@@ -11202,7 +11235,7 @@ compile 看见 **extern template declaration**, **不会generate code** for that
         -  file 的 ```.o``` 文件不会包括 被定义了 extern template classs的instantiation, 会包括没有被定义extern template class 的实例化. 
         -  There <span style="color:red">must be an **explicit instantiation definition(实例化定义)** somewhere in the program</span> for every instantiation declaration.
         -  当compiler 看见instantiation 定义(as opposed to a declaration), it generates code. 当build application, <span style="color:red">必须 link 有extern template definition 的 ```.o``` with 用到extern template的file</span> (e.g```Application.o```)
-- <span style="background-color:#FFFF00">**Instantiation Definitions Instantiate All Members**</span>: 与普通class template instantiations 不同, <span style="color:red">compiler instantiates all member of that class 因为不知道which member functions the program uses. 即使没有用到这个member, member也会被实例化</span>. 
+- <span style="background-color:#FFFF00">**Explicit Instantiation Definitions Instantiate All Members**</span>: 与普通class template instantiations 不同, <span style="color:red">compiler instantiates all member of that class 因为不知道which member functions the program uses. 即使没有用到这个member, member也会被实例化</span>. 
   - 因此, An instantiation definition can be <span style="color:red">used only for **types**</span> that can be used with <span style="color:red">**every member function**</span> of a class template.
 
 
@@ -11269,7 +11302,7 @@ template class Blob<string>; // instantiates all members of the class template
         - <span style="color:red">deleter stored indirectly</span>, call ```del(p)``` 需要run-time jump to location stored in ```del```  to execute the code to which ```del``` points (需要一次运行时的跳转操作，转到del中保存的地址来执行)
     - ```unique_ptr```
         - ```unique_ptr``` template parameter 有两个，一个是type that ```unique_ptr``` manages 里一个是 表示 deleter 的type. 因为type of deleter 是 part of type or ```unique_tpr```. <span style="color:red">因此deleter type 必须known at compile time</span>
-        - <span style="color:red">deleter store directly `` in ```unique_ptr``` object, **no run-time overhead**</span>
+        - <span style="color:red">deleter store directly in ```unique_ptr``` object, **no run-time overhead**</span>
         - ```del(p); // no run-time overhead``` del 可以是default deleter type or user-supplied type.没关系 the code that wil be executed is known at compile time. 如果Deleter 类似于 上面```DebugDelele``` class, call 可以是 inlined at compile time 
 - Binding the deleter at **compile time**, <span style="color:red">unique_ptr **avoids the run-time cost** of an indirect call to its deleter</span>. By binding the deleter at run time, <span style="color:red">**shared_ptr** makes it easier for users to override the deleter</span>.
 
@@ -11287,7 +11320,9 @@ template class Blob<string>; // instantiates all members of the class template
 
 **Conversions**
 
-例子中 T 是value type, call ```fobj```, ```const string``` to value (top-level const 被忽略). call ```fref```, ```s1``` from ````string``` to ```const string&``` 是合法的. 在数组例子中, 因为size 不一样, 类型不同, 在call ```fobj```, 数组大小无关紧要, 因为会convert to pointer. 但是对于 ```fref``` 是非法的, <span style="color:red">因为parameter 是 reference, array 不会convert to pointer</span>, ```a``` 和 ```b``` 类型不一样
+例子中 T 是value type, 
+- call ```fobj```, ```const string``` to value (top-level const 被忽略). call ```fref```, ```s1``` from ```string``` to ```const string&``` 是合法的. 
+- 在数组例子中, 因为size 不一样, 类型不同, 在call ```fobj```, 数组大小无关紧要, 因为会convert to pointer. 但是对于 ```fref``` 是非法的, <span style="color:red">因为parameter 是 reference, array 不会convert to pointer</span>, ```a``` 和 ```b``` 类型不一样
 
 ```c++
 template <typename T> T fobj(T, T); // arguments are copied 
