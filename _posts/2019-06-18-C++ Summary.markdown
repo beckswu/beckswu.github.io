@@ -11006,8 +11006,9 @@ ct = Foo::count(); // error: which template instantiation?
     - 对于given template，每一个declaration and definition 必须有一样 number and kind (type or nontype) of parameters
 - Access class Types
     - 比如当我们用scope operator, 可以access <span style="background-color:#FFFF00">**type**</span> or <span style="background-color:#FFFF00">**static member**</span>. 但是对于template, <span style="color:red">template直到被**实例化**才知道是 type or static member</span>. 但是compiler 必须知道a name 是不是 type 才能 process. 
-        - 比如 ```T size_type *p```: compiler 需要知道我们是在define a variable named ```p``` 还是将 名为```size_type``` 的static 成员与 名为 p 的成员 想乘. 
-        - 克服上面问题, 必须显式告诉 compiler the name is type, by using keyword ```typename```. When we want to <span style="color:red">inform the compiler that a name represents a **type**</span>, we must <span style="color:red">use the keyword **typename**, not class</span>.
+        - 比如 ```T::size_type *p```: compiler 需要知道我们是在define a variable named ```p``` 还是将 名为```size_type``` 的static 成员与 成员```p``` 想乘.
+	- <span style="color:red">by default, languages assume access name through scope operator is not a type</span>. 当use type member of a template type parameter, must explicitly tell compiler that the name is a type by ```typename```
+        - 克服上面问题, 必须显式告诉 compiler the name is type, by using  ```typename T::size_type *p```. When we want to <span style="color:red">inform the compiler that a name represents a **type**</span>, we must <span style="color:red">use the keyword **typename**, not class</span>.
 - **Default Template Arguments**: default arguments for both function and class templates   
     -  像 function default argument, 只有它<span style="color:red">**右侧所有**parameters 都是 **default argument**</span>, 它才是default argument
     - 如果使用默认的template argment, 需要用空的 bracket pair ```<>``` following the template's name
@@ -11051,7 +11052,7 @@ template <typename Type>
 Type calc(const Type& a, const Type& b) { /* . . . */ }
 ```
 
-显式告诉compiler 定义的template 是 type, 用typename 
+显式告诉compiler we want to <span style="background-color:#FFFF00">use a **type member** of a template type parameter</span>, 用```typename T::value_type()```. Our ```top``` function expects a container as its argument and uses typename to specify its return type and to<span style="color:red"> generate a value initialized element if c has no elements</span>.
 ```c++
 template <typename T>
 typename T::value_type top(const T& c)
@@ -11239,8 +11240,8 @@ compile 看见 **extern template declaration**, **不会generate code** for that
   - 因此, An instantiation definition can be <span style="color:red">used only for **types**</span> that can be used with <span style="color:red">**every member function**</span> of a class template.
 
 
-> From StackOverflow
-> <span style="color:red">**explicit instantiation** is useful **when creating library(.lib) files that uses templates** for distribution</span>, uninstantiated template definitions are not put into object (.obj) files.
+> From StackOverflow <br/>
+> <span style="color:red">**explicit instantiation** is useful **when creating library(.lib) files that uses templates** for distribution</span>, uninstantiated template definitions are not put into object (.obj) files.<br/>
 > 比如: ```std::basic_string<char,char_traits<char>,allocator<char> >``` (which is ```std::string```) so every time you use functions of std::string, <span style="color:red">the same function code doesn't need to be copied to objects</span>. The compiler only need to refer (link) those to ```libstdc++```.)
 
 **An explicit instantiation**: 用下面的形式
@@ -11368,16 +11369,26 @@ a.v //实例化 static member v
 
 #### (i). Template Argument Deduction
 
-- The process of <span style="background-color:#FFFF00">**determining the template arguments** from the function arguments</span> is known as <span style="background-color:#FFFF00">**template argument deduction**</span>.
+The process of <span style="background-color:#FFFF00">**determining the template arguments** from the function arguments</span> is known as <span style="background-color:#FFFF00">**template argument deduction**</span>.
     - compiler 根据argument find template argument 来generate a **best match** 的 vesion of function 
-- function template argument -> parameter conversion
+
+1. **Conversions**
+2. **Function-Template Explicit Arguments**
+3. **Trailing Return Types and Type Transformation**
+4. **Function Pointers and Argument Deduction**
+5. **References Deduction**
+6. **Reference Collapsing and Rvalue Reference Parameters**
+
+
+**1.Conversions**
+
+- **function template argument -> parameter conversion**
     - <span style="background-color:#FFFF00">**top level const**</span> either in parameter or argument <span style="background-color:#FFFF00">都会被 **ignored**</span>
     - const conversions: argument 是 <span style="background-color:#FFFF00">**a reference (or pointer) to nonconst object**</span> -> parameter 是 <span style="background-color:#FFFF00">**reference (or pointer) to const object**</span>
     - <span style="background-color:#FFFF00">**如果parameter 不是 reference type**</span>, <span style="color:red">A **array** argument 将会被 convert to a **pointer** to its first element. A **function** argument will be converted to a **pointer** to the function's type.</span>
     - Other conversions, 比如 <span style="color:red">**arithmetic conversion**, **derived-to-base conversion**, and **user-defined conversion**(通过constructor) 是不会被执行的</span>
     - 注: <span style="color:red">**const conversions**</span> and <span style="color:red">**array or function to pointer**</span> are the only <span style="color:red">**automatic conversions**</span> for <span style="color:red">**arguments to parameters**</span> with template types.
 
-**Conversions**
 
 例子中 T 是value type, 
 - call ```fobj```, ```const string``` to value (top-level const 被忽略). call ```fref```, ```s1``` from ```string``` to ```const string&``` 是合法的. 
@@ -11405,39 +11416,272 @@ fref(a, b); // error: array types don't match
 ```
 
 
+**2.Function-Template Explicit Arguments**
+
+- **Function-Template Explicit Arguments**：compiler有时候不能deduce the types of template argument, 比如 return type 
+     - <span style="color:red">**Explicit template arguments**</span> are matched to <span style="color:red">**Explicit template parameters from left to right**</span>. 所以一个explicit template argument 可能被忽视如果放在right-most
+     - 可以用来进行 <span style="color:red">**normal conversion**</span>, 如果 <span style="color:red">**template type parameter is explicitly specified**</span>. 比如function argument 是 int, template parameter specify long, 会convert int to long
+
+比如下面return type ```T1```, impossible to deduce its type, need provide an **explicit template argument**, 对于T2, T3,不需要explicitly specify, compiler will deduce the type 
+```c++
+// T1 cannot be deduced: it doesn't appear in the function parameter list
+
+template <typename T1, typename T2, typename T3>
+T1 sum(T2, T3);
+```
+
+Template explicit arguments 需要放在左侧. 比如下面例子call ```alternative_sum```必须提供all three arguments 否则 error
+
+```c++
+// poor design: users must explicitly specify all three template parameters
+
+template <typename T1, typename T2, typename T3>
+T3 alternative_sum(T2, T1);
+
+// error: can't infer initial template parameters
+
+auto val3 = alternative_sum<long long>(i, lng);
+// ok: all three parameters are explicitly specified
+
+auto val2 = alternative_sum<long long, int, long>(i, lng);
+```
+
+<span style="background-color:#FFFF00">If we explicitly **specify the template parameter type**, normal conversions apply</span>.
+
+```c++
+long lng;
+compare(lng, 1024); // error: template parameters don't match
+
+//convert int to long
+
+compare<long>(lng, 1024); // ok: instantiates compare(long, long)
+
+//convert long to int 
+
+compare<int>(lng, 1024); // ok: instantiates compare(int, int)
+
+```
+
+
+**3.Trailing Return Types and Type Transformation**
+
+- **trailing return type**: 有时需要user determine the return type. 需要用 ```decltype``` on function parameter
+     - ordinary function return type 在 parameter 前面, 所以不行
+     - <span style="color:red">**trailing return type appears after parameter list**</span>, can use function's parameter
+
+可以用 ```decltype(*beg)``` obtain the type. 不可以用普通的表达式把return type 放前面. <span style="color:red">```beg``` not exist until parameter list has been seen</span>. Must use <span style="color:red"> **trailing return type** </span>，因为trailing return appears after parameter list. 可以用function's parameters
+
+reference operator returns a lvalue, 因为type deduced by ```decltype``` is a reference. 如果```fcn``` called on int, the return is ```int&```. 
+```c++
+// a trailing return lets us declare the return type after the parameter list is seen
+
+template <typename It>
+auto fcn(It beg, It end) -> decltype(*beg)
+{
+     // process the range
+     
+     return *beg; // return a reference to an element from the range
+     
+}
+
+vector<int> vi = {1,2,3,4,5};
+Blob<string> ca = { "hi", "bye" };
+auto &i = fcn(vi.begin(), vi.end()); // fcn should return int&
+
+auto &s = fcn(ca.begin(), ca.end()); // fcn should return string&
+
+```
+
+**Type Transformation** 
+
+- 比如我们要获取element by value 而不是 reference to an element. 问题是we don't know the type. 比如pass iterator, no iterator operations that yield elements. 
+- 所以获取element type, we use a library <span style="color:red">**type transformation**</span> template. defined in ```type_traits``` header. ```type_traits``` ared used for <span style="background-color:#FFFF00">**template metaprogramming**</span>
+-  <span style="background-color:#FFFF00">如果返回是```type_traits::type```，必须用**typename**, 告诉compiler that ```type``` represents a type</span> 因为```type``` is member of a class that depends on a template parameter. 
+- <span style="color:red">如果not possible to transform template's parameter. ```type``` member is template parameter itself</span>. 比如 ```remove_pointer<T>::type``` 如果```T``` is pointer type, 则type is pointer 指向的类型, 否则no tranformation is needed, ```type``` is the same type as ```T```
+
+| For ```Mode<T>``` where ```Mod``` is   |      ```T``` is      |  ```Mod<T>::type``` is |
+|----------|:-------------:|:------|
+| ```remove_reference``` |  ```X&``` or ```X&&``` <br/> otherwise | ```X```<br/> ```T``` |
+| ```add_const``` |  ```X&```, ```const X```, or ```function``` <br/> otherwise | ```T```<br/> ```const T``` |
+| ```add_lvalue_reference``` |  ```X&``` <br/> ```X&&``` <br/> otherwise | ```T```<br/> ```X&```<br/> ```T&``` |
+| ```add_rvalue_reference``` |  ```X&``` or ```X&&``` <br/> otherwise | ```T```<br/> ```T&&``` |
+| ```remove_pointer``` |  ```X*``` <br/> otherwise | ```X```<br/> ```T``` |
+| ```add_pointer``` |  ```X&``` or ```X&&``` <br/> otherwise | ```X*```<br/> ```T*``` |
+| ```make_signed``` |  ```signed type``` <br/> otherwise | ```X```<br/> ```T``` |
+| ```make_unsigned``` |  ```unsigned X``` <br/> otherwise | ```unsigned T```<br/> ```T``` |
+| ```remove_extent``` |  ```X[n]``` <br/> otherwise | ```X```<br/> ```T``` |
+| ```remove_all_extents``` |  ```X[n1][n2]``` <br/> otherwise | ```X```<br/> ```T``` |
+
+比如上面定义的 ```fcn``` function, 可以用```remove_reference``` to obatin the element type. 
+     - ```remove_reference``` has a template type parameter 和一个(public) type member named ```type```, 
+     -if instantiate with a reference type, 则```type``` 是去reference 的type, 比如```remove_reference<int&>```, type member is int 
+     - 因为返回时 ```::type```, 必须用**typename** 在trailing return 前面
+```
+template<typename It>
+auto fcn2(It beg, It end) ->
+     typename remove_reference<decltype(*beg)>::type
+//decltype(*beg) is reference, so 
+
+//remove_reference<decltype(*beg)>::type is value 
+
+{
+     //process
+     return *beg; //return a copy of an element from the range;
+}
+```
+
+
+
+**4.Function Pointers and Argument Deduction**
+
+- when initialize or assign a  <span style="color:red">**function pointer from function template**</span>, compiler <span style="color:red"> use the type of the pointer</span> (等号右边的值) to  <span style="color:red">deduce the template arguments</span>(template 在等号左面)
+     - When a function-template instaniate, <span style="color:red">the context allows a **unique type** or **value**</span> to be determined for each template parameter.否则 ambiguous, not compile
+     - 注意看下面例子
+
+The type of parameters in ```pf1``` 决定 tyep of template argument for ```T```,下面例子template argument for ```T``` is int. <span style="color:red">The pointer pf1 points to the **instantiation** of ```compare```</span> with T bound to int. 
+
+```c++
+template <typename T> int compare(const T&, const T&);
+// pf1 points to the instantiation int compare(const int&, const int&)
+
+int (*pf1)(const int&, const int&) = compare;
+```
+
+<span style="background-color:#FFFF00">It is **error** 如果template arugment cannot be determined from function pointer type</span>. 下面overload function pointer by different function parameter, 两个function pointer 都可以用来instantiate ```compare```. cannot compile. <span style="background-color:#FFFF00">解决方法是using explicit template arguments as function parameters</span>
+
+```c++
+// overloaded versions of func; each takes a different function pointer type
+
+void func(int(*)(const string&, const string&));
+void func(int(*)(const int&, const int&));
+func(compare); // error: which instantiation of compare?
+
+// ok: explicitly specify which version of compare to instantiate
+
+func(compare<int>); // passing compare(const int&, const int&)
+```
+
+**5.Template Argument Deduction and References**
+
+- ```template <typename T> void f(T &p);```
+     - can <span style="color:red">only pass **lvalue**</span> (variable or expression returns a reference type). Argument might or might not have a const type
+     - normal bidng rules apply. 
+     - ```const``` are low level, not top level, 比如 ```p``` 是 ```int * const int``` , 则 ```T``` 是 ```int * const ``` pointer to const int 
+- ```template <typename T> void f2(const T&p);```
+     - normal binding say we can pass any kind of argument- an object, temporary, literal value. <span style="background-color:#FFFF00">```T``` is not const type. 因为const 已经是part of function parameter type</span>
+- ```template <typename T> void f3(T &&p);```
+     - <span style="color:red">只能pass **rvalue**</span> to this parameter
+     - deduced 跟lvalue reference  一样, <span style="background-color:#FFFF00">deduced type of ```T``` is type of rvalue</span>
 
 
 
 
 
+**lvalue reference**
+
+```c++
+template <typename T> void f1(T&); // argument must be an lvalue
+
+// calls to f1 use the referred-to type of the argument as the template parameter type
+
+f1(i); // i is an int; template parameter T is int
+
+f1(ci); // ci is a const int; template parameter T is const int
+
+f1(5); // error: argument to a & parameter must be an lvalue
+
+```
 
 
+**const lvalue reference** 下面还是那三个call, 与上面不同的是 ```T``` 全是```int```
+
+```c++
+template <typename T> void f2(const T&); // can take an rvalue
+// parameter in f2 is const &; const in the argument is irrelevant
+// in each of these three calls, f2's function parameter is inferred as const int&
+f2(i); // i is an int; template parameter T is int
+
+f2(ci); // ci is a const int, but template parameter T is int
+
+f2(5); // a const & parameter can be bound to an rvalue; T is int
+
+```
+
+**rvalue reference**: 只能接rvalue
+
+```c++
+template <typename T> void f3(T&&);
+f3(42); // argument is an rvalue of type int; template parameter T is int
+
+```
+
+**6. Reference Collapsing and Rvalue Reference Parameters**
+
+比如when we pass lvalue ```int i = 3``` to a template function that has rvalue reference paramter ```template <typename T> void f3(T&&);```. We would assume it as illegal, 但是language define two exceptions foundation for how library facilities ```move``` operate.
+
+- Exception One: When we <span style="color:red">pass an **lvalue**</span> (e.g., i) to a function parameter that is an <span style="color:red">**rvalue reference**</span>  to a template type parameter (e.g, T&&), the compiler <span style="color:red">deduces the template type parameter</span>  (```T```) as the <span style="color:red">argument’s lvalue reference type</span> .
+- Exception Two(normal binding rule):If we <span style="background-color:#FFFF00">indirectly create a **reference to a reference**, then those references “collapse.”</span>. Reference collapsing applies only when a <span style="color:red">**reference to a reference** is created **indirectly**</span>, such as in a <span style="color:red">**type alias**</span> or a <span style="color:red">**template parameter**</span>
+     - ```X& &```, ```X& &&```, and ```X&& &``` all collapse to type ```X&```
+     - The type ```X&& &&``` collapses to ```X&&```
+   
+ 根据Reference Collapse rule: 我们can 上面的例子```template <typename T> void f3(T&&);```
+ 
+ ```
+ f3(i);   // argument is an lvalue; template parameter T is int&
+ f3(ci); // argument is an lvalue; template parameter T is const int&
+ ```
+
+<span style="background-color:#FFFF00">当Template parameter ```T``` deduced as **reference type**, collapsing rule says function parameter ```T&&``` collapses to **lvalue reference type**</span>. 因此instantiation would be something like 下面形式. 因此即使 <span style="color:red"> function parameter in ```f3``` is an **rvalue reference**, call instantiates ```f3``` with an **lvalue reference type**</span>
+
+```c++
+// invalid code, for illustration purposes only
+
+void f3<int&>(int& &&); // when T is int&, function parameter is int& &&
+
+// int & && collapses to int & , like 
+
+void f3<int&>(int&); // when T is int&, function parameter collapses to
+int&
+
+```
+
+**two important consequences from these rules:**
+
+- A function parameter that is an rvalue reference to a template type parameter
+(e.g., T&&) can be bound to an lvalue; (lvalue reference and rvalue reference to lvalue reference)
+- If the argument is an lvalue, then the <span style="color:red">**deduced template argument type**</span> will be an <span style="color:red">**lvalue reference type**</span> and the <span style="color:red">function parameter will be instantiated</span> as an (ordinary) <span style="color:red">**lvalue reference parameter**</span> (```T&```), 表示即使template function 是 rvalue reference, can be used by lvalue as well
+- <span style="color:red">An argument of **any type** can be passed</span> to a function parameter that is an <span style="color:red">**rvalue reference**</span> to a template parameter type (i.e., T&&).
+
+**Writing Template Functions with Rvalue Reference Parameters
+The**
 
 
+```c++
+template <typename T> void f3(T&& val)
+{
+     T t = val; // copy or binding a reference?
+     
+     t = fcn(t); // does the assignment change only t or val and t?
+     
+     if (val == t) { /* ... */ } // always true if T is a reference type
+     
+}
+```
 
+- 当call ```f3``` on rvalue, 比如literal 42, ```T``` is int. The local varaible ```t``` is <span style="color:red">**initialized by copy** value of ```val```. 当we assign to ```t```, parameter is ```val``` <span style="color:red">**remains unchanged**</span>
+- 当call ```f3``` on lvalue ```i```, then ```T``` is ```int&``` 当define and initialize local variable ```t```, variable has type ```int&```. This <span style="color:red">initialization of ```t``` **binds**(reference) ```t``` to ```val</span>. when <span style="color:red">assign to ```t```, **change** ```val``` at the same time</span>. In this instantiation of ```f3```, <span style="background-color:#FFFF00">```if``` test always yields true</span>
+- 所以 it is <span style="color:red">very **hard** to write code correct when types involved 是 plain (nonreference) types or reference types</span> (尽管type transformation classes such as ```remove_reference``` can help)
+     - rvalue reference 只用于两个地方, <span style="color:red">**forwarding its argument**</span> or <span style="color:red">**template overloading**</span>
+     - function templates that use rvalue references often use overloading in the same way as before
+	
+use rvalue reference for overloading (跟以前一样), 如果下面function 不是template 的话,first version bind to modifiable rvalues and 第二个版本 bint to lvalues or const 
+```c++
+template <typename T> void f(T&&); // binds to nonconst rvalues
 
+template <typename T> void f(const T&); // lvalues and const
+rvalues
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+```
 
 
 
