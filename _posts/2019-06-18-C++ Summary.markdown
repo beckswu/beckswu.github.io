@@ -185,16 +185,16 @@ Sequential Container
 - 如果return type is template parameter, 定义在class 外面,not in class scope,need to specify if type defined inside class ```Blob<T>::type```
 - inside class scope, 不用specify template parameter, 因为assume we use the same type as member's instantiation
 - template parameter 会 hides any declaration of that name in outer scope
-- 如果使用default template argument, 用的时候 用```Blob<>```
-    Nontype Template Parameters
-    Compilation Errors Are Mostly Reported during Instantiation
+- 如果使用default template argument, 用的时候 用```Blob<>``` 
+- Compilation Errors Are Mostly Reported during Instantiation
 - 告诉compiler we use type not static member, use **typename**
-- class 的member template cannot be virtual. class template parameter come first, then member parameter list 
+- <span style="color:red">class 的member template cannot be virtual</span>. class template parameter come first, then member parameter list 
 -  explicit instantiation: ```extern```
     - 当compiler 看见 ```extern``` 不会generate code
+    - extern declaration 必须出现在code 使用实例化之前
     - file 的 ```.o``` 文件不会包括 被定义了 extern template classs的instantiation
     - 必须link 有extern class 的定义 的```.o``` file 与 用到 extern template 的 file ```.o``` file 
-    - explicit instantiation: compiler instantiates all member of that class
+    - explicit instantiation definition: compiler instantiates all member of that class. 所以要求types works for every member function
 - function template argument conversion
     - top level const ignore
     - const conversion, 没有lower-const pointer / reference 给有lower-const pointer/reference 
