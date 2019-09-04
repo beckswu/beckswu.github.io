@@ -12247,13 +12247,34 @@ svec.emplace_back(s1 + s2); // uses the move constructor
 ```
 
 
+#### (l). Template Specializations
+
+- 使template is best for every possible tmplate argument which template 可以被实例化 是不可能的. 有时general template definition is wrong for a type. 有时候 也许write more efficient code than instantiated from template. 
+- When we <span style="color:red">**specialize a function template**</span>, we must <span style="color:red">supply arguments for **every template parameter**</span> in the original template
+  - to indicate specialing a template, 用 keyword ```template``` 后跟一个 empty angle brackets ```<>```: 指出 <span style="color:red">argument will be supplied for **all** the template parameters</span> of original template
 
 
+比如我们```compare``` function, compare character pointer by ```strcmp``` 而不是 cmparing pointer values. <span style="color:red">第二个版本</span> called only when <span style="color:red">pass **string literal**</span> or an <span style="color:red">**array**</span>. 如果对比 <span style="color:red">**character pointers**</span>, <span style="color:red">first version</span> of template will be called.
 
+- ```compare(p1, p2);``` calls the first template: 因为<span style="background-color:#FFFF00">**no way to convert a pointer to a reference to an array**</span>. 因此第二个版本的 ```compare``` not viable
+- ```compare("hi", "mom");```
 
+```c++
+// first version; can compare any two types
 
+template <typename T> int compare(const T&, const T&); 
 
+// second version to handle string literals
 
+template<size_t N, size_t M>
+int compare(const char (&)[N], const char (&)[M]);
+
+const char *p1 = "hi", *p2 = "mom";
+compare(p1, p2); // calls the first template
+
+compare("hi", "mom"); // calls the template with two nontype parameters
+
+```
 
 
 
