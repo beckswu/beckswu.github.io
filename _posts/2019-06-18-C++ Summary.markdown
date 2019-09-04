@@ -11780,7 +11780,7 @@ s2 = std::move(s1); // ok: but after the assigment s1 has indeterminate value
 **static_cast from an Lvalue to an Rvalue Reference Is Permitted**: 尽管我们不能implicitly convert an lvalue to rvalue reference, 但是我们可以explictly <span style="background-color:#FFFF00">cast an **lvalue** to **rvalue reference** using ```static_cast```</span>. 用cast, 这样language prevent us from casting lvalue to rvalue reference implicitly. 绑定到rvalue reference, lvalue 被 clobber(截断)
 
 
-**8.Forwarding****
+**8.Forwarding**
 
 - 一些function 需要 forward 一个或多个 arguments with theri types unchanged to another function, 需要<span style="color:red">**preserve everything about forwared arguments**, 包括是不是**const**, argument 是 **lvalue** or **rvalue**</span>
 - we an <span style="color:red">preserve all the type information</span> by defining function parameter as <span style="color:red">**rvalue reference** to a <span style="color:red">**template type parameter**</span>. 
@@ -12027,8 +12027,9 @@ func("hi"); //print in pointer 如果没有Pointer version, call reference
 
 #### (k). Variadic Templates
 
-1.**Writing a Variadic Function Template**
-
+1. **Writing a Variadic Function Template**
+2. **Pack Expansion**
+3. **Forwarding Parameter Packs**
 
 - variadic template is template function or class that can take <span style="background-color:#FFFF00">**verying number of parameters**</span>
    - varying parameter are known as <span style="background-color:#FFFF00">**parameter pack**</span>. There are two kinds of parameter pack
@@ -12088,7 +12089,182 @@ void g(Args ... args) {
 **1. Writing a Variadic Function Template**
 
 - define a function ```print```, argument types 可以变化, that will print the contents of a given list of arguments on a given stream.
-- **Variadic functions** 通常是 recursive 的, 
+- **Variadic functions** 通常是 recursive 的</span>, The call process first argument in the pack 再call itself on remaining arguments.
+- To stop the recursion, need to define a nonvariadic print function, 在我们例子中, 最好一个```rest``` 就只有一位数, 这时call ```print``` 不会call variadic version
+- key part of ```print``` 是 ```return print(os, rest...); //``` <span style="color:red">**the first argument**</span> in pack ```rest``` 会被 <span style="color:red">**removed from the pack**</span> and becomes the argument bound to ```t```. The remaining arguments in ```rest``` for the next call to ```print``` 的 parameter pack
+- 注意 <span style="color:red">A **declaration for nonvariadic version** of ```print``` must be in scope</span> when the variadic version is defined. Otherwise, the variadic function will <span style="color:red">**recurse indefinitely**</span>.
+
+```c++
+// function to end the recursion and print the last element
+
+// this function must be declared before the variadic version of print is defined
+
+template<typename T>
+ostream &print(ostream &os, const T &t)
+{
+return os << t; // no separator after the last element in the pack
+}
+// this version of print will be called for all 除了 last element in the pack
+
+template <typename T, typename... Args>
+ostream &print(ostream &os, const T &t, const Args&... rest)
+{
+   os << t << ", "; // print the first argument
+
+   return print(os, rest...); // recursive call; print the other arguments
+
+}
+```
+
+用一个call 来说明 ```print(cout, i, s, 42); // two parameters in the pack``` ， 分成了3个call, 前两个call variadic version 因为 nonvariadic version 不viable. 最后一个call ```print(cout, 42)```, variadic(parameter pack 是empty) 和 nonvariadic 都viable, 但是<span style="color:red">nonvariadic template is more **specialized** than variadic template</span>, nonvariadic version is chosen
+
+| Call | t | rest... | 
+|----------|-------------|------|
+| ```print(cout, i, s, 42)``` | ```i``` | ```s,42``` |
+| ```print(cout, s, 42)``` | ```s``` | ```42``` |
+| ```print(cout, 42)``` | | call nonvariadic version |
+
+
+
+**2.Pack Expansion**
+
+- 除了获取size, we can **expand** the parameter pack
+- when expand a pack, 需要provide a <span style="background-color:#FFFF00">**pattern**</span> to be used on each expanded element. pattern 适用于每个被expanded 的elements
+- We trigger an expansion by <span style="color:red">putting an ellipsis (```. . .``` ) to the right of the pattern</span>.
+- The <span style="color:red">**pattern**</span> in an expansion <span style="color:red">**applies separately** to each element</span> in the pack.
+
+比如下面例子有两个 expansions. 
+- 第一个expansion: expands the template pack and <span style="color:red">generates function parameter list</span> for ```print```
+   - The expansion of ```Args``` applies pattern ```const Args&``` to 每一个elements in template parameter pack ```Args```. 
+   - The expansion of this pattern is a <span style="color:red">comma-separated **list** of zero or more parameter types</span>, each of which will have the form ```const type&```.
+- 第二个expansion happens in recusive call to ```print```. pattern is the name of the function parameter pack (i.e., rest) (pattern 就是function parameter pack 名字自己). This pattern expands to a **comma-separated list** of the elements in the pack. the call 等同于 ```print(os, s,42)```
+
+```c++
+template <typename T, typename... Args>
+ostream & print(ostream &os, const T &t, const Args&... rest)// expand Args
+{
+     os << t << ", ";
+     return print(os, rest...); // expand rest
+     
+}
+
+```
+比如有```print(cout, i, s, 42); ```, The type of last two arguments <span style="color:red">along with **pattern** determine the types of **trailing parameter**</span>. Call is instantiated as 
+
+```c++
+ostream& print(ostream&, const int&, const string&, const int&);
+```
+
+
+**Understanding Pack Expansions**: more complicated pattern
+
+下面例子用 pattern ```debug_rep(rest)```. pattern says 我们想 call ```debug_rep``` on each element in function parameter pack ```rest```. 
+
+
+```c++
+// call debug_rep on each argument in the call to print
+template <typename... Args>
+ostream &errorMsg(ostream &os, const Args&... rest)
+{
+	// print(os, debug_rep(a1), debug_rep(a2), ..., debug_rep(an)
+	
+	return print(os, debug_rep(rest)...);
+}
+```
+
+比如call 
+
+```c++
+errorMsg(cerr, fcnName, code.num(), otherData, "other", item);
+``` 
+等同于execute as 
+```
+print(cerr, debug_rep(fcnName), debug_rep(code.num()), 
+     debug_rep(otherData), debug_rep("otherData"),
+     debug_rep(item));
+```
+
+而下面的pattern <span style="color:red">**not compile**</span>.因为attempt to call ```debug_rep``` with a list of five arguments. ```debug_rep``` function is not variadic 并且也没有 ```debug_rep``` function has five parameters 
+
+```c++
+// passes the pack to debug_rep;  print(os, debug_rep(a1, a2, ..., an))
+
+print(os, debug_rep(rest...)); // error: no matching function to call
+
+
+//The call is executed as 
+print(cerr, debug_rep(fcnName, code.num(),
+	otherData, "otherData", item));
+```
+
+**3. Forwarding Parameter Packs**
+
+- Under new standard, 可以<span style="color:red">use variadic templates together with ```forward```</span> to write functions that pass their arguments **unchanged** to some other function.
+
+E.g. add ```emplace_back``` member to ```StrVec``` class. 
+- <span style="background-color:#FFFF00"> Library container的 ```emplace_back``` 是 **variadic member templates**</span> that uses arguments to construct an element directly in space managed by container
+- 必须是variadic member,因为string constructor differ in terms of parameter. 而且想要 string move constructor, <span style="color:red">必须preserve all type information about the arguments</span>. Perserve 分为two-step
+   - <span style="background-color:#FFFF00">define parameter as **rvalue reference**</span> to template type parameter, 所以可以pass any type to function
+   - must <span style="background-color:#FFFF00">use ```forward```</span> to preserve arguments' <span style="color:red">**original types**</span> when ```emplace_back``` passes those arguments to ```construct``` (another function)
+
+- 例子中 ```std::forward<Args>(args)...``` <span style="color:red">**expands both template parameter pack**</span> ```Args``` and <span style="color:red">**function parameter pack**</span> ```args```. 
+   - Pattern generate form ```std::forward<Ti>(ti)```: ```Ti```: ith element in tempalte parameter pack. ```ti```: ith element in function parameter pack
+- By using ```forward``` in this call, we guarantee  if ```emplace_back``` is <span style="color:red">called with an rvalue, then construct will also get an rvalue</span>
+- 比如 ```svec.emplace_back(s1 + s2); ```. Putting in emplace back 是 rvalue, result from ```forward<string>``` is ```string&&```, will forward argument to string move constructor
+
+```c++
+class StrVec{
+public:
+   template<class ...Args> void emplace_back(Args&&... );
+};
+
+template<class ...Args> 
+inline 
+void StrVec::emplace_back(Args&& ... args){
+     check_n_alloc();//reallocate if necessary
+     
+     alloc.constructor(first_free++, 
+        std::forward<Args>(args) ...);
+}
+
+//假设svec is a StrVec
+
+svec.emplace_back(10, 'c'); // adds cccccccccc as a new last element
+
+//constructor will expand to 
+
+std::forward<int>(10), std::forward<char>(c)
+
+
+svec.emplace_back(s1 + s2); // uses the move constructor
+
+//the argument to emplace_back is an rvalue
+
+//The result type from forward<string> is string&&, 
+
+//so construct will be called with an rvalue reference.
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
