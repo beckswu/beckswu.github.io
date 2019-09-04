@@ -11367,7 +11367,7 @@ a.v //实例化 static member v
 - Binding the deleter at **compile time**, <span style="color:red">unique_ptr **avoids the run-time cost** of an indirect call to its deleter</span>. By binding the deleter at run time, <span style="color:red">**shared_ptr** makes it easier for users to override the deleter</span>.
 
 
-#### (i). Template Argument Deduction
+#### (i). Argument Deduction
 
 The process of <span style="background-color:#FFFF00">**determining the template arguments** from the function arguments</span> is known as <span style="background-color:#FFFF00">**template argument deduction**</span>.
     - compiler 根据argument find template argument 来generate a **best match** 的 vesion of function 
@@ -11952,6 +11952,143 @@ E.g.3: both tmeplates ar viable and both provide an exact match
 const string *sp = &s;
 cout << debug_rep(sp) << endl;
 ```
+
+E.g.4: nontemplate function and template function
+- ```debug_rep<string>(const string&)```, template ```T``` bound to ```string```
+- ```debug_rep(const string&)``` ordinary, nontemplate function
+- nontemplate function selected, nontemplate 和 template 比选nontemplate的, 因为it is more specialized, 
+
+```c++
+string debug_rep(const string &s)
+{
+     return '"' + s + '"';
+}
+string s("hi");
+cout << debug_rep(s) << endl;
+```
+
+E.g 5. Pointers to C-style character strings and string literals
+
+- ```debug_rep(const T&)``` with ```T``` bound to ```char[10]```
+- ```debug_rep(T*)``` with ```T``` bound to ```const char```
+- ```debug_rep(const string&)``` which requires a conversion from ```const char*``` to ```string```, 因为需要user-defined conversion 所以不优于前两个
+- 第二个template require conversion from array to pointer(满足exact match in §6.f), 所以选择```debug_rep(T*)```, most specialized than first one
+
+```
+cout << debug_rep("hi world!") << endl; // calls debug_rep(T*)
+```
+
+如果我们想<span style="color:red">handle character pointers as ```string```</span>, 可以define 两个nontemplate overloads
+
+```c++
+string debug_rep(char *p)
+{
+return debug_rep(string(p));
+}
+string debug_rep(const char *p)
+{
+return debug_rep(string(p));
+}
+```
+
+记着declare ```string debug_rep(const string &s)``` before ```string debug_rep(const char *p)``` <span style="color:red">否则**wrong version** will be called</span>, compiler instantiate the call from template, 比如例子中如果不declare ```debug_rep``` with ```string```, compiler instantiate template version that takes a ```const T&```. <span style="background-color:#FFFF00">好习惯是declare every function in an overloaded set before any functions</span>
+
+```c++
+template <typename T> string debug_rep(const T &t);
+template <typename T> string debug_rep(T *p);
+// the following declaration must be in scope
+
+string debug_rep(const string &);
+string debug_rep(char *p)
+{
+   // if the declaration for the version that takes a const string& is not in scope
+  
+   // the return will call debug_rep(const T&) with T instantiated to string
+   return debug_rep(string(p));
+}
+```
+
+E.g. 6
+
+```
+template<typename T>
+void func(const T& a) {
+	cout << " in reference " << endl;
+}
+template<typename T>
+void func(const T* a) {
+	cout << " in pointer " << endl;
+}
+
+func("hi"); //print in pointer 如果没有Pointer version, call reference
+
+```
+
+
+#### (k). Variadic Templates
+
+1.**Writing a Variadic Function Template**
+
+
+- variadic template is template function or class that can take <span style="background-color:#FFFF00">**verying number of parameters**</span>
+   - varying parameter are known as <span style="background-color:#FFFF00">**parameter pack**</span>. There are two kinds of parameter pack
+   	- A <span style="background-color:#FFFF00">**template parameter pack**</span> represents zero or more template parameters (pack 可以是不同类型)
+	- A <span style="background-color:#FFFF00">**function parameter pack**</span> represents zero or more function parameters (pack 可以是不同类型)
+- use ellipsis 表示template or function <span style="color:red">represents a pack</span>, In template parameter list, ```class...``` or ```typename...``` <span style="color:red">表示following prameter 是 a list of zero or more types</span>; <span style="color:red">the **name**</span> of a type followed by an ellipsis represents a list of zero or more nontype parameters of the given type.
+- As usual, compiler deduces template parameter types from function's argument. For variadic template, <span style="color:red">compiler **deduces the number of parameters** in the pack</span>
+- ```sizeof...(pack)```, how many elements in a pack(either template or function), 用```sizeof...(pack)```, returns a constant expression and does not evaludate its argument
+- <span style="color:red">**initializer_list**</span> take a verying number of arguments with <span style="color:red">the **same type**</span>. <span style="color:red">**Variadic functions**</span> are used when <span style="color:red">不知道 number or types of arguments</span> we want to process
+
+```c++
+// Args is a template parameter pack; rest is a function parameter pack
+
+// Args represents zero or more template type parameters
+
+// rest represents zero or more function parameters
+
+template <typename T, typename... Args>
+void foo(const T &t, const Args& ... rest);
+```
+
+
+下面例子, type of ```T``` is deduced from first argument. The remainng arguments <span style="color:red">provide the number of, and types for, the addiational arguments</span> to the function
+
+```c++
+int i = 0; double d = 3.14; string s = "how now brown cow";
+foo(i, s, 42, d); // three parameters in the pack
+
+foo(s, 42, "hi"); // two parameters in the pack
+
+foo(d, s); // one parameter in the pack
+
+foo("hi"); // empty pack
+
+
+//compiler instantiate 4 instances of foo
+
+void foo(const int&, const string&, const int&, const double&);
+void foo(const string&, const int&, const char[3]&);
+void foo(const double&, const string&);
+void foo(const char[3]&);
+
+```
+
+**sizeof**
+
+```c++
+template<typename ... Args> 
+void g(Args ... args) {
+   cout << sizeof...(Args) << endl; // number of type parameters
+   
+   cout << sizeof...(args) << endl; // number of function parameters
+   
+}
+```
+
+**1. Writing a Variadic Function Template**
+
+- define a function ```print```, argument types 可以变化, that will print the contents of a given list of arguments on a given stream.
+- **Variadic functions** 通常是 recursive 的, 
 
 
 
