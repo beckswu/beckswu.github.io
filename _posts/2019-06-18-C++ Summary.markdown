@@ -11281,9 +11281,11 @@ template class Blob<string>; // instantiates all members of the class template
 - function template argument -> parameter conversion
     - <span style="background-color:#FFFF00">**top level const**</span> either in parameter or argument <span style="background-color:#FFFF00">都会被 **ignored**</span>
     - const conversions: argument 是 <span style="background-color:#FFFF00">**a reference (or pointer) to nonconst object**</span> -> parameter 是 <span style="background-color:#FFFF00">**reference (or pointer) to const object**</span>
+    - const conversions: argument 是 <span style="background-color:#FFFF00">**a reference (or pointer) to nonconst object**</span> -> parameter 是 <span style="background-color:#FFFF00">**reference (or pointer) to const object**</span>. 不可以是value to pointer/reference(non const) conversion
     - <span style="background-color:#FFFF00">**如果parameter 不是 reference type**</span>, <span style="color:red">A **array** argument 将会被 convert to a **pointer** to its first element. A **function** argument will be converted to a **pointer** to the function's type.</span>
     - Other conversions, 比如 <span style="color:red">**arithmetic conversion**, **derived-to-base conversion**, and **user-defined conversion**(通过constructor) 是不会被执行的</span>
     - 注: <span style="color:red">**const conversions**</span> and <span style="color:red">**array or function to pointer**</span> are the only <span style="color:red">**automatic conversions**</span> for <span style="color:red">**arguments to parameters**</span> with template types.
+- function template 也可以用 <span style="color:red">普通参数</span>, do not involve a template type parameter. 这些argument <span style="color:red">no special processing</span>, 可以converted as usual to the corresponding type of the parameter. 比如可以从 derived-to-base
 
 **Conversions**
 
@@ -11309,16 +11311,47 @@ fobj(a, b); // calls f(int*, int*)
 fref(a, b); // error: array types don't match
 
 ```
+一个<span style="color:red">template type parameter 可以被用作more than one function parameter</span>, 但是这些parameters必须有相同的类型, 如果deduced types 不匹配, call is <span style="color:red">**error**</span>. 比如下面例子, ```compare``` takes two ```const T&``` parameters. arguments 必须有 same type. 例子中一个是 ```long```, 一个是```int```, deduction fails. 
+
+```c++
+long lng;
+compare(lng, 1024); // error: cannot instantiate compare(long, int)
+
+```
+
+function with **two type parameters**: 比如下面例子, ```<``` operator must exist that can compare values of those types
+
+```c++
+template<typename A, typename B>
+int flexibleCompare(const A& v1, const B& v2)
+{
+    if (v2 < v1) return 1;
+    if (v1 < v2) return -1; 
+    return 0;
+}
+
+long lng;
+flexibleCompare(lng, 1024); // ok: calls flexibleCompare(long, int)
+
+```
 
 
 
 
+**Normal Conversions Apply for Ordinary Arguments**: 如果template 是普通参数，可以进行普通的conversion, 不用服从template的conversion. 比如下面例子,因为typep of parameter 不depend on template parameter convert from ```ofstream``` to ```ostream&``` 
 
+```c++
+template <typename T> ostream &print(ostream &os, const T &obj)
+{
+    return os << obj;
+}
 
+print(cout, 42); // instantiates print(ostream&, int)
 
+ofstream f("output");
+print(f, 10); // uses print(ostream&, int); converts ofstream to ostream&
 
-
-
+```
 
 
 
