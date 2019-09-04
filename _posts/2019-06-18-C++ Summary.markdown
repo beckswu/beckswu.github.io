@@ -7607,8 +7607,8 @@ void StrVec::reallocate(){
     - 因此可以自由将rvalue reference 移动到另一个对象中
 - an <span style="background-color:#FFFF00">**lvalue**</span> expression refers to an object’s <span style="background-color:#FFFF00">**identity**</span> whereas an <span style="background-color:#FFFF00">**rvalue**</span> expression refers to an <span style="background-color:#FFFF00">object’s **value**</span>
 - <span style="background-color:#FFFF00">rvalue reference 只能接 rvalue </span>
-- <span style="background-color:#FFFF00">**r-value reference <-x-  lvalue**</span>:  <span style="color:red">can bind an **rvalue reference** to 要求conversion的expression,to literals, 或者返回 rvalue 的 expression, 但lvalue reference(不算const) 不能绑定到这些表达式; 反过来 但是 **rvalue-reference**不能绑定到一个**lvalue**</span>
-- <span style="background-color:#FFFF00">**rvalue-reference <-x- rvalue reference**</span> <span style="color:red">不能绑定  **rvalue reference**</span> to a variable defined as an <span style="color:red">**rvalue reference**</span> type.
+- <span style="background-color:#FFFF00">**r-value reference <-X-  lvalue**</span>:  <span style="color:red">can bind an **rvalue reference** to 要求conversion的expression,to literals, 或者返回 rvalue 的 expression, 但lvalue reference(不算const) 不能绑定到这些表达式; 反过来 但是 **rvalue-reference**不能绑定到一个**lvalue**</span>
+- <span style="background-color:#FFFF00">**rvalue-reference <-X- rvalue reference**</span> <span style="color:red">不能绑定  **rvalue reference**</span> to a variable defined as an <span style="color:red">**rvalue reference**</span> type.
 - <span style="background-color:#FFFF00">**lvalue-reference <-x- rvalue**</span> 
 不可以比如```int & r = i*42; ```
 
@@ -7650,7 +7650,7 @@ int &&rr2 = rr1; // error: the expression rr1 is an lvalue!
 
 **The Library move Function**
 
-- 尽管不能直接把rvalue reference 绑定到 lvalue, 但<span style="background-color:#FFFF00">可以 cast lvalue to rvalue reference type by use ```std`::move``</span>
+- 尽管不能直接把rvalue reference 绑定到 lvalue, 但<span style="background-color:#FFFF00">可以 cast lvalue to rvalue reference type by use ```std`::move```</span>
 - ```move``` 告诉compiler 我们有个lvalue, 但想让对待rvalue 一样处理它.
 - We can <span style="color:red">**destroy**</span> a moved-from object and can <span style="color:red">**assign** a new value</span> to it, <span style="color:red">but we cannot use the value of a moved-from object</span>.
 - 不用using declaraction for ```move```, 因为我们调用 ```std::move``` 而不是 ```move```, 原因将在18.2.3中讲到
@@ -11378,6 +11378,10 @@ The process of <span style="background-color:#FFFF00">**determining the template
 4. **Function Pointers and Argument Deduction**
 5. **References Deduction**
 6. **Reference Collapsing and Rvalue Reference Parameters**
+7. **Understanding std::move**
+8. **Forwarding**
+
+
 
 
 **1.Conversions**
@@ -11385,8 +11389,7 @@ The process of <span style="background-color:#FFFF00">**determining the template
 - **function template argument -> parameter conversion**
     - <span style="background-color:#FFFF00">**top level const**</span> either in parameter or argument <span style="background-color:#FFFF00">都会被 **ignored**</span>
     - const conversions: argument 是 <span style="background-color:#FFFF00">**a reference (or pointer) to nonconst object**</span> -> parameter 是 <span style="background-color:#FFFF00">**reference (or pointer) to const object**</span>
-    - const conversions: argument 是 <span style="background-color:#FFFF00">**a reference (or pointer) to nonconst object**</span> -> parameter 是 <span style="background-color:#FFFF00">**reference (or pointer) to const object**</span>. 不可以是value to pointer/reference(non const) conversion
-    - <span style="background-color:#FFFF00">**如果parameter 不是 reference type**</span>, <span style="color:red">A **array** argument 将会被 convert to a **pointer** to its first element. A **function** argument will be converted to a **pointer** to the function's type.</span>
+    - <span style="background-color:#FFFF00">**如果parameter 是 nonreference type**</span>, <span style="color:red">A **array** argument 将会被 convert to a **pointer** to its first element. A **function** argument will be converted to a **pointer** to the function's type.</span>
     - Other conversions, 比如 <span style="color:red">**arithmetic conversion**, **derived-to-base conversion**, and **user-defined conversion**(通过constructor) 是不会被执行的</span>
     - 注: <span style="color:red">**const conversions**</span> and <span style="color:red">**array or function to pointer**</span> are the only <span style="color:red">**automatic conversions**</span> for <span style="color:red">**arguments to parameters**</span> with template types.
 - function template 也可以用 <span style="color:red">普通参数</span>, do not involve a template type parameter. 这些argument <span style="color:red">no special processing</span>, 可以converted as usual to the corresponding type of the parameter. 比如可以从 derived-to-base
@@ -11611,7 +11614,7 @@ func(compare<int>); // passing compare(const int&, const int&)
 - ```template <typename T> void f2(const T&p);```
      - normal binding say we can pass any kind of argument- an object, temporary, literal value. <span style="background-color:#FFFF00">```T``` is not const type. 因为const 已经是part of function parameter type</span>
 - ```template <typename T> void f3(T &&p);```
-     - <span style="color:red">只能pass **rvalue**</span> to this parameter
+     - <span style="color:red">pass **rvalue**</span> to this parameter
      - deduced 跟lvalue reference  一样, <span style="background-color:#FFFF00">deduced type of ```T``` is type of rvalue</span>
 
 
@@ -11648,7 +11651,7 @@ f2(5); // a const & parameter can be bound to an rvalue; T is int
 
 ```
 
-**rvalue reference**: 只能接rvalue
+**rvalue reference**: 接rvalue
 
 ```c++
 template <typename T> void f3(T&&);
@@ -11667,9 +11670,11 @@ f3(42); // argument is an rvalue of type int; template parameter T is int
    
  根据Reference Collapse rule: 我们can 上面的例子```template <typename T> void f3(T&&);```
  
- ```
+ ```c++
  f3(i);   // argument is an lvalue; template parameter T is int&
+
  f3(ci); // argument is an lvalue; template parameter T is const int&
+
  ```
 
 <span style="background-color:#FFFF00">当Template parameter ```T``` deduced as **reference type**, collapsing rule says function parameter ```T&&``` collapses to **lvalue reference type**</span>. 因此instantiation would be something like 下面形式. 因此即使 <span style="color:red"> function parameter in ```f3``` is an **rvalue reference**, call instantiates ```f3``` with an **lvalue reference type**</span>
@@ -11691,6 +11696,7 @@ int&
 - A function parameter that is an rvalue reference to a template type parameter
 (e.g., T&&) can be bound to an lvalue; (lvalue reference and rvalue reference to lvalue reference)
 - If the argument is an lvalue, then the <span style="color:red">**deduced template argument type**</span> will be an <span style="color:red">**lvalue reference type**</span> and the <span style="color:red">function parameter will be instantiated</span> as an (ordinary) <span style="color:red">**lvalue reference parameter**</span> (```T&```), 表示即使template function 是 rvalue reference, can be used by lvalue as well
+- 如果用rvalue pass 到 ```T&&```, deduced type ```T``` 是 rvalue 的类型 (no reference)
 - <span style="color:red">An argument of **any type** can be passed</span> to a function parameter that is an <span style="color:red">**rvalue reference**</span> to a template parameter type (i.e., T&&).
 
 **Writing Template Functions with Rvalue Reference Parameters
@@ -11710,12 +11716,12 @@ template <typename T> void f3(T&& val)
 ```
 
 - 当call ```f3``` on rvalue, 比如literal 42, ```T``` is int. The local varaible ```t``` is <span style="color:red">**initialized by copy** value of ```val```. 当we assign to ```t```, parameter is ```val``` <span style="color:red">**remains unchanged**</span>
-- 当call ```f3``` on lvalue ```i```, then ```T``` is ```int&``` 当define and initialize local variable ```t```, variable has type ```int&```. This <span style="color:red">initialization of ```t``` **binds**(reference) ```t``` to ```val</span>. when <span style="color:red">assign to ```t```, **change** ```val``` at the same time</span>. In this instantiation of ```f3```, <span style="background-color:#FFFF00">```if``` test always yields true</span>
+- 当call ```f3``` on lvalue ```i```, then ```T``` is ```int&``` 当define and initialize local variable ```t```, variable has type ```int&```. This <span style="color:red">initialization of ```t``` **binds**(reference) ```t``` to ```val```</span>. when <span style="color:red">assign to ```t```, **change** ```val``` at the same time</span>. In this instantiation of ```f3```, <span style="background-color:#FFFF00">```if``` test always yields true</span>
 - 所以 it is <span style="color:red">very **hard** to write code correct when types involved 是 plain (nonreference) types or reference types</span> (尽管type transformation classes such as ```remove_reference``` can help)
      - rvalue reference 只用于两个地方, <span style="color:red">**forwarding its argument**</span> or <span style="color:red">**template overloading**</span>
      - function templates that use rvalue references often use overloading in the same way as before
 	
-use rvalue reference for overloading (跟以前一样), 如果下面function 不是template 的话,first version bind to modifiable rvalues and 第二个版本 bint to lvalues or const 
+use rvalue reference for overloading (跟以前一样), 如果下面function 不是template 的话,first version bind to modifiable rvalues and 第二个版本 bind to lvalues or const 
 ```c++
 template <typename T> void f(T&&); // binds to nonconst rvalues
 
@@ -11724,7 +11730,228 @@ rvalues
 
 ```
 
+**7.Understanding std::move**
 
+- Although we <span style="color:red">cannot directly bind an **rvalue reference** to an **lvalue**</span>, we <span style="color:red">can use ```move```</span> to obtain an rvalue reference bound to an lvalue.
+
+standard defines ```move```: 注需要用typename 来显示是 type. 
+
+- move's function parameter is ```T&&``` rvalue reference to template parameter type, <span style="background-color:#FFFF00">通过 **reference collapsing**, parameter can match arguments of any type</span>. 我们可以pass lvalue or rvalue to ```move```
+
+```c++
+// for the use of typename in the return type and the cast see § 16.1.3
+
+ // remove_reference is covered in § 16.2.3 
+
+template <typename T>
+typename remove_reference<T>::type&& move(T&& t)
+{
+    //static_cast covered in § 4.11.3
+
+    return static_cast<typename remove_reference<T>::type&&>(t);
+}
+
+string s1("hi!"), s2;
+s2 = std::move(string("bye!")); // ok: moving from an rvalue
+
+s2 = std::move(s1); // ok: but after the assigment s1 has indeterminate value
+
+```
+
+
+**How std::move Works**
+
+- ```std::move(string("bye!")```:  call instantiates```move<string>``` which is the function ```string&& move(string &&t)```
+  - The deduced type of ```T``` is ```string```.
+  -  Therefore, ```remove_reference``` is instantiated with ```string```.
+  - The type member of ```remove_reference<string>``` is ```string```. 
+  - The return type of move is ```string&&```.
+  - move’s function parameter, t, has type ```string&&```.
+  - body of function returns ```static_cast<string&&>(t)```. the type of t 已经是 ```string && ```, <span style="background-color:#FFFF00">cast does nothing </span>
+-  ```std::move(s1)```
+   - The deduced type of T is ```string&``` (<span style="background-color:#FFFF00">reference to string</span>, not plain string). 
+   - Therefore, ```remove_reference``` is instantiated with ```string&```.
+   - The type member of ```remove_reference<string&>``` is ```string```,
+   - The return type of move is still ```string&&```.
+   - move’s function parameter, t, <span style="background-color:#FFFF00">instantiates as ```string& &&```, which collapses to ```string&```</span>.
+   - call instantiates ```move<string&>``` which is ```string&& move(string &t)``` 就是我们想要的, want bind rvalue reference to an lvalue. 
+      - the type of t is ```string&``` which cast scnverts to ```string&&```
+
+**static_cast from an Lvalue to an Rvalue Reference Is Permitted**: 尽管我们不能implicitly convert an lvalue to rvalue reference, 但是我们可以explictly <span style="background-color:#FFFF00">cast an **lvalue** to **rvalue reference** using ```static_cast```</span>. 用cast, 这样language prevent us from casting lvalue to rvalue reference implicitly. 绑定到rvalue reference, lvalue 被 clobber(截断)
+
+
+**8.Forwarding****
+
+- 一些function 需要 forward 一个或多个 arguments with theri types unchanged to another function, 需要<span style="color:red">**preserve everything about forwared arguments**, 包括是不是**const**, argument 是 **lvalue** or **rvalue**</span>
+- we an <span style="color:red">preserve all the type information</span> by defining function parameter as <span style="color:red">**rvalue reference** to a <span style="color:red">**template type parameter**</span>. 
+  - use a reference parameter ( either lvalue or rvalue) lets us <span style="color:red">**preserve constness**</span> and <span style="color:red">**lvalue/rvalue property**</span> of its corresponding argument, 因为 const in reference type 是 low-level
+  - 还有个问题是, 所有 <span style="color:red">**function parameter** 都是**lvalue** 即使type is rvalue reference</span>, 所以如果forward 到的function 有rvalue reference 是error, 因为不能用 lvalue 去绑定到 rvalue reference
+    - 可以解决的这个问题用 ```forward``` (in ```utility``` header) that <span style="color:red">**preserves the types** of the original arguments</span>
+    - 不像 ```move```, ```forward``` must be called with an **explicit argument type**(上面第二点). <span style="color:red">```forward<T>``` returns a **rvalue reference**</span>(```T&&```) to that explicit argument type. 
+    - 通常用 ```forward``` <span style="color:red">pass **function parameter** (定义为 rvalue reference) to **template type parameter**</span>. Through <span style="background-color:#FFFF00">**reference collapsing**</span> on its return type, forward <span style="background-color:#FFFF00">preserves the **lvalue/rvalue** nature</span> of its given argument
+    - same as ```move``` , 不用 using declaration for ```std::forward``` (cover at § 18.2.3)
+
+下面例子的```flip1``` 用来对调两个参数, 但是顶层const 和 references 都丢掉了 
+```c++
+// template that takes a callable and two parameters
+
+// and calls the given callable with the parameters ''flipped''
+
+// flip1 is an incomplete implementation: top-level const and references are lost
+
+template <typename F, typename T1, typename T2> void flip1(F f, T1 t1, T2 t2)
+{
+    f(f2, f1);    
+}
+```
+
+但是上面的works fine 知道 遇到 reference parameter，比如直接call ```f``` 改变 绑定到 ```v2``` 的值, 但是 call ```f``` through ```flip1``` 不会改变原来的值, ```j``` passed to ```t1``` 是 a plain, non reference type ```int``` not ```int&```.  相当于实例化了 ```void flip1(void(*fcn)(int, int&), int t1, int t2);```, reference parameter 绑定到 ```t1``` 上 而不是 ```j``` 上
+
+
+```c++
+void f(int v1, int &v2) // note v2 is a reference
+{ 
+    cout << v1 << " " << ++v2 << endl;
+}
+f(42, i); // f changes its argument i
+
+flip1(f, j, 42); // f called through flip1 leaves j unchanged
+
+//the instantiation of the call, reference parameter 被绑定到 t1 上 而不是 j 上
+
+void flip1(void(*fcn)(int, int&), int t1, int t2);
+
+```
+
+通过define rvalue reference 来 preserve all the type information
+- 在 ```flip2``` 中, ```flip1(f, j, 42); ```  type dedeuced for ```T1``` is ```int&```, collapses to ```int&```. The reference ```t1``` bound to ```j```. 改变 ```t1``` 改变 ```j``` 的value
+
+```c++
+template <typename F, typename T1, typename T2> void flip2(F f, T1 &&t1, T2 &&t2)
+{ 
+    f(t2, t1);
+}
+```
+
+但是还有个问题, 当call a function that has an **rvalue reference** parameter, 比如call ```g``` through ```flip2```, 我们pass to function ```g``` inside ```flip2``` 因为 <span style="background-color:#FFFF00">**function parameter**</span> 都是 <span style="background-color:#FFFF00">**lvalue expression**</span>. 相当于 pass <span style="color:red"> **lvalue** to ```g``` **rvalue reference** parameter</span>
+
+```c++
+void g(int &&i, int& j)
+{
+    cout << i <<" " << j <<endl;
+}
+
+flip2(g, i, 42); // error: can't initialize int&& from an lvalue
+
+```
+
+
+**forward**: 如果arg 是 rvalue reference to a template type parameter 会represent all the type information 
+
+- 如果argment 是 <span style="color:red">**rvalue**</span>, ```Type``` is ordinary type and ```forward<Type>``` return ```Type&&```  <span style="color:red">**rvalue reference**</span> 
+- 如果argument 是 <span style="color:red">**lvalue**</span>, 通过 reference collapsing, ```Type``` is lvalue reference type(```Type&```), ```forward<Type>``` return ```Type& &&``` is ```Type&``` <span style="color:red">**lvalue reference type**</span>.  
+
+```c++
+template <typename Type> intermediary(Type &&arg)
+{
+    finalFcn(std::forward<Type>(arg));
+ }
+```
+
+所以上面```flip``` 可以写成 下面形式, ```i``` passed as ```int&``` and 41 passed as an ```int&&```
+
+```c++
+template<typename F, typename T1, typename T2>
+void flip(F f, T1 &&t1, T2 &&t2){
+    f(std::forward<T2>(t2, std::forward<T1>(t1)));
+}
+
+flip(g, i, 42);
+```
+
+
+
+
+
+#### (j). Overloading
+
+- Function templates can be **overloaded** by other templates or by ordinary, nontemplate functions. function 必须是 具有不同数量参数 或 不童类型 的参数
+- 函数匹配规则受 几方面影响
+  - **candidate functions** 包括所有 <span style="color:red">**function-template instantiation**</span> for which <span style="color:red">template argument deduction succeeds</span>
+  - **candidate functions**  是 可行的(viable),因为 <span style="color:red">**template argument deduction** 排除了不行的</span>
+  - <span style="color:red">可行的 function 是**根据 conversions 来rank的**</span>. 当然 conversions used to call a function template 是不多的 (const & array/function to pointer) 
+  - 如果有一个better than others, functions s selected. 但是如果several tunctions that provides equal match，那么
+    - 如果仅有一个 <span style="color:red">**nontemplate function**</span> equally good matches, 选择nontemplate function
+    - 如果没有 nontemplate function 都是 function templates, <span style="background-color:#FFFF00">one of these templates is **more specialized**</span>(更特例化) than any of the others, the more specialized function template is called
+    - 除此之外, call is ambiguous 
+
+好的定义 set of overloaded function templates <span style="background-color:#FFFF00">需要好的理解 **relationship among types and of restricted conversons** applied to arguments</span> in template functions
+
+
+**Writing Overloaded Templates**
+
+定义 template function, returns a string, <span style="background-color:#FFFF00">可以用于 any type that has an **output operator**, to generate a string
+```c++
+// print any type we don't otherwise handle
+template <typename T> string debug_rep(const T &t)
+{
+    ostringstream ret; // see § 8.3 
+
+    ret << t; // uses T's output operator to print a representation of t 
+    
+    return ret.str(); // return a copy of the string to which ret is bound
+
+}
+```
+
+define a version of ```debug_rep``` to print pointers. 注意下面function cannot print ```char*```, 因为 IO library deines a version of ```<<``` for ```cahr*``` values(假定pointer deontes a null-terminated character arrya, 打印数组内容, 而不是地址). 
+
+```c++
+//打印指针的值, 后跟指针指向对象
+
+//不能用于 char* 
+
+template <typename T> string debug_rep(T *p)
+{
+    ret << "pointer: " << p; // print the pointer's own value 
+    
+    if (p)
+        ret << " " << debug_rep(*p); // print the value to which p points
+    
+    else
+        ret << " null pointer"; // or indicate that the p is null
+
+    return ret.str(); // return a copy of the string to which ret is bound 
+
+}
+```
+
+
+E.g.1: 对于 下面code, 只有第一个版本是可行的, 第二个版本不可行, 因为其需要pointer parameter. no way to **instantiate a function template** that expects a pointer type from a nonpointer argument, so argument deduction fails. 只有一个viable function.
+
+```c++
+string s("hi");
+cout << debug_rep(s) << endl;
+```
+
+E.g.2: 对于下面code,  both functons generate viable instantiations: 
+    - ``` debug_rep(const string* &)```, which is the instantiation of the first version, T is ````string*```
+    - ```debug_rep(string*)````, which is the instantiation of the second version of ```debug_re```p with T bound to string
+    - <span style="color:red">第二个version is better match. 因为第一个版本需要conversion of plain pointer to a pointer to ```const```</span>
+
+```c++
+cout << debug_rep(&s) << endl;
+```
+
+E.g.3: both tmeplates ar viable and both provide an exact match
+- ```debug_rep (const string* &)```, the instantiation of the first version of the template with ```T``` bound to ```const string*```
+- ```debug_rep(const string*)```, the instantiation of the second version of the template with ```T``` bound to ```const string```
+-  ```ebug_rep(T*)``` is better match 因为<span style="color:red">more **specialized** template</span>. 因为```debug_rep(const T&)``` 本质上可以用于任何类型, 包括指针类型, 而```debug_rep(T*)``` 只能用于指针
+
+```c++
+const string *sp = &s;
+cout << debug_rep(sp) << endl;
+```
 
 
 
