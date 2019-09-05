@@ -146,8 +146,8 @@ Sequential Container
 - pure virtual function 可以被定义, 但只能定义在class外面
 - user 的 derived-to-base conversion 必须是public inheritance, derived的member and friend 无所谓, derived of derived可以用derived-to-base conversion 必须是public/protected的
 - friend 不是 transitive 和 inheritance 的 (清楚这个概念例子)
-- <span style="color: red">Derived class中 friend function, access base 的protected (base protected 也是derived protected) 成员能通过 derived-class object access, 不能通过base-class object</span>. A derived B. B friend C, C 只能用 B 获取A的protected, public, cannot use A 取获取 A
-- <span style="color: red">class friend function 可以从class 的 derived class 中获取class member， 但不能获取derived member</span>. A friend C, A derived to B, C 中可以用 B 获取A的值
+- <span style="color: red">Derived class中 friend function, access base 的protected (base protected 也是derived protected) 成员能通过 derived-class object access, 不能通过base-class object</span>. A derived to B. B friend is C, C 只能用 B 获取A的protected, public, cannot use A 取获取 A
+- <span style="color: red">class friend function 可以从class 的 derived class 中获取class member， 但不能获取derived member</span>. A friend is C, A derived to B, C 中可以用 B 获取A的值
 - Name Lookup before type checking 
 - 可以用using declaration ```Derived d; d.Base::memfcn();``` change access level (base protected 变成 derived 的 public, base 的被hide了)
 - <span style="color:red">At Compile time: static type 决定什么member can be used</span> (也是virtual function定义在base 和 derived原因). 如果Derived 有 function ```fcn``` 而 Base 中没有, then ```Base *p = &d; p->fcn();```是error的， 因为static search scope, ```fcn``` 不在 ```Base``` 中
@@ -174,7 +174,7 @@ Sequential Container
 
 
 ***
-16. Templates and Generic Programming
+16.Templates and Generic Programming
 
 - function template
     - T 可以用作 return type, function parameter type, variable declaration or cast
@@ -188,7 +188,7 @@ Sequential Container
 - 如果使用default template argument, 用的时候 用```Blob<>``` 
 - Compilation Errors Are Mostly Reported during Instantiation
 - 告诉compiler we use type not static member, use **typename**
-- <span style="color:red">class 的member template cannot be virtual</span>. class template parameter come first, then member parameter list 
+- <span style="color:red">class(template / nontemplate) 的member template cannot be virtual</span>. class template parameter come first, then member parameter list. Member templates arguments 像function template 一样, 可以被deduces出来
 -  explicit instantiation: ```extern```
     - 当compiler 看见 ```extern``` 不会generate code
     - extern declaration 必须出现在code 使用实例化之前
@@ -198,9 +198,67 @@ Sequential Container
 - function template argument conversion
     - top level const ignore
     - const conversion, 没有lower-const pointer / reference 给有lower-const pointer/reference 
-    - array/function to pointer type
+    - array/function to pointer type (如果T是reference type ```const T&```, 不会有convert to pointer)
     - 不可以 arithmetic conversion, derived-to-base conversion, and user-defined conversion
-
+    - normal parameter 可以进行conversion 
+- template/nontemplate class to template /nontemplate class friendship，只有one to one friendship 且friend class 是template 时候，<span style="color:red">需要forward declaration of template, 1 v 1比如 class-template, template to template(具有相同的实例化 instance 才是friend)</span>
+- typedef 只能用于instantiated class,不能refer to a template 
+- 每一个instantiation 都有自己的 class member 成员, 可以用实例化对象access or scope operator ```Foo<int>::sta``` 不可以 ```Foo::sta```
+- template declaration 必须包括 template parameters
+- Implicit instantiation: 只有用到时候才实例化: declare pointer(只是declare没有绑定) to class, 不会instantiate classs. 或者当有derived-to-base pointer conversion时候 or  delete pointer
+- <span style="color:red">如果class static member, 只有用static member时候才会实例化</span>
+- 有时候compiler 不能deduced type(比如 return type or normal conversion) ，需要Function explicit arguments. explicit argument from left to right. ```long lng; compare(lng, 1024); ```, error 因为没有```compare(long,int)```, ```compare<long>(lng, 1024);``` correct, 1024 convert to long 
+- Trailing Return Types：deduce ```decltype``` return type from parameters. 因为trailing return appears after parameter list
+- header ```type_traits``` type tranformation for template parameter.  如果返回是```type_traits::type``` 必须加**typename**， 告诉compiler we use type 
+    - 如果not possible to transform, ```type_traits::type``` is template parameter, 比如```remove_pointer<T>::type```, if ```T``` is ```int*```, return type is ```int```, 如果 ```T``` is ```int```, return type is ```int``` 
+- assign or intialize a function pointer, compiler use type of pointer(等号右边)值 to deduce template. ```int (*pf1)(const int&, const int&) = compare;``` compare is template
+- ```template <typename T> void f(T &p);``` 如果有 const, 是lower-level, not top level. 
+- ```template <typename T> void f(T &p);``` 只能pass lvalue, <span style="color:red">如果```T``` 含有const, 只能是lower-level</span>, 比如```const char * ```
+- ```template <typename T> void f2(const T&p);``` <span style="color:red">parameter 的 const 可是top/lower level, 比如```const char * const &p``` T是 char to const object (T中的const 是 lower-level), ```const T&p``` 的 ```const``` 是 top level 指pointer is const pointer. 比如```const int&```, T是```int```, const 是lower level的</span>
+- rvalue reference collasping
+    - 可以pass 任何type to template function with rvalue reference
+    - <span style="color:red">pass rvalue to ```T&&```, T is rvalue type (not reference)</span>
+    - <span style="color:red">pass lvalue  to template function with rvalue reference 是, T是 lvalue reference</span>
+    - reference collasping only applies 当 reference to reference is created indirectly 比如type alias or template parameter
+    - 比如function paramter is ```T&& val```, function内 ```T t = val```; <span style="color:red">如果pass rvalue is copy value of val, 改变t, 不改变外面值 . 如果pass is lvalue(```T``` is reference type),  is binds reference to val, 改变t, 改变外面值 </span>
+    - rvalue reference 只用于forwarding argument or template overloading
+        - ```template <typename T> void f(T&&);``` binds to nonconst rvalues 
+        - ```template <typename T> void f(const T&);```  lvalues and const rvalues, 因为有const conversion (不是top的)，所以上面的不是exact match
+- ```move```: 返回的type是```remove_reference<T>::type&&```always return rvalue reference. 对于rvalue, cast does nothing, 对于lvalue, ```static_cast<remove_reference<T>::type&&> (t)``` t 是lvalue reference  
+- ```forward<T>::type```
+    - <span style="color:red">必须called with explicit argument type</span>
+    - return rvalue reference (```T&&```) to that explicit argument type 
+        - if argument is rvalue,  ```type``` is rvalue oridinary ty[e. return rvalue reference
+        - if argument is lvalue, ```type``` is lvalue reference, return ```Type& &&``` is lvalue reference
+    - preserve all the type information by <span style="color:red">using rvalue reference and ```std::forward<T>(t)```</span>
+    - 如果不用rvalue reference, 不work 的例子
+    - 如果不用forward, 即使rvalue reference 也会被当做lvalue to pass 给 template function 内的另一个function 
+- template matching rule:
+    - 根据conversions 来排序 (array/function to pointer, lower const conversion), 如果several functions viable 
+        - 如果有nontemplate function, 选nontemplate function 
+        - 其次选择more specialized  比如 ```T* p``` more specialized than ```const T& p```
+    - 注意string literal types```"Hi"``` is const char array, 所以有```const T&a``` 和 ```const T*a``` 都avaiable 优先不call pointer的, 因为不需要 array to pointer conversion 
+-Variadic Templates: varying parameter is <span style="background-color:#FFFF00">**parameter pack**</span>, 大于等于0个不同类型 parameters
+    - ```sizeof...(pack)``` 有多少个pack
+    - **initializer_list** used varying number of parameter with the same type, **Variadic functions** used when different type
+    - vardiadic function 通常是recursive的, process first one and call iteself on remaining 
+        - 需要一个nonvariadic version stop recursion, 如果fail to declare before variadic, 无限的recursion
+- Expand Pack: put ellipsis to right of the pattern
+- Forward Pack: rvalue reference + forward: ```std::forward<Args>(args) ...```: expands both template parameter pack Args and function parameter pack args.
+- specialization 
+    - function: 必须为其提供arguments for every template parameter. 
+    - function specialization is instantiation. <span style="color:red">不是overload function, 不影响function match</span>, 如果定义normal template 和 specialization, 选择specialization (其实只是一个实例化), (根据matching rule, more specialized)
+    - class template 可以 partial specialized , 在class 名字后的 ```<>``` specify template parameter we are specializing, 与原模板中 的参数 按位置对应.
+    - 可以只specialize members 而不是whole class (比如```hash<Sales_data>```)
+    - declaration for a specialization must be in scope before any code uses that instantiation, 否则compiler generate code using template
+- ```hash<key_type>```: 必须定义
+    - 1 call operator returns ```size_t``` and parameters is ```key_type```
+    - 2 ```result_type``` (```size_t```) and ```argument_type``` (就是```key_type``` 比如 ```Sales_data```)
+    - 3 default constructor and copy-assignment constructor (can be implicitly synthesized)
+    - 必须specialized in namespace ```std``` as defined. 
+    - 如果使用 key_type（```Sales_data```） 的 private type, 需要make ```hash<key_type>``` as ```Sales_data```friends
+    - ```key_type``` 需要有 ```==``` 定义
+	
 ***
 
 ## 2. Variable and Basic Types
@@ -11005,7 +11063,7 @@ ct = Foo::count(); // error: which template instantiation?
     - A template <span style="background-color:#FFFF00">**declaration** must include the **template parameters**</span>
     - 对于given template，每一个declaration and definition 必须有一样 number and kind (type or nontype) of parameters
 - Access class Types
-    - 比如当我们用scope operator, 可以access <span style="background-color:#FFFF00">**type**</span> or <span style="background-color:#FFFF00">**static member**</span>. 但是对于template, <span style="color:red">template直到被**实例化**才知道是 type or static member</span>. 但是compiler 必须知道a name 是不是 type 才能 process. 
+    - 比如当我们用scope operator ```::```, 可以access <span style="background-color:#FFFF00">**type**</span> or <span style="background-color:#FFFF00">**static member**</span>. 但是对于template, <span style="color:red">template直到被**实例化**才知道是 type or static member</span>. 但是compiler 必须知道a name 是不是 type 才能 process. 
         - 比如 ```T::size_type *p```: compiler 需要知道我们是在define a variable named ```p``` 还是将 名为```size_type``` 的static 成员与 成员```p``` 想乘.
 	- <span style="color:red">by default, languages assume access name through scope operator is not a type</span>. 当use type member of a template type parameter, must explicitly tell compiler that the name is a type by ```typename```
         - 克服上面问题, 必须显式告诉 compiler the name is type, by using  ```typename T::size_type *p```. When we want to <span style="color:red">inform the compiler that a name represents a **type**</span>, we must <span style="color:red">use the keyword **typename**, not class</span>.
@@ -11240,8 +11298,8 @@ compile 看见 **extern template declaration**, **不会generate code** for that
   - 因此, An instantiation definition can be <span style="color:red">used only for **types**</span> that can be used with <span style="color:red">**every member function**</span> of a class template.
 
 
-> From StackOverflow <br/>
-> <span style="color:red">**explicit instantiation** is useful **when creating library(.lib) files that uses templates** for distribution</span>, uninstantiated template definitions are not put into object (.obj) files.<br/>
+> From StackOverflow <br/> <br/>
+> <span style="color:red">**explicit instantiation** is useful **when creating library(.lib) files that uses templates** for distribution</span>, uninstantiated template definitions are not put into object (.obj) files.<br/><br/>
 > 比如: ```std::basic_string<char,char_traits<char>,allocator<char> >``` (which is ```std::string```) so every time you use functions of std::string, <span style="color:red">the same function code doesn't need to be copied to objects</span>. The compiler only need to refer (link) those to ```libstdc++```.)
 
 **An explicit instantiation**: 用下面的形式
@@ -11312,7 +11370,7 @@ template<class T> class X {
     X* p;
     void f();
     void g();
-1};
+};
 
 X<int>* q;
 X<int> r;//实例化 X<int>
@@ -11542,7 +11600,7 @@ auto &s = fcn(ca.begin(), ca.end()); // fcn should return string&
 -  <span style="background-color:#FFFF00">如果返回是```type_traits::type```，必须用**typename**, 告诉compiler that ```type``` represents a type</span> 因为```type``` is member of a class that depends on a template parameter. 
 - <span style="color:red">如果not possible to transform template's parameter. ```type``` member is template parameter itself</span>. 比如 ```remove_pointer<T>::type``` 如果```T``` is pointer type, 则type is pointer 指向的类型, 否则no tranformation is needed, ```type``` is the same type as ```T```
 
-| For ```Mode<T>``` where ```Mod``` is   |      ```T``` is      |  ```Mod<T>::type``` is |
+| For ```Mod<T>``` where ```Mod``` is   |      ```T``` is      |  ```Mod<T>::type``` is |
 |----------|:-------------:|:------|
 | ```remove_reference``` |  ```X&``` or ```X&&``` <br/> otherwise | ```X```<br/> ```T``` |
 | ```add_const``` |  ```X&```, ```const X```, or ```function``` <br/> otherwise | ```T```<br/> ```const T``` |
@@ -11559,7 +11617,7 @@ auto &s = fcn(ca.begin(), ca.end()); // fcn should return string&
      - ```remove_reference``` has a template type parameter 和一个(public) type member named ```type```, 
      -if instantiate with a reference type, 则```type``` 是去reference 的type, 比如```remove_reference<int&>```, type member is int 
      - 因为返回时 ```::type```, 必须用**typename** 在trailing return 前面
-```
+```c++
 template<typename It>
 auto fcn2(It beg, It end) ->
      typename remove_reference<decltype(*beg)>::type
@@ -11609,11 +11667,13 @@ func(compare<int>); // passing compare(const int&, const int&)
 
 - ```template <typename T> void f(T &p);```
      - can <span style="color:red">only pass **lvalue**</span> (variable or expression returns a reference type). Argument might or might not have a const type
-     - normal bidng rules apply. 
-     - ```const``` are low level, not top level, 比如 ```p``` 是 ```int * const int``` , 则 ```T``` 是 ```int * const ``` pointer to const int 
+     - normal binding rules apply. 
+     - ```const``` are <span style="color:red">**low level**</span>, not top level, 比如 ```p``` 是 ```int * const int``` , 则 ```T``` 是 ```int * const ``` pointer to const int 
 - ```template <typename T> void f2(const T&p);```
-     - normal binding say we can pass any kind of argument- an object, temporary, literal value. <span style="background-color:#FFFF00">```T``` is not const type. 因为const 已经是part of function parameter type</span>
-- ```template <typename T> void f3(T &&p);```
+     - normal binding say we can pass any kind of argument- an object, temporary, literal value. <span style="background-color:#FFFF00">paramter 的```T``` is top level的 or lower level的</span>, 比如const pointer
+     - 比如```const char * const &p```, ```T``` 是 ```const char*```, char to const object (lower-level), 
+     - 再比如 ```const int&p```, ```T``` 是 ```int```, const 是 lower-level 的
+- ```template <typename T> void f3(T &&p);````
      - <span style="color:red">pass **rvalue**</span> to this parameter
      - deduced 跟lvalue reference  一样, <span style="background-color:#FFFF00">deduced type of ```T``` is type of rvalue</span>
 
@@ -11641,8 +11701,11 @@ f1(5); // error: argument to a & parameter must be an lvalue
 
 ```c++
 template <typename T> void f2(const T&); // can take an rvalue
+
 // parameter in f2 is const &; const in the argument is irrelevant
+
 // in each of these three calls, f2's function parameter is inferred as const int&
+
 f2(i); // i is an int; template parameter T is int
 
 f2(ci); // ci is a const int, but template parameter T is int
@@ -11663,7 +11726,7 @@ f3(42); // argument is an rvalue of type int; template parameter T is int
 
 比如when we pass lvalue ```int i = 3``` to a template function that has rvalue reference paramter ```template <typename T> void f3(T&&);```. We would assume it as illegal, 但是language define two exceptions foundation for how library facilities ```move``` operate.
 
-- Exception One: When we <span style="color:red">pass an **lvalue**</span> (e.g., i) to a function parameter that is an <span style="color:red">**rvalue reference**</span>  to a template type parameter (e.g, T&&), the compiler <span style="color:red">deduces the template type parameter</span>  (```T```) as the <span style="color:red">argument’s lvalue reference type</span> .
+- Exception One: When we <span style="color:red">pass an **lvalue**</span> (e.g., i) to a function parameter that is an <span style="color:red">**rvalue reference**</span>  to a template type parameter (e.g, ```T&&```), the compiler <span style="color:red">deduces the template type parameter</span>  (```T```) as the <span style="color:red">argument’s lvalue reference type</span> .
 - Exception Two(normal binding rule):If we <span style="background-color:#FFFF00">indirectly create a **reference to a reference**, then those references “collapse.”</span>. Reference collapsing applies only when a <span style="color:red">**reference to a reference** is created **indirectly**</span>, such as in a <span style="color:red">**type alias**</span> or a <span style="color:red">**template parameter**</span>
      - ```X& &```, ```X& &&```, and ```X&& &``` all collapse to type ```X&```
      - The type ```X&& &&``` collapses to ```X&&```
@@ -11686,8 +11749,7 @@ void f3<int&>(int& &&); // when T is int&, function parameter is int& &&
 
 // int & && collapses to int & , like 
 
-void f3<int&>(int&); // when T is int&, function parameter collapses to
-int&
+void f3<int&>(int&); // when T is int&, function parameter collapses to int&
 
 ```
 
@@ -11697,7 +11759,7 @@ int&
 (e.g., T&&) can be bound to an lvalue; (lvalue reference and rvalue reference to lvalue reference)
 - If the argument is an lvalue, then the <span style="color:red">**deduced template argument type**</span> will be an <span style="color:red">**lvalue reference type**</span> and the <span style="color:red">function parameter will be instantiated</span> as an (ordinary) <span style="color:red">**lvalue reference parameter**</span> (```T&```), 表示即使template function 是 rvalue reference, can be used by lvalue as well
 - 如果用rvalue pass 到 ```T&&```, deduced type ```T``` 是 rvalue 的类型 (no reference)
-- <span style="color:red">An argument of **any type** can be passed</span> to a function parameter that is an <span style="color:red">**rvalue reference**</span> to a template parameter type (i.e., T&&).
+- <span style="color:red">可以 pass **any type** </span> to a function parameter that is an <span style="color:red">**rvalue reference**</span>(i.e., T&&).
 
 **Writing Template Functions with Rvalue Reference Parameters
 The**
@@ -11725,18 +11787,19 @@ use rvalue reference for overloading (跟以前一样), 如果下面function 不
 ```c++
 template <typename T> void f(T&&); // binds to nonconst rvalues
 
-template <typename T> void f(const T&); // lvalues and const
-rvalues
+template <typename T> void f(const T&); // lvalues and const rvalues
 
 ```
 
-**7.Understanding std::move**
+**7. Understanding std::move**
 
 - Although we <span style="color:red">cannot directly bind an **rvalue reference** to an **lvalue**</span>, we <span style="color:red">can use ```move```</span> to obtain an rvalue reference bound to an lvalue.
 
 standard defines ```move```: 注需要用typename 来显示是 type. 
 
 - move's function parameter is ```T&&``` rvalue reference to template parameter type, <span style="background-color:#FFFF00">通过 **reference collapsing**, parameter can match arguments of any type</span>. 我们可以pass lvalue or rvalue to ```move```
+- ```remove_reference<T>``` 如果 ```T``` 是 ```X&&``` or ```X&```, ```remove_reference<T>::type``` is  ```X```, then ```remove_reference<T>::type&&``` is rvalue reference
+- 不能把 lvalue 绑定到 rvalue, 所以利用```move```, 获得的 rvalue reference  可以绑定到lvalue 
 
 ```c++
 // for the use of typename in the return type and the cast see § 16.1.3
@@ -11775,14 +11838,14 @@ s2 = std::move(s1); // ok: but after the assigment s1 has indeterminate value
    - The return type of move is still ```string&&```.
    - move’s function parameter, t, <span style="background-color:#FFFF00">instantiates as ```string& &&```, which collapses to ```string&```</span>.
    - call instantiates ```move<string&>``` which is ```string&& move(string &t)``` 就是我们想要的, want bind rvalue reference to an lvalue. 
-      - the type of t is ```string&``` which cast scnverts to ```string&&```
+      - the type of t is ```string&``` which cast converts to ```string&&```
 
 **static_cast from an Lvalue to an Rvalue Reference Is Permitted**: 尽管我们不能implicitly convert an lvalue to rvalue reference, 但是我们可以explictly <span style="background-color:#FFFF00">cast an **lvalue** to **rvalue reference** using ```static_cast```</span>. 用cast, 这样language prevent us from casting lvalue to rvalue reference implicitly. 绑定到rvalue reference, lvalue 被 clobber(截断)
 
 
-**8.Forwarding**
+**8. Forwarding**
 
-- 一些function 需要 forward 一个或多个 arguments with theri types unchanged to another function, 需要<span style="color:red">**preserve everything about forwared arguments**, 包括是不是**const**, argument 是 **lvalue** or **rvalue**</span>
+- 一些function 需要 forward 一个或多个 arguments with their types unchanged to another function, 需要<span style="color:red">**preserve everything about forwared arguments**, 包括是不是**const**, argument 是 **lvalue** or **rvalue**</span>
 - we an <span style="color:red">preserve all the type information</span> by defining function parameter as <span style="color:red">**rvalue reference** to a <span style="color:red">**template type parameter**</span>. 
   - use a reference parameter ( either lvalue or rvalue) lets us <span style="color:red">**preserve constness**</span> and <span style="color:red">**lvalue/rvalue property**</span> of its corresponding argument, 因为 const in reference type 是 low-level
   - 还有个问题是, 所有 <span style="color:red">**function parameter** 都是**lvalue** 即使type is rvalue reference</span>, 所以如果forward 到的function 有rvalue reference 是error, 因为不能用 lvalue 去绑定到 rvalue reference
@@ -11805,7 +11868,7 @@ template <typename F, typename T1, typename T2> void flip1(F f, T1 t1, T2 t2)
 }
 ```
 
-但是上面的works fine 知道 遇到 reference parameter，比如直接call ```f``` 改变 绑定到 ```v2``` 的值, 但是 call ```f``` through ```flip1``` 不会改变原来的值, ```j``` passed to ```t1``` 是 a plain, non reference type ```int``` not ```int&```.  相当于实例化了 ```void flip1(void(*fcn)(int, int&), int t1, int t2);```, reference parameter 绑定到 ```t1``` 上 而不是 ```j``` 上
+但是上面的works fine 直到 遇到 reference parameter，比如直接call ```f``` 改变 绑定到 ```v2``` 的值, 但是 call ```f``` through ```flip1``` 不会改变原来的值, ```j``` passed to ```t1``` 是 a plain, non reference type ```int``` not ```int&```.  相当于实例化了 ```void flip1(void(*fcn)(int, int&), int t1, int t2);```, reference parameter 绑定到 ```t1``` 上 而不是 ```j``` 上
 
 
 ```c++
@@ -11833,7 +11896,7 @@ template <typename F, typename T1, typename T2> void flip2(F f, T1 &&t1, T2 &&t2
 }
 ```
 
-但是还有个问题, 当call a function that has an **rvalue reference** parameter, 比如call ```g``` through ```flip2```, 我们pass to function ```g``` inside ```flip2``` 因为 <span style="background-color:#FFFF00">**function parameter**</span> 都是 <span style="background-color:#FFFF00">**lvalue expression**</span>. 相当于 pass <span style="color:red"> **lvalue** to ```g``` **rvalue reference** parameter</span>
+但是还有个问题, 当call a function that has an **rvalue reference** parameter, 比如call ```g``` through ```flip2```, 因为 <span style="background-color:#FFFF00">**function parameter**</span> 都是 <span style="background-color:#FFFF00">**lvalue expression**</span>. 相当于 pass <span style="color:red"> **lvalue** to ```g``` **rvalue reference** parameter</span>
 
 ```c++
 void g(int &&i, int& j)
@@ -11858,7 +11921,7 @@ template <typename Type> intermediary(Type &&arg)
  }
 ```
 
-所以上面```flip``` 可以写成 下面形式, ```i``` passed as ```int&``` and 41 passed as an ```int&&```
+所以上面```flip``` 可以写成 下面形式, ```i``` passed as ```int&``` and 42 passed as an ```int&&```
 
 ```c++
 template<typename F, typename T1, typename T2>
@@ -11880,7 +11943,7 @@ flip(g, i, 42);
   - **candidate functions** 包括所有 <span style="color:red">**function-template instantiation**</span> for which <span style="color:red">template argument deduction succeeds</span>
   - **candidate functions**  是 可行的(viable),因为 <span style="color:red">**template argument deduction** 排除了不行的</span>
   - <span style="color:red">可行的 function 是**根据 conversions 来rank的**</span>. 当然 conversions used to call a function template 是不多的 (const & array/function to pointer) 
-  - 如果有一个better than others, functions s selected. 但是如果several tunctions that provides equal match，那么
+  - 如果有一个better than others, functions s selected. 但是如果several functions that provides equal match，那么
     - 如果仅有一个 <span style="color:red">**nontemplate function**</span> equally good matches, 选择nontemplate function
     - 如果没有 nontemplate function 都是 function templates, <span style="background-color:#FFFF00">one of these templates is **more specialized**</span>(更特例化) than any of the others, the more specialized function template is called
     - 除此之外, call is ambiguous 
@@ -11888,11 +11951,12 @@ flip(g, i, 42);
 好的定义 set of overloaded function templates <span style="background-color:#FFFF00">需要好的理解 **relationship among types and of restricted conversons** applied to arguments</span> in template functions
 
 
-**Writing Overloaded Templates**
+**Writing Overloaded Templates** (注意e.g. 3)
 
 定义 template function, returns a string, <span style="background-color:#FFFF00">可以用于 any type that has an **output operator**, to generate a string
 ```c++
 // print any type we don't otherwise handle
+	
 template <typename T> string debug_rep(const T &t)
 {
     ostringstream ret; // see § 8.3 
@@ -11904,7 +11968,7 @@ template <typename T> string debug_rep(const T &t)
 }
 ```
 
-define a version of ```debug_rep``` to print pointers. 注意下面function cannot print ```char*```, 因为 IO library deines a version of ```<<``` for ```cahr*``` values(假定pointer deontes a null-terminated character arrya, 打印数组内容, 而不是地址). 
+define a version of ```debug_rep``` to print pointers. 注意下面function cannot print ```char*```, 因为 IO library deines a version of ```<<``` for ```char*``` values(假定pointer denotes a null-terminated character array, 打印数组内容, 而不是地址). 
 
 ```c++
 //打印指针的值, 后跟指针指向对象
@@ -11935,8 +11999,8 @@ cout << debug_rep(s) << endl;
 ```
 
 E.g.2: 对于下面code,  both functons generate viable instantiations: 
-    - ``` debug_rep(const string* &)```, which is the instantiation of the first version, T is ````string*```
-    - ```debug_rep(string*)````, which is the instantiation of the second version of ```debug_re```p with T bound to string
+    - ``` debug_rep(const string* &)```, which is the instantiation of the first version, T is ```string*```
+    - ```debug_rep(string*)```, which is the instantiation of the second version of ```debug_rep``` with T bound to string
     - <span style="color:red">第二个version is better match. 因为第一个版本需要conversion of plain pointer to a pointer to ```const```</span>
 
 ```c++
@@ -11944,9 +12008,9 @@ cout << debug_rep(&s) << endl;
 ```
 
 E.g.3: both tmeplates ar viable and both provide an exact match
-- ```debug_rep (const string* &)```, the instantiation of the first version of the template with ```T``` bound to ```const string*```
+- ```debug_rep (const string * const &)```, the instantiation of the first version of the template with ```T``` bound to ```const string*``` (lower-level const), ```debug_rep``` 的template parameter 的 const 是 top-level const 
 - ```debug_rep(const string*)```, the instantiation of the second version of the template with ```T``` bound to ```const string```
--  ```ebug_rep(T*)``` is better match 因为<span style="color:red">more **specialized** template</span>. 因为```debug_rep(const T&)``` 本质上可以用于任何类型, 包括指针类型, 而```debug_rep(T*)``` 只能用于指针
+-  ```debug_rep(T*)``` is better match 因为<span style="color:red">more **specialized** template</span>. 因为```debug_rep(const T&)``` 本质上可以用于任何类型, 包括指针类型, 而```debug_rep(T*)``` 只能用于指针
 
 ```c++
 const string *sp = &s;
@@ -11983,11 +12047,11 @@ cout << debug_rep("hi world!") << endl; // calls debug_rep(T*)
 ```c++
 string debug_rep(char *p)
 {
-return debug_rep(string(p));
+     return debug_rep(string(p));
 }
 string debug_rep(const char *p)
 {
-return debug_rep(string(p));
+     return debug_rep(string(p));
 }
 ```
 
@@ -12004,13 +12068,14 @@ string debug_rep(char *p)
    // if the declaration for the version that takes a const string& is not in scope
   
    // the return will call debug_rep(const T&) with T instantiated to string
+   
    return debug_rep(string(p));
 }
 ```
 
 E.g. 6
 
-```
+```c++
 template<typename T>
 void func(const T& a) {
 	cout << " in reference " << endl;
@@ -12020,7 +12085,9 @@ void func(const T* a) {
 	cout << " in pointer " << endl;
 }
 
-func("hi"); //print in pointer 如果没有Pointer version, call reference
+func("hi"); //print in pointer 
+
+//因为 "hi" 是 const char array, call pointer need conversion to pointer
 
 ```
 
@@ -12038,7 +12105,7 @@ func("hi"); //print in pointer 如果没有Pointer version, call reference
 - use ellipsis 表示template or function <span style="color:red">represents a pack</span>, In template parameter list, ```class...``` or ```typename...``` <span style="color:red">表示following prameter 是 a list of zero or more types</span>; <span style="color:red">the **name**</span> of a type followed by an ellipsis represents a list of zero or more nontype parameters of the given type.
 - As usual, compiler deduces template parameter types from function's argument. For variadic template, <span style="color:red">compiler **deduces the number of parameters** in the pack</span>
 - ```sizeof...(pack)```, how many elements in a pack(either template or function), 用```sizeof...(pack)```, returns a constant expression and does not evaludate its argument
-- <span style="color:red">**initializer_list**</span> take a verying number of arguments with <span style="color:red">the **same type**</span>. <span style="color:red">**Variadic functions**</span> are used when <span style="color:red">不知道 number or types of arguments</span> we want to process
+- <span style="color:red">**initializer_list**</span> take a verying number of arguments with <span style="color:red">the **same type**</span>. <span style="color:red">**Variadic functions**</span> are used when <span style="color:red">不知道 number or types (可以是different types) of arguments</span> we want to process
 
 ```c++
 // Args is a template parameter pack; rest is a function parameter pack
@@ -12071,7 +12138,6 @@ void foo(const int&, const string&, const int&, const double&);
 void foo(const string&, const int&, const char[3]&);
 void foo(const double&, const string&);
 void foo(const char[3]&);
-
 ```
 
 **sizeof**
@@ -12089,7 +12155,7 @@ void g(Args ... args) {
 **1. Writing a Variadic Function Template**
 
 - define a function ```print```, argument types 可以变化, that will print the contents of a given list of arguments on a given stream.
-- **Variadic functions** 通常是 recursive 的</span>, The call process first argument in the pack 再call itself on remaining arguments.
+- <span style="color:red">**Variadic functions** 通常是 recursive 的</span>, The call process first argument in the pack 再call itself on remaining arguments.
 - To stop the recursion, need to define a nonvariadic print function, 在我们例子中, 最好一个```rest``` 就只有一位数, 这时call ```print``` 不会call variadic version
 - key part of ```print``` 是 ```return print(os, rest...); //``` <span style="color:red">**the first argument**</span> in pack ```rest``` 会被 <span style="color:red">**removed from the pack**</span> and becomes the argument bound to ```t```. The remaining arguments in ```rest``` for the next call to ```print``` 的 parameter pack
 - 注意 <span style="color:red">A **declaration for nonvariadic version** of ```print``` must be in scope</span> when the variadic version is defined. Otherwise, the variadic function will <span style="color:red">**recurse indefinitely**</span>.
@@ -12116,7 +12182,7 @@ ostream &print(ostream &os, const T &t, const Args&... rest)
 }
 ```
 
-用一个call 来说明 ```print(cout, i, s, 42); // two parameters in the pack``` ， 分成了3个call, 前两个call variadic version 因为 nonvariadic version 不viable. 最后一个call ```print(cout, 42)```, variadic(parameter pack 是empty) 和 nonvariadic 都viable, 但是<span style="color:red">nonvariadic template is more **specialized** than variadic template</span>, nonvariadic version is chosen
+用一个call 来说明 ```print(cout, i, s, 42); // two parameters in the pack``` ， 分成了3个call, 前两个call variadic version 因为 nonvariadic version 不viable. 最后一个call ```print(cout, 42)```, variadic(parameter pack 是empty) 和 nonvariadic 都viable, 但是<span style="color:red">**nonvariadic template is more specialized than variadic template**</span>, nonvariadic version is chosen
 
 | Call | t | rest... | 
 |----------|-------------|------|
@@ -12193,6 +12259,7 @@ print(os, debug_rep(rest...)); // error: no matching function to call
 
 
 //The call is executed as 
+
 print(cerr, debug_rep(fcnName, code.num(),
 	otherData, "otherData", item));
 ```
@@ -12259,7 +12326,7 @@ svec.emplace_back(s1 + s2); // uses the move constructor
 - 使template is best for every possible tmplate argument which template 可以被实例化 是不可能的. 有时general template definition is wrong for a type. 有时候 也许write more efficient code than instantiated from template. 
 - When we <span style="color:red">**specialize a function template**</span>, we must <span style="color:red">supply arguments for **every template parameter**</span> in the original template
   - in order to specialize a template, a <span style="background-color:#FFFF00">**declaration** for original template **must be in scope**</span>.  <span style="color:red">**declaration**</span> for a specialization <span style="color:red">**must be in scope before any code uses that instantiation**</span> of the template(specilization 就是instantiation)
-    - 对于普通functions, missing declaration 是容易发现的, 但是对于spcialization declaration is missing, **compiler 通常generate code using original template**, 因为compiler 可以用original template 实例化 when a specialization is missing. 所以declaration  order error between template and its specialization 容易犯但不容易发现
+    - 对于普通functions, missing declaration 是容易发现的, 但是对于spcialization declaration is missing, <span style="color:red">**compiler 通常generate code using original template**</span>, 因为compiler 可以用original template 实例化 when a specialization is missing. 所以declaration  order error between template and its specialization 容易犯但不容易发现
     - 如果程序用了specialization and instantiation of original template with **the same set of template argument** 是error. 这种错误compiler unlikely to detect
     - Best Practices: <span style="background-color:#FFFF00">templates and their specialization declared in same header. Declaration for all templatess 先appera, followed by any specializations of those template</span>
   - to indicate specialing a template, 用 keyword ```template``` 后跟一个 empty angle brackets ```<>```: 指出 <span style="color:red">argument will be supplied for **all** the template parameters</span> of original template
@@ -12289,16 +12356,17 @@ compare("hi", "mom"); // calls the template with two nontype parameters
 
 ```
 
-e.g. <span style="background-color:#FFFF00">specialization 的 ```T``` 类型是 ```const char *```</span>, 我们template function 的parameter 是 ```const char&```, <span style="background-color:#FFFF00">const 表示是pointer 是const, 而不是a pointer to const</span>. 因此 need to use in specialization is ```const char* const &```, a reference to cosnt pointer to const char
+e.g. <span style="background-color:#FFFF00">specialization 的 ```T``` 类型是 ```const char *```</span>, 我们template function 的parameter 是 ```const T&```, <span style="background-color:#FFFF00">这里const 表示是pointer 是const, 而不是a pointer to const</span>. 因此 need to use in specialization is ```const char* const &```, a reference to cosnt pointer to const char
 
 ```c++
 template <typename T> int compare(const T&, const T&);
 
 // special version of compare to handle pointers to character arrays 
+
 template <>
 int compare(const char* const &p1, const char* const &p2)
 {
-`   return strcmp(p1, p2);
+     return strcmp(p1, p2);
 }
 ```
 
@@ -12314,7 +12382,7 @@ int compare(const char* const &p1, const char* const &p2)
 比如定义two versions ```compare```, 一个是template specialization parameter 是 ```char (&arr)[10]```, 另一个是 ```const T&```. 下面的function call```compare("hi", "mom")``` , <span style="background-color:#FFFF00">两个function template 都viable. 会选择specialization 版本的, 因为more specialized</span>
 ```c++
 template<typename T>
-int compare(const T& a, cosnt T&b);
+int compare(const T& a, const T&b);
 
 template<>
 compare(const char * const &a, const char * const & b );
@@ -12331,8 +12399,8 @@ compare(const char * a, const char * b);
 **2.Class Template Specializations**
 
 比如define a specialization of library ```hash``` template , 用来store ```Sales_data``` objects in an unordered container. 
-- By default, unordered container use ```hash<key_type>``` to organize their elements. To use this default with our own data type, 必须define a specialization of ```hash``` tempalte. 一个specializaed ```hash``` 必须定义 
-  - An <span style="color:red">**overloaded call operator** that returns a ```size_t```</span> and takes an object of the container’s key type
+- By default, unordered container use ```hash<key_type>``` to organize their elements. To use this default with our own data type, 必须define a specialization of ```hash``` template. 一个specializaed ```hash``` 必须定义 
+  - An <span style="color:red">**overloaded call operator** that returns a ```size_t```</span> and takes an object of the container’s key type as parameters
   - Two type members, ```result_type``` and ```argument_type```, which are the return and argument types, respectively, of the call operator
   - The **default constructor** and a **copy-assignment operator** (which can be implicitly defined )
 - 必须 <span style="color:red">**specialize** a template in **the same namespace** which original template is defined</span>. Any definition 注意namespace close no semicolon after curly brace.
@@ -12412,6 +12480,7 @@ unordered_multiset<Sales_data> SDset;
 
 ```c++
 //original, most general template 
+
 template <class T> struct remove_reference {
 typedef T type;
 };
@@ -12459,7 +12528,9 @@ template <typename T> struct Foo
 };
 
 template<> // we're specializing a template
+
 void Foo<int>::Bar() // we're specializing the Bar member of Foo<int>
+
 {
     // do whatever specialized processing that applies to ints 
 
