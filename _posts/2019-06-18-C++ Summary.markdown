@@ -12249,9 +12249,22 @@ svec.emplace_back(s1 + s2); // uses the move constructor
 
 #### (l). Template Specializations
 
+1. **Function Overloading versus Template Specializations**
+2. **Class Template Specializations**
+3. **Class-Template Partial Specializations**
+4. **Specializing Members but Not the Class**
+
+
+
 - 使template is best for every possible tmplate argument which template 可以被实例化 是不可能的. 有时general template definition is wrong for a type. 有时候 也许write more efficient code than instantiated from template. 
 - When we <span style="color:red">**specialize a function template**</span>, we must <span style="color:red">supply arguments for **every template parameter**</span> in the original template
+  - in order to specialize a template, a <span style="background-color:#FFFF00">**declaration** for original template **must be in scope**</span>.  <span style="color:red">**declaration**</span> for a specialization <span style="color:red">**must be in scope before any code uses that instantiation**</span> of the template(specilization 就是instantiation)
+    - 对于普通functions, missing declaration 是容易发现的, 但是对于spcialization declaration is missing, **compiler 通常generate code using original template**, 因为compiler 可以用original template 实例化 when a specialization is missing. 所以declaration  order error between template and its specialization 容易犯但不容易发现
+    - 如果程序用了specialization and instantiation of original template with **the same set of template argument** 是error. 这种错误compiler unlikely to detect
+    - Best Practices: <span style="background-color:#FFFF00">templates and their specialization declared in same header. Declaration for all templatess 先appera, followed by any specializations of those template</span>
   - to indicate specialing a template, 用 keyword ```template``` 后跟一个 empty angle brackets ```<>```: 指出 <span style="color:red">argument will be supplied for **all** the template parameters</span> of original template
+  - the <span style="color:red">function parameter types(s) 必须 **match** corresponding types in previously declared template</span>
+  - 注意有时候function parameter type 如果是 const type, type aliases, pointer, 会annoyed. 比如function parameter 是 ```const T&```, 要specialize ```const char *```类， 那么特例化的function parameter 是 ```const char * const &```(在下面例子中) 
 
 
 比如我们```compare``` function, compare character pointer by ```strcmp``` 而不是 cmparing pointer values. <span style="color:red">第二个版本</span> called only when <span style="color:red">pass **string literal**</span> or an <span style="color:red">**array**</span>. 如果对比 <span style="color:red">**character pointers**</span>, <span style="color:red">first version</span> of template will be called.
@@ -12276,23 +12289,191 @@ compare("hi", "mom"); // calls the template with two nontype parameters
 
 ```
 
+e.g. <span style="background-color:#FFFF00">specialization 的 ```T``` 类型是 ```const char *```</span>, 我们template function 的parameter 是 ```const char&```, <span style="background-color:#FFFF00">const 表示是pointer 是const, 而不是a pointer to const</span>. 因此 need to use in specialization is ```const char* const &```, a reference to cosnt pointer to const char
+
+```c++
+template <typename T> int compare(const T&, const T&);
+
+// special version of compare to handle pointers to character arrays 
+template <>
+int compare(const char* const &p1, const char* const &p2)
+{
+`   return strcmp(p1, p2);
+}
+```
+
+
+**1. Function Overloading versus Template Specializations**
+
+- 当定义 a function template specialization, 是take over job of compiler. <span style="color:red">是**supply definition** to use for a specific **instantiation** of original template</span>. 
+  - <span style="background-color:#FFFF00">**specialization is an instantiation**</span>. It is <span style="color:red">**not an overloaded instance**</span> of the function name。 因此, <span style="color:red">**specialization not affect function matching**</span>
+- 定义 function as <span style="color:red">**specialization** or **independent nontemplate function** 可以影响function matching</span>
+  - 注意下面例子
+
+
+比如定义two versions ```compare```, 一个是template specialization parameter 是 ```char (&arr)[10]```, 另一个是 ```const T&```. 下面的function call```compare("hi", "mom")``` , <span style="background-color:#FFFF00">两个function template 都viable. 会选择specialization 版本的, 因为more specialized</span>
+```c++
+template<typename T>
+int compare(const T& a, cosnt T&b);
+
+template<>
+compare(const char * const &a, const char * const & b );
+
+compare("hi", "mom");
+```
+
+但是如果我们定义一个nontemplate function. 两个function template 和nontemplate function 都可行, 但是<span style="background-color:#FFFF00">选择nontemplate function</span>
+
+```c++
+compare(const char * a, const char * b);
+```
+
+**2.Class Template Specializations**
+
+比如define a specialization of library ```hash``` template , 用来store ```Sales_data``` objects in an unordered container. 
+- By default, unordered container use ```hash<key_type>``` to organize their elements. To use this default with our own data type, 必须define a specialization of ```hash``` tempalte. 一个specializaed ```hash``` 必须定义 
+  - An <span style="color:red">**overloaded call operator** that returns a ```size_t```</span> and takes an object of the container’s key type
+  - Two type members, ```result_type``` and ```argument_type```, which are the return and argument types, respectively, of the call operator
+  - The **default constructor** and a **copy-assignment operator** (which can be implicitly defined )
+- 必须 <span style="color:red">**specialize** a template in **the same namespace** which original template is defined</span>. Any definition 注意namespace close no semicolon after curly brace.
 
 
 
+注意 
+- Any definitions that appear between open and close curlies 是 part of ```std``` namespace 
+- Our ```hash<Sales_data>``` definition starts with ```template<>```, which indicates that we are <span style="color:red">defining a **fully specialized template**</span>. template we specialize is named ```hash``` and specialized version is ```hash<Sales_data>```
+- As with any other class, we can <span style="color:red">define the **members of a specialization** inside the class or out of it</span>, 我们定义的```operator()``` outside class. 
+- The overloaded **call operator** must define a **hashing function** over the values of the given type(```Sales_data```). 好的hash function 总会yield different results for unequal object  
+  - 这里 我们将hash function 交给了标准库, 标准库 defines specializations of the ```hash``` class for built-in types and for many of library types. 
+- By default, the <span style="color:red">**unordered containers** use the **specialization of hash**</span> that corresponds to the ```key_type``` along with the <span style="color:red">**equality operator**</span> on the key type.
+  - 假设<span style="color:red">specialization is in scope</span>, it will be <span style="color:red">**used automatically**</span> when we use ```Sales_data``` as a key to unordered containers
+- 因为```hash<Sales_data>``` 使用 ```Sales_data``` private members (```bookNo```, ```revenue```), <span style="background-color:#FFFF00">必须make ```hash<Sales_data>``` as **friend** of ```Sales_data```</span>. 因为```hash<Sales_data>``` <span style="color:red">**instantiation 定义在 std namespace**, our friend declarations 使用 ```std::hash```</span>
+- To enable users of ```Sales_data``` to use the specialization of ```hash```, we should <span style="color:red">define this specialization(hash) in the ```Sales_data``` header</span>.
+  
+```c++
+//open the std namespace so we can specialize std::hash
+
+namespace std {
+template <> // we're defining a specialization with 
+
+struct hash<Sales_data> // the template parameter of Sales_data 
+{   
+    // the type used to hash an unordered container must define these types
+
+    typedef size_t result_type;
+    typedef Sales_data argument_type; //默认情况下, this type 需要 ==
+
+    size_t operator()(const Sales_data& s) const;
+    // our class uses synthesized copy control and default constructor
+
+};
+size_t hash<Sales_data>::operator()(const Sales_data& s) const {
+    return  hash<string>()(s.bookNo) ^ 
+            hash<unsigned>()(s.units_sold) ^
+            hash<double>()(s.revenue);
+}
+} // close the std namespace; note: no semicolon after the close curly
+
+```
+
+因为使用了Sales_data private member, 必须make ```std::hash<Sales_data>``` as ```Sales_data``` friend 
+
+```c++
+template <class T> class std::hash; // needed for the friend declaration
+
+class Sales_data {
+friend class std::hash<Sales_data>;
+    // other members as before 
+
+};
+```
 
 
+如果specialiation of ```hash``` in scope, will be used automatically when use ```Sales_data``` as key to unordered container,比如
+```c++
+// uses hash<Sales_data> and Sales_data operator==from § 14.3.1 
+
+unordered_multiset<Sales_data> SDset;
+```
 
 
+**3. Class-Template Partial Specializations**
+
+- We <span style="background-color:#FFFF00">can **partially specialize only a class template**</span>. We cannot partially specialize a function template.
+- 不同于function templates, a <span style="color:red">**class template specialization** 不需要提供 argument for every template parameter. 可以specify some, but not all template parameters</span> or some, but not all, aspects of the parameters.
+-  A class **template partial specialization** 本身是 **template**. Users must **supply arguments** for those 特例化版本中未指定的 template parameters.
+
+比如 ```remove_reference```. That template works through a series of specializations 
+- 第一个templalte 定义most general version. can be instantiated with any type. 它uses template argument as type for its member named ```type```. 接下来两个class 是 **partial specializations** of original template. 
+- Because a partial specialization is a template, class name 与template 一样. The specialization’s <span style="color:red">**template parameter list** 包括了 template parameter whose type is not fixed by this partial specialization</span> (未被确定的参数).
+- 在class name 后的```<>```中 <span style="color:red">specify arguments for the template parameter we are specializing(提供特例化的实参)</span>. 这些arguments <span style="color:red">与原始模板中 的参数 按位置对应</span>.
+- The **template parameter list** of a partial specialization is a <span style="color:red">**subset** of, or a **specialization** of, the parameter list of the original template</span>
+    -在下面例子中, 特例化有一样数量的parameter as original template, parameter's type in specialization differ from original template. specialization 用于lvalue 和 rvalue reference type
+
+```c++
+//original, most general template 
+template <class T> struct remove_reference {
+typedef T type;
+};
+
+// partial specializations that will be used for lvalue and rvalue references
+
+template <class T> struct remove_reference<T&> // lvalue references
+
+{ typedef T type; };
+template <class T> struct remove_reference<T&&> // rvalue references
+
+{ typedef T type; };
+```
+
+下面是三个变量 a,b,c 均为 int 类型
+
+```c++
+int i;
+// decltype(42) is int, uses the original template 
+
+remove_reference<decltype(42)>::type a;
+// decltype(i) is int&, uses first (T&) partial specialization 
+
+remove_reference<decltype(i)>::type b;
+// decltype(std::move(i)) is int&&, uses second (i.e., T&&) partial specialization 
+
+remove_reference<decltype(std::move(i))>::type c;
+```
 
 
+**4. Specializing Members but Not the Class**
 
+- 可以只特例化特定成员函数 而不是 特例化整个模板 (比如上面的```hash<Sales_data>```, 只特例化了call operator, result_type 和 argument_type)
 
+e.g. 如果 ```Foo``` is a template class witha a member ```Bar```, 可以只specialize that member. 只特例化了 ```Foo<int>``` 类的一成员, 其他类由```Foo``` template 提供. 如果use ```Foo``` with 任何 type, members are instantiated as usual. If  use ```Bar``` member of ```Foo<int>```, 则使用我们定义的特例化版本
 
+```c++
+template <typename T> struct Foo 
+{
+    Foo(const T &t = T()): mem(t) { } 
+    void Bar() { /* ... */ }
+    T mem;
+    // other members of Foo 
 
+};
 
+template<> // we're specializing a template
+void Foo<int>::Bar() // we're specializing the Bar member of Foo<int>
+{
+    // do whatever specialized processing that applies to ints 
 
+}
 
+Foo<string> fs; // instantiates Foo<string>::Foo()
 
+fs.Bar(); // instantiates Foo<string>::Bar()
+
+Foo<int> fi; // instantiates Foo<int>::Foo()
+
+fi.Bar(); // uses our specialization of Foo<int>::Bar()
+
+```
 
 
 
