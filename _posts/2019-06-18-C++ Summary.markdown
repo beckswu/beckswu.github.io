@@ -11730,7 +11730,8 @@ f3(42); // argument is an rvalue of type int; template parameter T is int
 - Exception Two(normal binding rule):If we <span style="background-color:#FFFF00">indirectly create a **reference to a reference**, then those references “collapse.”</span>. Reference collapsing applies only when a <span style="color:red">**reference to a reference** is created **indirectly**</span>, such as in a <span style="color:red">**type alias**</span> or a <span style="color:red">**template parameter**</span>
      - ```X& &```, ```X& &&```, and ```X&& &``` all collapse to type ```X&```
      - The type ```X&& &&``` collapses to ```X&&```
-   
+- 注意: <span style="color:red">**lvalue deduced to lvalue references, rvalues are not deduced to rvalue references**</span>. Rvalues are deduced to the type itself  
+  
  根据Reference Collapse rule: 我们can 上面的例子```template <typename T> void f3(T&&);```
  
  ```c++
@@ -12545,6 +12546,68 @@ Foo<int> fi; // instantiates Foo<int>::Foo()
 fi.Bar(); // uses our specialization of Foo<int>::Bar()
 
 ```
+
+
+> ![From Scott Meyers](https://isocpp.org/blog/2012/11/universal-references-in-c11-scott-meyers)
+
+
+**rvalue references, move semantics, or perfect forwarding**. **Auto** variables with ```&&```  跟type deduction for function template parameter 原理是一样的. so lvalues of type T are deuced to have type ```T&```, rvalue of type T to have type ```T```. 
+
+
+declare using ```&&``` 不一定表示是 rvalue reference, 比如下面code, 如果see ```&&``` assume its rvalue reference, misread lot of c++ code 
+
+```c++
+Widget&& var1 = someWidget;  // here, “&&” means rvalue reference, 
+
+//but var1 is lvalue, 因为take address of var1
+ 
+auto&& var2 = var1;// here, “&&” does not mean rvalue reference
+ 
+template<typename T>
+void f(std::vector<T>&& param);  // here, “&&” means rvalue reference
+ 
+template<typename T>
+void f(T&& param);     // here, “&&”does not mean rvalue reference
+
+```
+
+references declared with ```&&``` that may be either lvalue references or rvalue references may bind to anything.  Such unusually flexible references deserve their own name. I call them **universal references**. ```&&``` indicates a universal reference only where **type deduction** takes place
+
+```c++
+template<typename T>// deduced parameter type ⇒ type deduction;
+
+void f(T&& param);  // && ≡ universal reference
+       
+ 
+template<typename T>
+class Widget {
+    ...
+    Widget(Widget&& rhs); // fully specified parameter type ⇒ no type deduction;
+    
+    ...       // && ≡ rvalue reference
+};
+ 
+template<typename T1>
+class Gadget {
+    ...
+    template<typename T2>
+    Gadget(T2&& rhs); // deduced parameter type ⇒ type deduction;
+    
+    ...    // && ≡ universal reference
+};
+ 
+void f(Widget&& param); / fully specified parameter type ⇒ no type deduction;
+      
+      // && ≡ rvalue reference
+      
+```
+
+
+
+
+
+
+
 
 
 
