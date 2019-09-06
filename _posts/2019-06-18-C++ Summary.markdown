@@ -205,15 +205,14 @@ Sequential Container
 - typedef 只能用于instantiated class,不能refer to a template 
 - 每一个instantiation 都有自己的 class member 成员, 可以用实例化对象access or scope operator ```Foo<int>::sta``` 不可以 ```Foo::sta```
 - template declaration 必须包括 template parameters
-- Implicit instantiation: 只有用到时候才实例化: declare pointer(只是declare没有绑定) to class, 不会instantiate classs. 或者当有derived-to-base pointer conversion时候 or  delete pointer
+- Implicit instantiation: 只有用到时候才实例化: declare pointer(只是declare没有绑定) to class, 不会instantiate classs  比如```Foo<int>*a``` class defintiion不会instantiated. 或者当有derived-to-base pointer conversion时候 or  delete pointer
 - <span style="color:red">如果class static member, 只有用static member时候才会实例化</span>
 - 有时候compiler 不能deduced type(比如 return type or normal conversion) ，需要Function explicit arguments. explicit argument from left to right. ```long lng; compare(lng, 1024); ```, error 因为没有```compare(long,int)```, ```compare<long>(lng, 1024);``` correct, 1024 convert to long 
 - Trailing Return Types：deduce ```decltype``` return type from parameters. 因为trailing return appears after parameter list
 - header ```type_traits``` type tranformation for template parameter.  如果返回是```type_traits::type``` 必须加**typename**， 告诉compiler we use type 
     - 如果not possible to transform, ```type_traits::type``` is template parameter, 比如```remove_pointer<T>::type```, if ```T``` is ```int*```, return type is ```int```, 如果 ```T``` is ```int```, return type is ```int``` 
 - assign or intialize a function pointer, compiler use type of pointer(等号右边)值 to deduce template. ```int (*pf1)(const int&, const int&) = compare;``` compare is template
-- ```template <typename T> void f(T &p);``` 如果有 const, 是lower-level, not top level. 
-- ```template <typename T> void f(T &p);``` 只能pass lvalue, <span style="color:red">如果```T``` 含有const, 只能是lower-level</span>, 比如```const char * ```
+- ```template <typename T> void f(T &p);``` 只能pass lvalue, <span style="color:red">如果```T``` 含有const, 只能是lower-level, not top level. </span>, 比如```const char * ```
 - ```template <typename T> void f2(const T&p);``` <span style="color:red">parameter 的 const 可是top/lower level, 比如```const char * const &p``` T是 char to const object (T中的const 是 lower-level), ```const T&p``` 的 ```const``` 是 top level 指pointer is const pointer. 比如```const int&```, T是```int```, const 是lower level的</span>
 - rvalue reference collasping
     - 可以pass 任何type to template function with rvalue reference
@@ -222,13 +221,14 @@ Sequential Container
     - reference collasping only applies 当 reference to reference is created indirectly 比如type alias or template parameter
     - 比如function paramter is ```T&& val```, function内 ```T t = val```; <span style="color:red">如果pass rvalue is copy value of val, 改变t, 不改变外面值 . 如果pass is lvalue(```T``` is reference type),  is binds reference to val, 改变t, 改变外面值 </span>
     - rvalue reference 只用于forwarding argument or template overloading
-        - ```template <typename T> void f(T&&);``` binds to nonconst rvalues 
-        - ```template <typename T> void f(const T&);```  lvalues and const rvalues, 因为有const conversion (不是top的)，所以上面的不是exact match
+        - ```template <typename T> void f(T&&);``` binds to nonconst rvalues and lvalues
+        - ```template <typename T> void f(const T&);```  const lvalues and rvalues, 因为有const conversion (不是top的)，所以上面的不是exact match
+        - 如果同时```T&&``` 和 ```const T&``` 对于nonst lvalue, call ```T&&``` 因为更specialized 的
 - ```move```: 返回的type是```remove_reference<T>::type&&```always return rvalue reference. 对于rvalue, cast does nothing, 对于lvalue, ```static_cast<remove_reference<T>::type&&> (t)``` t 是lvalue reference  
 - ```forward<T>::type```
     - <span style="color:red">必须called with explicit argument type</span>
     - return rvalue reference (```T&&```) to that explicit argument type 
-        - if argument is rvalue,  ```type``` is rvalue oridinary ty[e. return rvalue reference
+        - if argument is rvalue,  ```type``` is rvalue oridinary type. return rvalue reference
         - if argument is lvalue, ```type``` is lvalue reference, return ```Type& &&``` is lvalue reference
     - preserve all the type information by <span style="color:red">using rvalue reference and ```std::forward<T>(t)```</span>
     - 如果不用rvalue reference, 不work 的例子
@@ -237,8 +237,9 @@ Sequential Container
     - 根据conversions 来排序 (array/function to pointer, lower const conversion), 如果several functions viable 
         - 如果有nontemplate function, 选nontemplate function 
         - 其次选择more specialized  比如 ```T* p``` more specialized than ```const T& p```
+	- 看overloading match 例子
     - 注意string literal types```"Hi"``` is const char array, 所以有```const T&a``` 和 ```const T*a``` 都avaiable 优先不call pointer的, 因为不需要 array to pointer conversion 
--Variadic Templates: varying parameter is <span style="background-color:#FFFF00">**parameter pack**</span>, 大于等于0个不同类型 parameters
+- Variadic Templates: varying parameter is <span style="background-color:#FFFF00">**parameter pack**</span>, 大于等于0个不同类型 parameters
     - ```sizeof...(pack)``` 有多少个pack
     - **initializer_list** used varying number of parameter with the same type, **Variadic functions** used when different type
     - vardiadic function 通常是recursive的, process first one and call iteself on remaining 
@@ -250,13 +251,13 @@ Sequential Container
     - function specialization is instantiation. <span style="color:red">不是overload function, 不影响function match</span>, 如果定义normal template 和 specialization, 选择specialization (其实只是一个实例化), (根据matching rule, more specialized)
     - class template 可以 partial specialized , 在class 名字后的 ```<>``` specify template parameter we are specializing, 与原模板中 的参数 按位置对应.
     - 可以只specialize members 而不是whole class (比如```hash<Sales_data>```)
-    - declaration for a specialization must be in scope before any code uses that instantiation, 否则compiler generate code using template
+    - <span style="color:red">declaration for a specialization must be in scope before any code uses that instantiation, 否则compiler generate code using original template</span>
 - ```hash<key_type>```: 必须定义
     - 1 call operator returns ```size_t``` and parameters is ```key_type```
     - 2 ```result_type``` (```size_t```) and ```argument_type``` (就是```key_type``` 比如 ```Sales_data```)
     - 3 default constructor and copy-assignment constructor (can be implicitly synthesized)
     - 必须specialized in namespace ```std``` as defined. 
-    - 如果使用 key_type（```Sales_data```） 的 private type, 需要make ```hash<key_type>``` as ```Sales_data```friends
+    - 如果使用 key_type（```Sales_data```） 的 private member, 需要make ```hash<key_type>``` as ```Sales_data```friends
     - ```key_type``` 需要有 ```==``` 定义
 	
 ***
@@ -12091,6 +12092,26 @@ func("hi"); //print in pointer
 //因为 "hi" 是 const char array, call pointer need conversion to pointer
 
 ```
+
+E.g 7 如果同时 ```T&&``` 和 ```const T&``` 对于lvalue 都available, call ```T&&```, 因为更specialized. 但对于 const rvalue reference, call  ```const T& t```, 因为```T&&``` 需要const version， 不如```const T&```
+
+```c++
+template<typename T>
+void debug(const T& t) {
+	cout << "in lvalue " << endl;
+}
+template<typename T>
+void debug(T&& t) {
+	cout << " in rvalue " << endl;
+}
+int r = 1;
+debug(r); // print in rvalue;
+
+const int&& i = r*3;
+debug(i);
+```
+
+
 
 
 #### (k). Variadic Templates
