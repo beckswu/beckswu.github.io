@@ -4834,6 +4834,29 @@ cout << equal(a.begin(), a.end(), b.begin());//print 1
 
 ``` 
 
+<span style="background-color:#FFFF00"> accumulate 可以用于 self-defined class, 只要class **overload addition operator**, pass 到 accumulate 需要pass as **functor(rvalue) with constructor**</span>
+
+```c++
+class myobj {
+public:
+     int a = 0;
+     myobj(string s) {}
+     myobj& operator+(const myobj& l) {
+          this->a += l.a;
+	  return (*this);
+     }
+};
+
+myobj a("1"); myobj b("2");
+a.a = 1; b.a = 2;
+vector<myobj> vec = { a,b };
+
+myobj c = accumulate(vec.begin(), vec.end(), myobj("whatever string"));
+cout << "c value " << c.a << endl; //print 3
+
+```
+
+
 Algorithm that write element
 
 | Syntax | Description | 
@@ -12378,7 +12401,7 @@ compare("hi", "mom"); // calls the template with two nontype parameters
 
 ```
 
-e.g. <span style="background-color:#FFFF00">specialization 的 ```T``` 类型是 ```const char *```</span>, 我们template function 的parameter 是 ```const T&```, <span style="background-color:#FFFF00">这里const 表示是pointer 是const, 而不是a pointer to const</span>. 因此 need to use in specialization is ```const char* const &```, a reference to cosnt pointer to const char
+e.g. <span style="background-color:#FFFF00">specialization 的 ```T``` 类型是 ```const char *```</span>, 我们template function 的parameter 是 ```const T&```, <span style="background-color:#FFFF00">这里const 表示是pointer 是const, 而不是a pointer to const</span>. 因此 need to use in specialization is ```const char* const &```, a reference to const pointer to const char
 
 ```c++
 template <typename T> int compare(const T&, const T&);
@@ -12622,6 +12645,420 @@ void f(Widget&& param); / fully specified parameter type ⇒ no type deduction;
       // && ≡ rvalue reference
       
 ```
+
+decltype is different deduction from auto, 比如下面的第二个例子, won't compile 
+
+> a) if the value category of expression is **xvalue**, then decltype yields ```T&&```;<br/>
+> b) if the value category of expression is **lvalue**, then decltype yields ```T&```;<br/>
+> c) if the value category of expression is **prvalue**, then decltype yields ```T```.<br/>
+
+
+```c++
+Widget w1, w2;
+ 
+auto&& v1 = w1; // v1 is an auto-based universal reference being
+                  
+	// initialized with an lvalue, so v1 becomes an
+                                 
+	// lvalue reference referring to w1.
+ 
+decltype(w1)&& v2 = w2; // v2 is a decltype-based universal reference, and
+             
+	     // decltype(w1) is Widget, so v2 becomes an rvalue reference.
+             
+	     // w2 is an lvalue, and it’s not legal to initialize an
+            
+	    // rvalue reference with an lvalue, so
+           
+	   // this code does not compile.
+
+```
+
+
+***
+<br/> <br/> <br/>
+
+
+## 17. Specialized Library Facilities
+
+
+#### (a). Tuple
+
+1. **Defining and Initializing tuples**
+2. **Using a tuple to Return Multiple Values**
+
+
+
+- Tuple can have <span style="color:red">any number of members</span>. Each distinct tuple type has a fixed number of members. 不同 tuple type 的 member 数量可以不同
+- Tuple is useful when combine some data into one object but 不想建立 a data structure. 
+- tuple can be think as quick and dirty data structure
+
+Tuple type, along with its companion types, and functions defined in ```tuple``` header.
+
+| syntax | description | 
+|----------|:-------------|
+| ```tuple<T1,T2, ... , Tn>t``` | a tuple with members types are ```T1```... ```Tn```. members are <span style="background-color:#FFFF00">**value initialized**</span>  |
+| ```tuple<T1, T2,..., Tn>t(v1,v2,...vn);``` | members initialized from <span style="background-color:#FFFF00">**initializer**</span> vi. The <span style="background-color:#FFFF00">constructor is **explicit** </span> |
+| ```make_tuple<v1,v2,...,vn)``` | returns a tuple initialized from given initializer. The <span style="background-color:#FFFF00">type</span> of the tuple is <span style="background-color:#FFFF00">**inferred from types of initializer**</span> | 
+| ```t1 == t2```<br/> ```t1 != t2``` | two tuples are equal if they 一样数量member and each pair of members are equal. Use member 的 ```==``` operator. <span style="background-color:#FFFF00">一旦发现不一样, subsequent members are not tested</span> | 
+| ```t1 relop``` t2 | Relational operations. <span style="background-color:#FFFF00">两个tuples must have the 一样数量的member</span> | 
+| ```get<i>(t)``` | return <span style="background-color:#FFFF00">**reference**</span> to ith data member of t. <span style="background-color:#FFFF00">如果t is lvalue, result is **lvalue reference**, otherwise it is **rvalue reference**</span>. 所有member of tuple 是 public | 
+| ```tuple_size<tupleType>::value``` | A class template that can be instantitated by a tuple type and has a <span style="background-color:#FFFF00">**public constexpr static data member** named ```value``` 是 ```size_t``` type</span> 表示number of members in specified tuple type, 因为是constexpr, 可以用于array declare, 比如 ```int a[tuple_size<..>:value]``` |
+| ```tuple_element<i, tupleType>::type``` | A class template that can be instantiated by an integral constant and a tuple type and has a public member named ```type``` that is <span style="background-color:#FFFF00">type of specified members</span> in specified tuple type  | 
+
+**1. Defining and Initializing tuples**
+
+- when create a tuple, use default tuple constructor, <span style="color:red">**value initialized** each member</span>
+- 因为tuple constructor is explicit. must use direct initialization syntax.
+- ```make_tuple``` generateds tuple object
+- use ```get``` through library function template <span style="color:red">必须specify **explicit template argument**</span>
+   - ```get``` <span style="color:red">returns a **reference**</span> to specified member
+   - inside bracket ```<>``` must be <span style="color:red">**integral constant expression**</span>
+-  To use ```tuple_size``` or ```tuple_element```, need to <span style="color:red">know **type** of ```tuple``` object</span>.如果有tuple type 不知道, 可以用 ```decltype```.
+   - ```tuple_size``` has <span style="color:red">**public static** data member ```value```</span>: 是members的数量 in specified ```tuple```. 
+   - ```tuple_element``` take index 和 tuple type. has <span style="color:red">**public type member ```type```**</span>: the type of spcified member of specified tuple type. indices 从 0 开始 
+- relational and equality operators: 
+   -  <span style="color:red">必须有 same number of members</span>. to compare, 必须legal to use ```<``` and ```==``` to compare each pair of members (left-hand tuple vs right-hand tuple)
+   - 因为tuple defines ```<``` and ```==``` operators, <span style="background-color:#FFFF00">可以pass sequences of tuples to algorithms  and use tuples as **key type in ordered container**</span> 
+
+```c++
+tuple<size_t, size_t, size_t> threeD; // all three members set to 0
+
+tuple<string, vector<double>, int, list<int>>
+	someVal("constants", {3.14, 2.718}, 42, {0,1,2,3,4,5});
+```
+
+Tuple 必须用 <span style="background-color:#FFFF00">**direct initialization**</span>. 因为tuple constructor 是```explicit tuple (const Types&... elems);``` 和  ```explicit tuple (UTypes&&... elems); ```， 不能用copy constructed 的形式
+
+```c++
+tuple<size_t, size_t, size_t> threeD = {1,2,3}; // error
+
+tuple<size_t, size_t, size_t> threeD{1,2,3}; // ok
+
+```
+
+library 定义了 ```make_tuple``` function that generates a ```tuple``` object. <span style="background-color:#FFFF00">Uses the types of the supplied initializers to **infer** the type of the tuple</span>
+
+```c++
+// tuple that represents a bookstore transaction: ISBN, count, price per book
+
+auto item = make_tuple("0-999-78345-X", 3, 20.00);
+
+```
+
+
+```get``` function 定义是, 所以<span style="background-color:#FFFF00">必须specify **explicit template argument**</span>
+```c++
+template <size_t I, class... Types>
+typename tuple_element< I, tuple<Types...> >::type& get(tuple<Types...>& tpl) noexcept;
+
+template <size_t I, class... Types>
+typename tuple_element< I, tuple<Types...> >::type&& get(tuple<Types...>&& tpl) noexcept;
+
+template <size_t I, class... Types>
+typename tuple_element< I, tuple<Types...> >::type const& get(const tuple<Types...>& tpl) noexcept;
+
+auto book = get<0>(item); // returns the first member of item
+
+auto cnt = get<1>(item); // returns the second member of item
+
+auto price = get<2>(item)/cnt; // returns the last member of item
+
+get<2>(item) *= 0.8; // apply 20% discount
+
+```
+
+<span style="background-color:#FFFF00">如果有tuple size 不知道, 可以用 ```decltype```</span>
+```c++
+typedef decltype(item) trans; //trans is type of item 
+
+//return the number of members in trans
+size_t sz = tuple_size<trans>::value
+
+cnt has the same type as second item in trans
+
+tuple_element<1, trans>::type cnt  = get<1>(item); // is int
+
+```
+
+Relational operator 
+
+```c++
+tuple<string, string> duo("1", "2");
+tuple<size_t, size_t> twoD(1, 2);
+bool b = (duo == twoD); // error: can't compare a size_t and a string
+
+tuple<size_t, size_t, size_t> threeD(1, 2, 3);
+b = (twoD < threeD); // error: differing number of members
+
+tuple<size_t, size_t> origin(0, 0);
+b = (origin < twoD); // ok: b is true
+
+```
+
+**2. Using a tuple to Return Multiple Values**
+
+- common use of tuple is to <span style="color:red">**return multiple values**</span> from function.
+
+
+E.g. 有几个书店, 每个书店hold data for 每个transaction saved in ```Sales_data```. structure is ```vector<vector<Sales_data>>```, 假设每个书店的```vector<Sales_data>``` 是按照```isbn```来排序的, write function to find given book, output structure 是第一个参数第几个书店发现, 第二个参数和 第三个参数表示出现的range, 因为一本书可能多个书店出现, 用```vector<tuple<>>```
+
+注意：
+- 因为```equal_range``` 需要 ```<``` operator, ```Sales_data``` 没有定义 ```<``` operator, we pass a pointer to ```compareIsbn``` function
+- 因为Sales_data 定义了 addition operator, can use accumulate, pass ```Sales_data``` as functor initialized by constructor that takes a string as starting point for summation 
+	  
+
+```c++
+typedef tuple<vector<Sales_data>::size_type
+	vector<Sales_data>::const_iterator
+	vector<Sales_data>::const_iterator> matches;
+
+vector<matches>
+findBook(const vector<vector<Sales_data>>& files, const string &book)
+{
+     vector<matches> ret;
+     for(auto it = files.cbegin(); it!=files.cend(); ++it)
+     {
+          auto found = equal_range(it.cbegin(), it.cend(), book, compareIsbn);
+     	  if(found.first != found.second)
+	     ret.push_push_back(make_tuple(it - files.cbegin(),
+	        found.first, found.second));
+     }
+     return ret;
+}
+
+void reportResults(istream &in, ostream& os, 
+     const vector<vector<Sales_data>>& files)
+{
+     string s;
+     while(in >> s){
+          auto trans = findBook(files, s); 
+	  if(trans.empty()){
+	  	cout << s << "not found in any stores"<<endl;
+		continue
+	  }
+          for(const auto & store: trans)
+	        os <<"store" << get<0>(store) << " sales: "
+     		<< accumulate(get<1>(store), get<2>(store), 
+		             Sales_data(s))
+	        <<endl;
+     }
+}
+```
+
+
+
+#### (b). bitset
+
+- bitset defined in ```bitset``` header
+- bitset possible to deal with collections of bits 大于 longest integral type
+- Like, bitset has <span style="color:red">**fixed size**</span> size must be constant expression： how many bits bitset contains 
+- starting 在0 的位置bits叫做 <span style="background-color:#FFFF00">**low-order** bits</span>
+- ending 在最后一位的位置bits <span style="background-color:#FFFF00">**high-order** bits</span>
+- 当use integral value as initializer for a bitset, <span style="background-color:#FFFF00">value convert to ```unsigned long long``` and treat as **bit pattern**. The bits in bitset are **copy** of that pattern</span>
+- 如果<span style="color:red">size of bitset 小于 number of bits, only **lower-order bits**</span> from given value ar used. higher order bits beyond size discarded
+- 当initialize bitset from pointer to element in char array or string. <span style="background-color:#FFFF00">chars in **lower indices correspond to high-order bits**</span>. The indexing conventions are <span style="background-color:#FFFF00">**inversely related**</span>. The character in string with the highest subscript (the rightmost character) is used to initialize the low-order bit(the bit with subscript 0).
+   - 听起来绕口, 跟读数字顺序是一样的
+   - 如果string contains few characters than size, <span style="color:red">**high-order bits are set to zero**</span>
+
+| syntax | description | 
+|----------|:-------------|
+| ```bitset<n>b``` | ```b``` <span style="color:red">has n bit; **each bit is 0**</span>. The constructor is <span style="background-color:#FFFF00">**constexpr**</span> | 
+| ```bitset<n>b(u)``` | b is <span style="background-color:#FFFF00">**copy** of n low-order bits</span> of unsigned long long value ```u```. 如果 n 大于 size of an unsigned long long, <span style="background-color:#FFFF00">higer-order bit beyond  are set to zero</span>. The constructor is <span style="background-color:#FFFF00">**constexpr**</span> | 
+| ```bitset<n>b(s, pos, m, zero, one)``` | b is <span style="background-color:#FFFF00">**copy**</span> of 从pos 开始 m 个 chars from string ```s```.  <span style="background-color:#FFFF00">```s``` **只能有 ```zero``` or ```one```** </span>. 如果含有其他的 character, throws ```invalid_argument```.  The characters stored in ```b``` is 0 or . <span style="background-color:#FFFF00">```pos``` default 是 0,, ```m default``` 是 ```string::npos```, ```zero``` default to '0', ```one``` default to '1'</span> | 
+| ```bitset<n>b(cp, pos, m, zero, one)``` | 跟上面一样, copies from character array ```cp``` points. <span style="background-color:#FFFF00">如果```m``` 没有提供, ```cp``` must point to **C-style string**</span>. 如果```m``` is supplied, 必须at least ```m``` characters that are ```zero``` or ```one``` starting at ```cp```|
+| | 注: constructor takes string or char pointers are <span style="background-color:#FFFF00">**explicit**</span> |
+
+
+下面例子：
+- 定义 ```bitvec``` holds 32 bits 
+- Like element in vector, <span style="color:red">the bits in bitset not named</span>
+- refer positionally: start from 0 through 31. 
+- bits <span style="background-color:#FFFF00">**starting at 0**</span> are reffered to as the <span style="background-color:#FFFF00">**low-order** bits</span>
+- those <span style="background-color:#FFFF00">**ending at 31**</span>  are referred to as <span style="background-color:#FFFF00">**high-order** bits.
+
+```c++
+bitset<32> bitvec(1U); // 32 bits; low-order bit is 1, remaining bits are 0
+
+```
+
+
+
+如果bitset size < given value, 只有lower-order 被copy, high-order bit 被丢弃 
+```c++
+// bitvec1 is smaller than the initializer; high-order bits from the initializer are discarded
+
+bitset<13> bitvec1 (0xbeef); // bits are 1111011101111
+
+// bitvec2 is larger than the initializer; high-order bits in bitvec2 are set to zero
+
+bitset<20> bitvec2(0xbeef); // bits are 00001011111011101111
+
+// on machines with 64-bit long long 0ULL is 64 bits of 0, so ~0ULL is 64 ones
+
+bitset<128> bitvec3(~0ULL); // bits 0 ... 63 are one; 63 ... 127 are zero
+
+
+0xbeef = 48879
+f -> 15 * (16 to power of 0) = 15 * 1 = 15
+e -> 14 * (16 to power of 1) = 14 * 16 = 224
+e -> 14 * (16 to power of 2) = 14 * 256 = 3584
+b -> 11 * (16 to power of 3) = 11 * 4096 = 45056
+```
+
+**initializing a bitset from a string**: 可以initialize a bitset from either string or a pointer to an element in character array. 哪种情况, characeters 都表示 bit pattern directly. 但是string 的 <span style="background-color:#FFFF00">highest suscript (最右侧的) is used to initialize **low-order bit**</span>
+
+```c++
+bitset<32> bitvec4("1100"); // bits 2 and 3 are 1, all others are 0
+
+// 也可以用substring 
+
+string str("1111111000000011001101");
+bitset<32> bitvec5(str, 5, 4); // four bits starting at str[5], 1100, 剩下的都是0
+
+bitset<32> bitvec6(str, str.size()-4); // use last four characters, 1101
+
+```
+**operation on bitset** 
+
+- support bitwise ( § 4.8 中), have the same meaning when applied to bitset as built-in operator for unsigned operands (```&```, ```|```)
+- ```set```, ```reset```, ```flip``` change state of bitset 是 overloaded, <span style="color:red">如果no applies, the given operation to entire set</span>
+- <span style="color:red">```b.size()``` is **constexpr**</span> and can be used when a const expression is required.
+- <span style="color:red">`subscript operator is overloaded on const</span> 
+   - <span style="color:red">**const version** 返回 bool value</span> true if bit at given index is on, false otherwise 
+   - <span style="color:red">**nonconst version**</span> returns a special type defined by bitset that <span style="color:red">lets us manipulate the bit value at the given index position</span>
+- ```~bitvec[0];``` 等于 ```bitvec.flip(0)```
+- ```b.to_ulong()();``` and ```b.to_ullong()``` <span style="color:red">only work if **size** of bitset less than or queal to crresponding size</span>
+   - Throw an ```overflow_error``` exception (§ 5.6) if the
+<span style="color:red">value in the bitset **does not fit** in the specified type</span>.
+- input operator reads character from input stream into <span style="color:red">**temporary object of type string**</span>. Read until it has <span style="color:red">read as many characters as size of corresponding ```bitset```, or encounter character 不是1 or 0, or it encounters end-of-file or an input error</span>
+   - then bitset is initialized from that temporary string. 如果fewer characters read than size of bitset, higher-order 用0 补充
+
+| syntax | description | 
+|----------|:-------------|
+| ```b.any()``` | Is any bit in b on ? |
+| ```b.all()``` | Are all the bits in b on ? |
+| ```b.none()``` | Are no bits in b on ? |
+| ```b.count()``` | number of bits in b are on  |
+| ```b.size()``` | A <span style="background-color:#FFFF00">**constexpr**</span> function that returns number of bits in b |
+| ```b.test(pos)``` | return true if bit at position ```pos``` is on, false otherwise  |
+| ```b.set(pos,v)``` <br/> ```b.set()``` | set the bit at position ```pos``` to the <span style="background-color:#FFFF00">**bool value**</span> ```v```. v is defaults to true, If no arguments, turns on all the bits in b |
+| ```b.reset(pos)``` <br/>```b.reset()``` | Turns off the bit at position pos or turns off all the bits in b |
+| ```b.flip(pos)``` <br/>```b.flip()``` | Change the state of the bit at position pos or every bit in b |
+| ```b[pos]``` | Gives access to bit in b at position ```pos```; 如果 b is const, then ```b[pos]``` returns a bool value true if the bit is on, false otherwise |
+| ```b.to_ulong()``` <br/> ```b.to_ullong()``` | returns an unsigned long or unsinged long long with same bits in b. <span style="color:red">Throw ```overflow_error``` if the bit pattern in b won't fit the indicated result type</span> |
+| ```b.to_string(zero,one)``` | returns a string  表示 bit pattern in b. ```zero``` and ```one``` are default to ```'0'``` and ```'1'```, 表示 bits 中的 0 and 1 |
+| ```os << b``` | prints the bit in b as characters 1 or 0 to stream ```os``` |
+| ```is >> b``` | Read characters from ```is``` into b. <span style="background-color:#FFFF00"> Reading stops when next character is not a 1 or 0 or when ```b.size()``` bit haven been read</span> |
+
+
+
+例子 
+```c++
+bitset<32> bitvec(1U); // 32 bits; low-order bit is 1, remaining bits are 0
+
+bool is_set = bitvec.any(); // true, one bit is set
+
+bool is_not_set = bitvec.none(); // false, one bit is set
+
+bool all_set = bitvec.all(); // false, only one bit is set
+
+size_t onBits = bitvec.count(); // returns 1
+
+size_t sz = bitvec.size(); // returns 32
+
+bitvec.flip(); // reverses the value of all the bits in bitvec
+
+bitvec.reset(); // sets all the bits to 0
+
+bitvec.set(); // sets all the bits to 1
+
+bitvec.flip(0); // reverses the value of the first bit
+
+bitvec.set(bitvec.size() - 1); // turns on the last bit
+
+bitvec.set(0, 0); // turns off the first bit
+
+bitvec.reset(i); // turns off the ith bit
+
+bitvec.test(0); // returns false because the first bit is off
+
+
+//subscript operator
+
+bitvec[0] = 0; // turn off the bit at position 0
+
+bitvec[31] = bitvec[0]; // set the last bit to the same value as the first bit
+
+bitvec[0].flip(); // flip the value of the bit at position 0
+
+~bitvec[0]; // equivalent operation; flips the bit at position
+
+
+//Retrieving the Value of a bitset
+
+unsigned long ulong = bitvec3.to_ulong();
+cout << "ulong = " << ulong << endl;
+
+
+//bitset IO Operators
+
+bitset<16> bits;
+cin >> bits; // read up to 16 1 or 0 characters from cin
+
+cout << "bits: " << bits << endl; // print what we just read
+
+
+
+```
+
+比较code 用bitwise operator 和 bitset
+
+```c++
+bool status;
+// version using bitwise operators
+
+unsigned long quizA = 0; // this value is used as a collection of bits
+
+quizA |= 1UL << 27; // indicate student number 27 passed
+
+status = quizA & (1UL << 27); // check how student number 27 did
+
+quizA &= ~(1UL << 27); // student number 27 failed
+
+
+// equivalent actions using the bitset library
+
+bitset<30> quizB; // allocate one bit per student; all bits initialized to 0
+
+quizB.set(27); // indicate student number 27 passed
+
+status = quizB[27]; // check how student number 27 did
+
+quizB.reset(27); // student number 27 failed
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
