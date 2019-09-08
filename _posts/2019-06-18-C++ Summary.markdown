@@ -13039,6 +13039,141 @@ quizB.reset(27); // student number 27 failed
 
 ```
 
+#### (c). Regular Expressions
+
+
+**2. Error in Specifying or Using a Regular Expression**
+**3. The Match and Regex Iterator Types**
+**4. Using Subexpressions**
+**5. Using regex_replace**
+
+- RE library defined in ```regex``` header
+- 可以搜索多种类型的输入序列, Input sequence 可以是 ```char``` data or ```wchar_t```data and those character 被存储到 ```string``` or array or ```char``` (或则wide character versions, ```wstring``` or array of ```wchar_t```)
+    - ```regex``` hold regular expression of type ```char```. library 还定义了 ```wregex``` class that hold type ```wchar_t``` and has same operations as ```regex```. 唯一不同是 initializers of ```wregex``` 必须用 ```wchar_t``` 而不是 ```char```
+    - 差异还在if in string or an array. ```smatch``` represents **string** input sequences, ```cmatch``` **character array** sequence. ```wsmatch``` **wide string** input, ```wcmatch``` **arrary of wide characters**
+
+
+| syntax | description | 
+|----------|:-------------|
+| ```regex``` | class that represent regular expression |
+| ```regex_match``` | Matches a sequence of characters against a regular expression. Returns true if <span style="background-color:#FFFF00">**entire input seqeunce**</span> matches the expression |
+| ```regex_search``` | Finds the first subseqence that mathces regular expression. Returns true if there is a <span style="background-color:#FFFF00">**substring**</span> in the input seqeunces that matches  |
+| ```regex_replace``` | Replaces a regulare expression using a given format |
+| ```sregex_itearotr``` |  Iterator adaptor that calls ```regex_search``` to iterate through the matches in a <span style="background-color:#FFFF00">**string**</span> |
+| ```smatch``` | Container class that holds the results of searching a string |
+| ```ssub_match``` | Results for a matched subexpression in a string |
+
+
+<center> Arguments to regex_search and regex_match. 返回类型是bool 表示whether match was found </center>
+ 
+| syntax | description | 
+|----------|:-------------|
+| ```(seq, m, r)``` <br/> ```(seq, m, r, mft)``` <br/>  ```(seq, r)``` <br/> ```(seq, r, mft)``` | 在character sequence ```seq``` 查找regex 对象 ```r``` 中的regular expression. ```seq``` can be <span style="background-color:#FFFF00">a **string**, a pirt of **iterators** denoting a range, or a pointer to a **null-terminated character array**</span>. ```m``` is a match object , 用来保存匹配结果细节. ```m``` and ```seq``` must have compatible types. ```mft``` is an optional ```regex_constant::match_flag_type``` value. (in §17.13) | 
+
+
+下面例子:
+- ```regex``` 使用的 regular expression 是 ECMAScript. 在ECMAScrip中, pattern ```[[:alpha:]]``` 表示匹配任意字母, 符号 ```+``` and ```*``` 分别表示 "one or more" or "zero or more"
+    - ```[[:alpha:]]*``` will match zero or more characters
+- 我们想要 match pattern "freind" and "theif" and words "receipt" 和 "receive" 
+- 定义```smatch``` object ```result```, 如果a match is found, ```results``` will hold details about where match occurred
+- ```regex_search``` functions stops 当只要找到一个匹配字串, ```results```  member ```str()```, print the part of ```test_str``` that match our pattern. 
+    - 因此打印的是 ```freind```
+
+
+```c++
+// find the characters ei that follow a character other than c
+
+string pattern("[^c]ei");
+
+pattern = "[[:alpha:]]*" + pattern + "[[:alpha:]]*"; 
+regex r(pattern); // construct a regex to find pattern
+
+smatch results; // define an object to hold the results of a search 
+
+// define a string that has text that does and doesn't match pattern
+
+string test_str = "receipt freind theif receive";
+
+// use r to find a match to pattern in test_str
+
+if (regex_search(test_str, results, r)) // if there is a match
+
+cout << results.str() << endl; // print the matching word
+
+```
+
+下面表中 Constructor and assignment operations 也会会throw exceptions of type ```regex_error```
+
+<center> regex (and wregex) Operations </center>
+
+| syntax | description | 
+|----------|:-------------|
+| ```regex r(re)``` <br/>  ```regex r(re,f)``` | re 表示个regular expression, can be a <span style="background-color:#FFFF00">**string**</span>, a <span style="background-color:#FFFF00">**pair of iterators** denoting a range of characters</span>, a <span style="background-color:#FFFF00">pointer to a <span style="background-color:#FFFF00">**null-terminated character array**</span>, a <span style="background-color:#FFFF00">**character pointer and a count**</span>, or a <span style="background-color:#FFFF00">**braced list of character**</span>. ```f``` is aflags that specify how object will execute. ```f``` 是通过下面列出来的值设置. If f is not specified, it defaults to ```ECMAScript``` |
+| ```r1 = re``` | 将```r1``` 中正则表达式替换为 ```re```. ```re``` 表示一个正则表达式, can be  <span style="background-color:#FFFF00">**string**</span>, a <span style="background-color:#FFFF00">pointer to a <span style="background-color:#FFFF00">**null-terminated character array**</span>, or a <span style="background-color:#FFFF00">**braced list of character**</span> | 
+| ```r1.assign(re,f)``` | Same effect as ```=```. and optional flag ```f```, 与```regex``` constructor 是一样的 | 
+| ```r.mark_count``` | Number of subexpressions in ```r``` |
+| ```r.flags()``` | Returns the flags set for ```r``` | 
+
+
+<center> Flag Specified when a ```regex``` is Defined: Defined in ```regex``` and ```regex::syntax_option_type```</center>
+
+| syntax | description | 
+|----------|:-------------|
+| ```icase``` | Ignore case during the match |
+| ```nosubs``` | Don't store subexpression mathces |
+| ```optimize``` | Favor speed of execution over speed of construction |
+| ```ECMAScript``` | use grammar as specied by ECMA-262 |
+| ```basic``` | Use POSIX basic regular-expression grammar |
+| ```extended``` | Use POSIX extended regular-expression grammar |
+| ```awk``` | Use grammar from the POSIX versionf of ```awk``` language |
+| ```grep``` | Use grammar from the POSIX versionf of ```grep```  |
+| ```egrep``` | Use grammar from the POSIX versionf of ```egrep```  |
+
+
+e.g.  找文件ends in ```.cc```, or ```.Cc``` or ```.cC``` or ```.CC```
+
+- ```.``` 匹配任意字符
+- we want to <span style="color:red">**escape the special nature**</span> of a character by preceding with backslash. 因为blash 也是 special character, 所以用两个backslash. <span style="color:red">```\\.``` 表示一个match 一个点</span>
+
+```c++
+regex r("[[:alnum:]]+\\.(cpp|cxx|cc)$", regex::icase);
+smatch results;
+string filename;
+while (cin >> filename)
+if (regex_search(filename, results, r))
+    cout << results.str() << endl; // print the current match
+
+```
+
+可以搜索多种类型的输入序列。
+
+| syntax | description | 
+|----------|:-------------|
+| ```string``` | ```regex```, ```smatch```, ```ssub_match```, ```sregex_iterator``` | 
+| ```const char*``` | ```regex```, ```cmatch```, ```csub_match```, ```cregex_iterator``` |
+| ```wstring``` | ```wregex```, ```wsmatch```, ```wssub_match```, ```wsregex_iterator``` | 
+| ```const wchar*``` | ```wregex```, ```wcmatch```, ```wcsub_match```, ```wcregex_iterator``` |
+
+
+
+
+第一段代码编译失败,因为 the type of match argument and type of nput sequence do not match
+
+```c++
+
+regex r("[[:alnum:]]+\\.(cpp|cxx|cc)$", regex::icase); 
+smatch results; // will match a string input sequence, but not char*
+
+if (regex_search("myfile.cc", results, r)) // error: char* input
+    
+    cout << results.str() << endl;
+
+cmatch results; // will match character array input sequences 
+
+if (regex_search("myfile.cc", results, r))
+    cout << results.str() << endl; // print the current match
+
+```
 
 
 
@@ -13051,7 +13186,535 @@ quizB.reset(27); // student number 27 failed
 
 
 
+**2.Error in Specifying or Using a Regular Expression**
 
+- 可以把regular expression 想成simple programming language. <span style="color:red">**not interpreted by c++ compiler**</span>. Instead, a regular expression is <span style="color:red">compiled at **run time**</span> when ```regex``` object is initialized with or assigned a new pattern
+- Regulation Expression <span style="color:red">**语法正确**(sytactic correctness) 与否 evaluated at **run time**</span>
+    - if make mistake writing regular expression, **run time library** will throw an exceptionf of ```regex_error```.
+    - 就像stnadard exception types, ```regex_error``` 有 ```what``` operation desribte the error that occurred
+    - ```regex_error``` 也有 value ```code``` returns a <span style="color:red">**numeric code** 表示 **type of error**</span> that was encountered
+- Avoid creating 不必要的正则表达式
+    - 因为正则表达式 <span style="background-color:#FFFF00">**compiled at rune time**</span>. Compiling a regular expression 是<span style="background-color:#FFFF00">**suprising a slow operation**</span>. 除非using extended regular expression grammar or using complicated expression. 因此<span style="color:red">regex object constructor and assignment 是time-consuming</span>
+    - 如果loop 中用了regular expression, <span style="color:red">应该在loop 外面创建 而不是recompiling it on each iteration</span>
+
+
+<center> Regular Expression Error Conditions</center>
+
+| syntax | description | 
+|----------|:-------------|
+| ```error_collate```| Invalid collating element request (无效元素校对请求) | 
+| ```error_ctype``` | Invalid character class | 
+| ```error_escape``` | Invalid escape character or trailing escape | 
+| ```error_backref``` | Invalid back reference | 
+| ```error_brack``` | Mismatched bracket (```[or]```) |
+| ```error_paren``` | Mismatched parentheses (```(or)```) | 
+| ```error_brace``` | Mismatched brace (```{or}```)  |
+| ```error_badbrace``` | Invalid range inside a ```{}``` |
+| ```error_range``` | Invalid charater range ```e.g. [z-a]``` | 
+| ```error_space``` | Insufficient memory to handle this regular expression | 
+| ```error_badrepeat``` | A repetition character (```*, ?, + {```) 之前没有有效的正则表达式 | 
+| ```error_complexity``` | 要求匹配过于复杂 | 
+| ```error_stack``` | <span style="background-color:#FFFF00">Insufficient memory</span> to evaluate a match |
+
+
+例如我们忽略了一个方括号 
+```c++
+try {// error: missing close bracket after alnum; the constructor will throw 
+    
+    regex r("[[:alnum:]+\\.(cpp|cxx|cc)$", regex::icase);
+} catch (regex_error e)
+{ 
+    cout << e.what() << "\ncode: " << e.code() << endl; 
+}
+
+//program generates 
+
+this program generates
+regex_error(error_brack):
+The expression contained mismatched [ and ]. code: 4
+```
+
+**3. The Match and Regex Iterator Types**
+
+- THe regex itearator are <span style="background-color:#FFFF00">**iterator adaptors**</span>(§ 9.6) that bound to an input that are bound to an <span style="background-color:#FFFF00">**input sequence**</span> and a <span style="background-color:#FFFF00">**regex object**</span>.
+- 当bind an ```sregex_iterator``` to a string and a regex object. iterator <span style="color:red">自动定位到 **first match** in given string</span>
+    - ```sregex_iterator``` constructor calls ```regex_search``` on given string and regex
+- when <span style="color:red">**dereference** the iterator</span>, get an ```smatch``` object corresponding to the <span style="color:red">results from **most recent search**</span>. 
+- when increment the iterator, it calls ```regex_search``` to <span style="color:red">find the next match in input string</span> 
+
+
+| syntax | description | 
+|----------|:-------------|
+| ```sregex_iterator it(b,e,r)``` | it is an sregex_iterator that iterates through string denoted by iterator ```b``` and ```e```, calls ```regex_search(b,e,r)``` to position it on the first match the input  | 
+| ```sregex_iterator end``` | off-the-end iterator for ```sregex_iterator``` | 
+| ```*it``` <br/> ```it->``` | Returns a <span style="background-color:#FFFF00">**reference** to ```smatch``` object or a **pointer** to the ```smatch``` object</span> from the most rececent call to ```regex_search``` | 
+| ```++it``` <br/> ```it++``` | Calls ```regex_search``` on input sequence <span style="background-color:#FFFF00">starting just after the current match</span>. The <span style="background-color:#FFFF00">**prefix** version returns a **reference**</span> to the incremnted iterator; <span style="background-color:#FFFF00">**postfix** returns **old value**</span> |
+| ```it1 == it2``` <br/> ```it1 != it2``` | 如果两个regex_ietator 都是<span style="background-color:#FFFF00">off-the-end iterator 则他们相等</span>. Two non-end iteartors are <span style="background-color:#FFFF00">**equal**</span> if they are <span style="background-color:#FFFF00">constructed from **the same input sequence and regex object**</span> |
+
+
+跟上面例子一样查找所有的 ```[^c]ie``` 的pattern. 
+
+- 当define ```it```, ```sregex_iterator``` constructor calls ```regex_seach``` to 定位 ```it``` on first match in ```file```. 
+- increment ```it``` for advances iterator by calling ```regex_search```
+- dereference the iterator, <span style="color:red">get an ```smatch``` object represent current match</span>. 
+
+```c++
+// find the characters ei that follow a character other than c
+
+string pattern("[^c]ei");
+
+// we want the whole word in which our pattern appears
+
+pattern = "[[:alpha:]]*" + pattern + "[[:alpha:]]*";
+
+regex r(pattern, regex::icase); // we'll ignore case in doing the match 
+
+// it will repeatedly call regex_search to find all matches in file
+
+for (sregex_iterator it(file.begin(), file.end(), r), end_it; it != end_it; ++it)
+    
+    cout << it->str() << endl; // matched word
+
+
+//output 
+
+freind
+theif
+```
+
+
+![](/img/post/C++/sregex_iterator.PNG)
+
+
+Smatch Operations. These operations also apply to ```cmatch```, ```wsmatch```, ```wcmatch``` and the corresponding ```csub_match```, ```wssub_match```, and ```wcsub_match``` types
+
+
+| syntax | description | 
+|----------|:-------------|
+| ```m.ready()``` | true if m has been set by a call to ```regex_search``` or ```regex_match```. false otherwise. <span style="background-color:#FFFF00">Operations on ```m``` are **undefined** if ```ready``` returns false</span> |
+| ```m.size()``` | Zero if ```match``` failed; othersise, return one plus the number of subexpressions in most recently matched regular expression | 
+| ```m.empty()``` | return true if ```m.size()``` is zero | 
+| ```m.prefix()``` | An ```ssub_match``` representing the sequence **before match** |
+| ```m.suffix()``` | An ```ssub_match``` representing the sequence the part **after end of the match** |
+| ```m.format(...)``` | see (§ 17.12) |  
+
+下面的operations that take an index, ```n``` defaults to 零 且 必须小于 ```m.size()``` . The first submatch (index 0) represents the overall match.
+
+| syntax | description | 
+|----------|:-------------|
+| ```m.length(n)``` | Size of the nth matched **subexpression** (string 的 大小) |
+| ```m.position(n)``` | <span style="background-color:#FFFF00">**Distance**</span> of the nth **subexpression** from the start of the sequence |
+| ```m.str(n)``` | The matched string for the nth subexpressions |
+| ```m[n]``` | ```ssub_match``` object corresponding to the nth subexpression |
+| ```m.begin(), m.end()``` <br/> ```m.cbegin(), m.cend()``` | Iterators across the ```sub_match``` elements in ```m```. ```cbegin``` and ```cend``` return ```const_iteartors``` |
+
+还是需要```[^c]ie``` 的pattern 的例子, we call ```prefix``` returns an ```ssub_match``` object 表示 the part of ```file``` ahdead of current match. We call ```length``` on ```ssub_match``` to find, 获得前缀部分的数目字数.   
+
+```c++ 
+for(sregex_iterator it(file.begin(), file.end(), r), end_it; it != end_it; ++it){
+    auto pos = it->prefix().length(); // size of the prefix
+    
+    pos=pos>40?pos-40:0; //we want up to40 characters
+    
+    cout << it->prefix().str().substr(pos) //last part of prefix
+
+        << "\n\t\t>>> " << it->str() << " <<<\n" // matched word 
+
+        << it->suffix().str().substr(0, 40) // first part of the suffix
+        
+        << endl;
+}
+
+//打印出来形式
+
+hey read or write according to the type 
+        >>> being <<<
+handled. The input operators ignore whi
+
+```
+
+
+**4. Using Subexpressions**
+
+- A pattern in a regular expression often contains <span style="color:red">**one or more subexpressions**</span>.  Regular-expression grammars typically <span style="color:red">use **parentheses** to denote subexpressions</span>.
+- 当用括号分组， 也就声明这些选项(allternatives) 行程a subexpression.  
+- The first submatch from ```smatch``` object <span style="background-color:#FFFF00">**index at 0,** 表示 match for **entire pattern**</span>. 每个subexpression appears in order. 
+- One common **use for <span style="color:red">subexpressions**</span> is to validate data that must match a <span style="color:red">**specific format**</span>.
+- ECMAScript regular expression
+    - ```{d}``` 表示单个数字,<span style="color:red">```{d}{n}``` 表示n个数字序列</span>, 比如 ```{d}{3}``` 匹配 a sequence of three digits. In C++ ```\\d{3}{3}```
+    - A collection of characters <span style="color:red">**inside square brackets** allows a match to any of those character</span> 比如 ```[-. ]``` matches a dash, a dot, or space. <span style="color:red">Note a dot has no special meaning inside bracket</span>
+    - A component <span style="color:red">followed by ```?``` is **optional**</span>. E.g. ```\{d}{3} [-. ]? \{d}{4}``` 匹配开始是三个数字, followed by an optional  dash, period or space, followed by four more digits, 比如patten match 555-0132 or 555-0132 or 555 0132 or 5550132  
+    - Like C++, ECMAScript use backslash 表示character represent itself rather than special meaning. 因为pattern 有时include parentheses, which are special character in ECMAScipt, 比如用parentheses that are part of pattern as ```\(or\)```, 因为c++， backslash 有special meaning, 必须有双backslash.  <span style="color:red">interprets ```\\``` as an **escape sequence** that represents a single backslash in memory</span>
+        - regex 中必须用 双backslash ```\\``` 才能表示单个 ```\``` 因为string 中有单个```\``` 表示escape special meaning, 但是regex 接受string, construct regex时候保留string 形式, 需要string 中有 ```\``` 形式, 所以要保留成 ```\``` 必须接受两个backslash 
+        - 比如 ```regex  reg(\\+)```  因为加号有特殊含义，要escape, The actual string data get  stored in memory is ```\+``` . 
+        - ```regex  reg(\\++)``` 表示match ```+``` 一次或者多次, 所以 string ```+```, ```++``` matches.  
+        - ```regex  reg("\\\\+");```    Matches one or more backslashes.
+
+
+Submatch Operations: These operations apply to ```ssub_match```, ```csub_match```, ```wssub_match```, ```wcsub_match```
+| syntax | description | 
+|----------|:-------------|
+| ```matched``` | A public bool data member that 表示 whether this ```ssub_match``` was matched | 
+| ```first``` <br/> ```second``` | public data members that are iterators  to the start and one past the end of the matching sequence. <span style="background-color:#FFFF00">如果no match, then ```first``` and ```second``` are second</span> |
+| ```length()``` | The size of this match. Returns 0 if ```matched``` is false | 
+| ```str()``` | Returns a string <span style="background-color:#FFFF00">containing the **matched portion** of the input</span>. <span style="background-color:#FFFF00">Returns **empty string** if ```matched``` is **false**</span> |
+| ```s = ssub``` | Convert the ```ssub_match``` object ```ssub``` to string ```s```. Equivalent to ```s = ssub.str()```. The <span style="background-color:#FFFF00">**convert operator** is **nonexplicit**</span> | 
+
+
+
+
+
+例如下面表达式有两个parenthesized subexpression
+
+- ```([[:alnum:]]+)```, which is a sequence of one or more characters 
+- ```(cpp| cxx| cc)``` which is the file extension
+- 比如 the file name is ```foo.cpp```, then ```results.str(0)``` hold ```foo.cpp```. ```results.str(1)``` will be ```foo```;  ```results.str(2)``` will be ```cpp```
+
+```c++
+// r has two subexpressions: the first is the part of the file name before the period 
+
+// the second is the file extension
+
+regex r("([[:alnum:]]+)\\.(cpp|cxx|cc)$", regex::icase);
+```
+
+print first subexpression
+
+```c++
+if (regex_search(filename, results, r))
+    cout << results.str(1) << endl; // print the first subexpression
+
+```
+
+
+
+
+```c++
+std::string s ("test subject");
+std::smatch m;
+std::regex e ("(sub)(.*)");
+
+std::regex_search ( s, m, e );
+
+for (unsigned i=0; i<m.size(); ++i) {
+    std::cout << "match " << i << " (" << m[i] << ") ";
+    std::cout << "at position " << m.position(i) << std::endl;
+}
+
+//print
+
+match 0 (subject) at position 5
+match 1 (sub) at position 5
+match 2 (ject) at position 8
+```
+
+One common **use for <span style="color:red">subexpressions**</span> is to validate data that must match a <span style="color:red">**specific format**</span>. 比如美国手机号10位数, The area code enclosed in parentheses. remaining 7个 digits  可以separated by a dash, a dot or a space. or not spearated at all. 我们希望可以接受任何上面的形式 and reject 其他形式的, 首先用regular expression to find sequences that ight be phone number then call a function to complete valiation of data. 比如 ```(908.555.1800``` we would like to reject
+
+define regular expression using subexpressions
+1. ```(\\()?```  (\\()? an optional open parenthesis for the area code 
+2. ```(\\d{3})``` the area code
+3. ```(\\))?``` an optional close parenthesis for the area code 
+4. ```([-. ])?``` an optional separator after the area code
+5. ```(\\d{3})``` the next three digits of the number 
+6. ```([-. ])?``` another optional separator
+7. ```(\\d{4})``` the final four digits of the number
+
+
+
+
+```c++
+//// our overall expression has seven subexpressions: ( ddd ) separator ddd separator dddd 
+
+// subexpressions 1, 3, 4, and 6 are optional; 2, 5, and 7 hold the number
+
+"(\\()?(\\d{3})(\\))?([-. ])?(\\d{3})([-. ])?(\\d{4})";
+```
+
+完整code: pattern 有7个subexpressions. 因此 ```smatch``` object conttain 8个 ```ssub_match``` elements. The element at ```[0]``` represent the overall match. The elements ```[1]...[7]``` represent each of the corresponding subexpressions. 
+
+```c++
+string phone = "(\\()?(\\d{3})(\\))?([-. ])?(\\d{3})([-. ]?)(\\d{4})";
+regex r(phone); // a regex to find our pattern smatch m;
+
+string s;
+while (getline(cin, s)) {
+    // for each matching phone number
+    
+    for (sregex_iterator it(s.begin(), s.end(), r), end_it;
+            it != end_it; ++it)
+    // check whether the number's formatting is valid 
+    
+    if (valid(*it))
+        cout << "valid: " << it->str() << endl; 
+    else
+        cout << "not valid: " << it->str() << endl;
+}
+
+bool valid(const smatch& m)
+else
+{
+    // if there is an open parenthesis before the area code 
+    
+    if(m[1].matched)
+        //区号后必须有一个右括号, 之后紧跟剩余好嘛或者一个空格
+
+        return m[3].matched && (m[4].matched == 0 || m[4].str() == " ");
+    else 
+        //否则 区号后不能有右括号
+
+        //另两组部分间 分隔符必须 匹配
+
+        return !m[3].matched && m[4].str() == m[6].str();
+}
+```
+
+
+
+**5. Using regex_replace**
+
+- takes an input character sequence and a ```regex``` object 
+- <span style="color:red">**refer to a particular subexpression** by using a ```$``` followed by **index number**</span> for a subexpression.
+- library 定义了 <span style="background-color:#FFFF00">**flags**</span> that we can use to <span style="background-color:#FFFF00">**control match process** or **formatting**</span> done during a replacement
+  - These flags can be passed to ```regex_search``` or ```regex_match``` functions or ```format``` members of class ```smatch```
+
+
+<center>Regular Expression Replace Operations</center>
+
+| syntax | description | 
+|----------|:-------------|
+| ```m.format(dest,fmt,mft)``` <br/> ```m.format(fmt,mft)``` | <span style="background-color:#FFFF00">Produced **formatted output** using **format string**</span> ```fmt```. the match in ```m```, and optional ```match_flag_type``` flags in ```mft```, 第一个版本是write to **output iterator** ```dest``` (§10.5.1) and takes ```fmt``` either a <span style="background-color:#FFFF00">**string**</span> or a <span style="background-color:#FFFF00">**pair of pointers** denoting a **range** in character array</span>. 第二个版本是returns a ```string``` that holds the output and takes ```fmt``` that is a <span style="background-color:#FFFF00">**string**</span> or <span style="background-color:#FFFF00">a **pointer to null-terminated character array**</span>. ```mft``` defaults to ```format_default```  |
+| ```regex_replace(dest, seq, r, fmt, mft)``` <br/> ```regex_replace(seq, r, fmt, mft)``` | Iterators ```seq```. <span style="background-color:#FFFF00">using ```regex_search``` to **find successive matches** to regex ```r```</span>. 用format string ```fmt``` and optional ```match_flag_type``` falgs in ```mft``` to produce its output. 第一个版本是<span style="background-color:#FFFF00"> writes to **output iterator**</span> ```dest``` and takes <span style="background-color:#FFFF00">**a pair of iterators**</span> to denote ```seq```. 第二个版本是 返回 a string 保存输出 and ```seq``` can be either <span style="background-color:#FFFF00">**string**</span> or <span style="background-color:#FFFF00">**pointer to a null-terminated character array**</span>. In all cases, ```fmt``` can be a <span style="background-color:#FFFF00">**string**</span> or <span style="background-color:#FFFF00">**pointer to null-terminated character array**</span>. ```mft``` defaults to ```format_default```  |
+
+
+比如上面的例子，我们想把电话转换为 “ddd.ddd.dddd“ 的形式,
+
+```c++
+string fmt = "$2.$5.$7"; // reformat numbers to ddd.ddd.dddd
+
+string phone = "(\\()?(\\d{3})(\\))?([-. ])?(\\d{3})([-. ]?)(\\d{4})";
+regex r(phone); // a regex to find our pattern
+
+string number = "(908) 555-1800";
+cout << regex_replace(number, r, fmt) << endl;
+
+//print 908.555.1800
+
+```
+
+replace phone numbers that are embeded in large file
+```c++
+//比如
+
+morgan (201) 555-2368 862-555-0123
+drew (973)555.0130
+lee (609) 555-0132 2015550175 800.555-0000
+
+//转换成
+morgan 201.555.2368 862.555.0123
+drew 973.555.0130
+lee 609.555.0132 201.555.0175 800.555.0000
+
+string phone = "(\\()?(\\d{3})(\\))?([-. ])?(\\d{3})([-. ])?(\\d{4})";
+regex r(phone); // a regex to find our pattern
+
+smatch m;
+
+string s;
+
+string fmt = "$2.$5.$7"; // reformat numbers to ddd.ddd.dddd 
+
+while (getline(cin, s))
+    cout << regex_replace(s, r, fmt) << endl; return 0;
+```
+
+
+
+<center>Match Flags</center>
+
+| syntax | description | 
+|----------|:-------------|
+| ```match_default``` | Equivalent to ```format_default``` |
+| ```match_not_bol``` | Don't treat the first character as the beginning of the line |
+| ```match_not_eol``` | Don't treat the last character as the end of the line |
+| ```match_not_bow``` | Don't treat the first character as the beginning of the word |
+| ```match_not_eow``` | Don't treat the last character as the end of the word |
+| ```match_any``` | 如果存在多于一个匹配，则可返回任意一个匹配 |
+| ```match_not_null``` | 不匹配任何空序列 |
+| ```match_continuous``` | 匹配序列必须从输入的首字符开始 |
+| ```match_prev_avail``` | 输入序列包含第一个匹配之前的内容 |
+| ```format_default``` | Replacement string uses the ```ECMAScript``` rules |
+| ```format_set``` | 用 POSIX sed 规则 替换 string |
+| ```format_no_copy``` | 不输出 input序列中的未匹配部分 |
+| ```format_first_only``` | Replace only the first occurence | 
+
+
+上面例子，加上一个flag ```format_no_copy``` 不输出未匹配的部分
+
+```c++
+string fmt2 = "$2.$5.$7 "; // put space after the last number as a separator
+
+// tell regex_replace to copy only the text that it replaces
+
+cout << regex_replace(s, r, fmt2, format_no_copy) << endl;
+
+//打印
+201.555.2368 862.555.0123
+973.555.0130
+609.555.0132 201.555.0175 800.555.0000
+```
+
+
+#### (d). Random Numbers
+
+1. **Random-Number Engines and Distribution**
+2. **Seeding a Generator**
+
+
+
+- Prior to new standard, Both C and C++ 依靠于 simple C library function ````rand```. <span style="color:red">函生成均匀分布(uniformly distributed)的 伪随机数(pseudorandom integers)</span>. 范围是从 0 到 system-dependent maximum value at least 32767. 但```rand``` 有一些问题:
+    - 一些程序需要<span style="color:red">**different range**</span> from produced by ```rand```, 一些需要random floating-point numbers. Some 需要non-uniform distribution.  Programmers often introduce <span style="color:red">**nonrandomness** when they try to transform the range, type, or distribution</span> of the numbers generated by ```rand```
+- defined in ```random``` header, 解决了这些问题through a set of cooperating classes: <span style="background-color:#FFFF00">**random-number engines** and **random-numberdistribution classes**</span>. 
+    - An <span style="color:red">**engine**</span> generates a sequence of <span style="color:red"> ```unsigned``` random numbers</span>. 
+    - A <span style="color:red">**distribution**</span> uses an <span style="color:red">**engine**</span> to <span style="color:red">generate random numbers of a specified type, in a given range, distributed</span> according to a particular probability distribution.
+- C++ programs <span style="background-color:#FFFF00">不应该使用 ```rand``` function, 而是使用 ```default_random_engine```</span> along with an appropriate distribution
+- output of calling a ```default_random_engine``` similar to output of ```rand```. <span style="color:red">**Engines**</span> 生成unsinged intergers in <span style="color:red">**system-defined range**</span>. <span style="color:red">**rand**</span> 生成范围是 <span style="color:red">0 到 ```RAND_MAX```</span>
+- The <span style="color:red">**range**</span> of an engine type is returned calling ```e.min()``` and ```e.max()``` members on an object of that type
+
+
+<center> Random Number Library Compoinents </center>
+
+| Name | description | 
+|----------|:-------------|
+| Engine | Types that generate a sequence of random ```unisnged``` integers | 
+| Distribution | Types that use an engine to return numbers according to a particular probability distribution | 
+
+
+engine 的 min and max
+```c++
+cout << "min: " << e.min() << " max: " << e.max() << endl;
+//print min: 1 max: 2147483646
+
+```
+
+
+**1. Random-Number Engines and Distribution**
+
+-  random-number <span style="color:red">**engines** are **function-object classes** 定义了**call operator** takes no arguments and returns a random ```unsigned``` number</span>
+    - 如果 ```e``` is engine, ```e()``` is to obtain the next random number.
+- The library defines several <span style="background-color:#FFFF00">**random-number engines**</span> that differ in terms of their <span style="background-color:#FFFF00">**performance** and **quality of randomness**</span>. 每一个compiler 都会<span style="color:red">指定其中一个做为 **default_random_engine type**</span>。 此类型一般具有最常用的特性
+    - 大多数情况, the <span style="color:red">**output of an engine** is **not directly used**</span>. The problem is that the numbers usually span a range that differs from the one we need. Correctly transforming the range of a random number is surprisingly hard.
+- To get a number in a specified range, we <span style="color:red">use an object of a **distribution type**</span>:
+    - Like engine type, <span style="background-color:#FFFF00">**distribution**</span> types are also <span style="background-color:#FFFF00">**function-object classes**</span>. Distribution types <span style="color:red">定义了 **call operator** that **takes a random-number engine**</span> as its argument. Distribution object 用engine to produce <span style="color:red">random number maps to specified distribution</span>
+    - 如果pass the engine object itself, ```u(e)``` (u is distribution, e is engine). 如果我们写成 ```u(e())```  含义变成, 将```e``` 生成**下一个值**传递给 ```u```, 会**compile-time error**.<span style="color:red"> We **pass the engine, not the next ersult of the engine**</span>, 因为some distribution may need to call the engine <span style="color:red">**more than once**</span>
+
+
+<center>Random Number Engine Operations</center>
+
+| Syntax | Description | 
+|----------|:-------------|
+| ```Engine e;``` | Default constructor; uses the <span style="background-color:#FFFF00">**default seed** for the **engine type**</span> |
+| ```Engine e(s);``` | Uses the integral value ```s``` as the seed | 
+| ```e.seed(s)``` | <span style="background-color:#FFFF00">**Reset the state**</span> of engine using the seed ```s``` | 
+| ```e.min()``` <br/> ```e.max()```| 此引擎可生成的最小值和最大值 | 
+| ```Engine::result_type``` | 此引擎生成的 ```unsigned``` 整数类型 (integral type) | 
+| ```e.discard(u)``` | Advance the engine by u steps; us has type ```unsigned long long``` |  
+
+
+
+
+E.g. 
+
+```c++
+default_random_engine e; // generates random unsigned integers 
+
+for (size_t i = 0; i < 10; ++i)
+    // e() "calls" the object to produce the next random number 
+    
+    cout << e() << " ";//生成random numer 16807 282475249...
+
+```
+
+use an object of a distribution type to geet a number in specified range. **注意只能写成** ```u(e)```, 不能是 ```u(e())```</span>
+
+```c++
+// uniformly distributed from 0 to 9 inclusive 
+
+uniform_int_distribution<unsigned> u(0,9); 
+default_random_engine e; // generates unsigned random integers 
+
+for (size_t i = 0; i < 10; ++i)
+    // u uses e as a source of numbers
+    
+    // each call returns a uniformly distributed value in the specified range 
+    
+    cout << u(e) << " ";
+
+```
+
+**2.Seeding a Generator**
+
+- 即使numbers that are generated appear to be random, a given <span style="color:red">generator returns **the same sequence of number** 每次run</span>
+  - It's very helpful during testing
+- A given *<span style="color:red">*random-number generator** always p**roduces the same sequence**</span> of numbers. A function with a local random-number generator should <span style="color:red">make that generator (both the **engine** and **distribution objects**) **static**</span>. Otherwise, the function will generate the identical sequence on each call.
+- 产生相同的随机数在Debugging 时候有用, 一旦完成debugging, want each run to generate different random results, by <span style="color:red">providing a **seed**</span>. 种子是一个数值, 引擎可以利用它从sequence中重新开始生成新的随机数. 两种方式seed an engine
+  - provide seed when create an engine 
+  - call the engine's **seed** member
+
+比如, print equval, 因为```v1``` 和 ```v2``` 具有一样的值, 所以编写此函数的好方法 <span style="background-color:#FFFF00">make the engine and associated distribution objects **static**</span>
+```c++
+vector<unsigned> bad_randVec()
+{
+    default_random_engine e; 
+    uniform_int_distribution<unsigned> u(0,9); 
+    vector<unsigned> ret;
+    for (size_t i = 0; i < 100; ++i)
+        ret.push_back(u(e)); 
+    return ret;
+}
+
+vector<unsigned> v1(bad_randVec());
+vector<unsigned> v2(bad_randVec());
+// will print equal
+
+cout << ((v1 == v2) ? "equal" : "not equal") << endl;
+
+//static 
+vector<unsigned> good_randVec()
+{
+    // because engines and distributions retain state, they usually should be 
+    
+    // defined as static so that new numbers are generated on each call
+    
+    static default_random_engine e;
+    static uniform_int_distribution<unsigned> u(0,9); 
+    vector<unsigned> ret;
+    for (size_t i = 0; i < 100; ++i)
+        ret.push_back(u(e)); 
+    return ret;
+}
+```
+
+Provide a ssed 
+```c++
+default_random_engine e1; // uses the default seed 
+
+default_random_engine e2(2147483646); // use the given seed value 
+
+// e3 and e4 will generate the same sequence because they use the same seed 
+
+default_random_engine e3; // uses the default seed value 
+
+e3.seed(32767); // call seed to set a new seed value 
+
+default_random_engine e4(32767); // set the seed value to 32767
+
+for (size_t i = 0; i != 100; ++i) {
+    if (e1() == e2())
+        cout << "unseeded match at iteration: " << i << endl;   
+    if (e3() != e4())
+        cout << "seeded differs at iteration: " << i << endl; 
+}
+```
 
 
 
