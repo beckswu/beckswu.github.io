@@ -299,6 +299,36 @@ public:
 	
 ***
 
+17. Specialized Library Facilities
+- ```tuple<T1,T2,...,Tn>t``` are value initialized 
+- ```tuple<T1,T2,...,Tn>t(t1,t2,...,tn)```: constructor is explicit (direct initialization 不能conversion constructed)
+- ```make_tuple<v1,v2,...,vn)```: type inferred from types of initializer
+- ```t1==t2```: <span style="color:red">member 必须有一样的数量</span>。 一旦发现不一样, 后面不用比较了
+- tuple Relational operations: tuples 必须有一样数量member 
+    - 因为tuple defines ```<```and ```== ```operators, 可以pass sequences of tuples to algorithms and use tuples as key type in <span style="background-color:#FFFF00">**ordered container**</span>
+    - 如果同样位置type 不可比也是error, 比如 第2位置一个是string, 一个是int, 不可比
+- ```get<i>(t)```: <span style="color:red">return reference</span>,如果```t``` is lvalue, result is lvalue reference, otherwise it is rvalue reference. 
+    - ```i``` <span style="color:red">必须是 integral constant expression</span>
+- 所有member of tuple 是 public
+- ```tuple_size<tupleType>::value```: size_t type.  public constexpr static data member, 可以用于array declare, 比如 ```int a[tuple_size<..>:value]``` 
+    - 如果tupleType 不知道, 可以用```decltype```
+- ```tuple_element<i, tupleType>::type```: type of specified members in specified tuple type
+
+- bitset possible to deal with collections of bits 大于 longest integral type
+- bitset has <span style="color:red">**fixed size**</span> size must be constant expression
+- **low-order bits**: 在0的位置, **high-order bits**:在最后位置
+- 如果用的bitset 小于given number, 只有**lower-order bits** are used, higher order bits 大于size的 被丢弃
+- initialize bits from string char pointer, char pointer lower index 给bitset high order，听起来绕口, 跟读数字顺序是一样的 
+- ```bitset<n>b(u)``` **copy** of n low-order bits. Constructor 是 **constexpr** and **explicit**
+- ```bitset<n>b(s, pos, m, zero, one)``` , ```bitset<n>b(cp, pos, m, zero, one)``` ```pos``` default 是 0,, ```m``` default 是 ```string::npos```, zero default to ‘0’, one default to ‘1’
+- ```set```(set at pos for **bool value** ```v```), ```reset```(turn off bits), ```flip```, 是overloaded, 如果没有提供argument, apply to entire sequence  
+    - ```~bitvec[0]```; 等于 ```bitvec.flip(0)```
+- ```b.size()``` is constexpr .
+- ```b.to_ulong() ``` 如果等号左边的range 小于 它, throw ```overflow_error```
+- ```bitset<16> bits; cin >> bits;```: read up to 16 1 or 0 characters from cin, or encounter character 不是1 or 0, or it encounters end-of-file or an input error
+- bitset subscript overloaded on const; const version： 返回bool if given index is on. nonconst version 返回type on bit lets us manipulate the bit value at the given index position
+***
+
 ## 2. Variable and Basic Types
 
 <span style="background-color: #FFFF00">**Initialization is not assignment**</span>. Initialization happens when a variable is given a value *when it is created*.(创建变量时 赋予它一个初始值). **Assignment** obliterates an object's current value and replaces that value with a new one (
@@ -11916,6 +11946,30 @@ s2 = std::move(s1); // ok: but after the assigment s1 has indeterminate value
     - 通常用 ```forward``` <span style="color:red">pass **function parameter** (定义为 rvalue reference) to **template type parameter**</span>. Through <span style="background-color:#FFFF00">**reference collapsing**</span> on its return type, forward <span style="background-color:#FFFF00">preserves the **lvalue/rvalue** nature</span> of its given argument
     - same as ```move``` , 不用 using declaration for ```std::forward``` (cover at § 18.2.3)
 
+
+即使function takes <span style="background-color:#FFFF00">**rvalue reference**, parameter is consider as **lvalue to an rvalue reference**</span> 
+
+```c++
+template <typename T>
+void pass(T&& v) {
+    reference(v);
+}
+```
+This is why Perfect Forwarding is needed, to get full semantics, use ```std::forward```
+```c++
+template <typename T>
+void pass(T&& v) {
+    reference(std::forward<T>(v));
+}
+// do something like this
+template <typename T>
+void pass(T&& v) {
+    reference(static_cast<T&&>(v));
+}
+```
+
+	
+
 下面例子的```flip1``` 用来对调两个参数, 但是顶层const 和 references 都丢掉了 
 ```c++
 // template that takes a callable and two parameters
@@ -12743,7 +12797,7 @@ Tuple type, along with its companion types, and functions defined in ```tuple```
 | ```tuple<T1, T2,..., Tn>t(v1,v2,...vn);``` | members initialized from <span style="background-color:#FFFF00">**initializer**</span> vi. The <span style="background-color:#FFFF00">constructor is **explicit** </span> |
 | ```make_tuple<v1,v2,...,vn)``` | returns a tuple initialized from given initializer. The <span style="background-color:#FFFF00">type</span> of the tuple is <span style="background-color:#FFFF00">**inferred from types of initializer**</span> | 
 | ```t1 == t2```<br/> ```t1 != t2``` | two tuples are equal if they 一样数量member and each pair of members are equal. Use member 的 ```==``` operator. <span style="background-color:#FFFF00">一旦发现不一样, subsequent members are not tested</span> | 
-| ```t1 relop``` t2 | Relational operations. <span style="background-color:#FFFF00">两个tuples must have the 一样数量的member</span> | 
+| ```t1 relop t2```  | Relational operations. <span style="background-color:#FFFF00">两个tuples must have the 一样数量的member</span> | 
 | ```get<i>(t)``` | return <span style="background-color:#FFFF00">**reference**</span> to ith data member of t. <span style="background-color:#FFFF00">如果t is lvalue, result is **lvalue reference**, otherwise it is **rvalue reference**</span>. 所有member of tuple 是 public | 
 | ```tuple_size<tupleType>::value``` | A class template that can be instantitated by a tuple type and has a <span style="background-color:#FFFF00">**public constexpr static data member** named ```value``` 是 ```size_t``` type</span> 表示number of members in specified tuple type, 因为是constexpr, 可以用于array declare, 比如 ```int a[tuple_size<..>:value]``` |
 | ```tuple_element<i, tupleType>::type``` | A class template that can be instantiated by an integral constant and a tuple type and has a public member named ```type``` that is <span style="background-color:#FFFF00">type of specified members</span> in specified tuple type  | 
@@ -12785,7 +12839,6 @@ library 定义了 ```make_tuple``` function that generates a ```tuple``` object.
 // tuple that represents a bookstore transaction: ISBN, count, price per book
 
 auto item = make_tuple("0-999-78345-X", 3, 20.00);
-
 ```
 
 
@@ -12810,14 +12863,15 @@ get<2>(item) *= 0.8; // apply 20% discount
 
 ```
 
-<span style="background-color:#FFFF00">如果有tuple size 不知道, 可以用 ```decltype```</span>
+<span style="background-color:#FFFF00">如果有tuple type 不知道, 可以用 ```decltype```</span>
 ```c++
 typedef decltype(item) trans; //trans is type of item 
 
 //return the number of members in trans
+
 size_t sz = tuple_size<trans>::value
 
-cnt has the same type as second item in trans
+//cnt has the same type as second item in trans
 
 tuple_element<1, trans>::type cnt  = get<1>(item); // is int
 
@@ -12894,7 +12948,7 @@ void reportResults(istream &in, ostream& os,
 
 - bitset defined in ```bitset``` header
 - bitset possible to deal with collections of bits 大于 longest integral type
-- Like, bitset has <span style="color:red">**fixed size**</span> size must be constant expression： how many bits bitset contains 
+- Like tuple, bitset has <span style="color:red">**fixed size**</span> size must be constant expression： how many bits bitset contains 
 - starting 在0 的位置bits叫做 <span style="background-color:#FFFF00">**low-order** bits</span>
 - ending 在最后一位的位置bits <span style="background-color:#FFFF00">**high-order** bits</span>
 - 当use integral value as initializer for a bitset, <span style="background-color:#FFFF00">value convert to ```unsigned long long``` and treat as **bit pattern**. The bits in bitset are **copy** of that pattern</span>
@@ -12964,9 +13018,9 @@ bitset<32> bitvec6(str, str.size()-4); // use last four characters, 1101
 **operation on bitset** 
 
 - support bitwise ( § 4.8 中), have the same meaning when applied to bitset as built-in operator for unsigned operands (```&```, ```|```)
-- ```set```, ```reset```, ```flip``` change state of bitset 是 overloaded, <span style="color:red">如果no applies, the given operation to entire set</span>
+- ```set```, ```reset```, ```flip``` change state of bitset 是 overloaded, <span style="color:red">如果no argument applies, the given operation to entire set</span>
 - <span style="color:red">```b.size()``` is **constexpr**</span> and can be used when a const expression is required.
-- <span style="color:red">`subscript operator is overloaded on const</span> 
+- <span style="color:red">subscript operator is overloaded on const</span> 
    - <span style="color:red">**const version** 返回 bool value</span> true if bit at given index is on, false otherwise 
    - <span style="color:red">**nonconst version**</span> returns a special type defined by bitset that <span style="color:red">lets us manipulate the bit value at the given index position</span>
 - ```~bitvec[0];``` 等于 ```bitvec.flip(0)```
