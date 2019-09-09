@@ -13568,6 +13568,7 @@ cout << regex_replace(s, r, fmt2, format_no_copy) << endl;
 
 1. **Random-Number Engines and Distribution**
 2. **Seeding a Generator**
+3. **Other Kinds of Distributions**
 
 
 
@@ -13659,6 +13660,9 @@ for (size_t i = 0; i < 10; ++i)
 - 产生相同的随机数在Debugging 时候有用, 一旦完成debugging, want each run to generate different random results, by <span style="color:red">providing a **seed**</span>. 种子是一个数值, 引擎可以利用它从sequence中重新开始生成新的随机数. 两种方式seed an engine
   - provide seed when create an engine 
   - call the engine's **seed** member
+-  Pick a good seed 就像generate a good random numer，是非常难的. <span style="color:red">最常见的方法call system ```time```function</span> (defined in ```ctime``` header), return number of seconds since a given epoch. ```time``` function <span style="color:red">takes a single **paramter**</span> that is <span style="color:red">a pointer 指向用于**写入时间的数据结构**</spam>. 如果<span style="color:red">pointer 是空, the function just returns the time</span>  
+   -  因为```time`` <span style="color:red">返回time 以秒计算, 因此这种方式值用于生成种子 **间隔为秒级** 或更长的应用</span>
+      -  Using ```time``` as a seed usually doesn’t work if the program is run **repeatedly** as part of an automated process; it might wind up with the same seed several times.
 
 比如, print equval, 因为```v1``` 和 ```v2``` 具有一样的值, 所以编写此函数的好方法 <span style="background-color:#FFFF00">make the engine and associated distribution objects **static**</span>
 ```c++
@@ -13694,7 +13698,8 @@ vector<unsigned> good_randVec()
 }
 ```
 
-Provide a ssed 
+Provide a seed : ```e1``` 和 ```e2``` 有不同的 seeds 生成different sequences. ```e3``` 和 ```e4``` 有一样的seed value. 生成一样的 sequence.
+
 ```c++
 default_random_engine e1; // uses the default seed 
 
@@ -13715,6 +13720,136 @@ for (size_t i = 0; i != 100; ++i) {
         cout << "seeded differs at iteration: " << i << endl; 
 }
 ```
+
+```c++
+default_random_engine e1(time(0)); // a somewhat random seed
+
+```
+
+**3. Other Kinds of Distributions**
+
+- engines 产生 unsigned numbers 每个number in engine's range 产生概率是相同的. Applications 通常使用 different types or distributions. 
+    - The library handles both 上面的needs 通过<span style="background-color:#FFFF00">defining different **distribution**</span>, when used an engine, produce the desired results
+
+<center>Distribution Operations</center>
+
+| Syntax | Description | 
+|----------|:-------------|
+| ```Dist d;``` | Default constructor; makes ```d``` ready to use. Other constructors depend on type of ```Dist``` (在附录 A.3.). The <span style="background-color:#FFFF00">distribution **constructor** are **explicit**</span> | 
+| ```d(e)``` | Successive calls with the same ```e``` produce a sequence of random numbers acoording to distribution type of ```d```. ```e``` is a **random-number engine generator** | 
+| ```d.min()``` <br/> ```d.max()``` | Return the smallest and largest numbers ```d(e)``` will generate |
+| ```d.reset()``` | Reestablish the state of ```d``` so that <span style="background-color:#FFFF00">**subsequent uses** of ```d``` **don't depend** on value ```d``` has already generate</span>  |
+
+
+**Generating Random Real Numbers**
+
+- 最常见但是 **Incorrect** way to obtain a random floating-point from ```rand``` is ```rand()/RAND_MAX``` (```RAND_MAX```: system-defined upper limit that is the **largest random number** that rand ```can``` return)
+    - <span style="background-color:#FFFF00">错误原因是 **less precision**</span>: random integer 的精度 通常 低于 random floarting-point number, 因此<span style="color:red">some floating-point values that will never be produced as output</span>
+- With new library, 可以获取floating-point random number, <span style="color:red">define an object type ```uniform_real_distribution```</span>: let library mapping random integers to random floating-point number
+    - 就像```uniform_int_distribution```,  ```uniform_real_distribution```: <span style="color:red">需要specifiy **minimum and maximum** value when define</span>
+-  The distribution types are <span style="background-color:#FFFF00">**templates**</span> that have a <span style="background-color:#FFFF00">single template type parameter</span> that represents <span style="color:red">**type**</span> of the numbers that the distribution generates. These types always <span style="color:red">generate either a **floating-point** type or an **integral** type</span>.
+    - 每一个 distribution template <span style="color:red">都有一个**default template argument**</span>. Distribution 用于 <span style="color:red">generate floating-point values 默认是 **double**</span>. Distribution 用于生成 <span style="color:red">integral type 默认值是 **int**</span>. 当用default: 在template's name后提供一个 empty angle bracket ```<>``` 表示使用 default 
+
+
+E.g.
+```c++
+default_random_engine e; // generates unsigned random integers 
+
+// uniformly distributed from 0 to 1 inclusive
+
+uniform_real_distribution<double> u(0,1); 
+for (size_t i = 0; i < 10; ++i)
+    cout << u(e) << " ";
+
+```
+
+use distribution template default template type parameter
+
+```c++
+// empty <> signify we want to use the default result type 
+
+uniform_real_distribution<> u(0,1); // generates double by default
+
+```
+
+
+**Generating Numbers That Are Not Uniformly Distributed**
+
+- The library 定义了 20 种 distribution types, 在附录(§ A.3, p6781 or PDF p882)
+
+
+E.g. generate a series of normally distributed values. 因为```normal_distribution``` generates floating-point number, 程序使用 ```cmath``` header 中的 ```lround``` function to round 每个 result to nearest integer. 生成200个数, mean = 4 and std = 1.5
+
+```c++
+default_random_engine e; // generates random integers 
+
+normal_distribution<> n(4,1.5); // mean 4, standard deviation 1.5
+
+vector<unsigned> vals(9); // nine elements each 0 
+
+for (size_t i = 0; i != 200; ++i) {
+    unsigned v = lround(n(e)); // round to the nearest integer 
+
+    if (v < vals.size()) // if this result is in range
+
+        ++vals[v]; // count how often each number appears 
+
+}
+for (size_t j = 0; j != vals.size(); ++j)
+    cout << j << ": " << string(vals[j], '*') << endl;
+
+```
+
+生成结果为, 注: 如果打印出的图是完美对称的(perfectly symmetrical). 反倒有理由质疑randompnumber generator了
+
+```c++
+0: ***
+1: ********
+2: ********************
+3: **************************************
+4: ********************************************************** 
+5: ******************************************
+6: ***********************
+7: *******
+8: *
+```
+
+
+**The bernoulli_distribution Class**
+
+- one distribution that does <span style="color:red">**not take a template parameter**</span> 是 ```bernulli_distribution```, which is <span style="color:red">**an ordinary class**, **not template**</span>
+- The distribution always return a **bool** value. <span style="color:red">returns true with a given probability. By default that probability is 0.5</span>
+- <span style="background-color:#FFFF00">**declare engines outside of loops**</span>. 否则<span style="color:red">create a new engine on each iteration and 产生the same value on each iterator</span>. 同样的 <span style="background-color:#FFFF00">**distribution**</span> may retain state and <span style="background-color:#FFFF00">**should be defined outside loop**</span>
+
+
+E.g. 一个游戏，用户或者程序必须先行，可以用```uniform_int_distribution``` 来选择, 也可以用```bernoulli_distribution``` 来选择, 假定有个 ```play``` function 进行游戏.
+
+
+```c++
+string resp;
+default_random_engine e; // e has state(保持状态), so it must be outside the loop!
+
+bernoulli_distribution b; // 50/50 odds by default
+
+do {
+    bool first = b(e); // if true, the program will go first 
+
+    cout << (first ? "We go first"
+            : "You get to go first") << endl; 
+    // play the game passing the indicator of who goes first
+
+    cout << ((play(first)) ? "sorry, you lost"
+        : "congrats, you won") << endl;
+    cout << "play again? Enter 'yes' or 'no'" << endl; 
+} while (cin >> resp && resp[0] == 'y');
+
+```
+
+如果有beeter chancing of going first 
+```c++
+bernoulli_distribution b(.55); // give the house a slight edge
+```
+
 
 
 
