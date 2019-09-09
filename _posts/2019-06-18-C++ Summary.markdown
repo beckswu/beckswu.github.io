@@ -232,7 +232,7 @@ public:
 - function template argument conversion
     - top level const ignore
     - const conversion, 没有lower-const pointer / reference 给有lower-const pointer/reference 
-    - array/function to pointer type (如果T是reference type ```const T&```, 不会有convert to pointer)
+    - array/function to pointer type (如果T是reference type ```const T&```, 不会有convert to pointer, <span style="background-color:#FFFF00">这种属于exact match conversion</span>)
     - 不可以 arithmetic conversion, derived-to-base conversion, and user-defined conversion
     - normal parameter 可以进行conversion 
 - template/nontemplate class to template /nontemplate class friendship，只有one to one friendship 且friend class 是template 时候，<span style="color:red">需要forward declaration of template, 1 v 1比如 class-template, template to template(具有相同的实例化 instance 才是friend)</span>
@@ -254,10 +254,6 @@ public:
     - <span style="color:red">pass lvalue  to template function with rvalue reference 是, T是 lvalue reference</span>
     - reference collasping only applies 当 reference to reference is created indirectly 比如type alias or template parameter
     - 比如function paramter is ```T&& val```, function内 ```T t = val```; <span style="color:red">如果pass rvalue is copy value of val, 改变t, 不改变外面值 . 如果pass is lvalue(```T``` is reference type),  is binds reference to val, 改变t, 改变外面值 </span>
-    - rvalue reference 只用于forwarding argument or template overloading
-        - ```template <typename T> void f(T&&);``` binds to nonconst rvalues and lvalues
-        - ```template <typename T> void f(const T&);```  const lvalues and rvalues, 因为有const conversion (不是top的)，所以上面的不是exact match
-        - 如果同时```T&&``` 和 ```const T&``` 对于nonst lvalue, call ```T&&``` 因为更specialized 的
 - ```move```: 返回的type是```remove_reference<T>::type&&```always return rvalue reference. 对于rvalue, cast does nothing, 对于lvalue, ```static_cast<remove_reference<T>::type&&> (t)``` t 是lvalue reference  
 - ```forward<T>::type```
     - <span style="color:red">必须called with explicit argument type</span>
@@ -272,7 +268,12 @@ public:
         - 如果有nontemplate function, 选nontemplate function 
         - 其次选择more specialized  比如 ```T* p``` more specialized than ```const T& p```
 	- 看overloading match 例子
-    - 注意string literal types```"Hi"``` is const char array, 所以有```const T&a``` 和 ```const T*a``` 都avaiable 优先不call pointer的, 因为不需要 array to pointer conversion 
+    - 注意string literal types```"Hi"``` is const char array, 所以有```const T&a``` 和 ```const T*a``` 都available 优先call pointer的, 因为 array to pointer conversion  属于exact match, ```const T*a``` 比 ```const T&a``` 更specialized
+     - rvalue reference 只用于forwarding argument or template overloading
+        - ```template <typename T> void f(T&&);``` binds to nonconst rvalues and lvalues
+        - ```template <typename T> void f(const T&);```  const lvalues and rvalues, 因为有const conversion (不是top的)，所以上面的不是exact match
+        - 如果同时```T&&``` 和 ```const T&``` 对于nonst lvalue, call ```T&&``` 因为更specialized 的	
+	
 - Variadic Templates: varying parameter is <span style="background-color:#FFFF00">**parameter pack**</span>, 大于等于0个不同类型 parameters
     - ```sizeof...(pack)``` 有多少个pack
     - **initializer_list** used varying number of parameter with the same type, **Variadic functions** used when different type
@@ -11507,7 +11508,7 @@ The process of <span style="background-color:#FFFF00">**determining the template
 - **function template argument -> parameter conversion**
     - <span style="background-color:#FFFF00">**top level const**</span> either in parameter or argument <span style="background-color:#FFFF00">都会被 **ignored**</span>
     - const conversions: argument 是 <span style="background-color:#FFFF00">**a reference (or pointer) to nonconst object**</span> -> parameter 是 <span style="background-color:#FFFF00">**reference (or pointer) to const object**</span>
-    - <span style="background-color:#FFFF00">**如果parameter 是 nonreference type**</span>, <span style="color:red">A **array** argument 将会被 convert to a **pointer** to its first element. A **function** argument will be converted to a **pointer** to the function's type.</span>
+    - <span style="background-color:#FFFF00">**如果parameter 是 nonreference type**</span>, <span style="color:red">A **array** argument 将会被 convert to a **pointer** to its first element. A **function** argument will be converted to a **pointer** to the function's type.</span> (<span style="background-color:#FFFF00">array / function to pointer conversion 属于exact match 的</span>)
     - Other conversions, 比如 <span style="color:red">**arithmetic conversion**, **derived-to-base conversion**, and **user-defined conversion**(通过constructor) 是不会被执行的</span>
     - 注: <span style="color:red">**const conversions**</span> and <span style="color:red">**array or function to pointer**</span> are the only <span style="color:red">**automatic conversions**</span> for <span style="color:red">**arguments to parameters**</span> with template types.
 - function template 也可以用 <span style="color:red">普通参数</span>, do not involve a template type parameter. 这些argument <span style="color:red">no special processing</span>, 可以converted as usual to the corresponding type of the parameter. 比如可以从 derived-to-base
@@ -12062,7 +12063,7 @@ cout << debug_rep(s) << endl;
 E.g.2: 对于下面code,  both functons generate viable instantiations: 
     - ``` debug_rep(const string* &)```, which is the instantiation of the first version, T is ```string*```
     - ```debug_rep(string*)```, which is the instantiation of the second version of ```debug_rep``` with T bound to string
-    - <span style="color:red">第二个version is better match. 因为第一个版本需要conversion of plain pointer to a pointer to ```const```</span>
+    - <span style="color:red">第二个version is better match. 因为第一个版本需要conversion of plain pointer to a pointer to ```const```(lower-level)</span>
 
 ```c++
 cout << debug_rep(&s) << endl;
@@ -12134,7 +12135,11 @@ string debug_rep(char *p)
 }
 ```
 
-E.g. 6
+E.g. 6 
+- "hi" 类型是 ```const char[3]```
+- ```const T&a``` 实例化是 ```const char (&a)[10]```
+- ```const T*a``` 实例化是 ```const char * const a```
+- 两个都是viable,但是 ```const T*a``` is more specialized
 
 ```c++
 template<typename T>
@@ -12148,11 +12153,11 @@ void func(const T* a) {
 
 func("hi"); //print in pointer 
 
-//因为 "hi" 是 const char array, call pointer need conversion to pointer
+//因为 "hi" 是 const char array, call pointer need conversion to pointer(但属于exact match)
 
 ```
 
-E.g 7 如果同时 ```T&&``` 和 ```const T&``` 对于lvalue 都available, call ```T&&```, 因为更specialized. 但对于 const rvalue reference, call  ```const T& t```, 因为```T&&``` 需要const version， 不如```const T&```
+E.g 7 如果同时 ```T&&``` 和 ```const T&``` 对于lvalue 都available, call ```T&&```, 因为更specialized. 但对于 const rvalue reference, call  ```const T& t```, 因为对于```T&&``` 需要const version, ```T``` bound to ```const int```， 不如```const T&```
 
 ```c++
 template<typename T>
@@ -12167,7 +12172,8 @@ int r = 1;
 debug(r); // print in rvalue;
 
 const int&& i = r*3;
-debug(i);
+debug(i); //print in lvalue
+
 ```
 
 
