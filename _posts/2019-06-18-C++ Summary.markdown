@@ -46,7 +46,41 @@ public:
 
 ***
 
-Sequential Container
+8.IO Library
+
+- 为支持wider character, library 有 ```wchar_t```, 有```wcin```, ```wcout```, ```wcerr```, 也有```wifstream```
+- ```ifstream```, ```istringstream``` 继承自 ```istream```
+- No copy or assign for IO Object: 通过reference pass 给 function(<span style="color:red">注意不能是const, 因为改变state></span>), return must be reference. 
+- state 
+    - badbit: not possible to use when ```badbit``` set. ```s.bad()``` return true if badbit set
+    - failbit: recoverable 比如expected numeric when meet char. ```s.failbit()``` return true if badbit and failbit set
+    - goodbit: <span style="color:red">guaranteed to have value 0</span> 表示no failure
+    - ```rdstate()```: current state, ```s.setstate(flag)```: reset condition of s to flags
+- 每一个流都管理一个缓冲区(buffer), 用来hold data that program reads and writes. 
+- Using a buffer 可以combine serval output operations into a single system-level write. 因为writing to device time-consuming. combine 多个到single write 可以 <span style="color:red">performance boost</span>
+- Buffers Are not flushed if program crashes. 如果程序异常终止, 缓冲区不会刷新, 当一个程序崩溃(crash)后, 它输出的数据可能停留在输出缓冲区中等待打印. (所以debug 时候小心)
+- 有几种条件导致换种刷新: 
+    - program completed normally. buffers flushed as part of main
+    - buffer become full 
+    - flush buffer explicitly using manipulator ```endl```, ```ends```, ```flush``` 
+    - ```unitbuf``` manipulator: ```cout << unitbuf; ``` 所有输出操作后都会立即刷新缓冲区. ```cout << nounitbuf;``` // returns to normal buffering  
+    - Output stream might be tie to another stream. 当绑定的stream read or write, 会flush. 默认是```cin``` 和 ```cerrr``` 绑定到```cout```, reading to ```cin``` or writing to ```cerr``` flushes the buffer in cout. 
+        - ```tie```: 一个版本是接受个pointer, ```cin.tie(&cout);```
+        - ```tie```: 另一个版本是返回现在绑定的stream ```ostream* old = cin.tie(nullptr);```
+- when we creat a file stream,  如果提供file name, ```open``` is called automatically.
+- When an fstream object is destroyed, <span style="color:red">```close``` is called automatically</span>
+- fstream constructor explicit
+- when specify ```ofstream```, 没有specifiy, ```out``` and ```trunc``` implicitly. 只specify ```out```, ```trunc``` implicitly. 只specify ```trunc```, ```out``` implicitly
+- when specify ```app``` on ```ofstream```, ```out``` implicitly
+- ```app```	seek to the end before every write 每次写操作前均定位到文件末尾
+- ```ate```	Seek to the end immediately after the open 打开文件后立即到文件末尾
+- stringstream constructor is explicit, holds an copy of stream ```sstream strm(s)```
+- ```getline```是从一个```ifstream```中读取数据.  <span style="color:red">```getline``` 不会跳过空格, 如果读取的string 第一个是空格，会保留空格</span>
+
+
+***
+
+9.Sequential Container
 
 - list /forward 不支持random access, 花销大
 - forward_list no size operation, no back, 但有end 
@@ -3986,7 +4020,7 @@ out2 = print(out2); // error: cannot copy stream objects
 |   ---      | :---    |  
 | ```strm::iostate``` |  ```strm``` is IO的一种类型,像上面的表中一样，可以是```ios::```, ```fs::```, ```ss::```, ```iostate``` is a machine-dependent integral type that represents the condition state of a stream | 
 | ```strm::badbit``` | indicate stream is corrupted(崩溃). It is not possible to use once ```badbit``` set |
-| ```strm::failbit``` |  indicate IO operation failed(IO 操作失败了). ```failbit``` set after a recovrabel error. 有可能fix error and continue using the stream. |
+| ```strm::failbit``` |  indicate IO operation failed(IO 操作失败了). ```failbit``` set after a recoverable error. 有可能fix error and continue using the stream. |
 | ```strm::eofbit``` |  indicate a stream hit end-of-file (流已经到达了文件结束) |
 | ```strm::goodbit``` |  indicate a stream is nt in error state. This value is guaranteed to be zero (流没有错误)  |
 | ```s.eof()``` | return true if eofbit in the stream s is set (若流到达了eofbit位置) |
@@ -4030,7 +4064,7 @@ cin.clear(cin.rdstate() & ~cin.failbit & ~cin.badbit);
 - <span style="background-color:#FFFF00">Buffers Are not flushed if program crashes</span>. 如果程序异常终止, 缓冲区不会刷新, 当一个程序崩溃(crash)后, 它输出的数据可能停留在输出缓冲区中等待打印
   - when debug a program that crashed, 需要make sure any output you think should have been written was actually flushed. 否则可能花大量时间track through code 为什么没有执行. 而实际上已经执行了, 只是程序crash后缓冲区没有刷新(flush), 输出的数据没有打印而已(output pending)
 
-有几种条件导致换种刷新(buffer flushed - write to actual output device or file  ) 
+有几种条件导致buffer刷新(buffer flushed - write to actual output device or file  ) 
   - The program completes normally. All output buffers are flushed as part of return from main. 
   - At some indeterminate time, the buffer can become full, it will flushed before writing next value (缓冲区满了)
   - flush the buffer explicitly using a manipulator(操作符) such as ```endl```
@@ -4089,7 +4123,7 @@ cin.tie(old_tie); // reestablish normal tie between cin and cout
 
 #### (b). File Input and Output
 
-- ```getline```是从一个```ifstream```中读取数据.  <span style="color:red">```getline``` 不会跳过空格, 如果读取的string 第一是空格，会保留空格</span>
+- ```getline```是从一个```ifstream```中读取数据.  <span style="color:red">```getline``` 不会跳过空格, 如果读取的string 第一个是空格，会保留空格</span>
 - ```fstream``` 除了继承```iostream```的类型外, ```fstream```中定义的类型还增加了一些新的成员管理与流关联的文件. 如表中, 可以对```fstream```, ```ifstream```, ```ofstream``` 对象调用这些操作, 但不能对其他的```IO```类型调用这些操作
 - when we creat a file stream, 可以选择性提供一个file name, associate that object with file. 如果提供file name, ```open``` is called automatically.
 - 因为 ```fstream``` 除了继承```iostream```的类型, 可以用```fstream``` type 代替```iostream&``` tyes
@@ -4195,7 +4229,7 @@ while(getline(cin, line))// or while (cin >> line)
     PeopleInfo info;
     istringstream record(line);
     record >> info.name;
-    while(record >> name){
+    while(record >> word){
         info.phones.push_back(word);
     }
     people.push_back(info);
