@@ -299,7 +299,7 @@ public:
 	
 ***
 
-17. Specialized Library Facilities
+17.Specialized Library Facilities
 - ```tuple<T1,T2,...,Tn>t``` are value initialized 
 - ```tuple<T1,T2,...,Tn>t(t1,t2,...,tn)```: constructor is explicit (direct initialization 不能conversion constructed)
 - ```make_tuple<v1,v2,...,vn)```: type inferred from types of initializer
@@ -327,6 +327,7 @@ public:
 - ```b.to_ulong() ``` 如果等号左边的range 小于 它, throw ```overflow_error```
 - ```bitset<16> bits; cin >> bits;```: read up to 16 1 or 0 characters from cin, or encounter character 不是1 or 0, or it encounters end-of-file or an input error
 - bitset subscript overloaded on const; const version： 返回bool if given index is on. nonconst version 返回type on bit lets us manipulate the bit value at the given index position
+
 ***
 
 ## 2. Variable and Basic Types
@@ -13138,10 +13139,10 @@ quizB.reset(27); // student number 27 failed
 #### (c). Regular Expressions
 
 
-**2. Error in Specifying or Using a Regular Expression**
-**3. The Match and Regex Iterator Types**
-**4. Using Subexpressions**
-**5. Using regex_replace**
+**2. Error in Specifying or Using a Regular Expression** <br/>
+**3. The Match and Regex Iterator Types** <br/>
+**4. Using Subexpressions** <br/>
+**5. Using regex_replace** <br/>
 
 - RE library defined in ```regex``` header
 - 可以搜索多种类型的输入序列, Input sequence 可以是 ```char``` data or ```wchar_t```data and those character 被存储到 ```string``` or array or ```char``` (或则wide character versions, ```wstring``` or array of ```wchar_t```)
@@ -13154,8 +13155,8 @@ quizB.reset(27); // student number 27 failed
 | ```regex``` | class that represent regular expression |
 | ```regex_match``` | Matches a sequence of characters against a regular expression. Returns true if <span style="background-color:#FFFF00">**entire input seqeunce**</span> matches the expression |
 | ```regex_search``` | Finds the first subseqence that mathces regular expression. Returns true if there is a <span style="background-color:#FFFF00">**substring**</span> in the input seqeunces that matches  |
-| ```regex_replace``` | Replaces a regulare expression using a given format |
-| ```sregex_itearotr``` |  Iterator adaptor that calls ```regex_search``` to iterate through the matches in a <span style="background-color:#FFFF00">**string**</span> |
+| ```regex_replace``` | Replaces a regular expression using a given format |
+| ```sregex_iterator``` |  Iterator adaptor that calls ```regex_search``` to iterate through the matches in a <span style="background-color:#FFFF00">**string**</span> |
 | ```smatch``` | Container class that holds the results of searching a string |
 | ```ssub_match``` | Results for a matched subexpression in a string |
 
@@ -13164,7 +13165,7 @@ quizB.reset(27); // student number 27 failed
  
 | syntax | description | 
 |----------|:-------------|
-| ```(seq, m, r)``` <br/> ```(seq, m, r, mft)``` <br/>  ```(seq, r)``` <br/> ```(seq, r, mft)``` | 在character sequence ```seq``` 查找regex 对象 ```r``` 中的regular expression. ```seq``` can be <span style="background-color:#FFFF00">a **string**, a pirt of **iterators** denoting a range, or a pointer to a **null-terminated character array**</span>. ```m``` is a match object , 用来保存匹配结果细节. ```m``` and ```seq``` must have compatible types. ```mft``` is an optional ```regex_constant::match_flag_type``` value. (in §17.13) | 
+| ```(seq, m, r)``` <br/> ```(seq, m, r, mft)``` <br/>  ```(seq, r)``` <br/> ```(seq, r, mft)``` | 在character sequence ```seq``` 查找regex 对象 ```r``` 中的regular expression.<br/> ```seq``` can be <span style="background-color:#FFFF00">a **string**, a pair of **iterators** denoting a range, or a pointer to a **null-terminated character array**</span><br/>. ```m``` is a match object , 用来保存匹配结果细节. ```m``` and ```seq``` must have compatible types.<br/> ```mft``` is an optional ```regex_constant::match_flag_type``` value. (in §17.13) | 
 
 
 下面例子:
@@ -13198,20 +13199,20 @@ cout << results.str() << endl; // print the matching word
 
 ```
 
-下面表中 Constructor and assignment operations 也会会throw exceptions of type ```regex_error```
+下面表中 Constructor and assignment operations 也会throw exceptions of type ```regex_error```
 
 <center> regex (and wregex) Operations </center>
 
 | syntax | description | 
 |----------|:-------------|
 | ```regex r(re)``` <br/>  ```regex r(re,f)``` | re 表示个regular expression, can be a <span style="background-color:#FFFF00">**string**</span>, a <span style="background-color:#FFFF00">**pair of iterators** denoting a range of characters</span>, a <span style="background-color:#FFFF00">pointer to a <span style="background-color:#FFFF00">**null-terminated character array**</span>, a <span style="background-color:#FFFF00">**character pointer and a count**</span>, or a <span style="background-color:#FFFF00">**braced list of character**</span>. ```f``` is aflags that specify how object will execute. ```f``` 是通过下面列出来的值设置. If f is not specified, it defaults to ```ECMAScript``` |
-| ```r1 = re``` | 将```r1``` 中正则表达式替换为 ```re```. ```re``` 表示一个正则表达式, can be  <span style="background-color:#FFFF00">**string**</span>, a <span style="background-color:#FFFF00">pointer to a <span style="background-color:#FFFF00">**null-terminated character array**</span>, or a <span style="background-color:#FFFF00">**braced list of character**</span> | 
+| ```r1 = re``` |  ```r1``` 中正则表达式替换为 ```re```. ```re```(regex object) 表示一个正则表达式, can be  <span style="background-color:#FFFF00">**string**</span>, a <span style="background-color:#FFFF00">pointer to a <span style="background-color:#FFFF00">**null-terminated character array**</span>, or a <span style="background-color:#FFFF00">**braced list of character**</span> | 
 | ```r1.assign(re,f)``` | Same effect as ```=```. and optional flag ```f```, 与```regex``` constructor 是一样的 | 
 | ```r.mark_count``` | Number of subexpressions in ```r``` |
 | ```r.flags()``` | Returns the flags set for ```r``` | 
 
 
-<center> Flag Specified when a ```regex``` is Defined: Defined in ```regex``` and ```regex::syntax_option_type```</center>
+Flag Specified when a ```regex``` is Defined: Defined in ```regex``` and ```regex::syntax_option_type```
 
 | syntax | description | 
 |----------|:-------------|
@@ -13256,7 +13257,6 @@ if (regex_search(filename, results, r))
 第一段代码编译失败,因为 the type of match argument and type of nput sequence do not match
 
 ```c++
-
 regex r("[[:alnum:]]+\\.(cpp|cxx|cc)$", regex::icase); 
 smatch results; // will match a string input sequence, but not char*
 
@@ -13287,7 +13287,7 @@ if (regex_search("myfile.cc", results, r))
 - 可以把regular expression 想成simple programming language. <span style="color:red">**not interpreted by c++ compiler**</span>. Instead, a regular expression is <span style="color:red">compiled at **run time**</span> when ```regex``` object is initialized with or assigned a new pattern
 - Regulation Expression <span style="color:red">**语法正确**(sytactic correctness) 与否 evaluated at **run time**</span>
     - if make mistake writing regular expression, **run time library** will throw an exceptionf of ```regex_error```.
-    - 就像stnadard exception types, ```regex_error``` 有 ```what``` operation desribte the error that occurred
+    - 就像standard exception types, ```regex_error``` 有 ```what``` operation describe the error that occurred
     - ```regex_error``` 也有 value ```code``` returns a <span style="color:red">**numeric code** 表示 **type of error**</span> that was encountered
 - Avoid creating 不必要的正则表达式
     - 因为正则表达式 <span style="background-color:#FFFF00">**compiled at rune time**</span>. Compiling a regular expression 是<span style="background-color:#FFFF00">**suprising a slow operation**</span>. 除非using extended regular expression grammar or using complicated expression. 因此<span style="color:red">regex object constructor and assignment 是time-consuming</span>
@@ -13307,10 +13307,10 @@ if (regex_search("myfile.cc", results, r))
 | ```error_brace``` | Mismatched brace (```{or}```)  |
 | ```error_badbrace``` | Invalid range inside a ```{}``` |
 | ```error_range``` | Invalid charater range ```e.g. [z-a]``` | 
-| ```error_space``` | Insufficient memory to handle this regular expression | 
+| ```error_space``` | <span style="background-color:#FFFF00">Insufficient memory</span> to handle this regular expression (no memory to convert expression) | 
 | ```error_badrepeat``` | A repetition character (```*, ?, + {```) 之前没有有效的正则表达式 | 
 | ```error_complexity``` | 要求匹配过于复杂 | 
-| ```error_stack``` | <span style="background-color:#FFFF00">Insufficient memory</span> to evaluate a match |
+| ```error_stack``` | <span style="background-color:#FFFF00">Insufficient memory</span> to evaluate regular expression match specified sequence |
 
 
 例如我们忽略了一个方括号 
@@ -13326,13 +13326,13 @@ try {// error: missing close bracket after alnum; the constructor will throw
 //program generates 
 
 this program generates
-regex_error(error_brack):
-The expression contained mismatched [ and ]. code: 4
+regex_error(error_brack): The expression contained mismatched [ and ]. 
+code: 4
 ```
 
 **3. The Match and Regex Iterator Types**
 
-- THe regex itearator are <span style="background-color:#FFFF00">**iterator adaptors**</span>(§ 9.6) that bound to an input that are bound to an <span style="background-color:#FFFF00">**input sequence**</span> and a <span style="background-color:#FFFF00">**regex object**</span>.
+- The regex itearator are <span style="background-color:#FFFF00">**iterator adaptors**</span>(§ 9.6) that bound to an input that are bound to an <span style="background-color:#FFFF00">**input sequence**</span> and a <span style="background-color:#FFFF00">**regex object**</span>.
 - 当bind an ```sregex_iterator``` to a string and a regex object. iterator <span style="color:red">自动定位到 **first match** in given string</span>
     - ```sregex_iterator``` constructor calls ```regex_search``` on given string and regex
 - when <span style="color:red">**dereference** the iterator</span>, get an ```smatch``` object corresponding to the <span style="color:red">results from **most recent search**</span>. 
@@ -13345,12 +13345,12 @@ The expression contained mismatched [ and ]. code: 4
 | ```sregex_iterator end``` | off-the-end iterator for ```sregex_iterator``` | 
 | ```*it``` <br/> ```it->``` | Returns a <span style="background-color:#FFFF00">**reference** to ```smatch``` object or a **pointer** to the ```smatch``` object</span> from the most rececent call to ```regex_search``` | 
 | ```++it``` <br/> ```it++``` | Calls ```regex_search``` on input sequence <span style="background-color:#FFFF00">starting just after the current match</span>. The <span style="background-color:#FFFF00">**prefix** version returns a **reference**</span> to the incremnted iterator; <span style="background-color:#FFFF00">**postfix** returns **old value**</span> |
-| ```it1 == it2``` <br/> ```it1 != it2``` | 如果两个regex_ietator 都是<span style="background-color:#FFFF00">off-the-end iterator 则他们相等</span>. Two non-end iteartors are <span style="background-color:#FFFF00">**equal**</span> if they are <span style="background-color:#FFFF00">constructed from **the same input sequence and regex object**</span> |
+| ```it1 == it2``` <br/> ```it1 != it2``` | 如果两个regex_iterator 都是<span style="background-color:#FFFF00">off-the-end iterator 则他们相等</span>. Two non-end iteartors are <span style="background-color:#FFFF00">**equal**</span> if they are <span style="background-color:#FFFF00">constructed from **the same input sequence and regex object**</span> |
 
 
 跟上面例子一样查找所有的 ```[^c]ie``` 的pattern. 
 
-- 当define ```it```, ```sregex_iterator``` constructor calls ```regex_seach``` to 定位 ```it``` on first match in ```file```. 
+- 当define ```it```, ```sregex_iterator``` constructor calls ```regex_search``` to 定位 ```it``` on first match in ```file```. 
 - increment ```it``` for advances iterator by calling ```regex_search```
 - dereference the iterator, <span style="color:red">get an ```smatch``` object represent current match</span>. 
 
@@ -13367,15 +13367,20 @@ regex r(pattern, regex::icase); // we'll ignore case in doing the match
 
 // it will repeatedly call regex_search to find all matches in file
 
-for (sregex_iterator it(file.begin(), file.end(), r), end_it; it != end_it; ++it)
+for (sregex_iterator it(file.begin(), file.end(), r), end_it; it != end_it; ++it){
     
-    cout << it->str() << endl; // matched word
-
+    cout << "size :" << it->size() << << " position: " << it->position(0) << endl;
+    
+    cout <<"match :" << it->str() << " prefix: " <<it->prefix()
+         << " suffix: "<<it->suffix() << endl;
+}
 
 //output 
 
-freind
-theif
+size :1 position :9
+match :rei prefix: receipt f suffix: nd theif receive
+size :1 position :16
+match :hei prefix: nd t suffix: f receive
 ```
 
 
@@ -13424,8 +13429,8 @@ for(sregex_iterator it(file.begin(), file.end(), r), end_it; it != end_it; ++it)
 //打印出来形式
 
 hey read or write according to the type 
-        >>> being <<<
-handled. The input operators ignore whi
+        >>> bei <<<
+ng handled. The input operators ignore whi
 
 ```
 
@@ -13435,7 +13440,7 @@ handled. The input operators ignore whi
 - A pattern in a regular expression often contains <span style="color:red">**one or more subexpressions**</span>.  Regular-expression grammars typically <span style="color:red">use **parentheses** to denote subexpressions</span>.
 - 当用括号分组， 也就声明这些选项(allternatives) 行程a subexpression.  
 - The first submatch from ```smatch``` object <span style="background-color:#FFFF00">**index at 0,** 表示 match for **entire pattern**</span>. 每个subexpression appears in order. 
-- One common **use for <span style="color:red">subexpressions**</span> is to validate data that must match a <span style="color:red">**specific format**</span>.
+- One <span style="color:red">**common use for subexpressions**</span> is to validate data that must match a <span style="color:red">**specific format**</span>.
 - ECMAScript regular expression
     - ```{d}``` 表示单个数字,<span style="color:red">```{d}{n}``` 表示n个数字序列</span>, 比如 ```{d}{3}``` 匹配 a sequence of three digits. In C++ ```\\d{3}{3}```
     - A collection of characters <span style="color:red">**inside square brackets** allows a match to any of those character</span> 比如 ```[-. ]``` matches a dash, a dot, or space. <span style="color:red">Note a dot has no special meaning inside bracket</span>
@@ -13448,6 +13453,7 @@ handled. The input operators ignore whi
 
 
 Submatch Operations: These operations apply to ```ssub_match```, ```csub_match```, ```wssub_match```, ```wcsub_match```
+
 | syntax | description | 
 |----------|:-------------|
 | ```matched``` | A public bool data member that 表示 whether this ```ssub_match``` was matched | 
@@ -13519,7 +13525,7 @@ define regular expression using subexpressions
 
 
 ```c++
-//// our overall expression has seven subexpressions: ( ddd ) separator ddd separator dddd 
+// our overall expression has seven subexpressions: ( ddd ) separator ddd separator dddd 
 
 // subexpressions 1, 3, 4, and 6 are optional; 2, 5, and 7 hold the number
 
