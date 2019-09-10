@@ -12688,7 +12688,7 @@ fi.Bar(); // uses our specialization of Foo<int>::Bar()
 ```
 
 
-> ![From Scott Meyers](https://isocpp.org/blog/2012/11/universal-references-in-c11-scott-meyers)
+> [From Scott Meyers](https://isocpp.org/blog/2012/11/universal-references-in-c11-scott-meyers)
 
 
 **rvalue references, move semantics, or perfect forwarding**. **Auto** variables with ```&&```  跟type deduction for function template parameter 原理是一样的. so lvalues of type T are deuced to have type ```T&```, rvalue of type T to have type ```T```. 
@@ -13945,6 +13945,374 @@ do {
 ```c++
 bernoulli_distribution b(.55); // give the house a slight edge
 ```
+
+
+#### (e). The IO Library Revisited
+
+
+1. **Formatted Input and Output**
+2. **Unformatted Input/Output Operations**
+
+
+**1. Formatted Input and Output**
+- The library 定义 a set of <span style="background-color:#FFFF00">**manipulators**</span> that <span style="background-color:#FFFF00">**modify the format state**</span> of a stream. 
+- A  <span style="background-color:#FFFF00">**manipulator**</span> is a  <span style="background-color:#FFFF00">**function**</span> or  <span style="background-color:#FFFF00">**object**</span> that <span style="color:red">affects the state of a stream</span> and can be used as an operand to an input or output operator. Like the input and output operators, a manipulator <span style="color:red">**returns the stream object**</span> to which it is applied, so we can combine manipulators and data in a single statement. 
+    - 大多数manipulator 改变format state 所以提供了 ```set/unset``` pairs.
+    - <span style="color:red">Manipulators</span> that change the format state of the stream usually <span style="color:red">**leave the format state changed for all subsequent IO**</span>    
+        - useful when want to use the same formatting. 
+        - 很多程序(程序员) 期望stream state as default. 所以最好undo state change 当不再需要format
+- ```endl```: It writes a newline and <span style="color:red">flushes the buffer</span>.
+- Manipulators are used for two broad categories of output control
+    - controlling the presentation of numeric values 
+    - controlling the amount and placement of padding
+- The ```setprecision``` manipulators and other manipulators that take arguments are defined in the ```iomanip``` header.
+- 默认情况, floating-point values print 精度是小数点后六位数; 如果没有fractional part, 不打印小数点. 
+- 根据<span style="background-color:#FFFF00">number value 决定print either fixed decimal or scientific notation</span>. Library chooses a format that enhances readbility of number. 非常大或者非常小的数 print using scientific notation. 其他print in fixed decimal
+
+
+
+<center>Manipulators Defined in iostream </center>
+
+
+| Syntax (```*``` 表示default stream state) | Description | 
+|----------|:-------------|
+| ```boolalpha``` | 将 true 和 false 输出为strings | 
+| ```* noboolalpha``` | true 和 false 输出为 0,1 |
+| ```showbase``` | Generate prefix 表示numeric base of integral values | 
+| ```* noshowbase``` | Do not generate notaional base prefix | 
+| ```showpoint``` |  Always dislay a decimal point for floating-point values |
+| ```* noshowpoint``` |  Display a decimal point only if the value has a fractional part | 
+| ```showpos``` | Display ```+``` in nonnegative numbers |
+| ```* noshowpos``` | Do not display ```+``` in nonnegative numbers |
+| ```uppercase``` | Generate upper-case letters for string  |
+| ```* nouppercase``` | Don't Generate upper-case letters for string |
+| ```* dec``` | 整型值显示为十进制 |
+| ```hex``` | 整型值显示为十六进制(hexadecimal) |
+| ```oct``` | 整型值显示为八进制(octal) |
+| ```left``` |  Add fill characters to the right of the value (左对齐) |
+| ```right``` |  Add fill characters to the left of the value (右对齐) |
+| ```internal``` | Add fill characters between the sign and the value | 
+| ```fixed``` | Display floating-point values in decimal notation | 
+| ```scientific``` | Display floating-point values in scientific notation | 
+| ```hexfloat``` | Display floating-point values in hex(new to C++11) | 
+| ```defaultfloat``` | Reset the floating-point format to decimal (new to C++11) | 
+| ```unitbuf``` | Flush buffers after every output operation | 
+| ```* nounitbuf``` | Restore the normal buffer flushing |
+| ```* skipws``` | Skip whitespace with input operators | 
+| ```noskipws``` | Do not skip whitespace with input operators |
+| ```flush``` | Flush the ```ostream``` buffer |
+| ```ends``` | Insert null, then flush the ```ostream``` buffer |
+| ```endl``` | Insert newline, then flush the ```ostream``` buffer |
+
+<center> Manipulators Defined in iomanip</center>
+
+| Syntax | Description | 
+|----------|:-------------|
+| ```setfill(ch)``` | Fill whitespace with ```ch``` |
+| ```setprecision(n)``` | Set floating-point precision to ```n``` |
+| ```set(w)``` | Read or write value to ```w``` characters | 
+| ```setbase(b)``` | Output integers in base ```b``` |
+
+
+
+
+**(A). Controlling the Format of Boolean Values**: 
+
+By default, bool values print as 1 or 0. 可以override this formatting by applying ```boolalpha``` manipulator
+
+```c++
+cout << "default bool values: " << true << " " << false
+     << "\nalpha bool values: " << boolalpha
+    << true << " " << false << endl;
+//print
+
+default bool values: 1 0 
+alpha bool values: true false
+```
+
+To undo the format state change to cout, we apply noboolalpha. 下面code change the format of ```bool``` values only to print the value of ```bool_val```. 一旦完成, reset the stream back to its initial state 
+```c++
+bool bool_val = get_status();
+cout << boolalpha // sets the internal state of cout
+
+    << bool_val
+    << noboolalpha; // resets the internal state to default formatting
+
+```
+
+
+**(B). Specifying the Base for Integral Values**: 
+
+Notice that like ```boolalpha```, 下面这些 manipulators change the format state. They <span style="color:red">affect the immediately following output</span> and all subsequent integral output until the format is reset by invoking another manipulator.
+
+```c++
+cout << "default: " << 20 << " " << 1024 << endl;
+cout << "octal: " << oct << 20 << " " << 1024 << endl; 
+cout << "hex: " << hex << 20 << " " << 1024 << endl;
+cout << "decimal: " << dec << 20 << " " << 1024 << endl;
+//print 
+
+default: 20 1024 
+octal: 24 2000 
+hex: 14 400 
+decimal: 20 1024
+```
+
+**(C). Indicating Base on the Output**
+
+默认没有cue  as to what notational base was used. 比如 20, really 20, or an octal representation of 16? 如果我们需要print octal or hexadecimal values, we should use ```showbase``` manipulator. 
+
+- A leading ```0x``` indicates hexadecimal(十六进制).
+- A leading ```0``` indicates octal(八进制).
+- The absence of either indicates decimal(十进制).
+
+
+```c++
+cout << showbase; // show the base when printing integral values 
+
+cout << "default: " << 20 << " " << 1024 << endl;
+cout<<"inoctal:"<<oct <<20<<""<<1024<<endl; 
+cout<<"inhex:"<<hex <<20<<""<<1024<<endl; 
+cout << "in decimal: " << dec << 20 << " " << 1024 << endl; 
+cout << noshowbase; // reset the state of the stream
+
+//print 
+
+default: 20 1024
+in octal: 024 02000 
+in hex: 0x14 0x400
+in decimal: 20 1024
+```
+
+默认情况下, hexadecimal 前导符号 ```x```是小写. We can display the ```X``` and the hex digits ```a–f``` as uppercase by applying the uppercase manipulator: ```uppercase```. Then apply the ```nouppercase```, ```noshowbase```, and ```dec``` manipulators to <span style="color:red">return the stream to its original state</span>.
+
+```c++
+cout << uppercase << showbase << hex
+<< "printed in hexadecimal: " << 20 << " " << 1024 
+    << nouppercase << noshowbase << dec << endl;
+//print 
+
+printed in hexadecimal: 0X14 0X400
+```
+
+**(D). Controlling the Format of Floating-Point Values**
+
+可以控制:
+
+- How many digits of precision are printed
+- Whether the number is printed in hexadecimal, fixed decimal, or scientific notation
+- Whether a decimal point is printed for floating-point values that are whole numbers
+
+
+**(E).Specifying How Much Precision to Print**
+
+The ```precision``` member is overloaded 
+- 一个版本是 takes an ```int``` value and **sets** the precision to that **new value**. <span style="background-color:#FFFF00">It **returns previous precision value**</span>
+- 另一个版本是 take no arguments and <span style="background-color:#FFFF00">**returns the current precision value**</span>.
+- ```setprecision``` takes an argument which it uses to set the precision
+
+下面```sqrt``` functin 定义在 ```cmath``` header 中. 不同的 ```sqrt``` function overloaded and can be called on either a float, double or long double argument. 返回square root of its argument  
+
+```c++
+// cout.precision reports the current precision value
+
+cout << "Precision: " << cout.precision()
+    << ", Value: " << sqrt(2.0) << endl; 
+
+// cout.precision(12) asks that 12 digits of precision be printed
+
+cout.precision(12);
+cout << "Precision: " << cout.precision()
+    << ", Value: " << sqrt(2.0) << endl;
+
+// alternative way to set precision using the setprecision manipulator
+
+cout << setprecision(3);
+cout << "Precision: " << cout.precision()
+    << ", Value: " << sqrt(2.0) << endl;
+
+//print 
+Precision: 6, Value: 1.41421 
+Precision: 12, Value: 1.41421356237 
+Precision: 3, Value: 1.41
+```
+
+**(F). Specifying the Notation of Floating-Point Numbers**
+
+- 除非需要control presentation of floating-point number (比如 print data in columns or print data 表示money or percentage). <span style="color:red">最好用library choose the notation </span>
+
+- ```scientific```: scientific notation
+- ```fixed```: change the stream to use fixed decimal 
+- ```hexfloat```: force floating-point values to use 
+- ```defaultfloat```: returns the stream to its default state: 根据打印的值选择计数法
+- 上面这些manipulator 也改变了 meaning of precision. 
+    - After executing ```scientific```, ```fixed```, or ```hexfloat```, the precision value <span style="background-color:#FFFF00">controls the number of digits after the decimal point(控制小数点后面的数字位数)</span>. 
+    - By default, precision specifies the <span style="background-color:#FFFF00">total number of digits—both before and after the decimal point(默认是小数点前和小数点后 数字总位数)</span>.
+
+注意 下面例子默认情况下, ```e``` used in scientific notation are printed in lowercase, 可以用 ```uppercase``` manipulator 变成 upppercase 
+
+```c++
+cout << "default format: " << 100 * sqrt(2.0) << '\n'
+     << "scientific: " << scientific << 100 * sqrt(2.0) << '\n'
+     << "fixed decimal: " << fixed << 100 * sqrt(2.0) << '\n' 
+     << "hexadecimal: " << hexfloat << 100 * sqrt(2.0) << '\n'
+     << "use defaults: " << defaultfloat << 100 * sqrt(2.0) << "\n\n";
+
+//print 
+
+default format: 141.421 
+scientific: 1.414214e+002 
+fixed decimal: 141.421356 
+hexadecimal: 0x1.1ad7bcp+7 
+use defaults: 141.421
+```
+
+**(G). Printing the Decimal Point**
+
+默认情况下, 不打印小数点. The ```showpoint``` manipulator forces the decimal point to be printed. The ```noshowpoint``` manipulator reinstates the default behavior. The next output expression will have the default behavior 既浮点值的小数部分为0时不打印小数点
+
+```c++
+cout << 10.0 << endl; // prints 10 
+
+cout << showpoint << 10.0 // prints 10.0000
+
+    << noshowpoint << endl; // revert to default format for the decimal point
+
+```
+
+**(H). Padding the Output**
+
+- ```setw``` specify minimum space for the <span style="background-color:#FFFF00">**next**</span> numeric or string value
+- ```left``` to left-justify the output 
+- ```right``` : right-justify the output. Output is right-justified by default 
+- ```internal```: 控制负数符号位置，它左对齐符号，右对齐值, 用空格填满（padding）中间所有空间
+- ```setfill```: 允许指定字符代替默认空格来补白输出(pad the outut)
+- 注意```setw``` 与 ```endl``` 类似,<span style="color:red">不改变stream internal state, 只决定下一个输出大小</span>
+
+```c++
+int i = -16;
+double d = 3.14159;
+// pad the first column（补白第一列） to use a minimum of 12 positions in the output
+
+cout << "i: " << setw(12) << i << "next col" << '\n'
+    << "d: " << setw(12) << d << "next col" << '\n'; 
+
+// pad the first column and left-justify all columns
+
+cout << left
+    << "i: " << setw(12) << i << "next col" << '\n' 
+    << "d: " << setw(12) << d << "next col" << '\n'
+     << right; // restore normal justification
+
+
+// pad the first column and right-justify all columns 
+
+cout << right
+    << "i: " << setw(12) << i << "next col" << '\n'
+    << "d: " << setw(12) << d << "next col" << '\n'; 
+
+// pad the first column but put the padding internal to the field
+
+cout << internal
+    << "i: " << setw(12) << i << "next col" << '\n'
+    << "d: " << setw(12) << d << "next col" << '\n'; 
+
+// pad the first column, using # as the pad character
+
+cout << setfill('#')
+    << "i: " << setw(12) << i << "next col" << '\n' 
+    << "d: " << setw(12) << d << "next col" << '\n' 
+    << setfill(' '); // restore the normal pad character
+
+//print
+
+i:         -16next col
+d:     3.14159next col
+i:-16         next col     
+d:3.14159     next col
+i:         -16next col
+d:     3.14159next col
+i:-         16next col
+d:     3.14159next col
+i:-#########16next col 
+d:#####3.14159next col
+```
+
+
+**(I). Controlling Input Formatting**
+
+- 默认情况下, input operators 忽略whitespace (blank, tab, newline, formfeed, and carriage return)
+- The ```noskipws``` manipulator causes the input operator to <span style="background-color:#FFFF00">**read**</span>, rather than skip, <span style="background-color:#FFFF00">**whitespace**</span>.
+
+默认情况下 下面code, 
+```c++
+char ch;
+while (cin >> ch)
+    cout << ch;
+```
+
+Input: 
+```
+a b  c 
+d
+```
+执行 four times to read the characters a through d. The output from program is <span style="color:red">skipping the intervening blanks, possible tabs, and newline characters</span> Output:
+
+```
+abcd
+```
+
+The ```noskipws``` manipulator causes the input operator to <span style="background-color:#FFFF00">**read**</span>, rather than skip, <span style="background-color:#FFFF00">**whitespace**</span>.
+
+```c++
+cin >> noskipws; // set cin so that it reads whitespace 
+
+while (cin >> ch)
+    cout << ch;
+cin >> skipws; // reset cin to the default state so that it discards whitespace
+
+```
+
+this loop <span style="color:red">makes seven iterations, reading whitespace as well as the characters in the input</span>. Output:
+
+```
+a b  c 
+d
+```
+
+**2.Unformatted Input/Output Operations**
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
