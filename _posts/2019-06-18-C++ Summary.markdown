@@ -13457,7 +13457,7 @@ Submatch Operations: These operations apply to ```ssub_match```, ```csub_match``
 | syntax | description | 
 |----------|:-------------|
 | ```matched``` | A public bool data member that 表示 whether this ```ssub_match``` was matched | 
-| ```first``` <br/> ```second``` | public data members that are iterators  to the start and one past the end of the matching sequence. <span style="background-color:#FFFF00">如果no match, then ```first``` and ```second``` are second</span> |
+| ```first``` <br/> ```second``` | public data members that are iterators  to the start and one past the end of the matching sequence. <span style="background-color:#FFFF00">如果no match, then ```first``` and ```second``` are equal</span> |
 | ```length()``` | The size of this match. Returns 0 if ```matched``` is false | 
 | ```str()``` | Returns a string <span style="background-color:#FFFF00">containing the **matched portion** of the input</span>. <span style="background-color:#FFFF00">Returns **empty string** if ```matched``` is **false**</span> |
 | ```s = ssub``` | Convert the ```ssub_match``` object ```ssub``` to string ```s```. Equivalent to ```s = ssub.str()```. The <span style="background-color:#FFFF00">**convert operator** is **nonexplicit**</span> | 
@@ -13487,8 +13487,6 @@ if (regex_search(filename, results, r))
     cout << results.str(1) << endl; // print the first subexpression
 
 ```
-
-
 
 
 ```c++
@@ -13532,10 +13530,10 @@ define regular expression using subexpressions
 "(\\()?(\\d{3})(\\))?([-. ])?(\\d{3})([-. ])?(\\d{4})";
 ```
 
-完整code: pattern 有7个subexpressions. 因此 ```smatch``` object conttain 8个 ```ssub_match``` elements. The element at ```[0]``` represent the overall match. The elements ```[1]...[7]``` represent each of the corresponding subexpressions. 
+完整code: pattern 有7个subexpressions. 因此 ```smatch``` object contain 8个 ```ssub_match``` elements. The element at ```[0]``` represent the overall match. The elements ```[1]...[7]``` represent each of the corresponding subexpressions. 
 
 ```c++
-string phone = "(\\()?(\\d{3})(\\))?([-. ])?(\\d{3})([-. ]?)(\\d{4})";
+string phone = "(\\()?(\\d{3})(\\))?([-. ])?(\\d{3})([-. ])?(\\d{4})";
 regex r(phone); // a regex to find our pattern smatch m;
 
 string s;
@@ -13553,7 +13551,6 @@ while (getline(cin, s)) {
 }
 
 bool valid(const smatch& m)
-else
 {
     // if there is an open parenthesis before the area code 
     
@@ -13612,6 +13609,7 @@ drew (973)555.0130
 lee (609) 555-0132 2015550175 800.555-0000
 
 //转换成
+
 morgan 201.555.2368 862.555.0123
 drew 973.555.0130
 lee 609.555.0132 201.555.0175 800.555.0000
@@ -13663,6 +13661,18 @@ cout << regex_replace(s, r, fmt2, format_no_copy) << endl;
 201.555.2368 862.555.0123
 973.555.0130
 609.555.0132 201.555.0175 800.555.0000
+```
+
+```c++
+ std::cmatch m;
+ std::regex_match ( "subject", m, std::regex("(sub)(.*)") );
+ std::cout << m.format ("the expression matched [$0].\n");
+ std::cout << m.format ("with sub-expressions [$1] and [$2].\n");
+ 
+//Output:
+
+the expression matched [subject].
+with sub-expressions [sub] and [ject].
 ```
 
 
