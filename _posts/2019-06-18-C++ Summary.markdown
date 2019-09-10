@@ -327,7 +327,37 @@ public:
 - ```b.to_ulong() ``` 如果等号左边的range 小于 它, throw ```overflow_error```
 - ```bitset<16> bits; cin >> bits;```: read up to 16 1 or 0 characters from cin, or encounter character 不是1 or 0, or it encounters end-of-file or an input error
 - bitset subscript overloaded on const; const version： 返回bool if given index is on. nonconst version 返回type on bit lets us manipulate the bit value at the given index position
-
+- ```regex_match```需要entire sequence match
+- ```regex_search``` 只要有substring in the input sequence matches
+- ```regex_search``` and ```regex_match``` 都返回bool, argument  ```(seq, m, r, mft)```, match object, match flag type optional, ```seq```是 string, iterator, or null-terminated array,
+- ```regex``` operation:
+    - ```regex r(re,f)```: re 可以是 string,iterators denoting a range of characters,  pointer to a null-terminated character array, a character flag f optional
+- ```sregex_iterator``` call ```regex_search``` to iterate through matches,
+    - consturctor ```sregex_iterator it(b,e,r)```, ```b,e``` iterator(e.g.string), r object 
+    - 是iterator adaptors bound to an input sequence and regex object, 当绑定后, <span style="color:red">自动定义位到first match in given string</span>
+        - constructor call ```regex_search```
+    - <span style="color:red">dereference iterator, get an ```smatch``` object</span> corresponding to results from most recent search
+    - 当increment iterator, calls ```regex_search``` to find next match in string, prefix returns next match, postfix returns old value. 
+    - iterater 比较, 如果都是off-the-end 则相等. 如果是绑定到same object and input sequence, 也相等
+- ```smatch``` operation: ```ready()```(如果被set 到了```regex_search``` or ```regex_match```), ```prefix()```(sequence before match),```suffix()```, ```size()```(等于match 的 subexpression 个数加1)
+    - 对```smatch``` subexpression 操作(是在```smatch``` object 上而不是 ```ssub_match``` object上): ```m.length(n)```, ```m.position(n)```(distance of nth subexpression from start of sequence), ```m.str(n)```, ```m[r]```(获取```ssub_match``` object)
+- ```smatch``` for string, ```cmatch``` for char array, ```wsmatch``` for wide string, ```wcmatch``` wide char array
+- first ```ssub_match``` from ```smtach``` index at 0 表示match entire pattern
+- subexpression use parentheses to denote
+- ```[-. ]``` match dash, dot  空格. note: dot in bracket no special meaning 
+- Operation on ```ssub_match```
+    - ```matched```: 表示whether ```ssub_match``` was matched, 比如optional ```?``` match了
+    - ```first second``` : match range
+    - ```length()```:  Returns 0 if matched is false
+    - ```str()```:	string containing the matched portion
+    - ```s=ssub``` : 等于 ```s = ssub.str()```, the convert operator is nonexplicit
+- to escape, must use 双backslash, ```\\```
+- 可以把regular expression 想成 simple programming language, not interpreted by C++ compiler, compiled at run-time. 
+- regular expression 语法正确与否 evaluated at run time. very slow, constructor ```regex``` outside the loop
+- ```reg_replace```: ```r```: regex object, ```fmt``` format, ```seq``` can be string or pointer to null-terminated array
+    - ```regex_replace(dest, seq, r, fmt, mft)```: dest is output iterator
+    - ```regex_replace(seq, r, fmt, mft)```
+    - ```$i``` 表示第i个subexpression
 ***
 
 ## 2. Variable and Basic Types
