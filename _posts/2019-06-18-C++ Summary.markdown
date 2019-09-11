@@ -357,7 +357,7 @@ public:
 - ```reg_replace```: ```r```: regex object, ```fmt``` format, ```seq``` can be string or pointer to null-terminated array
     - ```regex_replace(dest, seq, r, fmt, mft)```: dest is output iterator
     - ```regex_replace(seq, r, fmt, mft)``` 返回string
-    - ```$i``` 表示第i个subexpression
+    - ```$i``` <span style="color:red">表示第i个subexpression</span>
     
 - ```rand```: uniformly distributed)的 伪随机数(pseudorandom integers), 0 到system-dependent maximum value(```RAND_MAX```): <span style="color:red">问题是当需要floating-point number or non-uniform distribution</span>. need to transform the range, type or distribution
     - ```rand()/RAND_MAX```: precision 低于random floating-number. some floating-point values that will never be produced
@@ -376,8 +376,8 @@ public:
 - A distribution <span style="color:red">uses an engine to generate random numbers of a specified type</span>, in a given range, distributed according to a particular probability distribution.
     - engine pass to distribution, ```u(e)``` , 不可以是 ```u(e())```(是value passed to distribution)
     - 默认template argument: 用```<>``` after template name
-        -```double```: distribution 用于生成floating-point 
-        -```int```: distribution 用于生成integral  type
+        - ```double```: distribution 用于生成floating-point 
+        - ```int```: distribution 用于生成integral  type
     -  ```normal_distribution<> n(4,1.5); ``` mean 4, standard deviation 1.5 
 - ```bernoulli_distribution b``` is not template  <span style="color:red">是class</span>.  always return a bool value given probability
 - C++ programs 不应该使用 ```rand```, 而使用 ```default_random_engine``` along with an appropriate distribution
