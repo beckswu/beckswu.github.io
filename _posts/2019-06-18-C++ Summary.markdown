@@ -13998,6 +13998,7 @@ bernoulli_distribution b(.55); // give the house a slight edge
 
 1. **Formatted Input and Output**
 2. **Unformatted Input/Output Operations**
+3. **Random Access to a Stream**
 
 
 **1. Formatted Input and Output**
@@ -14328,42 +14329,225 @@ d
 
 **2.Unformatted Input/Output Operations**
 
+- library provides low-level operations 支持 <span style="background-color:#FFFF00">**unformatted IO**</span>. 让我们deal with <span style="color:red">stream as a sequence of **uninterpreted bytes**</span>
+
+
+<center>  Single-Byte Low-Level IO Operations </center>
+
+
+| Syntax | Description | 
+|----------|:-------------|
+| ```is.get(ch)``` | Put the next byte from ```istream is``` in character ```ch```(读取放进```ch```), Returns ```is``` |
+| ```os.put(ch)``` | Put the character ```ch``` onto ```ostream os```. Returns ```os``` | 
+| ```is.get()``` | Returns next byte from ```is``` as an ```int``` |
+| ```is.putback(ch)``` | Put the character ```ch``` back on ```is```; return ```is``` |
+| ```is.unget()``` | Move ```is``` back one type(向后移动一个字节, 将读取的值退回流); return ```is``` |
+| ```is.peek()``` | Return the next byte as ```int``` but doesn't remove it | 
+
+
+**Single-Byte Operations**: read 而不是 ignore whitespace. 比如下面例子<span style="color:red">**preserves the whitespace** in input. Output 跟 input 一样</span>. 与之前用```noskipws``` 一样
+
+```c++
+char ch;
+while (cin.get(ch))
+    cout.put(ch);
+```
+
+**Putting Back onto an Input Stream**
+
+- ```peek```: returns a <span style="color:red">**copy** of next character on input stream  but not change the stream</span>. ```peek``` 返回的值仍留在 stream 中
+- ```unget```: 使流向后移动, 从而最后读取的值又回到流中, 即使不知道最后从六中读取什么值, 仍然可以调用```unget```
+- ```putback```: 特殊版本的```unget```，退回从流中读取的最后一个值, 接受一个参数, 此参数必须与最后读取的值相同
+- 注: <span style="color:red">只能**put back** at most **one value** before next read</span>. 不保证call ```putback``` or ```unget``` successively without an intervening read operation.
+
+**int Return Values from Input Operations**
+
+- ```get``` 和 ```peek``` 都返回int,而不是char. 因为int allow them to return an <span style="color:red">**end-of- file marker**</span>. char 没有表示end-of-file 的
+- 返回int 的函数 将他们要```char``` convert 到 unsigned ```char``` 再promote to ```int```. 因此character set 有character map 到负数, the ```int``` returned from 将会是正的. 
+- library 用<span style="color:red">**negative value** 表示 **end-of-file**</span>. 保证了与任何合法char的值都不同.
+  - ```cstdio``` 定义了一个名为 ```EOF``` 的 const, 可以用它检测从 ```get``` 返回的值是否为 **end-of-file**
+  - 非常重要要用 ```int``` hold the return from the function
+- 建议用 type-safe, higher-level IO operations 而不是 low-level IO operations
+
+```c++
+int ch; // use an int, not a char to hold the return from get() 
+
+// loop to read and write all the data in the input
+
+while ((ch = cin.get()) != EOF)
+    cout.put(ch);
+```
+
+如果用了 char 而不是 int, 如果在一台 ```char``` implemented as ```unsigned char``` 的机器, 将会是灾难，程序永远不会停止, 因为get 返回 EOF 时, 被转换为 ```unsigned char```, 转化得到的值不在于 ```int``` 值相等, 在一台 ```char``` implemented as ```signed char``` 的机器, 不能确定loop的行为. what hapens to an out-of-bounds value 被assigned to a signed value 取决于compiler. 很多机器上可以正常工作除非input matches EOF valus(尽管普通input 不太可能). 比如 输入包含```\377``` , 循环终止, 因为我们机器上, -1 转换为sign char, 就会得到 ```\377```
+
+```c++
+char ch; // using a char here invites disaster!
+
+// the return from cin.get is converted to char and then compared to an int
+
+while ((ch = cin.get()) != EOF)
+    cout.put(ch);
+```
+
+
+**Multi-Byte Operations**
+
+- 下面表中operatios require us to allocate and manage character arrays 用于store and retrieve data.
+
+Multi-Byte Low-Level IO Operations:
+
+- ```is.get(sink,size, delim)``` : 
+    - 从```is``` 中 最多读取 ```size``` 个 bytes and <span style="color:red">stores them in **char array**</span> beginning at the address pointed by ```sink```. 读取过程直至遇到字符 ```delim``` 或读取 ```size``` 个字节 或者遇到文件尾时停止, 如果遇到了```delim``` 则将其保留在input stream and not read ```delim``` into ```sink```
+- ```is.getline(sink,size,delim)```:
+    - 与上面版本类似，<span style="background-color:#FFFF00">但会读取并丢弃 ```delim```</span>
+- ```is.read(sink,size)```: 
+    - Reads up to ```size``` bytes into character array ```sink```. Returns ```is``` 
+- ```is.gcount()```: 
+    - Returns <span style="color:red">**number of bytes read** from the stream ```is``` by last call</span> to an unformatted read operation
+    - 可以call ```gcount``` <span style="background-color:#FFFF00">before any intervening **unformatted input operation**</span>. 特别的是， single-character operation hat put character back to tream 属于 unformatted input operations. 如果 ```peek```, ```unget```, or ```putback``` are calling before ```gcount```, return value will be 0 </span>
+- ```os.write(source, size)```
+    - Writes ```size``` bytes from the character array ```source``` to ```os```. Returns ```os```
+- ```is.ignore(size, delim)```
+    - 读取并忽略最多 ```size``` 个字符, 包括```delim```. 不像其他未格式化的函数, ```ignore``` has default arguments: ```size``` defaults to 1 and ```delim``` to end-of-file.  
+- ```get``` 和 ```getline``` functions  接受相同的参数, actions are similar but not identical. 
+    - 相同的是 ```sink``` 都是一个char array 用来保存数据.  <span style="background-color:#FFFF00">delimiter 都不会存到 ```sink```</span>
+    - 不同是 treat delimiter differently.```get``` leaves delimiter as next character in ```istream```. ```getline``` read 并丢弃 delimiter.  
+    - 两个function 都一直读取数据直到: 
+        - 已经读取 ```size-1``` 个characters
+        - **End-of-file** is encountered 
+        - The **delimiter** character is encountered
 
 
 
+**3.Random Access to a Stream**
 
 
+- library provides funcion ```seek``` to given localtion and ```tell``` current location in associated stream 
+- 尽管```seek``` and ```tell``` are defined for all stream types, 但是比如绑定到```cin```, ```cout```, ```cerr```, ```clog``` 流 不支持random accesss 是没有意义的, , 比如```count``` 直接输出, 向回跳10个位置没有意义
+  - 对这些流 ```seek``` and ```tell```, will <span style="color:red">fail at run time, leave the stream in an invalid state</span>
+- <span style="color:red">**Support random access**</span>, IO types matiner a marker that determines where the next read or write will happen</span>
+  - 定义了两对 seek and tell and distinguiushede by suffix: g 表示 getting, p 表示 putting 
+    - 只能用 g version on an ```istream``` and on ```ifstream``` and ```istringstream``` (inhert from ```istream```), 不能用 ```seekg```. 
+    - 只能用 p version on ```ostream``` 和 它的子类 ```ofstream``` and ```ostringstream```. 
+  - ```iostream```, ```fstream```, ```stringstream``` 可以用both types, either g or p version 
+- <span style="background-color:#FFFF00">There Is **Only One Marker**</span>: 即使有seek and tell 函数, 但不存在 read marker and writ marker.
+  - Because there is only a single marker, we must <span style="color:red">**do a seek to reposition the marker**</span> whenever we <span style="color:red">**switch**</span> between reading and writing.
+  - 比如```fstream``` 和 ```stringstream``` 可以read and write the same stream. 但<span style="color:red">**只有一个buffer** that holds data to be read and written and a **single marker** 表示current position in buffer</span>. library maps both g and p positions to this buffer
+
+<center> Seek and Tell Functions </center>
+
+| Syntax | Description | 
+|----------|:-------------|
+| ```tellg()``` <br/> ```tellp()``` | Return current position of the marker in input stream (```tellg```) or an output stream (```tellp```) | 
+| ```seekg(pos)``` <br/> ```seekp(pos)``` | <span style="background-color:#FFFF00">**Reposition the marker**</span> in input or output stream to given absolute address in stream. ```pos``` 通常是前一个 ```tellg``` or ```tellp``` 的返回值 | 
+| ```seekp(off,from)``` <br/> ```seekg(off,from)``` | 字啊一个输入流或者输出流中将标记定位到```from``` 之前或之后 ```off``` 个字符, ```from``` 可以是下列值之一 |
+| |  - ```beg``` seek relative to the beginning of the stream | 
+| |  - ```cur``` seek relative to the current position of the stream | 
+| |  - ```end``` seek relative to the end of the stream | 
 
 
+**Repositioning the Marker**
+
+- <span style="background-color:#FFFF00">参数 ```new_position``` 和 ```offset```类型分别为 ```pos_type``` 和 ```off_type```. 都是**machine-dependent types**</span>(各自defined in ```istream``` 和 ```ostream```). 
+- ```pos_type```表示 file position and ```off_type``` 表示offset from that position. value of type <span style="background-color:#FFFF00">```off_type``` 可以是**正的或者负的**</span>, can sek forward or backward in file
+
+```c++
+// set the marker to a fixed position
+
+seekg(new_position); // set the read marker to the given pos_type location 
+
+seekp(new_position); // set the write marker to the given pos_type location
+
+// offset some distance ahead of or behind the given starting point
+
+seekg(offset, from); // set the read marker offset distance from from 
+
+seekp(offset, from); // offset has type off_type
+
+```
 
 
+例子
+```c++
+// remember the current write position in mark 
+
+ostringstream writeStr; // output stringstream
+
+ostringstream::pos_type mark = writeStr.tellp(); // ...
+
+if (cancelEntry)
+    // return to the remembered position 
+    
+    writeStr.seekp(mark);
+```
 
 
+**Reading and Writing to the Same File**
+
+e.g. 写一个新行 contains the relative position at which each line begins
+
+- 注意不用输出第一行, 因为从第一行开始的
+- offset counts 每行结尾的换行符
+
+```
+abcd 
+efg 
+hi
+j
+
+生成: 
+abcd 
+efg 
+hi
+j
+5 9 12 14
+```
 
 
+```c++
+// open for input and output and preposition file pointers to end-of-file
 
+fstream inOut("copyOut", fstream::ate | fstream::in | fstream::out); 
+if (!inOut) {
+    cerr << "Unable to open file!" << endl;
+    return EXIT_FAILURE; // EXIT_FAILURE see § 6.3.2(p. 227)
 
+}  
+// inOut is opened in ate mode, so it starts out positioned at the end position
 
+auto end_mark = inOut.tellg();// remember original end-of-file
 
+inOut.seekg(0, fstream::beg); // reposition to the start of the  file 
 
+size_t cnt = 0; // accumulator for the byte count 
 
+string line; // hold each line of input
 
+// while we haven't hit an error and are still reading the original data
 
+while (inOut && inOut.tellg() != end_mark
+        && getline(inOut, line)) { // and can get another line of input 
 
+    cnt += line.size() + 1;  // add 1 因为换行符
+    
+    auto mark = inOut.tellg(); // remember the read position
 
+    inOut.seekp(0, fstream::end); // set the write marker to the end
 
+    inOut << cnt; // write the accumulated length
 
+    // print a separator if this is not the last line
 
+    if (mark != end_mark) inOut << " ";
 
+    inOut.seekg(mark); // restore the read position 
 
+}
+inOut.seekp(0, fstream::end);  // seek to the end
 
+inOut << "\n";  write a newline at end-of-file
 
-
-
-
-
-
-
+```
 
 
 
