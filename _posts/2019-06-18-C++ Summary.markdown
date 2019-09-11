@@ -14596,6 +14596,65 @@ inOut << "\n";  write a newline at end-of-file
 
 
 
+
+
+
+
+
+
+
+
+
+***
+
+## 18. Tools for Large Programs
+
+#### (a). Exception Handling
+
+- <span style="background-color:#FFFF00">**Exception handlng**</span> allow to hand problems that arise at <span style="background-color:#FFFF00">**run time**</span>
+- one part of program detect problem and cass job of resolving to another part of program (Detecting part 不需要知道handling part)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ***
 <br/> <br/> <br/>
 
