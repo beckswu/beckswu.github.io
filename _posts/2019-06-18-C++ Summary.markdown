@@ -14612,11 +14612,19 @@ inOut << "\n";  write a newline at end-of-file
 #### (a). Exception Handling
 
 - <span style="background-color:#FFFF00">**Exception handlng**</span> allow to hand problems that arise at <span style="background-color:#FFFF00">**run time**</span>
-- one part of program detect problem and cass job of resolving to another part of program (Detecting part 不需要知道handling part)
+- one part of program detect problem and pass job of resolving to another part of program (Detecting part 不需要知道handling part)
 - exception is **raised** by throwing an expression. type of thrown expression, with current call chain 决定了 which <span style="color:red">**handler**</span> 处理 exception
    - selected handler in current call chain 是最接近 type of thrown object
    - type and contents of throwing object inform halder what went wrong 
-- when ```throw``` executed, <span style="color:red">statement following ```throw``` 不被执行</span>. 而是 <span style="color:red">**control** is transferred from ```throw``` to matching ```catch```</span>. 
+- when ```throw``` executed, <span style="color:red">statement following ```throw``` 不被执行</span>. 而是 <span style="color:red">**control** is transferred from ```throw``` to matching ```catch```</span>. ```catch``` 可能是同一个函数local 的 or 直接或间接called the function  which exception occurred. control pass 用两个implications:
+    - <span style="color:red">**Functions**</span> along the call chain 也许<span style="color:red">**prematurely exited**</span>(提早退出)
+    - when a handler is entered, <span style="color:red">**objects**</span> created along the call chain 将 <span style="color:red">被 **destoryed**</span>.
+    - 因此statements following a throw 不会被执行, a <span style="color:red">```throw``` is like return </span>. 通常是<span style="color:red">**conditional statement**</span> or <span style="color:red">**last statement in a function**</span>
+
+
+
+
+
 
 
 
