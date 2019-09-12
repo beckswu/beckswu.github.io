@@ -14611,6 +14611,15 @@ inOut << "\n";  write a newline at end-of-file
 
 #### (a). Exception Handling
 
+1. **Throwing an Exception**
+2. **Catching an Exception**
+3. **Function try Blocks and Constructors**
+4. **The noexcept Exception Specification**
+5. **Exception Specifications and Pointers, Virtuals, and Copy Control**
+6. **Exception Class Hierarchies**
+
+**1. Throwing an Exception**
+
 - <span style="background-color:#FFFF00">**Exception handlng**</span> allow to hand problems that arise at <span style="background-color:#FFFF00">**run time**</span>
 - one part of program detect problem and pass job of resolving to another part of program (Detecting part 不需要知道handling part)
 - exception is **raised** by throwing an expression. type of thrown expression, with current call chain 决定了 which <span style="color:red">**handler**</span> 处理 exception
@@ -14622,6 +14631,301 @@ inOut << "\n";  write a newline at end-of-file
     - 因此statements following a throw 不会被执行, a <span style="color:red">```throw``` is like return </span>. 通常是<span style="color:red">**conditional statement**</span> or <span style="color:red">**last statement in a function**</span>
 
 
+**Stack Unwinding**
+
+- 发exception thrown, execeution of current <span style="color:red">function **suspended** and search for matching ```catch ``</span> clause begin:
+    - 如果 ```throw``` inside a try block, 检查与该 ```try``` 块关联的 ```catch``` 语句。如果catch 匹配, 就使用该 catch 处理exception. 否则. 如果该 try 语句嵌套在 其他的try 块中, <span style="color:red">检查与**外层try** 匹配的 ```catch```</span>. <span style="color:red">如果找不到匹配的 ```catch```, 退出当前函数</span>(current function) and search continue in the calling function （在调用当前函数外层函数中继续寻找）
+    - 如果call to the function that threw is in a ```try``` block, 检查与try 关联的catch, 如果发现匹配的catch, 用该catch处理异常. 否则 继续检查外层try 匹配的catch, 如果没有找到, calling function is exited. search 外层的函数
+    - 上面的过程叫做 <span style="background-color:#FFFF00">**stack unwinding**</span>: <span style="color:red">continue up **the chain of nested function** calls until a ```catch``` clause</span> for exception is found, or ```main``` function is exited without having found a matching ```catch```
+        - 如果matching catch found, catch is entered, <span style="color:red">**program continue** by executing code inside catch</span>. 
+        - 如果没有matching catch found,  <span style="color:red">*program is **exited**</span>. program calls the library ```terminate``` function, stops the execution of program.
+- During **stack unwinding**, blocks in the call chain may be **exited prematurely**(调用链上的语句块可能提前退出)
+    - <span style="color:red">When a block is exited during **stack unwinding**</span>, the <span style="color:red">compiler **guarantees**</span> that <span style="color:red">objects</span> created in that block are <span style="color:red">properly **destroyed**</span>
+        - 如果local object is class type, <span style="color:red">destructor 自动被call </span>
+        - As usual, compiler does **no work** to destroy objects of built-in type. 
+    - 如果exception in <span style="background-color:#FFFF00">**constructor**</span>, object 也许 <span style="color:red">**partial constructor**</span>.一些member 被 initialized, but others 没有被initialized. 我们需要<span style="color:red">保证constructed member properly destroyed</span>
+    - 如果exception in **destructor**, exception occurs before 负责free resource 代码, free resources被跳过(will not executed). 所以we 需要ensure that resouces are properly freed when using class to control resource allocation.  
+        - 如果throw exception, 没有被catch, ```terminated``` is called
+        - 所以<span style="color:red">never throw exceptions that destructor itself doesn't hanlde</span>; 如果might throw, should <span style="color:red">wrap in a try block</span> and handle it locally to destructor
+        - 实际上, 因为destructor <span style="color:red">free resources, **unlikely** they will throw exceptions</span>. 
+        - 所有的standard library types <span style="color:red">保证destructor not raise an exception</span>.
+ 
+
+
+**The Exception Object** 
+
+- <span style="background-color:#FFFF00">**execption object**</span>: compiler <span style="color:red">use the **thrown expression** to **copy initalize**. 
+    - 因此, the  <span style="color:red"> expression in a ```throw``` 必须有 **complete type**</span>
+    - 如果expression has class type,  <span style="color:red">destructor accessible and accessible copy or move constructor</span>.
+    - 如果expression 是array of function type, expression 被转化为pointer type
+- exception object 在space 中, managed by compiler, guaranteed to be **accessible** to ```catch``` is invoked. THe exception object <span style="color:red">被 **destoryed** after exception is completely handled</span>
+- 因为an exception thrown, call chain exit 直到 发现 matching handler, 所以 <span style="color:red">throw a **pointer to a local object**</span> is <span style="color:red">**error**</span>
+    - 因为If the pointer points to an object in a <span style="color:red">**block** that is **exited** before the catch</span>, then that local object will have been destroyed before the catch.
+    - 同理返回a pointer to local object is error, 因为返回前, local object destoryed.
+- Expression <span style="background-color:#FFFF00">**static**, compile-time type 决定了 **type of exception** object</span>
+    - 比如throw expression derefereces <span style="color:red">a pointer to a base-class type points to a derived-type object</span>. thrown object is sliced-down; <span style="color:red">only **base-class** part is thrown</span>
+
+
+**2.Catching an Exception**
+
+- **exception declaration** 在 **catch clause** 像function parameter list 只有 exavtly 一个parameter. 可以<span style="color:red">忽略name</span> of catch parameter 如果 catch <span style="color:red">no need to access thrown expression</span>
+- The **type** of the declaration 决定什么类型exceptions can catch, <span style="color:red">Type 必须是 **a complete type**, 可以是 **lvalue reference**, 不能是 rvalue reference </span>
+- parameter in <span style="background-color:#FFFF00">**exception declaration** is **initialized** by **exception object**</span>. 
+    - 如果 ```catch``` parameter 是 <span style="color:red">**nonreference** type</span>, then parameter in catch is <span style="color:red">**copy** of exception object</span>. changes made to parameter inside catch are made to local copy not to exception object 
+    - 如果 ```catch``` parameter 是 <span style="color:red">**reference** type</span>. catch parameter is another name for exception object. <span style="color:red">Changes</span> made to parameter are made to <span style="color:red">exception object</span>
+    - 如果 catch parameter that has <span style="color:red">**a base-class**</span> type 可以被<span style="color:red">initialized by an exception **object derived from parameter type**</span>
+        - 如果 catch parameter a <span style="color:red">**nonreference type**</span>, <span style="color:red">exception object is **sliced down**</span>. 
+        - 如果parameter is <span style="color:red">**reference** to a base-class type</span>, then parameter bound to exception object in usual way(derived-to-base conversion).
+    - 跟function 一样, <span style="color:red">**static** type</span> of the exception declaration <span style="color:red">determines the actions that the catch may perform</span> 比如 如果catch parameter 是 base-class type, then the catch <span style="color:red">cannot use any members that are unique to the derived type</span>.
+
+
+**Finding a Matching Handler**
+
+- catch 发现的 不一定是最匹配的,而是 <span style="background-color:#FFFF00">**first one**</span> that <span style="color:red">matches the exception at all</span>
+    - 因此, in a list of ```catch```, the <span style="color:red">most specialized catch must appear first</span>
+    - <span style="color:red">**derived** type</span> should ocure <span style="color:red">**before**</span> a catch for <span style="color:red">**base** type</span>. Most derived 放前面, least derived 放后面
+- rules for when an <span style="color:red">**exception** matchces a catch **exception declaration** 是严格的</span>
+    - Conversions from nonconst to const are allowed. 因此throw of a **nonconst** oject 可以match a catch specified to take a **reference to const** 
+    - Conversion from derived type to bas type are allowed.
+    - Array is converted to a pointer to the type of the array; A function is converted to the appropriate pointer to function type.
+    - 不允许arithmetic conversion 和 conversion defined for class types 
+-  To **catch all exceptions**,use an **ellipsis** for the exception declaration. 
+    - 通常上 <span style="background-color:#FFFF00">catch all clause ```catch(...)``` is often combination</span> with a **rethrow**</span> expression
+    -  如果```catch(...)``` is used in combination with other catch clauses, catch-all 必须最后出息 （last), 否则<span style="color:red">any match 在 catch-all 之后的 never matched</span>
+
+
+```c++
+void manip(){
+    try{
+        //actions that cause an exception to be thrown
+
+    }catch(...){
+        //work to partially handle the exception
+
+    } 
+
+}
+```
+
+
+**Rethrow**
+
+- 有时候单独catch 不能完全处理 exception. A catch may decide that the exception must be handled by a function **further up the call chain**. A catch <span style="color:red">passes its exception out to another catch</span> by <span style="background-color:#FFFF00">**rethrowing**</span> the exception
+- A rethrow is a ```throw``` that is not followed by an expression: ```throw```
+    - empty ```throw``` 只能<span style="color:red">出现在 in a ```catch``` or in a function called from a ```catch```</span>
+    - rethrow 不 specify an expression, <span style="color:red">**exception object is passed up the chain**</span>
+    - 如果改变parameter后 rethrow, <span style="color:red">这些changes will be propagated only if catch **exception declaration** is a **reference**</span>
+
+比如下面例子只有parameter 是 reference时候, 才会更改 exception object pass up the chain 
+
+```c++
+catch (my_error &eObj) { // specifier is a reference type
+
+    eObj.status = errCodes::severeErr; // modifies the exception object
+
+    throw; // the status member of the exception object is severeErr
+
+} catch (other_error eObj) { // specifier is a nonreference type 
+
+    eObj.status = errCodes::badErr; // modifies the local copy only
+
+    throw; // the status member of the exception object is unchanged 
+    
+}
+```
+
+**3. Function try Blocks and Constructors**
+
+- 如果exception occur in <span style="color:red">**consturctor initializer**</span>, <span style="color:red">catch inside constructor body can't handle</span> exception thrown by constructor initializer 因为 ```try``` block inside constructor body 不会in effect when exception thrown
+- try block lets us associate a group< of catch clauses with the **initialization** phase of a **constructor**(or the destruction phase of a destructor) 和 constructor's (or destructor's) function body. 比如下面例子
+- The only way for a constructor to handle an exception from a constructor initializer is to <span style="color:red">write the constructor as a **function try block**</span>.
+
+注意:
+
+- keyword <span style="color:red">```try``` appears before colon</span> that begins constructor initializer list and before curly brace that forms constructor function body
+- try 关联的 <span style="background-color:#FFFF00">catch 既能处理excpetion in **initialization list** fo from **constructor body**</span>
+- 还有注意的是: exception can happen while initializing constructor's parameter. <span style="color:red">Such exceptions 不是 part of function ```try``` block</span>, **function try block** 只能 handle once constructor 开始execution. <span style="color:red">if exception occurs 在parameter **initialization**, that exception is handled in caller's context</span>
+
+
+```c++
+template <typename T> Blob<T>::Blob(std::initializer_list<T> il) try :
+        data(std::make_shared<std::vector<T>>(il)) { 
+    /* empty body */
+} catch(const std::bad_alloc &e) { handle_out_of_memory(e); }
+```
+
+
+**4. The noexcept Exception Specification****
+
+- 如果compiler know no exception thrown, perform optimiations (不适用于可能throw的)
+  - The ```noexcept``` specifier must appear <span style="color:red">on **all of the declarations**</span> and the corresponding <span style="color:red">**definition**</span> of a function or <span style="color:red">on **none** of them</span>
+  - ```noexcept``` 应在trailing return 之前. 
+  - 也可以 sepcify ```noexcept``` on declaration and definition of a function pointer. 
+  - 不能appear in a ```typedef``` or type alias.
+  - 在const ,reference qualifier 之后, 在 ```final```, ```override``` or virtual function ```=0``` 之前
+- compiler <span style="background-color:#FFFF00">no check sxception specifications </span> 对于 声明 ```noexcept``` 是否throw exception 不会检查 at <span style="background-color:#FFFF00">**compiled time**</span>
+  - 如果声明了```noexcept``` does throw, <span style="color:red">```terminate``` is called</span>. enforcing the promise not to throw at **run time**
+- ```noxcept``` 应该被用于两种情况: 
+  - case 1: confident that function won't throw
+  - case 2: don't know what to handle the error
+- ```noexcept``` 有个 <span style="color:red">optional argument</span> that 必须 convertible to ```bool```. 如果argument is true, the function won't throw; 如果argument is false, then function might throw.
+- ```noexcept``` Operator: unary operator(一元运算符), returns a **bool rvalue constant expression** 表示 whether given expression might throw. 像```sizeof```, ```noexcept``` 不会 evaluate its operand.  
+  - ```noexcept``` specifier 的argument 通常与 ```noexcept``` operator 混合使用, 
+  - ```noexcept(e)``` : 返回true, 如果 e  <span style="color:red">have nonthrowing specification ```noexcept```</span> and ```e``` itself does <span style="color:red">not contain a ```throw```</span>. 否则 返回 false
+- ```noexcept``` has two meanings:
+  -  It is an exception specifier when it follows a function’s parameter list, 
+  -  it is an operator that is often used as the bool argument to a ```noexcept``` exception specifier.
+
+
+
+
+
+
+
+下面例子, 我们说 ```recoup``` has a <span style="color:red">**nonthrowing specification**</span>
+```c++
+void recoup(int) noexcept; // won't throw 
+
+void alloc(int); // might throw
+
+```
+
+早期c++ 提供了更详细的exception specifications 可以specify the types of exceptions that function might throw. ```throww``` specifier appeared in the same place as ```noexcept``` specifier. The approach never use and deprecated in current standarad. ```throw()``` 表示不throw any exceptions
+
+```c++
+void recoup(int) noexcept; // recoup doesn't throw 
+
+void recoup(int) throw(); // equivalent declaration
+
+```
+
+```noexcept``` optional argument 
+
+```c++
+void recoup(int) noexcept(true); // recoup won't throw 
+
+void alloc(int) noexcept(false); // alloc can throw
+
+```
+
+```noexcept``` Operator: 下面例子如果 function g 承诺不 throw, ```f``` is nonthrowing. 若 ```g``` has no exception specifier, or has an exception specifier that allows exceptions, then ```f``` might throw
+
+```c++
+noexcept(recoup(i)) 
+// true if calling recoup can't throw, false otherwise
+
+void f() noexcept(noexcept(g())); // f has same exception specifier as g
+
+```
+
+
+**5. Exception Specifications and Pointers, Virtuals, and Copy Control**
+
+- 尽管```noexcept``` 不属于 function's type, 但 a function <span style="color:red">has an **exeception specification** 会影响function 使用</span>
+    - 因为a **pointer to function** and the function to which that pointer points <span style="color:red">must have compatible specifications</span>. 
+    - 如果声明a pointer 有<span style="background-color:#FFFF00">**nonthrowing exception specification**</span>. 我们可以用pointer only to point to similarly qualified functions(<span style="color:red">只能是nonthrowing的 function</span>)
+    - 但是如果 declare <span style="color:red">a pointer 可能throw</span>, pointer 可以<span style="color:red">指向任何function</span>, 即使promise not to throw
+- 如果<span style="color:red">**virtual function** promise not to throw, inherited virtual 必须都是not to throw</span>. 但是base 没有声明, derived function 可以promise not to throw
+- 如果**all class members** operation and **base classess** promise not to throw(```noexcept),  那么 compiler synthesized 的copy-control member 是 ```noexcept```, 
+  - 如果any function invoked by synthesized member can throw, 纳闷 sythesized member is ```noexcept(false)```
+- 如果<span style="color:red">没有Provide **exception specification** for **destructor** we define, compiler 会synthesizes one for us</span>. 生成的speciaition 与compiler 假设synthesized 的destructor类型一样 
+
+```c++
+// both recoup and pf1 promise not to throw 
+
+void (*pf1)(int) noexcept = recoup;
+
+// ok: recoup won't throw; it doesn't matter that pf2 might 
+
+void (*pf2)(int) = recoup;
+
+pf1 = alloc; // error: alloc might throw but pf1 said it wouldn't 
+
+pf2 = alloc; // ok: both pf2 and alloc might throw
+
+```
+
+
+```c++
+class Base {
+public:
+    virtual double f1(double) noexcept; // doesn't throw virtual 
+    
+    int f2() noexcept(false); // can throw virtual 
+    
+    void f3(); // can throw
+};
+class Derived : public Base { 
+public:
+    double f1(double); // error: Base::f1 promises not to throw 
+    
+    int f2() noexcept(false); // ok: same specification as Base::f2 
+    
+    void f3() noexcept; // ok: Derived f3 is more restrictive
+
+};
+```
+
+
+**6. Exception Class Hierarchies**
+
+![](/img/post/C++/ExceptionHierarchies.png)
+
+- ```exception``` 只定义 copy constructor, copy-assignment operator, a virtual destructor, and a virtual member named ```what```
+  - ```what``` 返回 ```const char*``` that points to a null-terminated character array. <span style="color:red">guaranteed not to throw any exceptions.</span>
+  - 因为```what``` is <span style="color:red">**virtual**</span>, 可以<span style="color:red">catch a **reference to base-type**</span> a call to the ```what``` function <span style="color:red">将execute the version to dynamic type</span> of exception object
+-  ```exception```, ```bad_cast```, and ```bad_alloc``` classes also <span style="color:red">define a **default constructor**</span>. The ```runtime_error``` and ```logic_error``` classes do <span style="color:red">not have a default constructor</span> but do have constructors that take a **C-style character string** or a library **string** argument. Those arguments are intended to <span style="color:red">**give additional information** about the error</span>. 
+- As the hierarchy becomes deeper, each layer becomes a more specific exception. 比如catch an object of type ```exception``` 只知道something wrong, 细节没有描述
+- ```runttime_error```: 表示can be <span style="background-color:#FFFF00">detected only</span> when program **is** executing</span>  ```logic_error```:表示我们可以从程序代码中发现的错误
+
+e.g. Bookstore application exception 
+
+```c++
+// hypothetical exception classes for a bookstore application 
+
+class out_of_stock: public std::runtime_error { 
+public:
+    explicit out_of_stock(const std::string &s): std::runtime_error(s) { }
+};
+class isbn_mismatch: public std::logic_error { 
+public:
+    explicit isbn_mismatch(const std::string &s): std::logic_error(s) { }
+    isbn_mismatch(const std::string &s,
+            const std::string &lhs, const std::string &rhs): 
+            std::logic_error(s), left(lhs), right(rhs) { }
+    const std::string left, right;
+};
+```
+
+比如, 为 ```Sales_data``` 定义了一个复合加法运算符,当检测两个 ```ISBN``` 编号不一致时, 抛出名为 ```isbn_mismatch``` 的异常.
+
+```c++
+// throws an exception if both objects do not refer to the same book 
+
+Sales_data&
+Sales_data::operator+=(const Sales_data& rhs)
+{
+    if (isbn() != rhs.isbn())
+        throw isbn_mismatch("wrong isbns", isbn(), rhs.isbn());
+    units_sold += rhs.units_sold; 
+    revenue += rhs.revenue; 
+    return *this;
+}
+
+// use the hypothetical bookstore exceptions
+
+Sales_data item1, item2, sum;
+while (cin >> item1 >> item2) { // read two transactions
+
+    try {
+        sum = item1 + item2; // calculate their sum
+        // use sum
+    } catch (const isbn_mismatch &e) {
+        cerr << e.what() << ": left isbn(" << e.left
+        << ") right isbn(" << e.right << ")" << endl;
+    }
+}
+```
 
 
 
@@ -14637,24 +14941,7 @@ inOut << "\n";  write a newline at end-of-file
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+****
 
 
 
