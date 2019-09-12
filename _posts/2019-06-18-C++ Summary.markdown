@@ -142,6 +142,28 @@ public:
 
 ***
 
+12. 
+
+- ```shared_ptr```: 
+    - constructor that takes a smart pointer 是 explicit的
+        - <span style="color:red">pointer used to create smart pointer 必须point to **dynamic memory**, 因为 smart pointer use ```delete``` to free associated object</span>
+    - 如果constructor 是 unique_ptr, make unique_ptr null, ```shared_ptr<T> p (u)```
+    - 如果constructor 是 shared_ptr, 递增计数器
+    - cannot implicitly convert a built-in pointer to a smart pointer
+    - ```p = q```: 递增 ```q``` 的reference count, 递减 ```p```的, delete p's existing memory if p's count goes to 0
+        - destructor decrease reference count, 如果是0，销毁对象, 内容被释放
+    - ```p->unique```: 若 ```p.use_count``` 为 1, return true, 其他false
+    - ```p.use_count```: 返回与p 共享对象的智能指针数量, 可能很慢, intended primarily for debugging purposes
+    - ```make_shared```： safest way and returns a shared_ptr that poitns to that object
+        - 可以用 ```auto``` save ```make_shared``` result  ```auto p6 = make_shared<vector<string>>();```
+    - dangerouse to use built-in pointer to access an object owned by smart pointer, 因为不知道什么object is destroyed
+
+- dynamically allocated array: 
+    - <span style="color:red">shared_ptr : 必须用 deleter, 否则删除就是 array 第一个元素</span>
+        - ```shared_ptr<Dog>p1(new Dog[3], [](Dog * p){delete[] p;});```
+
+***
+
 14: Operator Overloading
 
 - overloading parameter must at least one is class type 
@@ -409,7 +431,7 @@ public:
 - throw a pointer to local object
 - Expression 的static type 决定了 type of exception object. 
     -比如throw 一个dereferences pointer是base type points to derived-class object, thrown 是被 sliced-down. 只有 base-class 被thrown 
-- exception declartion: 只有一个parameter, name 可以忽略, type 可以是value / lvalue reference, 但不能是rvalue reference
+- exception declaration: 只有一个parameter, name 可以忽略, type 可以是value / lvalue reference, 但不能是rvalue reference
     - parameter 是initialized by exception object
         - 如果parameter is nonreference, copy of exception object. parameter 的change是local的, 不会影响exception object
         - 如果parameter is reference, change to parameter also made to exception object
@@ -6100,11 +6122,16 @@ Dynamic Memory and Smart Pointers:
 
 #### (a). Managing Memory Directly
 
+1. **Using new to Dynamically Allocate and Initialize Objects**
+2. **Dynamically Allocated const Objects**
+3. **Memory Exhaustion**
+
+
 **(1). Using new to Dynamically Allocate and Initialize Objects**
 
 - Objects <span style="background-color:#FFFF00">allocated on the **free store** are unnamed</span>(没有命名的), Instead, new returns a pointer to the object it allocates:
 - By default, dynamically allocated objects are **default initialized**: <span style="color:red"> built-in or compound type objects have undefined value; objects of class type are initialized by their default constructor</span>
-- 可以nitialize a dynamically allocated object using 直接初始化. 可以用**parentheses 的constructor**(in place construct) or 使用**list initialization(curly braces)**, 也可以用**value initialization**, 只需要在类型别名后跟一个空括号
+- 可以initialize a dynamically allocated object using 直接初始化. 可以用**parentheses 的constructor**(in place construct) or 使用**list initialization(curly braces)**, 也可以用**value initialization**, 只需要在类型别名后跟一个空括号
     - 对于**class type** that define their own constructor, value initialization 是没有意义的. 因为不管用什么形式, 都用default constructor 来初始化
     - 对于**built-in** type, 有difference, a <span style="color:red">**value-initialized object** of built-in type has a **well-defined value**</span> but a <span style="color:red">**default-initialized object does not** default-initialized 是未定义的</span>
 - 可以用```auto``` 去deduce the type
@@ -6153,7 +6180,8 @@ auto p2 = new auto{a,b,c}; // error: must use parentheses for the initializer, �
 **(2). Dynamically Allocated const Objects**
 - It is <span style="background-color:#FFFF00">legal to use new to allocate const objects</span>:
 - <span style="background-color:#FFFF00">A dynamically allocated const object must be **initialized**</span>
--  A <span style="color:red">**const dynamic object** of a **class type**</span> that defines a default constructor  may be <span style="color:red">**initialized implicitly**</span>. Objects of other types must be explicitly initialized. <span style="background-color:#FFFF00">const 动态对象可以隐式初始化, 不是const动态类型对象必须显示初始化</span> 
+-  A <span style="color:red">**const dynamic object** of a **class type**</span> that defines a default constructor  may be <span style="color:red">**initialized implicitly**</span>. Objects of other types must be explicitly initialized. <span style="background-color:#FFFF00">A
+const dynamic object of a class type that defines a default constructor 可以隐式初始化, 其他对象必须显示初始化</span> 
 - Because the allocated object is ```const```, <span style="color:red">the pointer returned by ```new``` is a pointer to ```const```</span>
 
 
@@ -6167,10 +6195,6 @@ const int *pci = new const int(1024);
 string *pcs = new const string;
 ```
 
-```c++
-
-
-```
 
 **(3). Memory Exhaustion**
 
@@ -6257,7 +6281,7 @@ Managing Dynamic Memory Is Error-Prone: can avoid all of these problem by using 
 ```c++
 int *p(new int(42)); // p points to dynamic memory
 
-auto q=p; // p and q pointtothesamememory 
+auto q=p; // p and q point to the same memory 
 
 delete p; // invalidates both p and q
 
@@ -6287,7 +6311,7 @@ p = nullptr; // indicates that p is no longer bound to an object
 | Syntax | Description | 
 | --- | :--- | 
 | ```make_shared<T>(args)```  |  返回一个```shared_ptr```, pointing to a <span style="color:red">**dynamically allocated object**</span> of type ```T```. Use args to initialize that object |
-| ```shared_ptr<T>p(q)```  |  p is a copy of ```shared_ptr q```, <span style="color:red">*递增q中的计数器</span>, The pointer in q must be convertible to ```T*``` |
+| ```shared_ptr<T>p(q)```  |  p is a copy of ```shared_ptr q```, <span style="color:red">递增q中的计数器</span>, The pointer in q must be convertible to ```T*``` |
 | ```p = q```  |  p 和 q 都是 ```shared_ptr```, 所保存的指针必须能相互转换，<span style="color:red">**Decrement p's reference count and increment q's count**; **delets** p's **existing memory** if p's **count goes to 0**</span> |
 | ```p->unique```| 若```p.use_count```为1，返回true, 否则返回false |
 | ```p.use_count```  |  返回与p 共享对象的智能指针数量, 可能很慢, <span style="color:red">intended primarily for debugging purposes</span> |
