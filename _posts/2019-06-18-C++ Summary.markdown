@@ -142,13 +142,51 @@ public:
 
 ***
 
-12. 
+12.Dynamic Memory
 
+
+- **automatic objects**: create and destoryed in block when definition is entered and exit
+- **static objects**: allocated before first use and destoryed when program ends
+- **dynamically allocated object**: independent of where created, exist 直到explicitly freeded
+- **static memory**: local static object(存在until 程序结束)
+- **stack memory**: nonstatic objects defined inside function. stack objects 存在only when program execute. FIFO
+    - stack usually in <span style="color:red">**CPU cache**, operations faster</span>
+    - limited resources, running out of stack is **stack overflow**, 一般不会有这个问题, 除非crazy recursion 
+- **heap** or **free store**: dynamically allocated object: <span style="color:red">**allocates at run-time**</span>
+    - 必须explicitly destroy such objects
+    - Dynamic memory is problematic: 
+        - 忘记删除, **memory leak**
+        - 用了删除的, **pointer invalid**
+    - <span style="color:red">running out of **heap** result in ```bad_alloc```</span> 
+        - <span style="color:red">可以用 ```nothrow``` 阻止 throw ```bad_alloc```</span>
+        - ```int *p2 = new (nothrow) int; ```: 如果不能分配内存, 返回空指针
+- ```new``` and ```delete```: error-prone
+    - ```new```： **allocates**, and **optionally initializes**, an object in dynamic memory and returns a pointer to that object;
+    - ```delete p```:  **destroys that object**, and **frees the associated memory**.
+        - ```p``` 必须point to dynamically allocated object or null 
+        - delete a pointer not allocated by ```new``` or delete the same pointer value more than once -> **undefined**
+        - compiler 不能告诉是staticly or dynamically allocated object 
+        - compiler cannot tell 是否 memory addressed by pointer 是否删除了.
+        - make the pointer null after delete, 看memory 是否被删除. ```delete p;```, ```p = nullptr;```
+            - 删除后的pointer 又被叫做 <span style="color:red">**dangling pointer**</span>. dangling pointer has all problem as uninitialized pointer.  by set as ```nullptr```: 知道不指向任何对象
+
+
+- smart pointer:
+    - if we do not initialize a smart pointer, it is <span style="color:red">initialized as a null pointer</span>
+        - ```shared_ptr<double> p1; ```
+    - 不要pass shared pointer by value to function 
+        - 比如 ```process(shared_ptr<int>(x))```, ```x```可能被destoryed after function call 
+    - smart pointer  确保memory is freeded 当 block 有exception exit prematurely, 如果built-in pointer 有error between ```new``` and ```delete```, memory not freeded
+    - not use built-in pointer to initialize more than one smart pointer
+    - dangerous to use built-in pointer to access an object owned by smart pointer, 因为不知道什么object is destroyed
+    - 不 ```delete``` ```get()``` 返回的指针
+    - 不把 ```get()``` 返回指针跟其他smart pointer 绑定
+    - 如果用 ```get()``` 返回pointer, remember pointer become invalid when 最后smart pointer goes away
+    - 不support pointer arthimetic, 必须用 ```get()``` 获取built-in pointer 做 pointer arithmetic
 - ```shared_ptr```: 
     - constructor that takes a smart pointer 是 explicit的
         - <span style="color:red">pointer used to create smart pointer 必须point to **dynamic memory**, 因为 smart pointer use ```delete``` to free associated object</span>
     - 如果constructor 是 unique_ptr, make unique_ptr null, ```shared_ptr<T> p (u)```
-    - 如果constructor 是 shared_ptr, 递增计数器
     - cannot implicitly convert a built-in pointer to a smart pointer
     - ```p = q```: 递增 ```q``` 的reference count, 递减 ```p```的, delete p's existing memory if p's count goes to 0
         - destructor decrease reference count, 如果是0，销毁对象, 内容被释放
@@ -156,12 +194,48 @@ public:
     - ```p.use_count```: 返回与p 共享对象的智能指针数量, 可能很慢, intended primarily for debugging purposes
     - ```make_shared```： safest way and returns a shared_ptr that poitns to that object
         - 可以用 ```auto``` save ```make_shared``` result  ```auto p6 = make_shared<vector<string>>();```
-    - dangerouse to use built-in pointer to access an object owned by smart pointer, 因为不知道什么object is destroyed
-
+- ```unique_ptr```
+    -  没有像```shared_ptr``` 的 ```make_shared``` function 
+    - 不能copy constructed
+    - 不能copy，可以调用 ```release()```(切断unique_ptr和它原来管理的对象联系) or ```reset()``` （delete pointed object）
+        - ```release``` 返回的通常用来initialize or assign 另一个smart pointer
+    - <span style="color:red">可以 copy or assign a unique_ptr that is about to be destoryed</span>. 常见例子是 return a unique_ptr from a function.
+    - <span style="color:red">与 shared_ptr, 必须give deleter type inside angle bracket for unique_ptr</span>
+- ```weak_ptr```: 
+    - doesn't control lifetime of the object, points to an object that is managed by a shared_ptr. 当最后一个shared_ptr 被删除, 对象被deleted, even if weak_ptrs point to
+    - 创建 weak_ptr 需要 shared_ptr 初始化, 不increase shared_ptr reference count
+    - ```w.lock()```: checks 是否 weak_ptr 指的对象仍然存在, 如果存在, returns a shared_ptr to shared object, otherwise return nullptr
+- **dynamically allocated object**:
+    - <span style="color:red">object allocated on heap is unamed</span>. ```new``` returns a pointer to the object it allocates
+    - object allocated 是default initialized, built-in or compound type 有undefined value, objects of class type 是initialized by default constructor
+    - 初始化可以用 ```()```, ```{}```, value initialization 是 ```()``` type name + 空括号
+        - 如果 initializer element 大于 size, ```new``` throw ```bad_array_new_length``` 
+        - 可以put element in ```{}```, 但是不能put in ```()```, 不能用 ```auto``` 放在```new``` 后面 to allocate an array 比如 ```new auto```
+    - 可以用 ```auto``` deduce type 
+    - const object: A dynamically allocated <span style="color:red">const object must be initialized</span>
+        - the pointer return from ```new``` is a pointer to const
+        - a const dynamic object of class type 定义了 default constructor 可以被 implicitly initialized, 其他对象不行
+        比如 ```string *pcs = new const string;```
 - dynamically allocated array: 
-    - <span style="color:red">shared_ptr : 必须用 deleter, 否则删除就是 array 第一个元素</span>
-        - ```shared_ptr<Dog>p1(new Dog[3], [](Dog * p){delete[] p;});```
-
+    - <span style="color:red">shared_ptr : 必须provide deleter 但不用specify deleter type, 否则删除就是 array 第一个元素</span>
+        - ```shared_ptr<int>sp(new int[10], [](int *p){delete[] p;});```
+    - 当unique_ptr points to dynamic allocated array
+        - deleter  需要 deleter type in bracket ```<>```
+        - 如果是built-in type, 需要加上括号```<int[]>```, 说明指向 dynamic array of int not ant int, 就不需要specify deleter, shared_ptr pointer type 不能是```<int[]>```
+        - 可以用subscript operator to access dynamically allocated array
+    - default initialize ```int *pia2 = new int[10](); ```. 10个值初始化为0的int.
+    - most application should use library container 而不是 dynamically allocated array.
+    - ```new``` 返回不是 array type. 是 pointer to element type of array.
+    - 不能用 ```begin``` and ```end```, 因为返回时 pointer. 也不能用 range ```for``` loop
+    - 可以 allocate empty arrray, 因为pointer cannot be dereferenced, after all, it points to no element
+    - ```delete []```:elements are destoryed in revere order: 最后一个element 先被删除:
+        - 如果不加上 ```[]```: 可能misbehave without warning during execution
+-  Allocator: separate allocation from construction
+    - it provide raw, unconstructred memory. 
+    - error to use raw memory which object not constructed.
+    - 只能 destroy elements that are actually constructed.
+    - ```a.deallocate(p, n)``` n 需要 the same size call to allocate. 如果 ```size``` 少了, 不会报错, 内存泄漏
+    - ```uninitialized_copy```, ```uninitialized_fill``` 批量 construct
 ***
 
 14: Operator Overloading
@@ -6709,7 +6783,7 @@ p3 = p2; // error: no assign for unique_ptr
 
 ```nullptr``` 没有 allocate memory 不能dereference
 
-```
+```c++
 unique_ptr<int>pt;
 *pt = 0;//error 因为nullptr 并没有allocate memory
 
@@ -6907,6 +6981,7 @@ StrBlobPtr& StrBlobPtr::incr(){
 int *pia = new int[get_size()]; // pia points to the first of these ints
 
 //type alias
+
 typedef int arrT[42]; // arrT names the type array of 42 ints
 
 int *p = new arrT; // allocates an array of 42 ints; p points to the first one
@@ -7086,6 +7161,7 @@ while (q != p)
 
 
 //free memory and return the memory to the system
+
 alloc.deallocate(p, n);
 ```
 
@@ -7099,7 +7175,7 @@ alloc.deallocate(p, n);
 | --- | :--- | 
 | ```uninitialized_copy(b,e,b2) ```  | Copies elements from the input range denoted by iterators b and e into <span style="background-color:#FFFF00">**unconstructed, raw memory**</span> denoted by the iterator b2. The memory denoted by <span style="background-color:#FFFF00">b2 must be large enough</span> to hold a copy of the elements in the input range |
 | ```uninitialized_copy_n(b,n,b2) ```  | <span style="color:red">Copies n elements starting from iterator b into **raw memory** starting at b2</span> | 
-| ```uninitialized_fill(b,e,t) ```  | Constructs objects in the range of **raw memory** denoted by iterators b and e as a copy of t (从b到e 值均为tt的拷贝) |
+| ```uninitialized_fill(b,e,t) ```  | Constructs objects in the range of <span style="background-color:#FFFF00">**raw memory**</span> denoted by iterators b and e as a copy of t (从b到e 值均为t的拷贝) |
 | ```uninitialized_fill_n(b,n,t) ```  | Constructs an unsigned number n objects starting at iterator b. b must denote <span style="color:red">**unconstructed, raw memory** large enough</span> to hold the given number of objects |
 
 
