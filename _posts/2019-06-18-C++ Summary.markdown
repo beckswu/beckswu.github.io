@@ -15097,9 +15097,13 @@ while (cin >> item1 >> item2) { // read two transactions
 
 #### (b), Namespace
 
-1. Namespace Definitions
-2. Using Namespace Members
-
+1. **Namespace Definitions**
+2. **Using Namespace Members**
+3. **Classes, Namespaces, and Scope**
+4. **Argument-Dependent Lookup and Parameters of Class Type**
+5. **Friend Declarations and Argument-Dependent Lookup**
+6. **Argument-Dependent Lookup and Overloading**
+7. **Overloading and using Declarations, Overloading and using Directives**
 
 - 对于大型程序, using libraries from different vendors, some of these names will clash 冲突因为命名一样,  Libraries that put names into the <span style="color:red">**global namespace**</span> are said to cause <span style="background-color:#FFFF00">**namespace pollution**</span>.
     - Traditionally, programmers 避免 namespace pollution by using 很冗长function name
@@ -15270,8 +15274,272 @@ namespace cplusplus_primer { /* ... */ };
 namespace primer = cplusplus_primer;
 ```
 
+
 **using Declarations: A Recap**
 
+- Using Declaration only <span style="color:red">introduce **one namespace member** at a time</span>
+    - visible from using declaration to end of scope in which the declaration appear. 一旦scope 结束, fully qualified name(有namespace name prefix的) must be used
+    - <span style="color:red">Entities with the same name</span> defined in an outer scope are<span style="color:red"> **hidden**</span>
+- using declaration 可以是global, local, namespace, class scope. 在<span style="background-color:#FFFF00">**class scope**</span> 中, 只能用于<span style="background-color:#FFFF00">**refer base class member**</span>
+
+
+
+**using Directive**
+
+- Using Directive 和 Using Declaration 相同之处是: use <span style="color:red">**unqualified form**</span> of a namespace name 
+- Using Directive 和 Using Declaration 之处是, namespace 中所有 名字都是 <span style="color:red">visible</span> without qualification
+- Using Directive 格式是 : ```using namespace namespace_name```
+    - It is <span style="color:red">**error**</span> 如果用 namespace name not previously defined
+- 可以用于global,local, namespace, 但是不能用于class scope
+- Providing a using directive for 多个 namespaces, such as ```std```, 程序可能有 name collision problems
+
+**using Directives and Scope**
+
+- using declaration 从效果看 是declare a local alias for namespace member
+- using directive 而是 <span style="color:red">**lift** namespace members 到 nearest scope</span> that contains both namespace itself and using directive
+    - 是nearest scope, 因为injected namespace 和现在enclosing scope name 有冲突, 因此as if appeared in nestest enclosing scope
+    - <span style="color:red">local defintion 也许会hide namespace member</span>
+- 如果header 含有 using declaration or using directive, 则会将<span style="color:red">namespace中的名字 injected into every file that include the header</span>
+    - 因为header should define only the names as part of its interface, not names used in its implemtation
+    - 因此, <span style="background-color:#FFFF00">header should **not contain using directive or using declaration**</span>
+- <span style="background-color:#FFFF00">**Avoid using Directives**</span>: 
+    - if application use many libraries, and 名字可能有冲突, global namespace pollution. 而且Fail to compile 如果增加一个library 跟现在using directive 的有冲突
+    - 而且ambiguity error 只有被用的时, 冲突爆发时 之前未被检测的错误 才被发现,
+    - <span style="background-color:#FFFF00">Better to use using declaration</span>: Ambiguity errors caused by using declaration <span style="background-color:#FFFF00">被检测到 at the point of declaration</span> not use
+
+下面例子: 
+
+- Assume ```manip``` define in global scope,then member of ```blip``` 就像也被declare在global scope
+- ```manip``` 与 ```blip``` 中的 ```j``` 有冲突, <span style="color:red">use the name ```j```, must explicitly 说明which version </span>. Unqualified ```j``` is ambiguous
+    - ```::j``` is defined in global scope, ```blip::j``` defined in namespace
+- local declarations within ```manip``` hide namespace ```k```. ```k``` is not ambiguous, 表示local 的
+
+
+```c++
+namespace blip {
+    int i = 16, j = 15, k = 23;
+}
+int j = 0; // okay: blip 的j 隐藏在命名空间中 
+
+void manip(){
+    using namespace blip;//using directive
+        
+        // 如果使用了j, 将会有冲突(clash) between ::j and blip::j 
+
+        ++i; //set blip::i to 17 
+
+        ++j; // error ambiguous global j or blip::j?
+
+        ++::j // okay: set global j to 1
+
+        ++blip::j; //okay set blip::j to 16
+
+        int k = 97; //local k hides blip::k
+
+        ++k; // set local k to 98
+}
+```
+
+**3. Classes, Namespaces, and Scope**
+
+- Name Lookup follows normal lookup rules: search looks outward through enclosing scope: 由内向外一次查找每个外层作用域， 而且只有在使用电之前声明的名字才被考虑
+    - first lookup member, then class (including base classes), then enclosing scopes(可能是多个namespace)
+    - 除了class member lookup 看class 内部的, 因为class member function may defined inside class, 永远是向上lookup 
+        - E.g.2 ```f2``` not compile, ```h``` not defined yet. 
+        - E.g.2  ```h``` inside ```f3``` is okay, 因为```f3``` defined after ```A::h```
+    - qualified name 说明了检查scope 顺序, reversed order
+        - E.g.2 ```A::C1::f3```: 先查 function ```f3```, then class ```C1```, then namespace ```A```
+
+E.g.1
+```c++
+namespace A {
+    int i;
+    namespace B {
+        int i; // hides A::i within B
+
+        int j;
+        int f1()
+        {
+            int j; // j is local to f1 and hides A::B::j
+            
+            return i; // returns B::i
+        
+        }
+    } // namespace B is closed and names in it are no longer visible
+    
+    int f2() {
+        return j; // error: j is not defined
+   
+    }
+    int j = i; // initialized from A::i
+
+}
+
+```
+
+E.g. 2
+```c++
+namespace A {
+    int i;
+    int k;
+    class C1 {
+        public:
+            C1(): i(0), j(0) { } // ok: initializes C1::i and C1::j
+
+            int f1() { return k; } // returns A::k
+
+            int f2() { return h; } // error: h is not defined
+
+            int f3();
+        private:
+        int i; // hides A::i within C1
+
+        int j;
+    };
+    int h = i; // initialized from A::i
+}
+// member f3 is defined outside class C1 and outside namespace A
+
+int A::C1::f3() { return h; } // ok: returns A::h
+
+```
+
+**4. Argument-Dependent Lookup and Parameters of Class Type**
+
+比如  ```operator>>(std::cin, s);``` defined in string library and defined in ```std``` namespace, 但是can call ```operator>>``` without ```std::``` qualifier and without using declaration
+
+```c++
+std::string s;
+std::cin >> s;
+//等价于
+
+operator>>(std::cin, s);
+```
+
+- When pass a class type to a function, <span style="background-color:#FFFF00">compiler searches the **namespace which argument's class** is defined</span> in addition to normal scope lookup. 
+    - This exception also apply to calls that <span style="color:red">pass **pointers** or **references** to a class type</span>
+- 上面例子中: compiler see ```operator>>```, look for a matching function in current scope, 因为 ```>>``` expression has parameter of class type, look for ```cin``` and ```s```defined 的 namespace (```istream``` and ```string```), then compiler find the ```string``` outuput operator function 
+- 如果没有上面的例外, 需要using delcaration or have to use function-call notation including namespace qualifer, 增加了使用IO难度
+    - ```using std::operator>>;```
+    - or ```std::operator>>(std::cin, s);``` : explicitly use ```std::>>```
+
+**Lookup and std::move and std::forward**
+
+- 如果程序定义了 name also in library. 下面两个one is true
+    - normal overloading determinte which call 
+    - application 使用自己定义的, never ues library version
+- Both ```move``` and ```forward``` 有 <span style="color:red">parameter type as rvalue reference which can match any type</span>. 因此 自己定义 ```move``` no matter what type parameter has, 都会collide library ```move```, (```forward```也是这样)
+- 因为 ```move``` and ```forward``` are specialized type manipulations. override behavior of these functions chance very small, And <span style="color:red">collision very likely</span>. so using ```std::move``` rather than ```move``` 表示we use version from library
+
+
+
+
+**5.Friend Declarations and Argument-Dependent Lookup**
+
+- when <span style="color:red">**class declares a friend**</span>, friend declaration does <span style="color:red">**not** make the friend **visible**</span>
+- <span style="color:red">**undeclared class** or **function**</span> that is first named <span style="color:red">in a friend declaration</span> is assumed to be a <span style="color:red">member of the **closest enclosing namespace**</span>。 一个未声明的类或者函数 第一次出现在右元声明中, 则认为它是最近外层命名空间的成员
+
+下面例子:  ```f``` and ```f2``` are members of namespace ```A```. 
+
+- <span style="background-color:#FFFF00">**Through argument-dependent lookup**, we can call ```f``` even if there is **no additional declaration** for ```f```</span>
+    - ```f``` takes an argument of **class type**. and ```f``` is **implicitly declare**d in the same namespace as ```C```
+-```f2``` has no parameter, will not be found 
+
+```c++
+namespace A {
+    class C {
+    // two friends; neither is declared apart from a friend declaration
+    
+    // these functions implicitly are members of namespace A
+    
+    friend void f2(); // won't be found, unless otherwise declared
+    
+    friend void f(const C&); // found by argument-dependent lookup
+    };
+}
+
+int main()
+{
+    A::C cobj;  
+    f(cobj); // ok: finds A::f through the friend declaration in A::C
+    
+    f2(); // error: A::f2 not declared
+
+}
+```
+
+**6. Argument-Dependent Lookup and Overloading**
+
+- 根据Argument-Dependent Lookup (include namespace where argument's class is defined). 会影响 如何确定 candidate set. 
+    - <span style="color:red">Any 一样名字 functions in those namespace</span> as called function 被added to candidate set. They are added, <span style="color:red">even though they are not visible at point of the call</span>
+
+比如下面: ```display``` 的 argument is ```Bulk_item```, search namespace where ```Bulk_item``` and its base class ```Quote``` declared
+
+```c++
+namespace NS {
+    class Quote { /* ... */ };
+    void display(const Quote&) { /* ... */ }
+}
+// Bulk_item's base class is declared in namespace NS
+
+class Bulk_item : public NS::Quote { /* ... */ };
+
+int main() {
+    Bulk_item book1;
+    display(book1);
+    return 0;
+}
+```
+
+**7. Overloading and using Declarations, Overloading and using Directives**
+
+- using declarations:
+    - <span style="color:red">**using declaration declares a name**</span>, not a specific function
+    - When we write a using declaration for overloaded functions, <span style="color:red">**all the versions**</span> of that function are <span style="color:red">**brought into the current scope**</span>.
+        - 引入所有版本 ensure interface not violated. 因为作者定义了different functions for a reason, 如果用户选择性忽略一些, can leading surprising behavior
+    - <span style="color:red">using declaration 引用functions 将overload any 一样名字 functions</span> declartions in the scope where using declaration appears
+    -  如果using declaration in local scope, <span style="color:red">hides existing declarations in outer scope</span>
+    - 如果using declaration introduece 的function <span style="color:red">跟现在scope 已有的function  name and parameter list 一样</span>, using declaration is in <span style="color:red">**error**</span>. Otherwise, defines additonal overloaded instances and increase candidate functions set
+- using directives:
+    - A using directive lifts the namespace members into the enclosing scope. If anamespace function has the same name as a function declared in the scope at whichthe namespace is placed, then the namespace member is added to the overload set
+
+using declaration 是 declare name 
+
+```c++
+using NS::print(int); // error: cannot specify a parameter list
+
+using NS::print; // ok: using declarations specify names only
+
+```
+
+Overloading and using Directives: 
+
+```c++
+namespace libs_R_us {
+    extern void print(int);
+    extern void print(double);
+}
+// 普通声明
+
+void print(const std::string &);
+// this using directive adds names to the candidate set for calls to print:
+
+using namespace libs_R_us;
+
+// 此时 print 调用函数 candidate set 包括
+
+// print(int) from libs_R_us
+
+// print(double) from libs_R_us
+
+// print(const std::string &) declared explicitly
+
+void fooBar(int ival)
+{
+    print("Value: "); // calls global print(const string &)
+    print(ival); // calls libs_R_us::print(int)
+}
+```
 
 
 
