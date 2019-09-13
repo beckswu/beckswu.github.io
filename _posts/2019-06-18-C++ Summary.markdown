@@ -221,12 +221,13 @@ public:
         - ```shared_ptr<int>sp(new int[10], [](int *p){delete[] p;});```
     - 当unique_ptr points to dynamic allocated array
         - deleter  需要 deleter type in bracket ```<>```
-        - 如果是built-in type, 需要加上括号```<int[]>```, 说明指向 dynamic array of int not ant int, 就不需要specify deleter, shared_ptr pointer type 不能是```<int[]>```
+        - 如果是built-in type, 需要加上括号```<int[]>```, 说明指向 dynamic array of int not an int, 就不需要specify deleter, shared_ptr pointer type 不能是```<int[]>```
         - 可以用subscript operator to access dynamically allocated array
     - default initialize ```int *pia2 = new int[10](); ```. 10个值初始化为0的int.
     - most application should use library container 而不是 dynamically allocated array.
     - ```new``` 返回不是 array type. 是 pointer to element type of array.
-    - 不能用 ```begin``` and ```end```, 因为返回时 pointer. 也不能用 range ```for``` loop
+    - dynamically allocated array 
+    不能用 ```begin``` and ```end```, 因为返回时 pointer. 也不能用 range ```for``` loop
     - 可以 allocate empty arrray, 因为pointer cannot be dereferenced, after all, it points to no element
     - ```delete []```:elements are destoryed in revere order: 最后一个element 先被删除:
         - 如果不加上 ```[]```: 可能misbehave without warning during execution
