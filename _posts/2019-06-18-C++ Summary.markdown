@@ -15018,9 +15018,182 @@ while (cin >> item1 >> item2) { // read two transactions
 }
 ```
 
+#### (b), Namespace
+
+1. Namespace Definitions
+2. Using Namespace Members
 
 
+- 对于大型程序, using libraries from different vendors, some of these names will clash 冲突因为命名一样,  Libraries that put names into the <span style="color:red">**global namespace**</span> are said to cause <span style="background-color:#FFFF00">**namespace pollution**</span>.
+    - Traditionally, programmers 避免 namespace pollution by using 很冗长function name
+    - **Namespace** provide a much more controlled mechanism for preventing name collisions.
+        - Namespace partition global namesapce. 
+        - A namespace is a scope. By defining library's names inside a namespace, library authors 可以避免全局名字的限制
 
+
+**1. Namespace Definitions**
+
+
+- definition: keyword ```namespace``` followed by namespace name.  之后是花括号括起来的 声明和定义.
+- Any declaration that can appear at global scope 可以被放进 namespace: classes, variable(with initializations), functions(with definitions), templates and other namesapces
+- a namespace <span style="color:red">**name** must be **unique**</span> within the scope in which the namespace is defined.
+- <span style="color:red">不可以定义namespace inside a function or class</span>
+- A namespace scope does not end with a semicolon.
+- Each namespace is a **scope**. Different namespaces introduce different scopes, different namespaces may have members with the same name
+    - Names defined in namesapce 可以被该namespace内成员 直接访问, 当被该namespace 外访问时 must indicate the namespace (which name is defined)
+        - 比如 ```cplusplus_primer::Query q = cplusplus_primer::Query("hello");```
+- **Namespaces can be discontiguous**: a namespace 可以被定义 in several parts
+    - 因为namespace members that define casses, and declarations for functions and object 是class interface, put in header files
+    - definitions of namespace member can be put in separate source files
+        - need to ensure functions and other names we defined only once. 
+        - 可以define namespace function outside namespace, 只需加上 namespace name 和 scope operator (Once name seen, assume in scope of namesapce). 
+        - 但不可以define in unrelated namespace
+    - 这么定义不会造成any compile-time or link-time errors.
+    - 定义多个, unrelated types 的 namespaces 时，should use **separate files**  to define 表示每个类型 或者关联类型集合
+- 注意 not put a ```#include``` inside the namespace. 如果这么做表示定义header总所有名字 定义成该命名空间的成员, 比如```string``` include in ```cplusplus_primer``` 表示 define ```std``` nested inside ```cplusplus_primer``` **Error**
+- <span style="background-color:#FFFF00">**Template specializations**</span> must be defined in the <span style="color:red">**same namespace** that contains the original template</span> . 只要在namespace 中声明specialization, 就可以define outside namespace
+- **Nested Namespaces**: 
+    - Names declared in inner namespace <span style="background-color:#FFFF00">**hide declarations**</span> of the same name in <span style="background-color:#FFFF00">**outer namespace**</span>. 
+- **Inline Namespaces**: 不像nested namespaces, names in inline namespace can be used as <span style="color:red">**direct members of enclosing namspace**</span> (可以被外层命名空间直接使用), 使用时 不需要提供inline namespace name. 只需提供enclosing namespace name
+    - keyword ```inline``` must appear on <span style="color:red">**first definition of the namespace**</span>. If the namespace is later reopened, the keyword ```inline``` 可以写也可以不写
+    - inline namespace <span style="color:red">通常用于 one **release** of an application to next</span>. 例如put all code from current edition into an inline namesapce. Previous version 放进 noninlined namespaces 
+- **Unnamed Namespaces**: 在<span style="color:red">keyword ```namespace``` 后 没有name</span>, 后紧跟curly braces 括起来的 declarations
+    - <span style="color:red">**Variables** defined in an unnamed namespace 有 **static** lifetime</span>: created before first use and destoryed when program ends
+    - An unnamed namespace may be <span style="color:red">**discontiguous** within a given file</span> but does <span style="color:red">**not span files**</span>.
+        - 每个file 有自己的unnamed namespace, <span style="color:red">如果two files contain unnamed namespace,those namespaces are **unrelated**</span>. Both unnamed namespaces <span style="color:red">can **define the same name**</span>; those definitions would <span style="color:red">refer to **different entitie**</span>
+        - 如果一个header defines a unnamed namespace, the names in that namespace <span style="color:red"> **define different entities** local to each file</span> that includes the header.
+    - Names defined in an unnamed namespace are  <span style="color:red">**used directly**</span>. 也找不到namespace name which qualify them. <span style="color:red">not possible to use the scope operator to refer to members of unnamed namespaces</span>
+    - Names defined in an unnamed namespace are in the **same scope** as the scope at which the namespace is defined. 如果unnamed namesapce defined 在 outermost scope in file, then <span style="color:red">names in the **unnamed namespace** must **differ from** names defined at **global scope**</span>.  注意下面例子
+    - unnamed namespace 可以 nested in another namespace. 如果 unnamed namespace nested, then names in it are <span style="color:red">**accessed using enclosing namespace name(s)**</span>
+
+
+**Namespaces can be discontiguous**:比如下面code, 可以是定义新namespace ```nsp``` or adds to existing namespace 
+```c++
+namespace nsp { 
+    // declarations
+
+}
+```
+
+`定义outside namespace: 与class member defined outside class类似, once fully qualified name is seen, we are in scope of namespace
+
+```c++
+cplusplus_primer::Sales_data cplusplus_primer::operator+(const Sales_data& lhs,
+{ 
+    //...
+
+}
+```
+
+**Template specializations**: <span style="background-color:#FFFF00">Template specializations must be defined in the same namespace that contains the original template </span>
+
+```c++
+namespace std {
+} template <> struct hash<Sales_data>;
+// having added the declaration for the specialization to std 
+
+// we can define the specialization outside the std namespace
+
+template <> struct std::hash<Sales_data>
+{
+
+};
+size_t operator()(const Sales_data& s) const { 
+    return hash<string>()(s.bookNo) ^
+    hash<unsigned>()(s.units_sold) ^
+    hash<double>()(s.revenue); 
+    } 
+    // other members as before
+
+};
+```
+
+**Nested Namespaces**: Names defined inside nested namespace 是local to inner namespace. Code in outer refer to a name in nested namespace only through its qualified name
+
+
+```c++
+namespace cplusplus_primer {
+    //nested namespace: defines Query portion of the library
+    namespace QueryLib {
+        class Query { /* ... */ };
+        Query operator&(const Query&, const Query&); 
+    }
+}
+
+cplusplus_primer::QueryLib::Query
+```
+
+**Inline Namespaces**
+
+
+```c++
+inline namespace FifthEd {
+    // namespace for the code from the Primer Fifth Edition
+
+} 
+namespace FifthEd { 
+    // implicitly inline class 
+    
+    Query_base { /* ... * /};
+    // other Query-related declarations 
+
+}
+
+namespace FourthEd {
+    class Item_base { /* ... */}; 
+    class Query_base { /* ... */}; 
+    // other code from the Fourth Edition
+
+}
+```
+
+定义 ```cplusplus_primer```, 因为 ```FifthEd``` 是 inline, code that refers to ```cplusplus_primer::Query_base``` will get version from that namspace. 如果想得到 earlier edition, can access it as nested namespace,  by using the names of **all the enclosing namespaces**: ```cplusplus_primer::FourthEd::Query_base.``` 
+```c++
+namespace cplusplus_primer { 
+    #include "FifthEd.h" 
+    #include "FourthEd.h"
+}
+```
+
+**Unnamed Namespace**
+
+```c++
+int i; // global declaration for i
+
+namespace {
+    inti;
+ } 
+// ambiguous: defined globally and in an unnested, unnamed namespace 
+
+i = 10;
+```
+
+unnamed namespace 可以 nested in another namespace. 如果 unnamed namespace nested, then names in it are accessed using enclosing namespace name(s)
+
+```c++
+namespace local { 
+    namespace {
+        int i;
+    } 
+} 
+// ok: i defined in a nested unnamed namespace is distinct from global i 
+
+local::i = 42;
+```
+
+**2. Using Namespace Members**
+
+**Namespace Aliases**
+- declaration begins with keyword ```namespace``` followed by alias name (别名), ```=```, orignal namespace name 
+- an <span style="color:red">**error**</span>  to use namspace alias if the original namespace name  not defined yet.
+- 一个namespace  <span style="color:red">可以有**多个 synonyms, or aliases**</span>. All the aliases and the original namespace name can be used interchangeably.
+
+```c++
+namespace cplusplus_primer { /* ... */ };
+namespace primer = cplusplus_primer;
+```
+
+**using Declarations: A Recap**
 
 
 
@@ -15033,6 +15206,9 @@ while (cin >> item1 >> item2) { // read two transactions
 
 
 ****
+
+
+
 
 
 
