@@ -7196,7 +7196,7 @@ uninitialized_fill_n(q, vi.size(), 42);  // initialize the remaining elements to
 
 例子： 给一个文本, 给一个单词, 打印出这个单词在文本中出现多少回，在第几行，第几行的文本
 
-![](/img/post/C++/shared_ptr_eg.PNG)
+![](/img/post/C++/shared_ptr_eg.png)
 - 设计两个class ```TextQuery``` 和 ```QueryResult```
     - 用 ```shared_ptr``` 用来传递 ```set``` (这个string 在第几行出现) 和 ```vector<string>``` (整个file 文本)  避免拷贝. 
     - ```query```是```const``` function: ```cons```t function 巧妙使用, 因为不会改变class obejct
@@ -8554,7 +8554,7 @@ public:
     - 因为这些运算符有了内置的含义，如果重载, behave differently from their normal meanings.
 - 如果一个class 定义了 ```==``` operator, 通常也应该定义 ```!=``` as well, 同样如果一个class定义了 ```<``` operator, 也应该定义 all relational operators
 
-![](/img/post/C++/operator_overloading.PNG)
+![](/img/post/C++/operator_overloading.png)
 
 error 去redefine built-in operators
 ```c++
@@ -9011,7 +9011,7 @@ sum = intAdd(10, intNegate(10)); // sum = 0
 ```
 
 
-![](/img/post/C++/functor.PNG)
+![](/img/post/C++/functor.png)
 
 使用function-object classes <span style="color:red">**override** the default operator used by an algorithm</span>. 比如: sort 用的default operator ```<``` which sorts the sequence into ascending order. To sort into descending order, pass ```greater```
 
@@ -13613,7 +13613,7 @@ match :hei prefix: nd t suffix: f receive
 ```
 
 
-![](/img/post/C++/sregex_iterator.PNG)
+![](/img/post/C++/sregex_iterator.png)
 
 
 Smatch Operations. These operations also apply to ```cmatch```, ```wsmatch```, ```wcmatch``` and the corresponding ```csub_match```, ```wssub_match```, and ```wcsub_match``` types
@@ -15603,7 +15603,7 @@ class Panda : public Bear, public Endangered { /* ... */ };
 
 <center> Conceptual Structure of a Panda Object </center>
 
-![](/img/post/C++/multipleInheritance.PNG)
+![](/img/post/C++/multipleInheritance.png)
 
 Derived constructor 只 initialize direct base classes
 
@@ -15635,7 +15635,7 @@ Panda::Panda()
 
 
 
-<span style="background-color:#FFFF00">*Error** to inherit **有一样parameter list** constructor from more than one base class</span>: 因为```Base1``` 和 ```Base2``` 都有 constructor takes ```const std::string&``` as parameter. Error to inherit from constructor
+<span style="background-color:#FFFF00">**Error** to inherit **有一样parameter list** constructor from more than one base class</span>: 因为```Base1``` 和 ```Base2``` 都有 constructor takes ```const std::string&``` as parameter. Error to inherit from constructor
 
 ```c++
 struct Base1 {
@@ -15731,9 +15731,6 @@ Object, reference, pointer 的 Static type 决定可以call 哪个member
 
 
 
-```c++
-Bear *pb = new Panda("ying_yang");
-pb->print(); // ok: Panda::print() pb->cuddle(); // error: not part of the Bear interface pb->highlight(); // error: not part of the Bear interface delete pb; // ok: Panda::~Panda()
 
 ```c++
 Bear *pb = new Panda("ying_yang");
@@ -15821,7 +15818,7 @@ double Panda::max_weight() const
 
 例子二：比如pandas 是属于 Raccoon 类 还是 Bear 有争议，就两个class 都继承
 
-![](/img/post/C++/virtualInheritance.PNG)
+![](/img/post/C++/virtualInheritance.png)
 
 因为 ```Raccoon``` 和 ```Bear```  inherited virtually from ```ZooAnimal```, 所以 ```Pandas``` 只有一个 ```ZooAnimal``` base part. <span style="background-color:#FFFF00">```virtual``` specifier 表示一种愿望,  share a single instance of the named base class within a **subsequently derived class**.</span>
 
