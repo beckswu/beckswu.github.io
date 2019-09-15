@@ -15573,6 +15573,9 @@ int main() {
 #### (c). Multiple/Virtual Inheritance
 
 1. **Multiple Inheritance**
+2. **Conversions and Multiple Base Classes**
+3. **Class Scope under Multiple Inheritance**
+4. **Virtual Inheritance**
 
 
 **1. Multiple Inheritance**
@@ -15584,9 +15587,13 @@ int main() {
 - 与single base class(§ 15.2.2)类似, **Derived constructor** 的 constructor initializer <span style="color:red">只能initialize **direct base** classes</span>
 - <span style="color:red">direct base class 初始顺序与 **derivation list** 相关的</span>, order 与 constructor initializer list 无关
 - 而 *<span style="color:red">*Destructors**</span> are always invoked in <span style="color:red">**reverse order**from constructors are run</span> 
-  - Derived class destructor 只负责 clean resources allocated by that class only. Destructor 自动call, synthesized destructor has empty function body.
+    - Derived class destructor 只负责 clean resources allocated by that class only. Destructor 自动call, synthesized destructor has empty function body.
 - 对于inherit constructors from one or more of its base classes. <span style="color:red">**Error** to inherit **有一样parameter list** constructor from more than one base class</span>. 见下面例子
   - 解决这样问题 是在 class 中 定义own version of that constructor
+- Copy/Move:
+    - 如果<span style="color:red">derived class use **synthesized version** </span>of copy, move / assign, <span style="color:red">base parts 被自动被 copied, moved, or assigned</span>. 
+    - In synthesized copy-control members, base class is implicitly constructed, assigned, or destroyed
+
 
 ```c++
 class Bear : public ZooAnimal {
@@ -15666,6 +15673,140 @@ struct D2: public Base1, public Base2 {
 };
 ```
 
+**Copy and Move Operations for Multiply Derived Classes**
+
+ 顺序(copy-assignment 也类似): 下面的copy control: 会invoke ```Bear```, then ```Zoo``` constructor before excecuting ```Bear``` copy constructor. Then execute ```Endangared``` copy constructor, 最后run ```Panda``` copy constructor
+
+```c++
+Panda ying_yang("ying_yang");
+Panda ling_ling = ying_yang; // uses the copy constructor
+
+```
+
+**2.Conversions and Multiple Base Classes**
+
+- Derived-to-base conversion: <span style="color:red">converting to each base class is equally good.</span>.
+    - 比如 most derived -> derived 和 most derived -> base conversion 在compiler 看来一样好
+- 与single inheritance一样, <span style="background-color:#FFFF00">**static type**</span> of the object, pointer, or reference <span style="color:red">determines</span> which members we can use
+    - 比如使用```ZooAnimal``` pointer, operation 定义在 ```ZooAnimal``` 中可以用, ```Bear```-specific, ```Pandas```-specific, ```Endangered```-specific operations invisible
+
+```c++
+//operations that take references to base classes of type Panda 
+
+void print(const Bear&);
+void highlight(const Endangered&);
+ostream& operator<<(ostream&, const ZooAnimal&);
+
+Panda ying_yang("ying_yang");
+print(ying_yang); // passes Panda to a reference to Bear 
+
+highlight(ying_yang); // passes Panda to a reference to Endangered
+
+cout << ying_yang << endl; // passes Panda to a reference to ZooAnimal
+
+```
+
+Converting to each base class is equally good.
+
+```c++
+void print(const Bear&);
+void print(const Endangered&);
+Panda ying_yang("ying_yang"); 
+print(ying_yang); // error: ambiguous
+
+```
+
+Object, reference, pointer 的 Static type 决定可以call 哪个member
+ 
+例子: Virtual Functions in the ZooAnimal/Endangered Classes
+
+| Function | Class Defining Own Versions | 
+|----------|:-------------|
+| ```print``` | ```ZooAnimal::ZooAnimal``` <br/> ```Bear::Bear``` <br/> ```Endangered::Endangered``` <br/> ```Panda::Panda```|
+| ```highlight``` | ```Endangered::Endangered``` <br/> ```Panda::Panda```|
+| ```toes``` | ```Bear::Bear``` <br/> ```Panda::Panda``` |
+| ```cuddle``` | ```Panda::Panda``` | 
+| destructor | ```ZooAnimal::ZooAnimal``` <br/>  ```Endangered::Endangered``` | 
+
+
+
+```c++
+Bear *pb = new Panda("ying_yang");
+pb->print(); // ok: Panda::print() pb->cuddle(); // error: not part of the Bear interface pb->highlight(); // error: not part of the Bear interface delete pb; // ok: Panda::~Panda()
+
+```c++
+Bear *pb = new Panda("ying_yang");
+pb->print(); // ok: Panda::print()
+
+pb->cuddle(); // error: not part of the Bear interface
+
+pb->highlight(); // error: not part of the Bear interface 
+
+delete pb; // ok: Panda::~Panda()
+
+```
+
+```c++
+Endangered *pe = new Panda("ying_yang"); 
+pe->print(); // ok: Panda::print()
+
+pe->toes(); // error: not part of the Endangered interface 
+
+pe->cuddle(); // error: not part of the Endangered interface 
+
+pe->highlight(); // ok: Panda::highlight()
+
+delete pe; // ok: Panda::~Panda()
+
+```
+
+
+
+**3. Class Scope under Multiple Inheritance**
+
+- Single Inheritance: lookup <span style="color:red">searching up the inheritance hierachy</span> until given nmae is found. 先找most derived class, 再找 least derived class, 最后找base class, 自下而上的查找
+    - <span style="background-color:#FFFF00">Name in derived class hide use of that name inside base.</span>
+- Multipe Inheritance: lookup happens <span style="color:red">**simultaneously** among all the direct base classes</span>. 
+    - 如果<span style="color:red">name </span>is found <span style="color:red">more than **one base class**</span>, <span style="color:red">**Unqualified** uses of that name are **ambiguous**</span>
+        - 但如果想避免ambigous, <span style="color:red">must specify</span> which <span style="color:red">version</span> we want to use 
+        - 比如 use a name through ```Panda```（object, pointer, reference）, 则会parallel 查找 ```Endangered``` and ```Bear/ZooAnimal``` subtrees. 如果发现 name in more than one subtree, ambiguous
+            - 不管是第几个level in both subtree, 只要找到more in subtree, 就是ambugious. 比如 function defined in ```ZooAnimal```(base in one subtree) 和 ```Endangered```(least derived in another subtree), 就是ambugious
+    - <span style="color:red">Name Lookup before type checking</span>
+        - 即使不同 base classes 中funtion name 一样  但是有 <span style="color:red">**different parameter lists**</span>, derived class call will be ambiguious
+        - function were <span style="color:red">**private** in one base class</span> and <span style="color:red">public or protected in another</span> base class, derived class call 是 ambiguious
+    
+
+例子, both ```ZooAnimal``` 和 ```Endangered``` define a member ```max_wiehgt```, 则下面call 是error. 如果```Pandas``` object 不 call ```max_weihgt```, ambiguity is avoided. 也可以避免 ambiguity, 当specifiy which version to run 
+
+```c++
+double d = ying_yang.max_weight();
+double d = ying_yang.ZooAnimal::max_weight(); //okay
+
+double d = ying_yang.Endangered::max_weight(); //okay
+
+```
+
+<span style="background-color:#FFFF00">best way to avoid potential ambiguities is to define a version of the function in the derived class</span>
+
+```c++
+double Panda::max_weight() const
+{ 
+    return std::max(ZooAnimal::max_weight(), Endangered::max_weight());
+}
+```
+
+**4. Virtual Inheritance**
+
+
+
+
+
+
+
+
+
+
+***
 
 
 
@@ -15680,7 +15821,6 @@ struct D2: public Base1, public Base2 {
 
 
 
-****
 
 
 
