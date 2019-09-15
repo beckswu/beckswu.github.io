@@ -15576,6 +15576,7 @@ int main() {
 2. **Conversions and Multiple Base Classes**
 3. **Class Scope under Multiple Inheritance**
 4. **Virtual Inheritance**
+5. **Constructors and Virtual Inheritance**
 
 
 **1. Multiple Inheritance**
@@ -15797,9 +15798,23 @@ double Panda::max_weight() const
 
 **4. Virtual Inheritance**
 
--  **virtual inheritance** lets a class specify that it is willing to <span style="color:red">share its base class</span>. 
+-  **virtual inheritance** lets a class specify that it is willing to <span style="color:red">share its base class</span>(share a single instance of base class ). 
     - The shared base-class subobject is called a <span style="background-color:#FFFF00">**virtual base class**</span>. 
     - 不管virtual base appear 几次in inheritance hierarchy, the derived object 只contain only <span style="color:red">**one shared subobject** for that virtual base class</span>
+- **Virtual derivation** affects the classes that **subsequently derive** from a class with a virtual base; 并不会影响 derived class 本身.
+    - 比如下面例子中，```Bear``` and ```Raccoon``` class (intermediate base class) 需要specify virutal on their derivation from ```ZooAnimal```,
+- **public virtual** or **virtual public** 顺序都可以
+- 即使base class is virtual, 也有derived-to-base conversion, 可以用virtual base pointer/reference 绑定 derived class
+- **Member visibility**: 
+    - virtual base 因为只有一个shared subobject, 所以 virtual base 的member can be accessed directly 并且 unambiguous. 
+    - 如果 virtual base member只被**一个 derivation path** override, 可以被accessed directly 且 unambiguous
+    -  如果 virtual base member 被**多个 derivation path** override,则通常上 derived class 需要定义自己version
+    - 例子说明 B defined member ```x```, D1 and D2 都virtual inherits from B, D inherits from D1 and D2. 如果想 use ```x``` through D object, 三种可能: 
+        1. D1, D2 没有自己的 ```x```, access B 的 ```x``` no ambiguity 
+        2. D1 or D2 定义了(override) ```x```, access D1 or D2 ```x``` no ambiguity
+        3. D1 and D2 都定义了(override) ```x```, access ```x```: ambiguity : 解决方法是在 D中定义自己的 ```x```（可以call D1, D2, or B 的```x``` by explicitly specify version 在自己的 ```x```中 )
+
+
 
 
 例子一: ```istream``` and ```ostream``` classes each inherit from a common abstract base class 是 ```basic_ios```(hold stream's buffer and manages stream's condition state). 而```iostream```继承了 both ```istream``` and ```ostream``` 默认情况下, 如果一个base class 在derived classes 出现多次, derived oject will have more than one subobject of that type. 对于```iostream``` 如果两个 ```basic_ios```, 一个```iostream``` 不会用一样的buffer for both reading and writing. 
@@ -15808,13 +15823,173 @@ double Panda::max_weight() const
 
 ![](/img/post/C++/virtualInheritance.PNG)
 
+因为 ```Raccoon``` 和 ```Bear```  inherited virtually from ```ZooAnimal```, 所以 ```Pandas``` 只有一个 ```ZooAnimal``` base part. <span style="background-color:#FFFF00">```virtual``` specifier 表示一种愿望,  share a single instance of the named base class within a **subsequently derived class**.</span>
+
+```c++
+// the order of the keywords public and virtual is not significant
+
+class Raccoon : public virtual ZooAnimal { /* ... */ }; 
+class Bear : virtual public ZooAnimal { /* ... */ };
+
+class Panda : public Bear,
+        public Raccoon, public Endangered {
+};
+```
+
+**virtual base 可以有 derived-to-base conversion**
+
+```c++
+void dance(const Bear&);
+void rummage(const Raccoon&);
+ostream& operator<<(ostream&, const ZooAnimal&); Panda ying_yang;
+dance(ying_yang); // ok: passes Panda object as a Bear
+
+rummage(ying_yang); // ok: passes Panda object as a Raccoon 
+
+cout << ying_yang; // ok: passes Panda object as a ZooAnimal
+
+```
+
+**5. Constructors and Virtual Inheritance**
+
+- In a virtual derivation, <span style="background-color:#FFFF00">the **virtual base** is initialized by the **most derived constructor**</span>
+    - 上面例子中, ```Panda``` constructor controls how ```ZooAnimal``` base class is initialized, 即使 ```ZooAnimal``` is not a direct base of ```Pandas```
+- object 有 virtual base 的 construction order 不同于 normal, <span style="background-color:#FFFF00">**virtual base 最先初始化**</span>, using initializer in constructor of most derived class. Virtual base classes are always constructed prior to nonvirtual base classes r<span style="color:red">egardless of where they appear in the inheritance hierarchy</span>. <span style="color:red">Then 根据derivation list order 初始化</span>. 我们例子中when ```Panda``` object is created, 顺序如下
+    1. ```ZooAnimal``` part constructed first, using initializers specified in ```Panda``` constructor initializer list.
+        - 注: 如果 ```ZooAnimal``` <span style="color:red">没有explicitly initialize ```ZooAnimal``` base class, then ```ZooAnimal``` default constructor is used</span>.如果没有default constructor, code is error
+    2. ```Bear``` part constructed next 
+    3. ```Raccoon``` part constructed next 
+    4. ```Endangered``` next
+    5. ```Panada``` part 最后constructed 
+- 对于**多个virtual base**, 初始化顺序由他们 appear in derivation list <span style="background-color:#FFFF00"> 从左向右顺序决定 </span>
+- **synthesized copy / move construtor**, **sythesized assignment operator** <span style="color:red">顺序与constructor 顺序一致</span>。 
+- <span style="color:red">**Destructor** 顺序与 **constructor** 顺序相反</span>
+
+比如normal initialization rules 当不同virtual inheitance, Both ```Bear``` and ```Raccoon``` would initialize the ZooAnimal part of a Panda object(<span style="color:red">a base class initialize more than once</span>). 
+
+每个class 都有可能成为 “most derived” object, the constructor  就必须initialize virtual base, 例如 当 ```Bear``` (or ```Raccoon``` ) object, <span style="background-color:#FFFF00">no further derived type</span>. ```Bear```(```Raccoon```) constructors directly initialize their ```ZooAnimal``` base. 当```Panda```是 most derived class, ```Panda```的 constructor initializes ```ZooAnimal```. 即使 ```ZooAnimal``` 不是 direct base of ```Panda```. 
+
+```c++
+//normal inheritance
+
+Bear::Bear(std::string name, bool onExhibit): 
+    ZooAnimal(name, onExhibit, "Bear") { }
+Raccoon::Raccoon(std::string name, bool onExhibit) : 
+    ZooAnimal(name, onExhibit, "Raccoon") { }
 
 
+Panda::Panda(std::string name, bool onExhibit) : 
+    ZooAnimal(name, onExhibit, "Panda"),
+    Bear(name, onExhibit), Raccoon(name, onExhibit),
+    Endangered(Endangered::critical), sleeping flag(false) { }
+```
 
+多个virtual base 的顺序由 它们出现在 derivation list 顺序决定, 比如下面例子, ```TeddyBear``` 有两个virtual base ```ZooAnimal``` 和 ```Bear```
+
+```c++
+class Character { /* ... */ };
+class BookCharacter : public Character { /* ... */ };
+class ToyAnimal { /* ... */ };
+class TeddyBear : public BookCharacter,
+    public Bear, public virtual ToyAnimal { /* ... */ };
+```
+
+初始化顺序
+
+```c++
+ZooAnimal(); // Bear's virtual base class
+
+ToyAnimal(); // direct virtual base class
+
+Character(); // indirect base class of first nonvirtual base class
+
+BookCharacter(); // first direct nonvirtual base class 
+
+Bear(); // second direct nonvirtual base class
+
+TeddyBear();// most derived class
+
+```
 
 
 
 ***
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## 19. Specialized Tools and Techniques
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
