@@ -15797,8 +15797,16 @@ double Panda::max_weight() const
 
 **4. Virtual Inheritance**
 
+-  **virtual inheritance** lets a class specify that it is willing to <span style="color:red">share its base class</span>. 
+    - The shared base-class subobject is called a <span style="background-color:#FFFF00">**virtual base class**</span>. 
+    - 不管virtual base appear 几次in inheritance hierarchy, the derived object 只contain only <span style="color:red">**one shared subobject** for that virtual base class</span>
 
 
+例子一: ```istream``` and ```ostream``` classes each inherit from a common abstract base class 是 ```basic_ios```(hold stream's buffer and manages stream's condition state). 而```iostream```继承了 both ```istream``` and ```ostream``` 默认情况下, 如果一个base class 在derived classes 出现多次, derived oject will have more than one subobject of that type. 对于```iostream``` 如果两个 ```basic_ios```, 一个```iostream``` 不会用一样的buffer for both reading and writing. 
+
+例子二：比如pandas 是属于 Raccoon 类 还是 Bear 有争议，就两个class 都继承
+
+![](/img/post/C++/virtualInheritance.PNG)
 
 
 
