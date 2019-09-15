@@ -15601,7 +15601,7 @@ class Bear : public ZooAnimal {
 class Panda : public Bear, public Endangered { /* ... */ };   
 ```
 
-<center> Conceptual Structure of a Panda Object </span>
+<center> Conceptual Structure of a Panda Object </center>
 
 ![](/img/post/C++/multipleInheritance.PNG)
 
