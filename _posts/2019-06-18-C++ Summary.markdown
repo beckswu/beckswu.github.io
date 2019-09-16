@@ -15215,16 +15215,16 @@ inline namespace FifthEd {
 namespace FifthEd { 
     // implicitly inline class 
     
-    Query_base { /* ... * /};
+    Query_base { };
     // other Query-related declarations 
     
 }
 
 namespace FourthEd {
-    class Item_base { /* ... */}; 
-    class Query_base { /* ... */}; 
+    class Item_base {}; 
+    class Query_base { }; 
     // other code from the Fourth Edition
-
+    
 }
 ```
 
