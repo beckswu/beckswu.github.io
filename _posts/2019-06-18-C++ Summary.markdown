@@ -513,7 +513,7 @@ public:
         - 如果parameter is base-class type, 可以initialized by an exception object derived from parameter type
             - 如果parameter is nonreference , object is sliced down
             - 如果parameter is reference, derived-to-base conversion
-- rules for exception matche exception declaration:
+- rules for exception matches exception declaration:
     - conversion from nonconst to const 
     - derived-to-base conversion
     - Array/function convert to pointer
@@ -15122,15 +15122,13 @@ while (cin >> item1 >> item2) { // read two transactions
 - <span style="color:red">不可以定义namespace inside a function or class</span>
 - A namespace scope does not end with a semicolon.
 - Each namespace is a **scope**. Different namespaces introduce different scopes, different namespaces may have members with the same name
-    - Names defined in namesapce 可以被该namespace内成员 直接访问, 当被该namespace 外访问时 must indicate the namespace (which name is defined)
+    - namespace 成员被外访问时 must indicate the namespace
         - 比如 ```cplusplus_primer::Query q = cplusplus_primer::Query("hello");```
 - **Namespaces can be discontiguous**: a namespace 可以被定义 in several parts
     - 因为namespace members that define casses, and declarations for functions and object 是class interface, put in header files
     - definitions of namespace member can be put in separate source files
         - need to ensure functions and other names we defined only once. 
         - 可以define namespace function outside namespace, 只需加上 namespace name 和 scope operator (Once name seen, assume in scope of namesapce). 
-        - 但不可以define in unrelated namespace
-    - 这么定义不会造成any compile-time or link-time errors.
     - 定义多个, unrelated types 的 namespaces 时，should use **separate files**  to define 表示每个类型 或者关联类型集合
 - 注意 not put a ```#include``` inside the namespace. 如果这么做表示定义header总所有名字 定义成该命名空间的成员, 比如```string``` include in ```cplusplus_primer``` 表示 define ```std``` nested inside ```cplusplus_primer``` **Error**
 - <span style="background-color:#FFFF00">**Template specializations**</span> must be defined in the <span style="color:red">**same namespace** that contains the original template</span> . 只要在namespace 中声明specialization, 就可以define outside namespace
@@ -15144,8 +15142,8 @@ while (cin >> item1 >> item2) { // read two transactions
     - An unnamed namespace may be <span style="color:red">**discontiguous** within a given file</span> but does <span style="color:red">**not span files**</span>.
         - 每个file 有自己的unnamed namespace, <span style="color:red">如果two files contain unnamed namespace,those namespaces are **unrelated**</span>. Both unnamed namespaces <span style="color:red">can **define the same name**</span>; those definitions would <span style="color:red">refer to **different entitie**</span>
         - 如果一个header defines a unnamed namespace, the names in that namespace <span style="color:red"> **define different entities** local to each file</span> that includes the header.
-    - Names defined in an unnamed namespace are  <span style="color:red">**used directly**</span>. 也找不到namespace name which qualify them. <span style="color:red">not possible to use the scope operator to refer to members of unnamed namespaces</span>
-    - Names defined in an unnamed namespace are in the **same scope** as the scope at which the namespace is defined. 如果unnamed namesapce defined 在 outermost scope in file, then <span style="color:red">names in the **unnamed namespace** must **differ from** names defined at **global scope**</span>.  注意下面例子
+    - Names defined in an unnamed namespace are  <span style="color:red">**used directly**</span>. 也找不到namespace name which qualify them.
+    - Names defined in an unnamed namespace are in the **same scope** as the scope at which the namespace is defined. 如果unnamed namespace 中member name 需要区别于unname scope  enclosing scope的 member names.  注意下面例子
     - unnamed namespace 可以 nested in another namespace. 如果 unnamed namespace nested, then names in it are <span style="color:red">**accessed using enclosing namespace name(s)**</span>
 
 
@@ -15196,6 +15194,7 @@ size_t operator()(const Sales_data& s) const {
 ```c++
 namespace cplusplus_primer {
     //nested namespace: defines Query portion of the library
+    
     namespace QueryLib {
         class Query { /* ... */ };
         Query operator&(const Query&, const Query&); 
@@ -15218,7 +15217,7 @@ namespace FifthEd {
     
     Query_base { /* ... * /};
     // other Query-related declarations 
-
+    
 }
 
 namespace FourthEd {
