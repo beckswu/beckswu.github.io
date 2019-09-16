@@ -552,6 +552,74 @@ public:
 
 
 
+- Namespace Name must unique
+- cannot define namespace inside function or class
+- A namespace scope does not end with a semicolon.
+- Each namespace is a scope. Different namespaces introduce different scopes
+- not put  ```#include``` inside the namespace, 比如 ```std``` in ```cplusplus``` 表示 ```std``` in out defined scope.
+- **Nested Namespace**: hide the declaration of outer namespace
+- <span style="color:red">**inline namespace**: can be used as direct members of enclosing namspace</span> 不需要提供inline namespace name. 只需提供enclosing namespace name
+    - keyword inline must <span style="background-color:#FFFF00">appear on first definition </span>of the namespace
+    - 用于多个版本，现在版本inline, old 版本noninline 
+- Unnamed Namespace: 
+    - variable in unnamed namespace has **static lifetime**, created before first use and destroyed when program ends 
+    - discontiguous within given file 但是不能span files，两个files 的unnamed space not related
+    - 如果include header 有 unnamed namespace, 在不同include 这个header 文件中定义属于每个file的entity 
+    - 可以nested in another namespace, access using enclosing namespace name 
+- **inline namespace** and **Unnamed Namespace**: 他们都是in the **same scope** as the scope at which unnamed namespace/inline space is defined.
+    - 区别是**inline namespace** 自动是same scope, **inline Namespace** 是在 using directive 时候在same scope
+- namespace Alias: ```using aa = int;```
+    - 一个namespace 可以有多个aliases. can be used interchangeably.
+- using declaration: introduce one member at a time. 
+    - 可以是global, local, namespace, class scope,
+    - <span style="color:red">在class scope 中只能用于refer base class member</span>
+- using directive:
+    - 可以用于global, local, namespace, 但不能用于class scope
+    -  lift namespace members 到 nearest scope that contains both namespace itself and using directive
+        - local definition 可能会hide namespace definition.
+    - 跟 Using Declaration 相同之处是: use **unqualified form** of a namespace name 
+    - 跟 Using Declaration 不同是, 
+        - namespace 中所有 名字都是visible without qualification
+        - clash (命名冲突) is detected in using declaration, but for using directive, 只有被用到时候, 才会发现 
+    - 如果用很多using directive,可能有name collision problems
+- <span style="color:red">避免header 有using directive or using declaration 否则将名字inject 到用到这些header 文件</span> 
+- Argument-Dependent Lookup： ```operator>>(std::cin, s);```  不同specify ```using std::string```
+    - <span style="color:red">search namespace where argument class is defined</span> in addition to normal lookup
+    - 因为```move``` and ```forward``` parameter is rvalue reference (can match any type), 因此用 ```std::move``` specify the version, avoid collision 
+    - 当make a function as **friend**, no visible, 但是friend function take class as parameter, visible, 因为Argument-Dependent Lookup
+    - 根据Argument-Dependent Lookup， 确定candidate set, 即使不在same namespace
+- overloading: 
+    - using declaration: 
+        - all the versions brought into current scope
+        - 如果name and parameter list 都一样, using declaration is error 
+    - using derivative:
+        - 如果name and parameter list 都一样, not an error 除非用的时候是error
+    
+- 没有限制number of base class in derivation list, 但一个base class 只能出现一次
+- derived constructor initialize all base classes (subobject)
+- base class 顺序只与order of derivation list 有关, 与constructor initializer list 无关
+- destrutor always invoked in reversed order as constructor
+- derived 的 synthesize copy/move constructor / assignment 自动call base class 的(self-defined or synthesized)。  derived 的 self-defined 的 copy/move constructor / assignment 不会自动call 
+- static type 决定可以用 那个member 
+- Multipe Inheritance: <span style="color:red">lookup happens simultaneously among all the direct base classes</span>.
+    - 如果 name is found more than one base class, Unqualified uses of that name are ambiguous
+    - <span style="background-color:#FFFF00">Name Lookup before type checking： 即使不同 base classes 中funtion name 一样 但是有 different parameter lists, derived class call will be ambiguious</span>
+        - <span style="background-color:#FFFF00">即使一个是private, 一个是public, 也是**error**</span>
+    - inherit constructor ```using Base1::Base1;``` from multiple base class, 如果有一样的parameter list error
+    - Derived-to-base conversion: converting to each base class is equally good..
+        - 比如 most derived -> derived 和 most derived -> base conversion 在compiler 看来一样好
+- Virtual Inheritance:  willing to share its **base class**
+    - Virtual derivation affects the classes that **subsequently derive from a class with a virtual base**; 并不会影响 derived class 本身.
+    - ```public virtual``` or ```virtual public``` 顺序都可以
+    - 可以用derived-to-base conversion, 可以用virtual base pointer/reference 绑定到 derived class
+    - visibility: access by derived class
+        - virtual base √
+        - 如果 virtual base 只被一个derivation path override √ 
+        - 如果 virtual base 只被多个derivation path override ×
+    - virtual base is initialized by most derived constructor
+    - virtual base 最先初始化，多个virtual base 初始化顺序根据derivation list 由左到右顺序决定, 之后initialize non virtual base class, 顺序也是由derivation list 由左到右顺序
+    - destructor 与 constructor 顺序相反
+
 ***
 
 
@@ -15143,9 +15211,9 @@ while (cin >> item1 >> item2) { // read two transactions
         - 每个file 有自己的unnamed namespace, <span style="color:red">如果two files contain unnamed namespace,those namespaces are **unrelated**</span>. Both unnamed namespaces <span style="color:red">can **define the same name**</span>; those definitions would <span style="color:red">refer to **different entitie**</span>
         - 如果一个header defines a unnamed namespace, the names in that namespace <span style="color:red"> **define different entities** local to each file</span> that includes the header.
     - Names defined in an unnamed namespace are  <span style="color:red">**used directly**</span>. 也找不到namespace name which qualify them.
-    - Names defined in an unnamed namespace are in the **same scope** as the scope at which the namespace is defined. 如果unnamed namespace 中member name 需要区别于unname scope  enclosing scope的 member names.  注意下面例子
     - unnamed namespace 可以 nested in another namespace. 如果 unnamed namespace nested, then names in it are <span style="color:red">**accessed using enclosing namespace name(s)**</span>
-
+-<span style="color:red"> **inline namespace** and **Unnamed Namespace**: 他们都是in the **same scope** as the scope at which unnamed namespace/inline space is defined</span>.
+    - 区别是**inline namespace** 自动是same scope, **inline Namespace** 是在 using directive 时候在same scope
 
 **Namespaces can be discontiguous**:比如下面code, 可以是定义新namespace ```nsp``` or adds to existing namespace 
 ```c++
@@ -15155,7 +15223,7 @@ namespace nsp {
 }
 ```
 
-`定义outside namespace: 与class member defined outside class类似, once fully qualified name is seen, we are in scope of namespace
+定义outside namespace: 与class member defined outside class类似, once fully qualified name is seen, we are in scope of namespace
 
 ```c++
 cplusplus_primer::Sales_data cplusplus_primer::operator+(const Sales_data& lhs,
@@ -15232,12 +15300,27 @@ namespace FourthEd {
 ```c++
 namespace cplusplus_primer { 
     #include "FifthEd.h" 
+    
     #include "FourthEd.h"
+    
 }
+```
+inline namespace member 跟定义它的enclosing scope 是 **in the same scope**
+```c++
+
+namespace nsp {
+   inline namespace {
+      int i = 5;
+   }
+   int i = 10;
+}
+cout << nsp::i << endl; //ambiguous
+
 ```
 
 **Unnamed Namespace**
 
+E.g1
 ```c++
 int i; // global declaration for i
 
@@ -15262,6 +15345,58 @@ namespace local {
 local::i = 42;
 ```
 
+E.g.2
+```c++
+void Foo() // 1
+
+{}
+namespace
+{
+  void Foo() // 2
+  
+  {}
+}
+
+namespace { // re-open same anonymous namespace
+
+    void do_main()
+    {
+      Foo(); // Calls local, anonymous namespace (Foo #2).
+      
+      ::Foo(); // Calls the Foo in the global namespace (Foo #1).
+
+    }
+}
+
+int main() {
+    do_main();
+}
+```
+
+E.g.3 
+
+```c++
+namespace nsp {
+   namespace {
+      int i = 5;
+   }
+   int i = 10;
+}
+cout << nsp::i<<endl;//print 10
+```
+E.g.4, ambiguous call, 因为using directive 把所有member 展开
+```
+namespace nsp {
+   namespace {
+      int i = 5;
+   }
+   int i = 10;
+}
+using namespace nsp;
+cout << i<<endl; //ambiguous
+
+```
+
 **2. Using Namespace Members**
 
 **Namespace Aliases**
@@ -15284,12 +15419,10 @@ namespace primer = cplusplus_primer;
 
 
 
-**using Directive**
+**using Directive**：  ```using namespace namespace_name```
 
 - Using Directive 和 Using Declaration 相同之处是: use <span style="color:red">**unqualified form**</span> of a namespace name 
-- Using Directive 和 Using Declaration 之处是, namespace 中所有 名字都是 <span style="color:red">visible</span> without qualification
-- Using Directive 格式是 : ```using namespace namespace_name```
-    - It is <span style="color:red">**error**</span> 如果用 namespace name not previously defined
+- Using Directive 和 Using Declaration 不同是, namespace 中所有 名字都是 <span style="color:red">visible</span> without qualification
 - 可以用于global,local, namespace, 但是不能用于class scope
 - Providing a using directive for 多个 namespaces, such as ```std```, 程序可能有 name collision problems
 
@@ -15337,6 +15470,7 @@ void manip(){
         int k = 97; //local k hides blip::k
 
         ++k; // set local k to 98
+	
 }
 ```
 
@@ -15377,7 +15511,7 @@ namespace A {
 
 ```
 
-E.g. 2
+E.g. 2, 注意 ```f3```定义 可以通过lookup ```A``` 发现 ```h```
 ```c++
 namespace A {
     int i;
@@ -15397,6 +15531,7 @@ namespace A {
         int j;
     };
     int h = i; // initialized from A::i
+    
 }
 // member f3 is defined outside class C1 and outside namespace A
 
@@ -15437,7 +15572,7 @@ operator>>(std::cin, s);
 **5.Friend Declarations and Argument-Dependent Lookup**
 
 - when <span style="color:red">**class declares a friend**</span>, friend declaration does <span style="color:red">**not** make the friend **visible**</span>
-- <span style="color:red">**undeclared class** or **function**</span> that is first named <span style="color:red">in a friend declaration</span> is assumed to be a <span style="color:red">member of the **closest enclosing namespace**</span>。 一个未声明的类或者函数 第一次出现在右元声明中, 则认为它是最近外层命名空间的成员
+- <span style="color:red">**undeclared class** or **function**</span> that is first named <span style="color:red">in a friend declaration</span> is assumed to be a <span style="color:red">member of the **closest enclosing namespace**</span>。 一个未声明的类或者函数 第一次出现在友元声明中, 则认为它是最近外层命名空间的成员
 
 下面例子:  ```f``` and ```f2``` are members of namespace ```A```. 
 
@@ -15497,7 +15632,6 @@ int main() {
     - <span style="color:red">**using declaration declares a name**</span>, not a specific function
     - When we write a using declaration for overloaded functions, <span style="color:red">**all the versions**</span> of that function are <span style="color:red">**brought into the current scope**</span>.
         - 引入所有版本 ensure interface not violated. 因为作者定义了different functions for a reason, 如果用户选择性忽略一些, can leading surprising behavior
-    - <span style="color:red">using declaration 引用functions 将overload any 一样名字 functions</span> declartions in the scope where using declaration appears
     -  如果using declaration in local scope, <span style="color:red">hides existing declarations in outer scope</span>
     - 如果using declaration introduece 的function <span style="color:red">跟现在scope 已有的function  name and parameter list 一样</span>, using declaration is in <span style="color:red">**error**</span>. Otherwise, defines additonal overloaded instances and increase candidate functions set
 - using directives:
@@ -15538,7 +15672,9 @@ using namespace libs_R_us;
 void fooBar(int ival)
 {
     print("Value: "); // calls global print(const string &)
+    
     print(ival); // calls libs_R_us::print(int)
+    
 }
 ```
 
@@ -15562,7 +15698,9 @@ using namespace Primer;
 long double print(long double); 
 int main() {
     print(1); // calls AW::print(int) 
-    print(3.1); // calls Primer::print(double) return 0;
+    
+    print(3.1); // calls Primer::print(double) return 0
+    
 }
 ```
 
@@ -15586,7 +15724,7 @@ int main() {
 - <span style="background-color:#FFFF00">**Derived constructors initialize all base classes(subobjects)**</span>
 - 与single base class(§ 15.2.2)类似, **Derived constructor** 的 constructor initializer <span style="color:red">只能initialize **direct base** classes</span>
 - <span style="color:red">direct base class 初始顺序与 **derivation list** 相关的</span>, order 与 constructor initializer list 无关
-- 而 *<span style="color:red">*Destructors**</span> are always invoked in <span style="color:red">**reverse order**from constructors are run</span> 
+- 而 <span style="color:red">**Destructors**</span> are always invoked in <span style="color:red">**reverse order**from constructors are run</span> 
     - Derived class destructor 只负责 clean resources allocated by that class only. Destructor 自动call, synthesized destructor has empty function body.
 - 对于inherit constructors from one or more of its base classes. <span style="color:red">**Error** to inherit **有一样parameter list** constructor from more than one base class</span>. 见下面例子
   - 解决这样问题 是在 class 中 定义own version of that constructor
@@ -15608,6 +15746,7 @@ Derived constructor 只 initialize direct base classes
 
 ```c++
 // explicitly initialize both base classes 
+
 Panda::Panda(std::string name, bool onExhibit)
       : Bear(name, onExhibit, "Panda"), Endangered(Endangered::critical) { }
 
@@ -15620,16 +15759,16 @@ Panda::Panda()
 
 上面class direct base 初始化顺序, 与 derivation list顺序一致, derivation list ： ```class Panda : public Bear, public Endangered ```: 顺序如下
 
-1. ```Bear``` initialized first
-2. ```Endangered``` second direct base is initialized next 
-3. ```Panda``` most derived part is initialized last
-4. ```Zoo``` 最后
+1. ```ZooAnimal``` initialized first
+2. ```Bear``` second direct base is initialized next 
+3. ```Endangered``` most derived part is initialized last
+4. ```Panda``` 最后
 
 被cdostryed 的顺序
 
 1. ```~Panda``` 
 2. ```~Enadangered```
-3. ```~Beat```
+3. ```~Bear```
 4. ```~ZooAnimal```
 
 
@@ -15792,6 +15931,26 @@ double Panda::max_weight() const
 }
 ```
 
+Name Lookup before type checking:
+
+```c++
+class Base1{
+public:
+   void get() {}
+};
+class Base2 {
+public:
+   void get(int i) {}
+};
+class nsp : public Base1, public Base2{
+public:
+};
+
+nsp aa;
+aa.get(1); //ambiguous
+
+```
+
 **4. Virtual Inheritance**
 
 -  **virtual inheritance** lets a class specify that it is willing to <span style="color:red">share its base class</span>(share a single instance of base class ). 
@@ -15880,7 +16039,7 @@ Panda::Panda(std::string name, bool onExhibit) :
     Endangered(Endangered::critical), sleeping flag(false) { }
 ```
 
-多个virtual base 的顺序由 它们出现在 derivation list 顺序决定, 比如下面例子, ```TeddyBear``` 有两个virtual base ```ZooAnimal``` 和 ```Bear```
+多个virtual base 的顺序由 它们出现在 derivation list 顺序决定, 比如下面例子, ```TeddyBear``` 有两个virtual base ```ZooAnimal``` 和 ```ToyAnimal```
 
 ```c++
 class Character { /* ... */ };
