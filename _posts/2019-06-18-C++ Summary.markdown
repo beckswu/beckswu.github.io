@@ -8057,40 +8057,87 @@ void StrVec::reallocate(){
 
 #### (e). Rvalue References
 
-- An <span style="color:red">**rvalue reference**</span> is a reference that must be <span style="color:red">bound</span> to an <span style="color:red">**rvalue**</span>.
-- important property: that rvalue reference <span style="color:red">只能 bound to an object that is about to be **destroyed**</span>
-    - 因此可以自由将rvalue reference 移动到另一个对象中
+- An <span style="color:red">**rvalue reference**</span> is a reference that must be <span style="color:red">bound</span> to an <span style="color:red">**rvalue**</span>(an object that is about to be **destroyed**). (除了template, auto)
+   - 因此可以自由将rvalue reference 移动到另一个对象中
 - an <span style="background-color:#FFFF00">**lvalue**</span> expression refers to an object’s <span style="background-color:#FFFF00">**identity**</span> whereas an <span style="background-color:#FFFF00">**rvalue**</span> expression refers to an <span style="background-color:#FFFF00">object’s **value**</span>
-- <span style="background-color:#FFFF00">rvalue reference 只能接 rvalue </span>
-- <span style="background-color:#FFFF00">**r-value reference <-X-  lvalue**</span>:  <span style="color:red">can bind an **rvalue reference** to 要求conversion的expression,to literals, 或者返回 rvalue 的 expression, 但lvalue reference(不算const) 不能绑定到这些表达式; 反过来 但是 **rvalue-reference**不能绑定到一个**lvalue**</span>
-- <span style="background-color:#FFFF00">**rvalue-reference <-X- rvalue reference**</span> <span style="color:red">不能绑定  **rvalue reference**</span> to a variable defined as an <span style="color:red">**rvalue reference**</span> type.
-- <span style="background-color:#FFFF00">**lvalue-reference <-x- rvalue**</span> 
-不可以比如```int & r = i*42; ```
-
-例子:
 - return lvalues 表达式的例子: along with the <span style="color:red">assignment, subscript, dereference, and **prefix** increment/decrement operators</span>
 - Functions that **return a nonreference type**, along with the <span style="color:red">arithmetic, relational(true/false), bitwise, and **postfix** increment/decrement operators, all yield **rvalues**</span>
 
+
+
+总结:
+
+- **rvalue-reference**: 只能绑定到 rvalue
+   - <span style="background-color:#FFFF00">**r-value reference <-- rvalue**✔️</span>:
+	- 可以绑定到literals, or expression return rvalue. but a lvalue reference cannot bind these
+   - <span style="background-color:#FFFF00">**r-value reference <-- rvalue reference**</span>, <span style="color:red">**Error**</span>: 因为rvalue reference variable 是lvalue (有identity)	
+   - <span style="background-color:#FFFF00">**r-value reference <-- lvalue**</span>, <span style="color:red">**Error**</span>
+   - <span style="background-color:#FFFF00">**r-value reference <-- lvalue reference**</span>, <span style="color:red">**Error**</span>
+- **lvalue**: 
+   -  <span style="background-color:#FFFF00">**lvalue <-- rvalue**✔️</span>:
+   -  <span style="background-color:#FFFF00">**lvalue <-- rvalue reference**✔️</span>:
+   - <span style="background-color:#FFFF00">**lvalue <-- lvalue**✔️</span>:
+   - <span style="background-color:#FFFF00">**lvalue <-- lvalue reference**✔️</span>
+- **lvalue reference**: 要绑定到object 上
+   -  <span style="background-color:#FFFF00">**lvalue <-- rvalue**</span> <span style="color:red">**Error**</span>
+      - but const lvalue reference can take rvalue 
+   -  <span style="background-color:#FFFF00">**lvalue <-- rvalue reference**✔️</span> 因为rvalue reference 表达式是 lvalue 
+   - <span style="background-color:#FFFF00">**lvalue <-- lvalue**✔️</span>:
+   - <span style="background-color:#FFFF00">**lvalue <-- lvalue reference**✔️</span>
+	
+	
+例子
+
 ```c++
-int i = 42;  //ok
+//rvalue reference:
 
-int &r = i;  //ok
+int lval = 10;
+int & lval_ref = lval; 
 
-int &&rr = i; lvalue  // error: cannot bind an rvalue reference to an lvalue
+int && rval_ref0 = 10; //error: cannot bind a lvalue 
 
-int &r2 = i * 42; // error: i * 42 is an rvalue
+int && rval_ref1 = lval_ref; //error: cannot bind a lvalue reference
 
-const int &r3 = i * 42; // ok: we can bind a reference to const to an rvalue
-
-int &&rr2 = i * 42; // ok: bind rr2 to the result of the multiplication
-
-//不能把r-value reference 绑定到 r-value reference 
+int && rval_ref2 = lval * 10; //okay: can bind rvalue reference 
 
 int &&rr1 = 42; // ok: literals are rvalues
 
-int &&rr2 = rr1; // error: the expression rr1 is an lvalue!
+int && rval_ref3 = rval_ref2; //error: cannot bind a rvalue reference  
+
+
+//lvalue:
+
+int lval = 10, &lval_ref = lval;
+int && rval_ref = lval * 10;
+
+int lval_0 = lval*10; //okay: can bind to a rvalue 
+
+int lval_1 = rval_ref; //okay: can bind to a rvalue reference
+
+int lval_2 = lval; //okay: can bind to a lvalue 
+
+int lval_3 = lval; //okay: can bind to a lvalue reference
+
+
+//lvalue reference: 
+
+int lval = 10, &lval_ref = lval;
+int && rval_ref = lval * 10;
+
+int& lval_ref1 = lval*10; //error: cannot bind to a rvalue 
+
+int lval_ref1 = rval_ref; //okay: can bind to a rvalue reference. the expression rr1 is an lvalue!
+
+int lval_ref2 = lval; //okay: can bind to a lvalue 
+
+int lval_ref3 = lval; //okay: can bind to a lvalue reference
+
+
+const int &lval_ref4= lval*10;; // ok: we can bind a reference to const to an rvalue
 
 ```
+
+
 
 **Lvalues Persist; Rvalues Are Ephemeral**
 
