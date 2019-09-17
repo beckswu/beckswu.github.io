@@ -302,7 +302,7 @@ public:
     - if class no move operation(也没有synthesized的), copy 代替move operation (当copy parameter type is const reference ) 
     - 如果没有copy, 不能用move constructor 代替copy, 因为不能用rvalue reference to take lvalue 
 - 如果copy/move constructor 都avaiable 根据function matching rule see which one is better
-    -<span style="color:red"> move constructor and move assignment operator, 通常是rvalue reference, not const rvalue reference</span>（pass rvalue to copy operation, 需要const version not exact match）, 否则 const rvalue reference and const lvalue reference 都accept everything.  还因为move operation is to steal from argument
+    - <span style="color:red"> move constructor and move assignment operator, 通常是rvalue reference, not const rvalue reference</span>（pass rvalue to copy operation, 需要const version not exact match）, 否则 const rvalue reference and const lvalue reference 都accept everything.  还因为move operation is to steal from argument
 - move iterator: transform ordinary iterator to move iterator: ```make_move_iterator ```
     - ```make_move_iterator(vec.begin())```
     - dereference return rvalue reference
