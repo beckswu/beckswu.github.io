@@ -239,6 +239,82 @@ public:
     - ```uninitialized_copy```, ```uninitialized_fill``` 批量 construct
 ***
 
+
+13.Copy Control
+
+- copy constructor: 
+    - parameter reference to const, 必须是reference, 否则无限recursion.
+    - 通常不是explicit
+    - 只copy nonstatic member, type 决定如何copy,
+        - class type: copy constructor 
+        - <span style="background-color:#FFFF00">尽管array 不能copy, synthesize copy constructor **copy each elements** from array</span>. 如果array element is class, 用class copy constructor
+    - ```insert``` ```push``` copy initialization, ```emplace``` direct initialization 
+    - 有explicit, 只能direct initialization(```vector<int>a(10)```), no copy initialization 
+    - during copy initialization, compiler 可能忽略 copy/move constructor and create object directly. 但是copy/move constructor 必须 accessible (not private)
+- assignment operator: return reference, library container / built-in type return as reference. <span style="color:red">若return value, 还需要call copy constructor</span>
+    - bad example 是: 直接delete exisiting left-hand operand, 导致如果是self-assignment, access an invalid pointer to make copy
+    - 顺序方法一:
+        1. copy right-hand to local temporary 
+        2. destory existing member of left-hand operand 
+        3. copy from temporary to left
+
+
+- destructor: free resources and <span style="color:red">destroyed **non-static** data member</span>
+    - 先run destructor function body then class members are destoryed(member destructor), reversed order of initialization
+    - <span style="color:red">destructor not run when reference or pointer out of scope</span>
+    - 会synthesize destructor for any class, 只有当base destructor 是private, 才不会生成
+    - 如果 destructor 是 ```=delete``` 不能create an object, 不能delete object or delete pointer to dynamically allocated object
+- 当 specify ```=default``` inside class, implicitly inline,如果不想让它inline, 可以specify ```=default``` on members definition outside class
+    - can only use ```=default``` on synthesize member version 
+- ```=default``` 不像 ```=default```: <span style="color:red"> must appear on the first declaration of a deleted function</span>
+    - <span style="color:red">不像```=default```, ```=delete``` 可以用于任何 function</span>
+- private copy control: user cannot copy but friend and member can still copy. 
+    - 阻止friend / member copy, not define them, 
+    - user error in compiler time, friend/member error in link time. 
+
+- Swap: 
+    - 通常involve one copy and two assignment operator
+    - 如果class 定义自己的 ```swap```, algorithm use class-version, 否则 use ```swap``` defined by library 
+    - usually define as friend member to access private data (argument-dependent lookup )
+    - optimize by define ```inline```
+    - 正确call 方法 ```using std::swap; swap(a,b)```: 只有当member 没有 ```swap``` 定义时, 才会call library version
+        - 根据template function matching rule: class member 更specialized 
+    - class 定义 ```swap``` 通常用于 assignment operation: copy and swap 
+        - copy 可以通过 paramter copy by value, call copy constructor to 完成复制, 而不用copy by reference
+        - assignment use copy and ```swap``` are exception safe and correctly 
+
+- rvalue reference: 
+    - rvalue reference <- rvalue  只能绑定rvalue (除了template, auto), 也可以绑定move 返回的 rvalue reference, 
+    - nonconst lvalue reference 不能绑定 rvalue, 也不能绑定move() 返回 的 rvalue reference, const lvalue reference 可以绑定rvalue 
+    - all variable are lvalues even type is rvalue reference
+    - ```move``` 不用provide ```std::move``` 因为argument dependent lookup
+        - performance boost
+        - 用于不能copy的, ```unique_ptr``` or IO classes
+
+- move constructor: first parameter is rvalue reference, 任何其他的parameters must all have default arguments; 
+    - must ensure moved-from object is harmless after move
+    - not throw except (因为no resouse allocation) ```noexcept``` 
+        - <span style="color:red">在所有的declaration and definition</span>
+    - library 的move, 如果发生异常, 比如比如vector ```push_back``` 有exception, vector itself 是unchanged
+
+- move assignment:it is crucial to , should maredt as ```noexcept``` 
+    - After move operation, “moved-from” object must remain a valid, destructible object but no assumptions about its value.（可以assign new value to moved from object）
+    - if class no move operation(也没有synthesized的), copy 代替move operation (当copy parameter type is const reference ) 
+    - 如果没有copy, 不能用move constructor 代替copy, 因为不能用rvalue reference to take lvalue 
+- 如果copy/move constructor 都avaiable 根据function matching rule see which one is better
+    -<span style="color:red"> move constructor and move assignment operator, 通常是rvalue reference, not const rvalue reference</span>（pass rvalue to copy operation, 需要const version not exact match）, 否则 const rvalue reference and const lvalue reference 都accept everything.  还因为move operation is to steal from argument
+- move iterator: transform ordinary iterator to move iterator: ```make_move_iterator ```
+    - ```make_move_iterator(vec.begin())```
+    - dereference return rvalue reference
+    - library no guarantees about which algorithm use move iterator and which cannot. 只有当确定算法运行完不再用时候, 才pass move iterator 
+- can call member regardless of its lvalue or rvalue 
+- reference qualifier: replace ```&``` or ```&&``` after parameter list
+    - 必须在```const``` 后面
+    - 与noexcept类似, reference qualifier 必须同时<span style="color:red">出现所有的于function declaration 和 definition 中</span>
+    - 可以被overload 基于 reference qualifier: 可以根据  reference qualifier 和 const 来区分一个成员函数的重载版本
+
+***
+
 14: Operator Overloading
 
 - overloading parameter must at least one is class type 
@@ -531,7 +607,7 @@ public:
 - function try block: only way handle constructor initializer list
     - 普通try block in constructor can't work, 
     - exception when initialize parameter 不能被function try block handle, 只能由caller handle
-- ```noexcept``` specifier: 要么声明在所有的declaration 和 definition 要么就不声明,  在const reference qualifer 之后, ```final```, ```override```, virtual function ```=0``` 之前
+- ```noexcept``` specifier: 要么声明在所有的declaration 和 definition 要么就不声明,  在const reference qualifer 之后, ```final```, ```override```, virtual function ```=0```, constructor initializer list 之前
     - 不属于function type一部分
     - 可以用于function pointer
     - 不能用于 ```typedef``` 和 type alias
@@ -7513,22 +7589,31 @@ str a = b;//error cannot copy
 
 **(4). The Rule of Three/Five**
 
+
+
+
+
 记: 1. constructor 2. copy constructor 3. copy assignment operator 4. destructor 5. move constructor 6 move assignment operator 
 
 - destructor 只有 当base destructor 是private 时候才不会生成
 - constructor synthesize only if no constructor defined by user (注: copy / move constructor 也算 constructor )
-- copy constructor:  no 3 ,4 , 5, 6 defined 
-- copy assignment operator: no 2, 4, 5, 6 defined 
-- move constructor: no 2, 3, 4, 6 defined 
-- move assignment operator: no 2, 3, 4, 5 defined 
+- copy constructor:  no 3 ,4 , 5, 6 defined 且member 是可以copy的, ( member 是class type 的 copy constructor accessible)
+- copy assignment operator: no 2, 4, 5, 6 defined, <span style="color:red">且member 没有const or reference, member 是可以copy assignment的</span>, ( member 是class type 的 copy assignment operator accessible) .
+- move constructor: no 2, 3, 4, 6 defined 且member 没有const or reference  member 是可以move的, ( member 是class type 的 move constructor accessible)
+- move assignment operator: no 2, 3, 4, 5 defined 且member 是可以move assigned 的, ( member 是class type 的 move assigment operator accessible)
+- copy / move only for <span style="color:red">**nonstatic** data member</span>
+- 即使声明synthesized as ```=delete``` 也算user defined 
+
 
 总结:
 - 2,3,5,6, 如果任何一个定义了, compiler都不会synthesize其他的，
 - 如果定义了 destructor, 2,3,5,6 也都不会生成
+-  注上面accessible 定义是 nondeleted and inaccessible
 - If the class needs a destructor, it almost surely needs a copy constructor and copy-assignment operator as well.
 - 一般需要copy constructor时候, 也需要copy assignment operator, 反之亦然. 
 - When we specify ```= default``` on the declaration of the member <span style="background-color:#FFFF00">inside the class body</span>, the synthesized function is **implicitly inline**. If do not want inline , 也可以  <span style="background-color:#FFFF00">specify ```= default``` on the member’s definition outside class</span>
   - We can <span style="background-color:#FFFF00">use ```= default``` only on member functions</span> that <span style="background-color:#FFFF00">**have a synthesized version**</span> (i.e., the default constructor or a copy-control member).
+  
 - **Preventing Copies** 对于不能copy 的class i.e IO class： 以免多个对象写入或者读取相同的IO缓冲
     1. Defining a Function as ```Deleted```: 
        -  Unlike ```= default```, <span style="color:red">```= delete``` must appear on the **first declaration** of a deleted function</span>, 函数第一次声明的时候就要加```=delete```, 不能像```= default```, 还可以定义在外部
@@ -8060,6 +8145,9 @@ void StrVec::reallocate(){
 - An <span style="color:red">**rvalue reference**</span> is a reference that must be <span style="color:red">bound</span> to an <span style="color:red">**rvalue**</span>(an object that is about to be **destroyed**). (除了template, auto)
    - 因此可以自由将rvalue reference 移动到另一个对象中
 - an <span style="background-color:#FFFF00">**lvalue**</span> expression refers to an object’s <span style="background-color:#FFFF00">**identity**</span> whereas an <span style="background-color:#FFFF00">**rvalue**</span> expression refers to an <span style="background-color:#FFFF00">object’s **value**</span>
+- **Lvalues Persist; Rvalues Are Ephemeral**
+   - **Lvalues** have persistent state, whereas rvalues are either **literals** or **temporary objects** created in the course of evaluating expressions.
+   - All variables Are **Lvalues**
 - return lvalues 表达式的例子: along with the <span style="color:red">assignment, subscript, dereference, and **prefix** increment/decrement operators</span>
 - Functions that **return a nonreference type**, along with the <span style="color:red">arithmetic, relational(true/false), bitwise, and **postfix** increment/decrement operators, all yield **rvalues**</span>
 
@@ -8067,10 +8155,12 @@ void StrVec::reallocate(){
 
 总结:
 
-- **rvalue-reference**: 只能绑定到 rvalue
+- **rvalue-reference**: 只能绑定到 rvalue, rvalue reference 
    - <span style="background-color:#FFFF00">**r-value reference <-- rvalue**✔️</span>:
-	- 可以绑定到literals, or expression return rvalue. but a lvalue reference cannot bind these
-   - <span style="background-color:#FFFF00">**r-value reference <-- rvalue reference**</span>, <span style="color:red">**Error**</span>: 因为rvalue reference variable 是lvalue (有identity)	
+      - 可以绑定到literals, or expression return rvalue. but a lvalue reference cannot bind these
+   - <span style="background-color:#FFFF00">**r-value reference <-- rvalue reference**</span>, 
+      - <span style="background-color:#FFFF00"> r-value reference <-- a variable which type is rvalue reference </span>. <span style="color:red">**Error**</span>: 因为**all varaibles are lvalue**
+      - <span style="background-color:#FFFF00"> r-value reference <-- move()``` ✔️</span>: can bind to rvalue reference from move 
    - <span style="background-color:#FFFF00">**r-value reference <-- lvalue**</span>, <span style="color:red">**Error**</span>
    - <span style="background-color:#FFFF00">**r-value reference <-- lvalue reference**</span>, <span style="color:red">**Error**</span>
 - **lvalue**: 
@@ -8078,10 +8168,12 @@ void StrVec::reallocate(){
    -  <span style="background-color:#FFFF00">**lvalue <-- rvalue reference**✔️</span>:
    - <span style="background-color:#FFFF00">**lvalue <-- lvalue**✔️</span>:
    - <span style="background-color:#FFFF00">**lvalue <-- lvalue reference**✔️</span>
-- **lvalue reference**: 要绑定到object 上
+- **lvalue reference**: 要绑定到object 上, 只能绑定 lvalue, lvalue reference
    -  <span style="background-color:#FFFF00">**lvalue <-- rvalue**</span> <span style="color:red">**Error**</span>
       - but const lvalue reference can take rvalue 
-   -  <span style="background-color:#FFFF00">**lvalue <-- rvalue reference**✔️</span> 因为rvalue reference 表达式是 lvalue 
+   -  <span style="background-color:#FFFF00">**lvalue <-- rvalue reference**</span>
+      - <span style="background-color:#FFFF00">**lvalue <-- a variable with type is rvalue reference**✔️</span>因为rvalue reference 表达式是 lvalue 
+      - <span style="background-color:#FFFF00">**lvalue <-- move() return rvalue reference**</span> <span style="color:red">**Error**</span> 
    - <span style="background-color:#FFFF00">**lvalue <-- lvalue**✔️</span>:
    - <span style="background-color:#FFFF00">**lvalue <-- lvalue reference**✔️</span>
 	
@@ -8102,7 +8194,11 @@ int && rval_ref2 = lval * 10; //okay: can bind rvalue reference
 
 int &&rr1 = 42; // ok: literals are rvalues
 
-int && rval_ref3 = rval_ref2; //error: cannot bind a rvalue reference  
+int && rval_ref3 = rval_ref2; //error: cannot bind a varabile with type rvalue reference variable
+
+//because rvalue reference variable is lvalue 
+
+int && rval_ref4 = move(rval_ref2); //okay: bind a rvalue reference  
 
 
 //lvalue:
@@ -8139,23 +8235,12 @@ const int &lval_ref4= lval*10;; // ok: we can bind a reference to const to an rv
 
 
 
-**Lvalues Persist; Rvalues Are Ephemeral**
-
--  **Lvalues** have persistent state, whereas rvalues are either **literals** or **temporary objects** created in the course of evaluating expressions.
-    - Variables Are **Lvalues**
--  **rvalue** references can only be bound to **temporaries**, we know that 
-    - <span style="color:red">The referred-to object is about to be **destroyed**</span>
-    - <span style="color:red">There can be no other users of that object </span>
-- 从上面一条, 所以rvalue reference 可以自由接管所引用对象自愿
-
-
-
 **The Library move Function**
 
-- 尽管不能直接把rvalue reference 绑定到 lvalue, 但<span style="background-color:#FFFF00">可以 cast lvalue to rvalue reference type by use ```std`::move```</span>
+- 尽管不能直接把rvalue reference 绑定到 lvalue, 但<span style="background-color:#FFFF00">可以 cast lvalue to rvalue type by use ```std`::move```</span>
 - ```move``` 告诉compiler 我们有个lvalue, 但想让对待rvalue 一样处理它.
 - We can <span style="color:red">**destroy**</span> a moved-from object and can <span style="color:red">**assign** a new value</span> to it, <span style="color:red">but we cannot use the value of a moved-from object</span>.
-- 不用using declaraction for ```move```, 因为我们调用 ```std::move``` 而不是 ```move```, 原因将在18.2.3中讲到
+- 不用using declaraction for ```move```, 因为我们调用 ```std::move``` 而不是 ```move```, 原因将在18.2.3中讲到(因为argument dependent lookup)
 
 ```c++
 int &&rr1 = 42; 
@@ -8174,10 +8259,17 @@ int &&rr3 = std::move(rr1);
 
 #### (f). Move Constructor and Move Assignment
 
+1. **Move Constructor**
+2. **Move Assignment**
+3. **Synthesized Move Operations**
+4. **Move Iterators**
+5. **Rvalue References and Member Functions**
+6. **Rvalue and Lvalue Reference Member Functions**
+
 **(1). Move Constructor**
 
--  **move constructor**:  the reference parameter in the  is an <span style="background-color:#FFFF00">**rvalue reference**</span>, 像copy constructor, <span style="color:red">**any additional parameters** must all have **default** arguments</span>.
- -  除了move resources, move constructor must **ensure** that <span style="color:red">destroying moved- from object(移后源) will be harmless </span>.  original object must no longer point to those moved resources. <span style="color:red">responsibiles 转移给了newly created object</span>
+-  **move constructor**:  the reference parameter is an <span style="background-color:#FFFF00">**rvalue reference**</span>, 像copy constructor, <span style="color:red">**any additional parameters** must all have **default** arguments</span>.
+ -  move constructor must **ensure** that <span style="color:red">destroying moved- from object(移后源) will be harmless </span>.  original object must no longer point to those moved resources. <span style="color:red">responsibiles 转移给了newly created object</span>
 - 因为<span style="background-color:#FFFF00">move operation 不allocate any resources</span>, 所以通常<span style="color:red">不会throw exception</span>. 如果不告诉compiler 它不会throw exception, compiler也许会做extra work to cater to the possibility that也许throw
   - specify ```noexcept``` on move constructor, 是<span style="color:red">promise that a function does **not throw** any exceptions</span>.   specify noexcept on a function after its **parameter list**. 在parameter list 内在**constructor initializer list**前面
   - 必须specify ```noexcept``` both on <span style="color:red">**declaration** in class header</span> 和 <span style="color:red">**definition** outside class</span>
@@ -8202,7 +8294,7 @@ StrVec::StrVec(StrVec &&s) noexcept : /* member initializers */
 
 
 
-例子中move constructor 没有allocate new memory. take over memory in given ```StrVec```, 在take over memory 之后, constructor body sets pointers to ```nullptr```. 之后moved-fom object 会被destoryed by calling destructor (会deallocate ```first_free```. <span style="color:red">如果我们忘记assign ```s.first_free``` to ```nulltpr```, 会deleted memory we just moved</span>)
+例子中move constructor 没有allocate new memory. take over memory in given ```StrVec```, 之后moved-fom object 会被destoryed by calling destructor (会deallocate. <span style="color:red">如果忘记 ```s.first_free = nullptr```, 会deleted memory we just moved</span>)
 ```c++
 StrVec::StrVec(StrVec &&s) noexcept // move won't throw any exceptions
 
@@ -8217,16 +8309,15 @@ StrVec::StrVec(StrVec &&s) noexcept // move won't throw any exceptions
 ```
 
 
-可能出现的问题: 比如在reallocate(move elements from old space to new memory) 过程中发生异常. If reallocation 使用move constructor throw exception 在移动了部分而不是全部元素后。问题就产生了: <span style="color:red">旧空间中的移动元素已经改变，而新空间中的unconsturcted elements 可能尚不存在</span>, vector满足不了 当有exception 自身unchanged 性质. 所以这种情况下, <span style="background-color:#FFFF00">vector 会使用copy constructor</span>: 如果exception 发生, elements are constructe in new memory, old elements remain unchanaged. <span style="color:red">如果exception 发生, vector free the space it allocated and return. 原始的vector elements still exist. 为了避免这种潜在问题, vector使用move constructor 而不是copy constructor 除非知道move constructor cannot throw an excetpion. tell compiler safe to use during reallocation. 必须explicitly tell library that our <span style="color:red">move constructor safe to use by marking ```noexcept```</span>
+可能出现的问题: 比如在reallocate(move elements from old space to new memory) 过程中发生异常. If reallocation 使用move constructor throw exception 在移动了部分而不是全部元素后。问题就产生了: <span style="color:red">旧空间中的移动元素已经改变，而新空间中的unconsturcted elements 可能尚不存在</span>, vector满足不了 当有exception 自身unchanged 性质. 所以这种情况下, <span style="background-color:#FFFF00">vector 会使用copy constructor</span>: 如果exception 发生, elements are construct in new memory, old elements remain unchanaged. 如果exception 发生, vector free the space it allocated and return. 原始的vector elements still exist. 为了避免这种潜在问题, vector使用move constructor 而不是copy constructor 除非知道move constructor cannot throw an excetpion. tell compiler safe to use during reallocation. 必须explicitly tell library that our <span style="color:red">move constructor safe to use by marking ```noexcept```</span>
 
 
 
 **(2). Move Assignment**
 - 像move constructor, if <span style="color:red">**move-assignment operator** won’t throw any exceptions</span>, we should make it <span style="color:red">```noexcept```</span>.  Like a copy-assignment operator, a move-assignment operator must guard against self-assignment
 - As in any other assignment operator, it is crucial that we <span style="color:red">在使用右侧运算对象之前，不能释放左侧运算对象的资源 (可能是相同资源)</span>.
-- After a **move operation**, 需要确保“moved-from” object must remain a valid, destructible object(可以run destructor) but users may <span style="color:red">make no assumptions about its value</span>.    
-  - ```StrVec``` move operations meet this requirement <span style="background-color:#FFFF00">by **setting the pointer members of the moved-from object to ```nullptr```**</span>
-  - valid 表示可以依然为其赋予新值, 可以安全使用不依赖其结果,比如```string```当移后, remain valid, 可以run operations such as ```empty``` or ```size``` on moved-from objects. 可是不知道会得到什么结果. 
+- After a **move operation**, “moved-from” object must remain a valid, destructible object(可以run destructor) but <span style="color:red">no assumptions about its value</span>.    
+  - valid 表示可以依然为其赋予新值, 可以安全使用不依赖其结果,比如```string```当移后, remain valid, 虽然可以run operations such as ```empty``` or ```size``` on moved-from objects. 但不知道会得什么结果. 
 
 例子中 we do check self-assignment. <span style="color:red">因为calling```move``` 可以让rvalue 作为右侧运算符</span>,
 
@@ -8251,18 +8342,10 @@ StrVec &StrVec::operator=(StrVec &&rhs) noexcept
 ```
 **(3). Synthesized Move Operations**
 
--  if a class <span style="color:red">defines its own copy constructor, copy-assignment operator, or destructor</span>, the <span style="color:red">**move constructor** and **move- assignment** operator are not synthesized</span>
-- when a class <span style="color:red">doesn’t have a move operation</span>, the corresponding <span style="color:red">**copy** operation is used in place of move</span> through normal function matching
-- The compiler will <span style="color:red">synthesize a move constructor or a move-assignment operator </span> only if the class <span style="background-color:#FFFF00">doesn’t define any of its own **copy-control members**</span> and if every <span style="color:red">nonstatic data member</span> of the class <span style="color:red">can be moved</span>.
-    - can move built-in type 
-    - can move member of a class type 如果该class 定义了 move operation 
-- <span style="background-color:#FFFF00">**move operation** is never implicitly defined as a ```deleted``` function</span>. 但是如果我们explicit ask compiler to gerenerate a move operation by using ```=default```, compiler unable to move member, then move operation 被定义成 ```deleted```. 除了一个important exception, rules for when a synthesized move operation 被定义成 ```deleted``` 跟 copy operation 类似的原则: (deleted or inaccessible as **DI**)
-    -   Unlike the copy constructor, the <span style="background-color:#FFFF00">**move constructor** is defined as ```deleted```</span> 如果class <span style="color:red">有member defines own copy constructor</span> 但是没有定义 move constructor, 或者 class member 的 class 没有定义copy constructor 并且<span style="color:red">compiler 不能sythesize a move constructor</span> (对move-assignment 同理) 
-    - The <span style="color:red">**move constructor**</span> or <span style="color:red">**move-assignment operator**</span> is defined as <span style="color:red">**deleted**</span>, 如果class memmber 的class <span style="color:red">有move constructor or move assignment 是DI的</span>
-    - Like the copy constructor, the <span style="color:red">**move constructor** is defined as deleted if the destructor is DI</span>.
-    - Like the copy-assignment operator, <span style="color:red">**move-assignment operator** 定义成 **deleted** 如果 class 有 const or reference member </span>
-    - <span style="background-color:#FFFF00">如果class 定义了move constructor or move assigment operator, 则他的copy constructor 和 copy-assignment operator for that class 都被定义成了 deleted</span> 
-- class 定义了move constructor and move-assignment operator 应该avoid overhead 由copy resource 产生的. 一般说如果定义了一个copy-control members, 就应该定义所有5个操作(copy constructor, copy/move constructor, copy/move assignment operator)
+- when a class <span style="color:red">not move operation</span>(也没有synthesized的), the corresponding <span style="color:red">**copy** operation is used in place of move</span> through normal function matching
+
+- <span style="background-color:#FFFF00">**move operation** is never implicitly defined as a ```deleted``` function</span>. 但是如果我们explicit ask compiler to gerenerate a move operation by using ```=default```, compiler unable to move member, then move operation 被定义成 ```deleted```. (比如class member unable synthesize move operation)
+
 
 
 ```c++
@@ -8279,12 +8362,12 @@ struct hasX {
 
 };
 
-X x, x2 = std::move(x); // uses the synthesized move constructor hasX hx, 
+X x, x2 = std::move(x); // uses the synthesized move constructor
 
 hasX hx, hx2 = std::move(hx); // uses the synthesized move constructor
 ```
 
-比如下面例子, 定义了copy constructor 没有定义move constructor, 因为忽略了move contructor的declaration, compiler 不能generate move constructor. 
+比如下面例子, 定义了copy constructor 没有定义move constructor, 因为忽略了move contructor的declaration, compiler 不能generate move constructor; 如果member class 都可以copy, 会用copy constructor. 
 ```c++
 // assume Y is a class that defines its own copy constructor but not a move constructor
 
@@ -8303,7 +8386,6 @@ struct hasY {
     hasY(const hasY& y) {
  	cout << "int copy constructor" <<endl;
     }
-    Y mem;
  };
  hasY hy, hy2 = std::move(hy);//ok, print: in copy constructor
  
@@ -8314,10 +8396,9 @@ struct hasY {
 
 -  When a class has both a **move constructor** and a **copy constructor**, the compiler uses ordinary function matching to determine which constructor to use
     - rvalue will call move constructor, 因为move constructor is better match 不用conversion
-    - 如果没有move constructor, will call copy constructor 
-- If a class has a <span style="color:red">**usable** copy constructor and no **move constructor**</span>, objects will be <span style="color:red">“moved” by the copy constructor</span>. Similarly for the <span style="color:red">copy-assignment operator and move-assignment</span>(如果没有move assignment 用copy-assignment).
+   
 
-第一个例子, v2是lvalue, 使用copy-assignment operator(因为对于move assignment operator <span style="background-color:#FFFF00">不能bind rvalue reference to an lvalue</span>). 第二个例子, ```getVec``` 返回时rvalue, 赋值是move-assignment operator. assign rvalue (实际上viable for both move-assignment and copy assignment. 但是<span style="background-color:#FFFF00">calling copy assignment 需要conversion to ```const```</span>, whereas ```StrVec&&``` is exact match )
+第一个例子, v2是lvalue, 不能pass to move assignment(rvalue reference). 第二个例子, ```getVec``` 返回时rvalue, 赋值是move-assignment operator. assign rvalue (实际上viable for both move-assignment and copy assignment. 但是<span style="background-color:#FFFF00">calling copy assignment 需要conversion to ```const```</span>, whereas ```StrVec&&``` is exact match )
 
 ```c++
 StrVec v1, v2;
@@ -8371,7 +8452,7 @@ hp2 hp = std::move(hp2); // move constructor moves hp2
 
 ```
 
-用**rvalue reference** call pointer ```&```
+用**rvalue reference** call pointer ```&```, 因为variable is lvalue
 ```c++
 Message::Message(Message &&m): contents(std::move(m.contents)) 
 //move constructor 
@@ -15054,7 +15135,7 @@ template <typename T> Blob<T>::Blob(std::initializer_list<T> il) try :
     - ```noexcept``` 应在trailing return 之前. 
     - 也可以 sepcify ```noexcept``` on declaration and definition of a **function pointer**. 
     - 不能appear in a ```typedef``` or type alias.
-    - 在const ,reference qualifier 之后, 在 ```final```, ```override``` or virtual function ```=0``` 之前
+    - 在const ,reference qualifier 之后, 在 ```final```, ```override``` or virtual function ```=0```, constructor initializer list  之前
     - compiler <span style="background-color:#FFFF00">no check exception specifications </span> 对于 声明 ```noexcept``` 是否throw exception 不会检查 at <span style="background-color:#FFFF00">**compiled time**</span>
         - 如果声明了```noexcept``` does throw, <span style="color:red">```terminate``` is called</span>. enforcing the promise not to throw at **run time**
     - ```noxcept``` 应该被用于两种情况: 
