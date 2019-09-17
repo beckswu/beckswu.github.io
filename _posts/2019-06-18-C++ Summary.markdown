@@ -280,7 +280,7 @@ public:
     - 正确call 方法 ```using std::swap; swap(a,b)```: 只有当member 没有 ```swap``` 定义时, 才会call library version
         - 根据template function matching rule: class member 更specialized 
     - class 定义 ```swap``` 通常用于 assignment operation: copy and swap 
-        - copy 可以通过 paramter copy by value, call copy constructor to 完成复制, 而不用copy by reference
+        - copy 可以通过 parameter copy by value, call copy constructor to 完成复制, 而不用copy by reference
         - assignment use copy and ```swap``` are exception safe and correctly 
 
 - rvalue reference: 
@@ -310,6 +310,7 @@ public:
 - can call member regardless of its lvalue or rvalue 
 - reference qualifier: replace ```&``` or ```&&``` after parameter list
     - 必须在```const``` 后面
+    - overload 要么不用，要用就都用
     - 与noexcept类似, reference qualifier 必须同时<span style="color:red">出现所有的于function declaration 和 definition 中</span>
     - 可以被overload 基于 reference qualifier: 可以根据  reference qualifier 和 const 来区分一个成员函数的重载版本
 
@@ -16275,11 +16276,16 @@ TeddyBear();// most derived class
 
 **1. Overloading new and delete**
 
-- ```new``` . This function allocates <span style="color:red">**raw**, **untyped memory**</span> large enough to hold an object (or an array of objects) of the specified type. Then compiler runs appropriate constructor to <span style="color:red">construct the object(s)</span> from specified initializers. 最后 a <span style="color:red">**pointer to newly allocated and constructed object**</span> is returned
-- ```delete```: <span style="color:red">the appropriate destructor is run</span> on the object to which ```sp``` points or on the elements in the array to which ```arr``` points. Next, <span style="color:red">the compiler **frees the memory**</span> by calling a library function named <span style="color:red">operator ```delete``` or operator ```delete[]```</span>, respectively.
-- 可以定义自己的 ```new``` and ```delete```, we take over responsibility for all dynamic memory allocation. <span style="color:red">Functions 必须crorect</span>
+- ```new``` . 
+    - This function allocates <span style="color:red">**raw**, **untyped memory**</span> large enough to hold an object (or an array of objects). 
+    - Then runs constructor to <span style="color:red">construct the object(s)</span> from specified initializers.     
+    - 最后 return a <span style="color:red">**pointer to newly allocated and constructed object**</span> is 
+- ```delete```: 
+    - <span style="color:red">destructor is run</span> on the object pointer points or on the elements in the array to which ```arr``` points. 
+    - Next, <span style="color:red">the compiler **frees the memory**</span> by calling a library function named <span style="color:red">operator ```delete``` or operator ```delete[]```</span>.
+- 可以定义自己的 ```new``` and ```delete```, we take over responsibility for all dynamic memory allocation. <span style="color:red">Functions 必须correct</span>
     - 可以定义在global scope or as member functions 
-    - 当compiler 发现 ```new``` or ```delete```, 如果object being allocated 是 class type, compiler 首先looks in class scope including any base classes. 如果发现, 就使用，否则, look for a matching function in global scope. 如果发现 user-defined version, it uses that function to execute the ```new``` or ```delete``` . 如果没有找到, use library version 
+    - 当compiler 发现 ```new``` or ```delete```, 如果object class type, compiler 首先looks class scope 包括 base classes. 否则, look in global scope.  . 如果没有找到, use library version 
     - 可以用scope operator to force ```new``` or ```delete```  to use specfic version. 比如 ```::new``` look only in global scope rather than class scope 
 
 
@@ -16289,7 +16295,7 @@ TeddyBear();// most derived class
     - ```delete``` <span style="color:red">must not throw an exception</span>. by ```noexcept``` exception specifier
     - 如果定义下面8个, 必须定义在<span style="color:red">**global scope**</span> or <span style="color:red">**class scope**</span>.
         - 当定义在<span style="color:red">**class member**</span>, these operator are <span style="color:red">**implicitly static**</span>(不同显示声明它static)
-        - static 原因: ```new``` and ```delete``` functions 必须是 static 因为they are used either before object is constructede or after it has been destroyed. <span style="background-color:#FFFF00">因此```new``` 和 ```delete``` 不能manipulate member data</span>
+        - static 原因: ```new``` and ```delete``` functions 必须是 static 因为they are used either before object is constructed or after it has been destroyed. <span style="background-color:#FFFF00">因此```new``` 和 ```delete``` 不能manipulate member data</span>
 - ```new```
     - ```operator new``` used when we <span style="background-color:#FFFF00">**allocate an object**</span>, ```operator new []``` is called when we <span style="background-color:#FFFF00">**allocate an array**</span>.
     - ```operator new``` or ```operator new []``` function must have a <span style="color:red">return type of ```void*```</span>  且<span style="color:red">first argument 必须是  ```size_t```</span>, ```size_t``` 不能有default argument.
