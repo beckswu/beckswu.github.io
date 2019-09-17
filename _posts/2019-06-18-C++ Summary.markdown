@@ -16104,24 +16104,109 @@ TeddyBear();// most derived class
 
 ## 19. Specialized Tools and Techniques
 
+#### (a). Memory Allocation
+
+1. **Overloading new and delete**
+2. **malloc and free Functions**
+3. **Placement new Expressions**
+
+
+**1. Overloading new and delete**
+
+- ```new``` . This function allocates <span style="color:red">**raw**, **untyped memory**</span> large enough to hold an object (or an array of objects) of the specified type. Then compiler runs appropriate constructor to <span style="color:red">construct the object(s)</span> from specified initializers. 最后 a <span style="color:red">**pointer to newly allocated and constructed object**</span> is returned
+- ```delete```: <span style="color:red">the appropriate destructor is run</span> on the object to which ```sp``` points or on the elements in the array to which ```arr``` points. Next, <span style="color:red">the compiler **frees the memory**</span> by calling a library function named <span style="color:red">operator ```delete``` or operator ```delete[]```</span>, respectively.
+- 可以定义自己的 ```new``` and ```delete```, we take over responsibility for all dynamic memory allocation. <span style="color:red">Functions 必须crorect</span>
+    - 可以定义在global scope or as member functions 
+    - 当compiler 发现 ```new``` or ```delete```, 如果object being allocated 是 class type, compiler 首先looks in class scope including any base classes. 如果发现, 就使用，否则, look for a matching function in global scope. 如果发现 user-defined version, it uses that function to execute the ```new``` or ```delete``` . 如果没有找到, use library version 
+    - 可以用scope operator to force ```new``` or ```delete```  to use specfic version. 比如 ```::new``` look only in global scope rather than class scope 
+
+
+
+- <span style="background-color:#FFFF00">Library 定义了8个 overloaded versions of ```operator new``` and ```delete```. 前四个有可能throw ```bad_alloc``` exception. 后四个support nonthrowing versions of ```new``` </span>
+    - ```nothrow_t``` 是struct 定义在 ```new``` header(also defines a ```const``` object named ```nothrow```, user pass nonthrowing version of ```new```)
+    - ```delete``` <span style="color:red">must not throw an exception</span>. by ```noexcept``` exception specifier
+    - 如果定义下面8个, 必须定义在<span style="color:red">**global scope**</span> or <span style="color:red">**class scope**</span>.
+        - 当定义在<span style="color:red">**class member**</span>, these operator are <span style="color:red">**implicitly static**</span>(不同显示声明它static)
+        - static 原因: ```new``` and ```delete``` functions 必须是 static 因为they are used either before object is constructede or after it has been destroyed. <span style="background-color:#FFFF00">因此```new``` 和 ```delete``` 不能manipulate member data</span>
+- ```new```
+    - ```operator new``` used when we <span style="background-color:#FFFF00">**allocate an object**</span>, ```operator new []``` is called when we <span style="background-color:#FFFF00">**allocate an array**</span>.
+    - ```operator new``` or ```operator new []``` function must have a <span style="color:red">return type of ```void*```</span>  且<span style="color:red">first argument 必须是  ```size_t```</span>, ```size_t``` 不能有default argument.
+    - 当call ```opeartor new```, initialize ```size_t``` parameter with the number of <span style="color:red">**bytes**</span> require to <span style="color:red">hold an object</span>. 
+    - 当call ```operator new[]```, it passes the number of <span style="color:red">**bytes**</span> required to store <span style="color:red">an array of **all** given elements</span>
+    - ```operator new``` 可以定义 additional parameter, 这种expression must use <span style="background-color:#FFFF00">**placement form** of ```new```</span> 比如 ```int* a = new (noexcept) int;```, 不可以定义成下面的格式:
+        - ```void *operator new(size_t, void*); ``` Error
+        - 因为这种形式是 reserved for use by the library 不能重新定义 
+- ```delete```:
+    - 必须有 ```void``` return and first parameter of type ```void*``` (initialize with a pointer to the memory to free)
+    - ```operator delete``` or ```operator delete[]``` 当被定义成class member, function 可以有第二个parameter of type ```size_t```. 初始值是the size in bytes addressed by first parameter. 
+        - ```size_t```  parameter is used when delete object  that are part of <span style="color:red">inheritance hierarchy</span>.
+        - 如果base class has a <span style="color:red">**virtual destructor**</span>, ```size_t```取决于 dynamic type of object deleted pointer points.
+    - <span style="color:red">```operator delete``` 也是由 **dynamic type** 决定的</span>
+- 与overloading 不同, 不像 ```operator=```, 没有overload ```new``` or ```delete``` expressions. In fact, we cannot redefine the behavior of the new and delete expressions.
+  - ```new``` : always executes by calling an ```operator new``` to obtain memory then construct an object in memory 
+  - ```delete``` expression always executes by destroying an object then calling ```operator delete``` to free memory used by an object
+  -  通过提供定义 ```operator new``` and ```operator delete```, 可以<span style="color:red">change how memory is allocated</span>. 可是, <span style="color:red">不能改变basic meaning of ```new``` and ```delete ``` operator</span>
+- 自己定义了 ```operator new``` and ```operator delete```. functions 必须 <span style="color:red">**allocate and deallocate memory**</span>.  即使define these functions in order to use a specialized memory allocator, 也是有用的 for testing purposes to allocate memory 
+
+
+```c++
+// these versions might throw an exception
+
+void *operator new(size_t); //allocate an object
+
+void *operator new[](size_t);//allocate an array
+
+void operator delete(void*) noexcept; //free an object 
+
+void operator delete[](void*) noexcept; //free an array 
+
+
+// versions that promise not to throw; see § 12.1.2 (p. 460)
+
+void *operator new(size_t, nothrow_t&) noexcept; 
+void *operator new[](size_t, nothrow_t&) noexcept; 
+void operator delete(void*, nothrow_t&) noexcept; 
+void operator delete[](void*, nothrow_t&) noexcept;
+```
 
 
 
 
+```c++
+// new expressions
+
+string *sp = new string("a value"); // allocate and initialize a string
+
+string *arr = new string[10]; // allocate ten default initialized strings
+
+delete sp; // destroy *sp and free the memory to which sp points 
+
+delete [] arr; // destroy the elements in the array and free the memory
+
+```
 
 
+**2. The malloc and free Functions**
+
+- ```malloc``` and ```free``` inherits from C. 定义在 ```cstdlib```
+  - ```malloc``` takes a ```size_t``` 说明 how many bytes to allocate. <span style="color:red">returns a pointer to memory it allocated</span> , or <span style="color:red">0 if was unable to allocate the memory</span>. 
+  - ```free```  takes a ```void*``` that is a <span style="color:red">**copy**</span> of a pointer that was return from ```malloc``` and returns the associate memory to the system.
+    - ```free(0)``` has no effect 
+
+A simple way to write ```operator new``` and ```operator delete``` as follow :
+
+```c++
+void *operator new(size_t size) { 
+    if (void *mem = malloc(size)) 
+        return mem;
+    else
+        throw bad_alloc();
+} 
+void operator delete(void *mem) noexcept { free(mem); }
+```
 
 
-
-
-
-
-
-
-
-
-
-
+**3. Placement new Expressions**
 
 
 
