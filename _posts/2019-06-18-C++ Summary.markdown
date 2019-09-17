@@ -592,7 +592,7 @@ public:
     - using declaration: 
         - all the versions brought into current scope
         - 如果name and parameter list 都一样, using declaration is error 
-    - using derivative:
+    - using directive:
         - 如果name and parameter list 都一样, not an error 除非用的时候是error
     
 - 没有限制number of base class in derivation list, 但一个base class 只能出现一次
@@ -7385,17 +7385,16 @@ ostream &print(ostream & os, const QueryResult &qr)
   -  <span style="color:red">copy constructor’s own parameter must be a **reference**</span>: 否则调用永远不会成功, 因为一直自己copy 自己 parameter
   - first parameter 通常是 a reference to const
   - 通常copy constructor is not <span style="color:red">**explicit**</span>
-  - When not define a copy constructor, the compiler <span style="color:red">**synthesizes**</span> one for us. Unlike the synthesized default constructor, <span style="color:red">a copy constructor is synthesized even if we define other constructors</span> 即使有其他的constructor, compiler也可能定义个copy constructor for us
-- The compiler <span style="background-color:#FFFF00">copies each **nonstatic** member</span> in turn <span style="background-color:#FFFF00">from the given object into the one being created</span>. The type of each member determines how that member is copied
+- The compiler <span style="background-color:#FFFF00">copies each **nonstatic** member</span> from the given object into the one being created. The type of each member determines how that member is copied
   - class member 是class type, 则由copy constructor for that class 进行拷贝
-  - Although we cannot directly copy an array, <span style="background-color:#FFFF00">the **synthesized copy constructor** copies</span> members of <span style="background-color:#FFFF00">**array** by copying each element</span>. 如果array elements 是class type, 用class的copy constructor.
+  - 尽管array 不能copy, <span style="background-color:#FFFF00">the **synthesized copy constructor** copies</span> members of <span style="background-color:#FFFF00">**array** by copying each element</span>. 如果array elements 是class type, 用class的copy constructor.
 -  **copy initialization** requires either the copy constructor or the move constructor.
    -  **Copy initialization** 不仅在我们用```=```定义变量时发生, 在下面情况也发生:
        - <span style="background-color:#FFFF00">```insert``` 和 ```push``` 是**copy initialization**, whereas ```emplace``` 是 **direct initialization**</span>
-       - 对于function call, <span style="color:red">**parameters** that have a **nonreference type**</span>, 对于 function return <span style="color:red">when a function has a **nonreference return type**：are **copy initialized**</span>
+       - 对于function call /return, 是 **nonreference type** are **copy initialized**</span>
        - <span style="color:red">**Brace initialize**</span> the elements in an array or the members of an <span style="color:red">**aggregate class**</span>
-   - 对于有<span style="color:red">**explicit**</span> 限定的constructor, <span style="color:red">不能进行类型转换的copy construct</span>. 可以进行initialization 比如:```vector<int>(10);```, 但不可以 ```vector<int>v = 10;```
-   - During copy initialization(implicit type conversion), the compiler is permitted (but not obligated) to <span style="color:red">skip the copy/move constructor and create the object directly</span>(<span style="background-color:#FFFF00">不同type assignment initialization 是type conversion via 没有explicit 修饰的type conversion constructor; 相同type assignment initialization 会通过copy constructor</span>). That is, the compiler is permitted to rewrite
+   - 对于有<span style="color:red">**explicit**</span> 限定的constructor, <span style="color:red">不能copy initialization</span>. 只能direct initialization 比如:```vector<int>(10);```, 但不可以 ```vector<int>v = 10;```
+   - During copy initialization(implicit type conversion), the compiler is permitted (but not obligated) to <span style="color:red">skip the copy/move constructor and create the object directly</span>. That is, the compiler is permitted to rewrite as direct initialization 
      - 即使忽略了copy/move constructor, 但是<span style="background-color:#FFFF00">copy/move constructor 必须exist(自己定义or compiler generated) and must be accessible (not private) in program</span>
      - 下面例子很重要, 
   
@@ -7460,9 +7459,7 @@ string null_book = "9-999-99999-9"; // copy initialization into
 string null_book("9-999-99999-9"); // compiler omits the copy constructor
 
 ```
-- 例子一, implicit type conversion, 用的是constructor,  跳过copy/move constructor, 
-  - <span style="background-color:#FFFF00">不同type assignment initialization 可以跳过copy/move constructor 直接通过constructor to create object; </span>
-  -  <span style="background-color:#FFFF00">相同type assignment initialization 会通过copy constructor</span>
+- 例子一, implicit type conversion, 因为constructor not specify ```explicit```
 - 例子二: 因为copy constructor 是private(inaccessible), 不能copy
   
 ```c++
@@ -7494,41 +7491,50 @@ struct str{
 private:
     str(const str& l) = default
 };
-string dog = "dog";
-str a =dog;//error cannot copy 
+str b = "dog";
+str a = b;//error cannot copy 
 
 ```
 
 **(2).The Copy-Assignment Operator**
 
-- To be consistent with assignment for the built-in types, <span style="background-color:#FFFF00">**assignment operators** usually **return a reference** to their left-hand operand</span>. the library generally requires that types stored in a <span style="color:red">**container** have assignment operators that **return a reference** to the left-hand operand</span>.
-- the compiler <span style="color:red">generates a **synthesized copy- assignment operator**</span> for a class if the class <span style="color:red">does not define</span> its own
-- <span style="background-color:#FFFF00">assigns **each nonstatic member** of the right-hand object to</span> the corresponding member of the <span style="background-color:#FFFF00">left-hand object<span style="background-color:#FFFF00"> using the copy-assignment operator for the type of that member.
+- To be consistent with assignment for the built-in types, <span style="background-color:#FFFF00">**assignment operators** usually **return a reference** to their left-hand operand</span>. the library generally requires that **container** have assignment operators that **return as reference**
+- <span style="background-color:#FFFF00">assigns **each nonstatic member** of the right-hand object to</span> to left-hand object
 
 
 **(3). Destructor**
-- destructors do whatever work is needed to <span style="color:red">**free the resources** </span> used by an object and <span style="color:red">destroy the **nonstatic data members** of the object</span>
-- <span style="color:red">takes no parameters, it cannot be overloaded</span>. <span style="background-color:#FFFF00">always only **one destructor** for a given class
-- In a destructor, the function body is executed first and then the members are destroyed. <span style="background-color:#FFFF00">Members are destroyed in **reverse order**</span> from the order in which they <span style="background-color:#FFFF00">were initialized</span>.
+- destructors: <span style="color:red">**free the resources** </span> used by an object and <span style="color:red">destroy the **nonstatic data members** of the object</span>
+- <span style="color:red">takes no parameters, it cannot be overloaded</span>.
+- destruction 顺序, the destructor function body is executed first and then the members are destroyed( <span style="color:red">call member 的destructor</span>). <span style="background-color:#FFFF00">Members are destroyed in **reverse order**</span> from the order of their initialization
 - Members of class type are destroyed by running the member’s own destructor. <span style="color:red">**The built-in types(包括了smart pointer) do not have destructors**</span>, so nothing is done to destroy members of built-in type
 - <span style="background-color:#FFFF00">The destructor is **not run** when a **reference or a pointer** to an object goes out of scope</span>.
-- The compiler defines a <span style="color:red">**synthesized destructor**</span> for any class that does <span style="color:red">not define</span> its own destructor
-    - 如果destructor 不是用来阻止对象被摧毁, the <span style="background-color:#FFFF00">**synthesized destructor**</span> has an <span style="background-color:#FFFF00">empty function body</span>.
-    - Members are destroyed as part of the implicit destruction phase that follows the destructor body(<span style="color:red">在destructor 完成之后, member call 他们自己的destructor, 比如string call 自己destructor to free</span>)
+- 如果destructor 不是用来阻止对象被摧毁, the <span style="background-color:#FFFF00">**synthesized destructor**</span> has an <span style="background-color:#FFFF00">empty function body</span>.
 
 
 **(4). The Rule of Three/Five**
--  copy / move constructor, copy / move assignment operator, destructor, 对于前四个, 如果除它外有任何一个定义了, compiler都不会synthesize， destructor 只有 当base destructor 是private 时候才不会生成. 比如 如果定义了destructor, 其他四个compiler都不会生成. 同样如果定义了 move assignment, ( copy/move constructor, copy assignment 也都不会生成), 但destructor 会生成
--  If the class needs a destructor, it almost surely needs a copy constructor and copy-assignment operator as well.
-- 当需要copy constructor时候, 也需要copy assignment operator, 反之亦然. (比如copy 是为了生成一个独一无二的序号)
-- When we specify ```= default``` on the declaration of the member <span style="background-color:#FFFF00">inside the class body</span>, the synthesized function is **implicitly inline**. If do not want the synthesized member to be an inline function, we 也可以  <span style="background-color:#FFFF00">specify ```= default``` on the member’s definition</span>(在class 外面定义时声明 ```=default```)
+
+记: 1. constructor 2. copy constructor 3. copy assignment operator 4. destructor 5. move constructor 6 move assignment operator 
+
+- destructor 只有 当base destructor 是private 时候才不会生成
+- constructor synthesize only if no constructor defined by user (注: copy / move constructor 也算 constructor )
+- copy constructor:  no 3 ,4 , 5, 6 defined 
+- copy assignment operator: no 2, 4, 5, 6 defined 
+- move constructor: no 2, 3, 4, 6 defined 
+- move assignment operator: no 2, 3, 4, 5 defined 
+
+总结:
+- 2,3,5,6, 如果任何一个定义了, compiler都不会synthesize其他的，
+- 如果定义了 destructor, 2,3,5,6 也都不会生成
+- If the class needs a destructor, it almost surely needs a copy constructor and copy-assignment operator as well.
+- 一般需要copy constructor时候, 也需要copy assignment operator, 反之亦然. 
+- When we specify ```= default``` on the declaration of the member <span style="background-color:#FFFF00">inside the class body</span>, the synthesized function is **implicitly inline**. If do not want inline , 也可以  <span style="background-color:#FFFF00">specify ```= default``` on the member’s definition outside class</span>
   - We can <span style="background-color:#FFFF00">use ```= default``` only on member functions</span> that <span style="background-color:#FFFF00">**have a synthesized version**</span> (i.e., the default constructor or a copy-control member).
 - **Preventing Copies** 对于不能copy 的class i.e IO class： 以免多个对象写入或者读取相同的IO缓冲
     1. Defining a Function as ```Deleted```: 
        -  Unlike ```= default```, <span style="color:red">```= delete``` must appear on the **first declaration** of a deleted function</span>, 函数第一次声明的时候就要加```=delete```, 不能像```= default```, 还可以定义在外部
-       -  Unlike ```= default```(只能用于default constructor or copy-control member that the compiler can synthesize), we <span style="color:red">can specify ```= delete``` **on any function**</span>
-       -  we did  <span style="color:red">not delete the destructor</span>: 因为If the destructor is deleted, then there is no way to destroy objects of that type. 同样 <span style="background-color:#FFFF00">不能create objects has a deleted destructor</span>。 If a member(member是class type, 假如有deleted destructor) of that class can’t be destroyed, the object/class as a whole can’t be destroyed.
-          -  It is not possible to define an object or delete a pointer to a **dynamically allocated object** of a type with a deleted destructor(因为无法删除).
+       -  Unlike ```= default```(只能用于compiler synthesized function), we <span style="color:red">can specify ```= delete``` **on any function**</span>
+       -  we did  <span style="color:red">not delete the destructor</span>: 因为If the destructor is deleted, then there is no way to destroy objects of that type. 同样 <span style="background-color:#FFFF00">不能create objects has a deleted destructor</span>。 只能create dynamically allocated object and store in pointer
+          -  Not possible to define an object or delete a pointer to a **dynamically allocated object** of a type with a deleted destructor(因为无法删除).
     2. **private Copy Control**:
         - 当 <span style="background-color:#FFFF00">**copy constructor** and **copy-assignment operator** are **private**</span>, <span style="color:red">user 不能 copy such objects</span>. However, <span style="color:red">**friends and members** of the class can still make copies</span>
           - 为 <span style="color:red">阻止friends and members of class still make copies</span>, 我们<span style="background-color:#FFFF00">declare these members as private but do **not define** them</span>.
@@ -7574,6 +7580,7 @@ public:
     Sales_data& operator=(const Sales_data &); 
     ~Sales_data() = default;
     // other members as before
+    
 };
 
 Sales_data& Sales_data::operator=(const Sales_data&) = default;
@@ -7704,8 +7711,8 @@ HasPtr::operator=(const HasPtr &rhs)
 
 - <span style="color:red">需要copy constructor and copy- assignment operator to **copy the pointer member**</span>,而不是copy pointer 指的值
 - 需要free memory when 最后一个指向的对象被销毁时
-- Easiest way is use ```shared_ptr``` to manage the resource(会referen count, track有多少个uses sharing th pointed-to object)
-- 如果自己创建reference count, 问题是where to put reference count, 比如下面例子, if store in object的话, 也许不能update correctly. 解决方法是<span style="background-color:#FFFF00">**store the counter in dynamic memory**</span>
+- Easiest way is use ```shared_ptr``` to manage the resource(会reference count, track有多少个uses sharing th pointed-to object)
+- 如果自己创建reference count, 问题是where to put reference count, 比如下面例子, if store in object的话, 也许不能update correctly. 解决方法是<span style="background-color:#FFFF00">**store the counter in dynamic memory**</span>(不能是static, 比如 ```HasPtr a``` 和 ```HasPtr b``` 要不是copy constructor, 计数器不同的 )
     - When we copy or assign an object, we’ll copy the pointer to the counter. That way the copy and the original will point to **the same counter**.
 
 当把p1 给 p3, 递增p1的计数器, 但是却没法递增p2的计数器
@@ -7717,14 +7724,14 @@ HasPtr p3(p1); // p1, p2, and p3 all point to the same string
 
 ```
 
-Reference counting works as follows: 
+E.g. Reference counting works as follows: 
 1. 每一个constructor (copy constructor 除外) creates a counter.<span style="color:red">记录多少个objects share state</span> with the object we are creating. When we create an object， initialize the counter as 1
 2. copy constructor not allocate a new counter; copies the data members of its given object, including the counter 并 递增reference counter
 3. destructor 递减counter, 如果count 变成0, destructor deletes that state
 4. copy assignment 递减左侧对象的counter, 递增右侧对象的counter, 如果left-hand operand goes to zero. destory the state of left-hand operand. <span style="background-color:#FFFF00">通过先增加右侧, 再减少左侧的counter</span>, 这样子保证不会先在左侧reference count等于0时 free memory
 
 e.g. reference count. 注意
-- 意destructor 不能随便删除, 只有counter go to zero, then free the memory of both ```ps``` and ```use``` point. 
+- destructor 不能随便删除, 只有counter go to zero, then free the memory of both ```ps``` and ```use``` point. 
 - copy assignment operator 增加右侧运算对象计数器, 减少左侧对象计数器, 如果左侧计数器等于0，delete/free memory. 而且要能handle self-assignment.
 
 下面是很好的例子, 注意什么时候删除pointer
@@ -7813,9 +7820,9 @@ v2.ps = temp;
 **(1).Write own swap function**
 
 - override the default behavior of ```swap``` by defining a version of swap that operates on our class.
-- **declaring** ```swap``` as a **friend**</span> to give it access to HasPtr’s (private) data members.
+- **declaring** ```swap``` as a **friend** to give it access to HasPtr’s (private) data members.
 - <span style="background-color:#FFFF00">**optimize**</span> our code, we’ve <span style="color:red">defined swap as an **inline**</span> function
-- <span style="color:red">Unlike the copy-control members, <span style="background-color:#FFFF00">```swap```</span> is never necessary. However, defining swap can be an important optimization for classes that allocate resources.
+- Unlike the copy-control members, ```swap``` is never necessary. However, defining swap can be an important optimization for classes that allocate resources.
 - if a class has a member that <span style="color:red">has its own type-specific ```swap``` function, calling ```std::swap``` would be a mistake</span>.
   - 下面例子有正确的使用方法: <span style="background-color:#FFFF00">type-specific version of swap 是better match than std</span>. 因此当没有type-specific version of swap, then—assuming there is <span style="color:red">a **using declaration** for swap</span> in scope—calls to swap will <span style="color:red">use the version in ```std```</span>.
   
@@ -7834,15 +7841,15 @@ inline void swap(HasPtr &lhs, HasPtr &rhs) {
     
 }
 ```
-如果有自己member 的swap, 用```std::swap```是mistake(不会报错), 如果Foo has type ```HasPtr```, the library ```swap``` makes unnecessary copies of the strings managed by ```HasPtr```. 下面例子中为什么```swap``` not hid declaraction for the ```HasPtr```的```swap```, 在18.2.3中讲解
+如果有自己member 的swap, 用```std::swap```是mistake(不会报错). 自己member ```swap``` 通常是class friend, argument-dependent lookup
 ```c++
 void swap(Foo &lhs, Foo &rhs)
 {
     // WRONG: this function uses the library version of swap, not the HasPtr version
 
     std::swap(lhs.h, rhs.h);
-
     // swap other members of type Foo
+    
 }
 
 //正确方式
@@ -7864,7 +7871,7 @@ void swap(Foo &lhs, Foo &rhs)
 - Assignment operators that use copy and swap are <span style="background-color:#FFFF00">automatically exception safe and correctly handle self-assignment</span>. 
 
 例子中 
-- the parameter is not a reference, pass right-hand operand by value.  Copying a ```HasPtr``` <span style="color:red">allocates a new copy</span> of that object’s string. 
+- the parameter is not a reference, pass right-hand operand by value.  
 - 当assignment operator 完成后,  <span style="color:red">```rhs``` is **destroyed**</span> and the ```HasPtr``` destructor is run
 - 是自动handle self-assignment and exception safe. 
   - copy right-hand operand before changing left-hand operand, it handles self assignment in the same was as we did in our original copy constructor
@@ -7908,9 +7915,10 @@ HasPtr& HasPtr::operator=(HasPtr rhs)
 下面code
 - allocator allocate是raw/unconstructed memory, 必须call ```construct``` 去construct an object in that memory, ```construct``` 会用到```first_free``` 并递增```first_free```(递增得到next, unconstructed element)
 - ```uninitialized_copy``` <span style="background-color:#FFFF00">返回时一个指针 指向one element past the last constructed element</span>
-- Moving, Not Copying, Elements during Reallocation. Before 写 reallocate, function 应该做:
+- ```allocate`` 返回 start of memory block
+- Moving, Not Copying, Elements during Reallocation. function 应该做:
     1.  Allocate memory for a new, larger array of strings
-    2. Construct the first part of that space to hold the existing elements
+    2. Construct the first part of that space to hold the existing elements by move
     3. Destroy the elements in the existing memory and deallocate that memory
 
 copy string 是<span style="background-color:#FFFF00">**value like**</span>, 改变一个不会影响另一个. 所以copy a string肯定会allocate memory for those characters and destory a string 肯定会free memory used by string. <span style="color:red">Perfomance will be much better by avoid overhead of allocating and deallocating string 当reallocate</span>
@@ -8021,7 +8029,7 @@ void StrVec::reallocate(){
 
     auto newdata = alloc.allocate(newcapacity);
 
-    auto dest = newdata; // points to the next free position in the new array
+    auto dest = newdata; // 返回the new start of the allocated memory
 
     auto elem = elements; //points to the next element in old array 
 
@@ -15566,6 +15574,21 @@ operator>>(std::cin, s);
 - Both ```move``` and ```forward``` 有 <span style="color:red">parameter type as rvalue reference which can match any type</span>. 因此 自己定义 ```move``` no matter what type parameter has, 都会collide library ```move```, (```forward```也是这样)
 - 因为 ```move``` and ```forward``` are specialized type manipulations. override behavior of these functions chance very small, And <span style="color:red">collision very likely</span>. so using ```std::move``` rather than ```move``` 表示we use version from library
 
+
+下面例子, 自己定义version 更specialized
+```c++
+struct str {
+   str(string a) {
+      cout << "in " << endl;
+   }
+   friend str&& move(str && a) {
+      cout << " in " << endl;
+   }
+};
+str a = string("dog");
+auto b = move(a); //print in
+
+```
 
 
 
