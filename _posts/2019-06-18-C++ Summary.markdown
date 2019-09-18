@@ -16441,9 +16441,9 @@ dynamic_cast<type&&>(e)
 **Pointer-Type dynamic_casts**
 
 假设```Base``` is a class with 至少一个 virtual function and ```Derived``` <span style="background-color:#FFFF00">**publicly derived**</span> from ```Base```. Have a pointer to Base ```bp```, cast it at runtime to a pointer to ```Derived``` . 
-- 如果 ```bp``` points to ```Derived``` object, cast initialie ```dp``` to point to the ```Derived``` object to which ```bp``` points. <span style="background-color:#FFFF00">Safe io use ```Derived``` operations inside if </span>
+- 如果 ```bp``` points to ```Derived``` object, cast will initialize ```dp``` to point to the ```Derived``` object to which ```bp``` points. <span style="background-color:#FFFF00">Safe io use ```Derived``` operations inside if </span>
 - 否则, result of cast is ```0```, then condition fails, else process appropriate to ```Base```
-- **Best Practice** ```dp``` defined inside the condition. do the <span style="color:red">cast and check as a single operation</span>. 而且 if cast <span style="color:red">**fails**</span>, then unbound pointer is <span style="color:red">not available for use in subsequent code</span>
+- **Best Practice**: ```dp``` defined inside the condition. do the <span style="color:red">cast and check as a single operation</span>. 而且 if cast <span style="color:red">**fails**</span>, then unbound pointer is <span style="color:red">not available for use in subsequent code</span>
     
 ```c++
 if (Derived *dp = dynamic_cast<Derived*>(bp))
