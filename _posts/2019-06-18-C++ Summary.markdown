@@ -16376,41 +16376,280 @@ void operator delete(void *mem) noexcept { free(mem); }
 
 **3. Placement new Expressions**
 
+- 与allocator 不同, 没有construct function to construct objects in memory allocated by ```operator new```. Use <span style="background-color:#FFFF00">**placement new**</span> form of new to construct an object
+    - can pass an address, ```place_address``` <span style="color:red">must be a **pointer** </span>
+    - initiailizers provide(possible empty) comma-separated list construct  newly allocated object
+- 当called with an address and no argument, placement new uses ```operator new(size_t, void*)``` to “allocate” its memory(不许overloaded 这个function). This function not allocate any memory, simply returns its pointer argument
+- **placement new** allow to construct an object at a <span style="color:red">specific, prepalocated memory address </span>
+- placement 和 allocator ```cosntructor``` 不同是:
+    - the pointer pass to ```construct```<span style="color:red"> must point to space allocated by the same</span> ```allocator``` object
+    - pointer pass to placement new <span style="color:red">need not point to memory allocated by ```operator new```</span>
+- 就像placement new 像使用 ```allocate```, an <span style="color:red">explicit call to a destructor</span> is analogous to calling ```destroy```
+    - 像```destory``` Calling a destructor destroys an object <span style="color:red">but does not free the memory</span>.
+
+placement new epxression has form 
+
+
+```c++
+new (place_address) type
+new (place_address) type (initializers)
+new (place_address) type [size]
+new (place_address) type [size] { braced initializer list }
+```
+
+explicit call destructor: invoke destructor directly, destructor preceded by a <span style="color:red">**tilde**</span> (~).
+
+```c++
+string *sp = new string("a value"); // allocate and initialize a string
+
+sp->~string();
+
+```
+
+#### (b). Run-Time Type Identification
+
+- Run-time type identification (RTTI) is provided through two operators:
+  -  ```typeid``` operator, returns the **type** of given expression
+  - ```dynamic_cast``` operator: safely converts a pointer or reference to a <span style="color:red">base type into</span> a pointer or reference to a <span style="color:red">derived type</span>
+- 当appiled to pointers / references to types that have <span style="color:red">**virtual functions**</span>, these operator <span style="color:red">**use dynamic type**</span> of the object to which pointer or reference is bound 
+- RTTI should be used with caution. When possible,<span style="color:red"> better to define virtual function </span> rather than to take over managing the types directly.
+  - 如果不能使用virtual, can use onf of the RTTI operator. 但是 use these operators is more <span style="color:red">error-prone</span> than virtual. programmer must know to which type oject should be cast and must check cast was performed successfully.
+
+
+1. **The dynamic_cast Operator**
+2. **The typeid Operator**
+3. **Using RTTI**
+4. **The type_info Class**
+
+**1. The dynamic_cast Operator**
+
+A dynamic_cast has the following form:
+```c++
+dynamic_cast<type*>(e) 
+dynamic_cast<type&>(e) 
+dynamic_cast<type&&>(e)
+```
+
+- ```type``` must be class type and 通常含有 virtual fucntions 
+- 第一个情况, ```e``` must be a valid pointer,  第二个情况, ```e``` must be valid lvalue, 第三个 ```e``` <span style="color:red">must not be lvalue</span>
+- In all cases, ```e``` must be either a class type that is <span style="color:red">**publicly derived**</span> from target type or <span style="color:red">same target type</span>. 如果 ```e``` 满足这些types, cast succeed. 否则 cast fails. 
+    - if a dynamic_cast to a <span style="color:red">**pointer**</span> type **fails**, <span style="color:red">result is ```0```</span>.
+    - if a dynamic_cast to a <span style="color:red">**reference**</span> type fails, <span style="color:red">operator throws an exception of type ```bad_cast```</span>
+- can do a dynamic_cast on <span style="background-color:#FFFF00">**null pointer**</span>. <span style="color:red">result is a null pointer of the requested type</span>
+
+
+**Pointer-Type dynamic_casts**
+
+假设```Base``` is a class with 至少一个 virtual function and ```Derived``` <span style="background-color:#FFFF00">**publicly derived**</span> from ```Base```. Have a pointer to Base ```bp```, cast it at runtime to a pointer to ```Derived``` . 
+- 如果 ```bp``` points to ```Derived``` object, cast initialie ```dp``` to point to the ```Derived``` object to which ```bp``` points. <span style="background-color:#FFFF00">Safe io use ```Derived``` operations inside if </span>
+- 否则, result of cast is ```0```, then condition fails, else process appropriate to ```Base```
+- **Best Practice** ```dp``` defined inside the condition. do the <span style="color:red">cast and check as a single operation</span>. 而且 if cast <span style="color:red">**fails**</span>, then unbound pointer is <span style="color:red">not available for use in subsequent code</span>
+    
+```c++
+if (Derived *dp = dynamic_cast<Derived*>(bp))
+{
+    // use the Derived object to which dp points
+    
+} else { // bp points at a Base object
+
+    // use the Base object to which bp points 
+
+}
+```
+
+**Reference-Type dynamic_casts**
+
+- differ from a dynamic_cast to a pointer type in <span style="color:red">how it signals that an error occurrred</span>. 因为没有 null reference
+  - 当cast to reference type <span style="color:red">**fails**</span>, cast throws a ```std::bad_cast``` exception, defined in ```typeinfo``` library header
 
 
 
 
+```c++
+void f(const Base & b){
+    try {c
+        onst Derived &d = dynamic_cast<const Derived&>(b); 
+        // use the Derived object to which b referred  
+
+    } catch (bad_cast) {
+    // handle the fact that the cast failed 
+    
+    }
+}
+```
+
+**2. The typeid Operator**
+
+- has the form  ```typeid(e)```:
+    -  ```e``` is any expression or a type name
+    - result is a <span style="color:red">reference to a const object</span> of ```type_info```(defined in ```typeinfo``` header), or a <span style="color:red">type publicly derived</span> from ```type_info``` 
+    - ```typeid``` 可以被用于expressions of any type. 像平常一样, top-level const is ignored. 
+    - 当expression is reference, ```typeid``` returns type to which reference referes. 
+    - 当apply to array of function, <span style="color:red">standard conversion to pointer not done</span>. if we take ```typeid(a)``` and ```a``` is an array, result describes an array, not pointer
+    - 当operand is **not class type** or class **without virtual** functions, ```typeid``` operator 表示 static type of operand. 
+    - 当operand 是lvalue of a class type that 定义了至少一个**virtual function**, type is <span style="background-color:#FFFF00">**evaluate at run time**</span>
+    - Whether typeid requires a <span style="color:red">**run-time check** determines</span> whether the <span style="color:red">expression is evaluated</span>.
+        - evaluate expression  只当 type has <span style="color:red">**virtual functions**</span>
+        - 如果type has <span style="color:red">**no virtuals**</span>, typeid returns the <span style="color:red">**static type**</span> of expression. compiler knows the static type without evaluating the expression.
+        - 如果<span style="color:red">dynamic type 不同于static type</span>, expression must be <span style="color:red">evaluated</span> (at <span style="color:red">**run time**</span>) to determine the resulting type
+            - ```typeid(*p)```. 如果p is a pointer to a type <span style="color:red">**no virtual functions**</span>, p<span style="color:red"> no need to be valid pointer</span>
+            - ```typeid(*p)```， if p is a <span style="color:red">null pointer</span>, <span style="color:red">throws a ```bad_typeid``` exception</span>
+    - The typeid of a **pointer** (as opposed to the object to which the pointer points) <span style="color:red">returns the **static**, **compile-time** type of the pointer.</span>
+
+
+例子, 用```typeid``` compare the types of two expressions or to compare the type of an expression to a specific type. <span style="background-color:#FFFF00">注意一点是 operands to ```typeid``` are **deferenced pointer** ```*bp``` not ```bp```</span>
 
 
 
+```c++
+Derived *dp = new Derived;
+Base *bp = dp; // both pointers point to a Derived object 
+
+// compare the type of two objects at run time
+
+if (typeid(*bp) == typeid(*dp)) {
+    // bp and dp point to objects of the same type
+
+} 
+// test whether the run-time type is a specific type
+
+if (typeid(*bp) == typeid(Derived)) {
+    // bp actually points to a Derived 
+
+}
+```
+
+下面条件 compare type ```Base*``` to type ```Derived```. 尽管 pointer points at object of class type that has virtual functions, <span style="background-color:#FFFF00">**the pointer itself is not a class-type object**</span>. The type ```Base*``` is <span style="background-color:#FFFF00">evaluated at compile time</span>. type is unequal to ```Derived```, condition always fail 不管 type of the object which ```bp``` points 
+
+```c++
+// test always fails: the type of bp is pointer to Base 
+
+if (typeid(bp) == typeid(Derived)) {
+    // code never executed 
+    
+}
+```
 
 
+**3. Using RTTI**
+
+implement equality ```==``` operator to compare two objects. define a set of virtual functions on each hierarchy level 和 parameter 是 reference to base 的缺陷: 
+
+- 如果parameter 是 reference to base(static type 决定可以call 哪些member), cannot compare member specific to derived class
+- 不能compare objects of different type. 比如compare base type with derived type
+
+用 RTII, define an equality operator with parameter reference to base-class type.  
+- use ```typeid``` to <span style="background-color:#FFFF00">verify operands have the same type</span>, 如果operands differ, the ```==``` return false, 否则will call a virtual ```equal``` function. 
+- 每个class 定义自己的```equal``` to compare the data of its own type. operator <span style="color:red">take ```Base&``` parameter</span> but will <span style="background-color:#FFFF00">cast (dynamic_cast) operand to its own type</span> before doing the comparison
+
+下面例子中 ```equal``` dynamic_cast <span style="background-color:#FFFF00">always succeed</span>, the function is called only testing two operands are the same type. 同时 cast is<span style="background-color:#FFFF00"> **nesscessary** 从而 function can access derived members</span> of right-hand operand
+
+```c++
+class Base {
+friend bool operator==(const Base&, const Base&);
+public:
+    // interface members for Base
+
+protected:
+    virtual bool equal(const Base&) const;
+    // data and other implementation members of Base
+
+};
+class Derived: public Base { 
+public:
+    // other interface members for Derived 
+
+protected:
+    bool equal(const Base&) const;
+// data and other implementation members of Derived 
+
+};
+
+bool operator==(const Base &lhs, const Base &rhs)
+{
+    // returns false if typeids are different; otherwise makes a virtual call to equal
+
+    return typeid(lhs) == typeid(rhs) && lhs.equal(rhs);
+    //如果 lhs Base type, then Base::equal is called 
+
+    //如果 lhs Derived type, then Derived::equal is called 
+
+}
+
+bool Derived::equal(const Base &rhs) const{
+    // we know the types are equal, so the cast won't throw
+    
+    auto r = dynamic_cast<const Derived&>(rhs);
+    // do the work to compare two Derived objects and return the result
+
+}
+```
+
+**4. The type_info Class**
+
+-  ```type_info``` class definition varies by compiler.  但是标准库保证class defined in ```typeinfo``` header 并且 class provide at least operations list 下面表中
+- The class provides a <span style="background-color:#FFFF00">**public virtual destructor**</span>, because intended as a bass class
+- When compiler want to provide <span style="color:red">additional type information</span>, normally does <span style="color:red">in a class derived</span> from ```type_info```
+- <span style="color:red">no ```type_info``` default constructor</span>, <span style="color:red">**copy/move constructor / assignment operators**</span> are defined as <span style="color:red">**deleted**</span>
+    - cannot define, copy, assign objects of type ```type_info``` 
+    - The only way to create a ```type_info``` object is through ```typeid``` operator 
+- ```name``` member function returns a C-style character string for the name of type represented by ```type_info``` object. value used for given type <span style="color:red">取决于 compiler</span> and <span style="color:red">not required to match the type names</span> as used in program
+    - The only guarantee for ```name```: it <span style="background-color:#FFFF00">returns a **unique** string for each type</span>
 
 
+<center> Operations on type_info </center>
+
+| Syntax | Desciption | 
+|----------|:-------------|
+| ```t1 == t2``` | Returns **true** if ```type_info``` objects ```t1``` and ```t2``` refer to the **same type**, false otherwise | 
+| ```t1 != t2``` | Returns **true** if ```type_info``` objects ```t1``` and ```t2``` refer to **different types**, false otherwise | 
+| ```t.name()``` | Returns a <span style="background-color:#FFFF00">**C-style character string**</span> that is a <span style="background-color:#FFFF00">**printable version of the type name**</span>. Type names are generated in a system-dependent way | 
+| ```t1.before(t2)``` | Returns a bool that indicates whether ```t1``` comes before ```t2```. The ordering imposed by ```before``` is compiler dependent (before 采取的顺序关系依赖于compiler) | 
 
 
+```c++
+t arr[10];
+Derived d;
+Base *p = &d;
+cout << typeid(42).name() << ", "
+    << typeid(arr).name() << ", "
+    << typeid(Sales_data).name() << ", "
+     << typeid(std::string).name() << ", " 
+    << typeid(p).name() << ", "
+    << typeid(*p).name() << endl;
+
+//output exeucted on our machine, gernerate output
+
+i, A10_i, 10Sales_data, Ss, P4Base, 7Derived
+```
+
+#### (c). Enumerations
+
+- **Enumerations** let us group together sets of <span style="background-color:#FFFF00">**integral constants**</span>
+- like class, <span style="color:red">each enumeration defines a new type</span>
+- Enumerations are <span style="background-color:#FFFF00">**literal types**</span>
+-  two kinds of enumerations: scoped and unscoped
+    - **scope enumeration** using ```enum class``` or ( equivalently ```enum struct```) followed by the **enumeration name** + **comma-separated list of enumerators** enclosed in curly braces + ```;```
+    - **unscoped enumeration** by <span style="color:red">**omitting the class (or struct)**</span>. 而且The enumeration <span style="color:red">name is **optional**</span>
+        - 只能define objects only as part of the ```enum``` definition. can provide a common-separated list of declarators 在 ```}``` 和 ```;``` 之前, 见下面例子
 
 
+scope enumeration 例子 : ```open_modes``` that has three enumerators: input, output, and append.
 
+```c++
+enum class open_modes {input, output, append};
+```
 
+unscope enumeration
+```c++
+enum color {red, yellow, green}; // unscoped enumeration 
 
+// unnamed, unscoped enum
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+enum {floatPrec = 6, doublePrec = 10, double_doublePrec = 10};
+//define object
+enum {floatPrec = 6, doublePrec = 10, double_doublePrec = 10} a, b;
+```
 
 
 
