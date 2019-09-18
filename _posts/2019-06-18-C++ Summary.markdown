@@ -400,6 +400,7 @@ public:
     - nontype parameter 是 value 而不是 type 
 - template declaration and definition in the header file. 因为template generate code when instantiation
 - function can deduce template parameter, but class cannot
+- nontype template parameter 必须是 constant expression (比如enum)
 - class template member function 只有被用到才被实例化
 - 如果return type is template parameter, 定义在class 外面,not in class scope,need to specify if type defined inside class ```Blob<T>::type```
 - inside class scope, 不用specify template parameter, 因为assume we use the same type as member's instantiation
@@ -16441,9 +16442,9 @@ dynamic_cast<type&&>(e)
 **Pointer-Type dynamic_casts**
 
 假设```Base``` is a class with 至少一个 virtual function and ```Derived``` <span style="background-color:#FFFF00">**publicly derived**</span> from ```Base```. Have a pointer to Base ```bp```, cast it at runtime to a pointer to ```Derived``` . 
-- 如果 ```bp``` points to ```Derived``` object, cast will initialize ```dp``` to point to the ```Derived``` object to which ```bp``` points. <span style="background-color:#FFFF00">Safe io use ```Derived``` operations inside if </span>
+- 如果 ```bp``` points to ```Derived``` object, cast initialie ```dp``` to point to the ```Derived``` object to which ```bp``` points. <span style="background-color:#FFFF00">Safe io use ```Derived``` operations inside if </span>
 - 否则, result of cast is ```0```, then condition fails, else process appropriate to ```Base```
-- **Best Practice**: ```dp``` defined inside the condition. do the <span style="color:red">cast and check as a single operation</span>. 而且 if cast <span style="color:red">**fails**</span>, then unbound pointer is <span style="color:red">not available for use in subsequent code</span>
+- **Best Practice** ```dp``` defined inside the condition. do the <span style="color:red">cast and check as a single operation</span>. 而且 if cast <span style="color:red">**fails**</span>, then unbound pointer is <span style="color:red">not available for use in subsequent code</span>
     
 ```c++
 if (Derived *dp = dynamic_cast<Derived*>(bp))
@@ -16630,9 +16631,30 @@ i, A10_i, 10Sales_data, Ss, P4Base, 7Derived
 - Enumerations are <span style="background-color:#FFFF00">**literal types**</span>
 -  two kinds of enumerations: scoped and unscoped
     - **scope enumeration** using ```enum class``` or ( equivalently ```enum struct```) followed by the **enumeration name** + **comma-separated list of enumerators** enclosed in curly braces + ```;```
+        - Names of enumerators (枚举成员名字) <span style="color:red">**inaccessible outside** the scope of enumeration</span>. Access 需要 enumeration name + scope operator 
+        - scope enumerators <span style="color:red">**不会自动 convert to integral type**</span>
     - **unscoped enumeration** by <span style="color:red">**omitting the class (or struct)**</span>. 而且The enumeration <span style="color:red">name is **optional**</span>
         - 只能define objects only as part of the ```enum``` definition. can provide a common-separated list of declarators 在 ```}``` 和 ```;``` 之前, 见下面例子
-
+        - Enumerator names are placed into <span style="color:red">**the same scope** as the enumeration itself</span>. 可以直接access if in same scope 不需要scope operator 
+        - object of unscope enumeration type <span style="color:red">**自动convert to integral type**</span>. They can be used where an integral value is required
+- <span style="background-color:#FFFF00">Enumerator value need not to be unique</span>. 如果omit initializers, <span style="color:red">by default enumerator values start at 0 and each enumerator 比前一个 大 1</span>
+- Enumerators are <span style="background-color:#FFFF00">**const**,</span> and if initialized, their <span style="color:red">initailizers</span> must be <span style="color:red">**constant expresssion**</span>. 可以用enumerator where a constant expression is required. 
+    - 例如, define ```constexpr``` variables of enumeration type
+    - 可以 use enum in ```switch``` statement and use value of enumerators as ```case``` labels. 
+    - 也可以 use an enumeration type as a <span style="background-color:#FFFF00">**nontype template parameter**</span> 
+    - 可以 initialize class static data members of enumeration type <span style="color:red">inside class definition</span>(只有是constant expression 时候才可以在class 内部initialize)
+- 只要 enum is named, can define and initalize. An enum object 只能被 initialized or assigned by <span style="color:red">one of its enumerators</span> or by <span style="color:red">another object of the same ```enum``` type </span>  
+    - 即使integral value 跟 enumerator 有一样的值, 也不能用它initialize / convert to  enum
+    - 但是 可以<span style="color:red">pass unscoped enum to function with integral type parameter</span>. enum value <span style="background-color:#FFFF00">**promote** to int or larger integral type</span>, <span style="color:red">取决于enumeration underlying type</span> 
+-  Although each enum defines a unique type, it is represented by one of the built-in integral type, specify that type 在 enum name 之后 with a colon.
+    - 如果没有指定 underlying type, <span style="color:red">default scoped enum have int as underlying type</span>. There is <span style="color:red">**no default** for unscoped enum</span>. all we know 是 underlying type 是足够大 hold enumerator values. 
+    - 当underlying type specified (including <span style="color:red">implicitly specified for a scoped enum</span>). It is an <span style="color:red">**error** enumerator value 大于 that type</span>
+    - sepecify the underlying type 让程序确保 不同环境(implementation)中 generate the same code when compile it 
+- Forward declarations for enumerations: <span style="color:red">必须 specify (implicitly or explicitly) the underlying size(类型)</span> of the ```enum```
+    -  因为unscope enum 没有 default size, 所以unscoped 必须specify size(type).
+    - scope enum 可以without specifying a size, implicitly defined as int
+    - enum declaration and defintion must match, <span style="color:red">size of one enum 必须一样 for all declarations and definition</span>
+    - <span style="color:red">不可以declare a name as unscope enum in one context and redeclare it as scoped enum later</span>
 
 scope enumeration 例子 : ```open_modes``` that has three enumerators: input, output, and append.
 
@@ -16652,10 +16674,110 @@ enum {floatPrec = 6, doublePrec = 10, double_doublePrec = 10} a, b;
 ```
 
 
+Scope
+
+```c++
+enum color {red, yellow, green}; // unscoped enumeration
+
+enum stoplight {red, yellow, green}; // error: redefines enumerators 
+
+enum class peppers {red, yellow, green}; // ok: enumerators are hidden
+
+color eyes = green; // ok: enumerators are in scope for an unscoped enumeration
+
+peppers p = green; // error: enumerators from peppers are not in scope
+
+                    // color::green is in scope but has the wrong type 
+
+color hair = color::red; // ok: we can explicitly access the enumerators
+
+peppers p2 = peppers::red; // ok: using red from peppers
+
+```
+
+下面例子, ```intTyp``` and ```shortTyp````, <span style="background-color:#FFFF00">an enumerator value need not be unique</span>
+
+```c++
+enum class intTypes {
+    charTyp = 8, shortTyp = 16, intTyp = 16,
+    longTyp = 32, long_longTyp = 64
+};
+```
+
+因为 <span style="background-color:#FFFF00">enumerator 是 constant expression</span>, 可以 define ```constexpr``` variables of enumeration type 
+
+```c++
+constexpr intTypes charbits = intTypes::charTyp;
+```
+
+**Like Classes, Enumerations Define New Types**
+
+```c++
+open_modes om = 2; // error: 2 is not of type open_modes
+
+om = open_modes::input; // ok: input is an enumerator of open_modes
+
+int i = color::red; // ok: unscoped enumerator implicitly converted to 
+
+int int j = peppers::red; // error: scoped enumerations are not implicitly converted
+
+```
+
+**Specifiy size of an enum**
+
+```c++
+enum intValues : unsigned long long {
+    charTyp = 255, shortTyp = 65535, intTyp = 65535, longTyp = 4294967295UL,
+    long_longTyp = 18446744073709551615ULL
+};
+```
 
 
+**Forward Declarations for Enumerations**: 必须specify the underlying size. 因为unscope enum 没有 default size, 所以unscoped 必须specify size.
 
+```c++
+// forward declaration of unscoped enum named intValues
 
+enum intValues : unsigned long long; // unscoped, must specify a type 
+
+enum class open_modes; // scoped enums can use int by default
+
+```
+
+**Parameter Matching and Enumerations**: 
+
+integral type cannot conver to enum 
+
+```c++
+enum Tokens {INLINE = 128, VIRTUAL = 129};
+void ff(Tokens); 
+void ff(int); 
+int main() {
+    Tokens curTok = INLINE;
+    ff(128); // exactly matches ff(int) 
+    
+    ff(INLINE); // exactly matches ff(Tokens) 
+    
+    ff(curTok); // exactly matches ff(Tokens) 
+    
+    return 0;
+}
+```
+
+can pass <span style="color:red">unscoped enumeration object / enumerator</span> to integral type parameter. <span style="background-color:#FFFF00">**enum value promotes to int or larger integral type**</span>. 
+
+下面例子中, ```enum Tokens``` 只有两个 enumerators, 大的value是 129, That value 可以表示为 ```unsigned char```. 许多compiler use ```unsigned char``` as underlying type for ```Tokens```. <span style="background-color:#FFFF00">Regardless of its underlying type, objects and enumerators of ```Tokens``` **promote to int**, Enumerators and value of enum type **不会 promote to ```unsigned char```** 即使 enumerators value fit 用 unsigned char 储存</span>
+
+```c++
+void newf(unsigned char); void newf(int);
+unsigned char uc = VIRTUAL; 
+newf(VIRTUAL); // calls newf(int)
+
+newf(uc); // calls newf(unsigned char)
+
+```
+
+#### (d). Pointer to Class Member
 
 
 
