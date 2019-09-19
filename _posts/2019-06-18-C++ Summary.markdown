@@ -16779,6 +16779,378 @@ newf(uc); // calls newf(unsigned char)
 
 #### (d). Pointer to Class Member
 
+1. **Pointers to Data Members**
+2. **Pointers to Member Functions**
+3. **Using Member Functions as Callable Objects**
+
+
+- **A pointer to member** can point to a <span style="color:red">**nonstatic** member of a class</span>. 
+    - 通常pointer points to an object, A pointer to member identifies a member of a class, not an object of class
+    - <span style="color:red">**static class**</span> members are not part of any object, no special syntax is needed. <span style="color:red">Pointer to static members are ordinary pointer</span>
+- They of a pointer to member 含有 both <span style="color:red">type of class</span> and <span style="color:red">type of member of that class</span>
+    - Initialize pointer to member <span style="color:red">不用 指定 an object that member belongs</span>. When <span style="color:red">use it</span>, <span style="color:red">supply the object</span> whose member we use
+
+
+```c++
+class Screen { 
+public:
+    typedef std::string::size_type pos;
+    char get_cursor() const { return contents[cursor]; } 
+    char get() const;
+    char get(pos ht, pos wd) const;
+
+private:    
+    std::string contents; 
+    pos cursor;
+    pos height, width;
+};
+```
+
+**1. Pointers to Data Members**
+
+- declare a **pointer to member** using a ```*``` to indicate declaring a pointer. 
+- Unlike ordinary pointers, a pointer to member also <span style="color:red">**incorporates the class**</span> that contains the member.
+- 因此用 ```classname::``` 在 ```*``` 之前 表示 dointer can point to a member of ```classname```
+- initialize: 需要指定所指成员 and apply <span style="background-color:#FFFF00">**address-of operator(```&```)**</span> not to an object in memory but to a member of the class
+- when <span style="color:red">**initialize**</span> or <span style="color:red">**assign**</span> a pointer to member, that pointer <span style="color:red">not yet point to any data</span>. It i<span style="color:red">dentifies a specific member but not the object that members</span>. 
+  - <span style="background-color:#FFFF00">Supply object when **dereference**</span> the pointer to member, 
+  - ```.*``` and ```->*``` let us <span style="color:red">supply an object</span> and <span style="color:red">dereference</span> the pointer to <span style="color:red">fetch a member </span>of that object
+  - 如果a pointer to member 的 member 是 <span style="color:red">**private**</span>, the use of pointer must inside a <span style="color:red">member</span> or <span style="color:red">friend</span> of class, 否则是error
+    - 因为一些 member are private, can't get a pointer to data member directly. Instead would <span style="color:red">define a function to return a pointer</span> to that member: 可以定义成**static**
+    - 见下面例子
+
+
+比如: ```pdata``` is a pointer to a member of class ```Screen``` that has type ```const string```, 只是data member 是 const, <span style="background-color:#FFFF00">但是```Screen``` 对象是不是 const 无关</span> 
+```c++
+// pdata can point to a string member of a const (or non const) Screen object
+
+const string Screen::*pdata;
+```
+
+当initialize a pointer to member, 需要指所指成员, 例如, we can make ```pdata``` <span style="background-color:#FFFF00">point to the ```contents``` member of an **unspecified**</span>(非特定) ```Screen``` object as follow: 
+
+```c++
+pdata = &Screen::contents;`
+```
+
+Under new standard, 最简单的办法是 declare a pointer to member is to <span style="background-color:#FFFF00">use ```auto``` or ```decltype```</span>: 
+
+```c++
+auto pdata = &Screen::contents
+```
+
+**Using a Pointer to Data Member**
+
+下面例子 ```.*``` and ```->*```  performs two actions: 
+1. They <span style="color:red">dereference the pointer</span> to member to get the member that we want
+2. fetch that member from an object (```.*```) or through a pointer (```->*```)
+ 
+
+```c++
+Screen myScreen, *pScreen = &myScreen;
+// .* dereferences pdata to fetch the contents member from the object myScreen 
+
+auto s = myScreen.*pdata;
+// ->* dereferences pdata to fetch contents from the object to which pScreen
+
+points s = pScreen->*pdata
+```
+
+**A Function Returning a Pointer to Data Member**
+
+Read return type from right to left, ```data``` returns a pointer to a member of class ```Screen``` that is const string. Function body applies the address-of operator to the ```contents``` member, functions 返回 a pointer to the ```contents``` member of ```Screen```. 注意, ```pdata``` points to a member of class ```Screen``` but<span style="color:red"> **not to actual data**</span>. To use ```pdata```, 必须 <span style="color:red">**bind it to an object**</span> of type ```Screen```
+
+```c++
+class Screen { 
+public:
+    // data is a static member that returns a pointer to member 
+    
+    static const std::string Screen::*data()
+    { return &Screen::contents; } // other members as before
+
+};
+
+//we call data, we get a pointer to member
+
+// data() returns a pointer to the contents member of class Screen 
+
+const string Screen::*pdata = Screen::data();
+
+// fetch the contents of the object named myScreen 
+
+auto s = myScreen.*pdata;
+```
+
+**2. Pointers to Member Functions**
+
+```c++
+// pmf is a pointer that can point to a Screen member function that is const 
+
+// that returns a char and takes no arguments
+
+auto pmf = &Screen::get_cursor;
+```
+
+- Like pointer to data member, pointer to function member declared using ```classname::*``` 
+- specifies the return type and parameter list 
+- If the member function is a <span style="color:red">**const member**</span> or a <span style="color:red">**reference member**</span>, <span style="background-color:#FFFF00">must include the const or reference as well</span> in pointer declaration 
+- If the member function **overloaded**, 必须 <span style="color:red">declaring the type **explicitly**</span>. 不能用```auto```
+- Unlike ordinary function pointers, **no automatic conversion** <span style="color:red">between a member function and a pointer to that member</span>, 必须用 <span style="background-color:#FFFF00">address-of operator</span>
+- pointer to function member can be used as return type or parameter (可以有default parameter)
+
+如果member function overload, 必须declare the type explicitly, 比如下面例子, 根据function pointer 确定point to which member function. 
+```c++
+char (Screen::*pmf2)(Screen::pos, Screen::pos) const; 
+pmf2 = &Screen::get;
+```
+
+注意 上面的 parentheses around ```Screen::``` is essential due to precedence, 如果没有parantheses, compiler treats following as function declaration: try to define an ordinary function ```p``` that returns a pointer to a member of class ```Screen``` taat has type ```char```. 因为是ordinary function, declaration 不能有 const qualifier
+```c++
+// error: nonmember function p cannot have a const qualifier 
+
+char Screen::*p(Screen::pos, Screen::pos) const;
+```
+
+不想普通的函数pointer, <span style="background-color:#FFFF00">**no automatic conversion**</span> <span style="color:red">between a member function and a pointer to that member</span>
+
+```c++
+// pmf points to a Screen member that takes no arguments and returns char
+
+pmf = &Screen::get; // must explicitly use the address-of operator
+
+pmf = Screen::get; // error: no conversion to pointer for member functions
+
+```
+
+**Using a Pointer to Member Function**
+
+- As a pointer to a data member,  we use ```.*``` or ```->``` operator to call a member function through a pointer to member
+- ```(myScreen->*pmf)()``` <span style="color:red">外层括号不可少</span>, 因为precedence of call operator higher than precedence of the pointer to member operators
+    - 没有 paratheses, ```myScreen.*pmf()``` would be interpreted as ```myScreen.*(pmf())```: use function ```pmf``` return value as operand of pointer-to-member operator ```.*``` 因为 ```pmf``` no function, is error
+
+```c++
+Screen myScreen,*pScreen = &myScreen;
+// call the function to which pmf points on the object to which pScreen points
+
+char c1 = (pScreen->*pmf)();
+// passes the arguments 0, 0 to the two-parameter version of get on the object myScreen
+
+char c2 = (myScreen.*pmf2)(0, 0);
+
+```
+
+**Using Type Aliases for Member Pointers**
+
+Type aliases make code that uses pointers to members <span style="color:red">much easier to read and write</span>.
+
+```c++
+// Action is a type that can point to a member function of Screen 
+
+// that returns a char and takes two pos arguments
+
+using Action =
+    char (Screen::*)(Screen::pos, Screen::pos) const;
+
+//with Type alias, can simplify the definition of a pointer to get 
+
+Action get = &Screen::get; // get points to the get member of Screen
+
+```
+
+Like any other parameter, a pointer-to-member parameter can have a <span style="background-color:#FFFF00">**default argument**</span>, a pointer to member function 作为 member parameters, 可以 passing either a pointer or address of an approriate member function. 
+
+```c++
+// action takes a reference to a Screen and a pointer to a Screen member function 
+
+Screen& action(Screen&, Action = &Screen::get);
+
+Screen myScreen;
+// equivalent calls:
+
+action(myScreen); // uses the default argument 
+
+action(myScreen, get); // uses the variable get that we previously defined 
+
+action(myScreen, &Screen::get); // passes the address explicitly
+
+```
+
+**Pointer-to-Member Function Tables**
+
+One common use for **function pointers** and for **pointers to member functions** is <span style="color:red">store in a **function table**</span>. 比如 a class has several members of same type, function table can be used to select one. 
+
+例子, ```Screen``` class is extended to contain several member functions, 每个 moves the cursor in particular direction
+```c++
+class Screen { 
+public:
+    // other interface and implementation members as before
+    
+    // cursor movement functions
+
+    Screen& home(); 
+    Screen& forward();
+    Screen& back(); 
+    Screen& up(); 
+    Screen& down();
+};
+```
+
+we might want to define a ```move``` that can call any of these functions and perform indicated action. To support new function, add a **static** member  an **array of pointers** ```Menu```: will pointers to each of cursor movement functions. ```move``` takes an enumerator and calls 对应 functions:<span style="background-color:#FFFF00"> the ```Menu``` element indexed by ```cm``` is fetched.</span> That element is a pointer to a member function of ```Screen``` class. 根据 ```this``` 所指对象 调用该元素所指的成员函数
+
+```c++
+class Screen { 
+public:
+    // other interface and implementation members as before
+    
+    // Action is a pointer that can be assigned any of the cursor movement members
+    
+    using Action = Screen& (Screen::*)();
+    // specify which direction to move; enum see § 19.3 (p. 832)
+
+    enum Directions { HOME, FORWARD, BACK, UP, DOWN };
+    Screen& move(Directions); 
+private:
+    static Action Menu[]; // function table 
+
+};
+
+
+Screen::Action Screen::Menu[] = { &Screen::home, &Screen::forward,
+        &Screen::back, &Screen::up,  &Screen::down};
+
+
+Screen& Screen::move(Directions cm)
+{
+    // run the element indexed by cm on this object
+    
+    return (this->*Menu[cm])(); // Menu[cm] points to a member function
+
+}
+
+Screen myScreen;
+myScreen.move(Screen::HOME); // invokes myScreen.home 
+
+myScreen.move(Screen::DOWN); // invokes myScreen.down
+
+```
+
+**3. Using Member Functions as Callable Objects**
+
+- 因为 call through a pointer to member function, must use ```.*``` or ```->*``` operators to bind the pointer to a specific object. 所以, 不像 ordinary function pointers, <span style="color:red">**a pointer to member is not a callable object**</span>()not support function-call operator)
+  - 所以不能directly pass a pointer to a member function to an algorithm
+- 方法一: use library function template
+  - member function execute is passed to the <span style="color:red">implicit ```this``` parameter</span>. 当 want to use function to generate a callable for a member function, have to translate the code to <span style="color:red">make implicit parameter explicit</span>
+  - function first parameter 必须是 <span style="color:red">represent the (normally implicit) object</span> on which the member will be run. The signature we give to function must specify whether the object will be <span style="color:red">passed as a pointer or a reference</span>
+- 方法二: Using ```mem_fn``` to Generate a Callable
+  - ```function``` must <span style="color:red">**supply the call signature**</span> of member we want to call.
+  - let compiler <span style="color:red">**deduce the member's type**</span> by using another library facility ```mem_fn``` like ```function```, 定义在 ```functional``` header
+  - 与 ```function``` 一样地方: ```mem_fn```: generate a callable object from a pointer to member 
+  - 与 ```function``` 不同地方: ```mem_fn``` deduce the type of callable from the type of the pointer to member 
+  - THe callable generated by ```mem_fn``` can be <span style="color:red">called on either an **object** or a **pointer**</span>
+- 方法三: Using bind to Generate a Callable
+  - 跟```function``` 一样, must <span style="color:red">make 通常implicit parameter (that represents object will operate) explicit </span>.
+  - Like ```mem_fn```, the first argument to callable generated by ```bind``` can be a pointer or a reference 
+
+
+
+不能directly pass a pointer to a member function to an algorithm, 比如 find first empty string in a ```vector<string>```, 之前call won't work. 
+
+```c++
+auto fp = &string::empty; // fp points to the string empty function 
+
+// error: must use .* or ->* to call a pointer to member
+
+find_if(svec.begin(), svec.end(), fp);
+```
+
+上面code won't compile, 因为 code inside ```find_if``` executes a statement something like 
+
+```c++
+// check whether the given predicate applied to the current element yields true 
+
+if (fp(*it)) // error: must use ->* to call through a pointer to member
+
+```
+
+**Using function to Generate a Callable**
+
+obtain a callable from a pointer to member function is by using the library function template, 下面例子告诉compiler, ```empty``` is a function that can be called with ```string ``` and return bool.  
+
+```c++
+function<bool (const string&)> fcn = &string::empty; 
+find_if(svec.begin(), svec.end(), fcn);
+```
+
+When a function object holds a pointer to a member function, the function class knows that it <span style="background-color:#FFFF00">must use the appropriate pointer-to-member operator to make the call</span>. 可以想象```find_if``` will have code like 
+
+```c++
+// assuming it is the iterator inside find_if, so *it is an object in the given range 
+
+if (fcn(*it)) // assuming fcn is the name of the callable inside find_if
+
+```
+
+when function execute using proper pointer-to-member operator, ```function``` transform this call into 
+
+```c++
+// assuming it is the iterator inside find_if, so *it is an object in the given range 
+
+if (((*it).*p)()) // assuming p is the pointer to member function inside fcn
+
+```
+
+When the callable is a member function, the signature’s first parameter must represent the (normally implicit) object on which the member will be run. The signature we give to function must specify whether the object will be passed as a pointer or a reference.
+
+When we defined ```fcn```, we knew that we wanted to call ```find_if``` on a sequence of string objects. 因此we asked function to generate a callable that took string objects. 比如下面 <span style="background-color:#FFFF00">vector 保存是 pointer, function expect a pointer</span>
+
+```c++
+vector<string*> pvec;
+function<bool (const string*)> fp = &string::empty; // fp takes a pointer to string and uses the ->* to call empty 
+
+find_if(pvec.begin(), pvec.end(), fp);
+```
+**Using mem_fn to Generate a Callable**
+
+use ```mem_fn(&string::empty)``` to generate a callable object that takes a ```string``` and return ```bool```
+
+```c++
+find_if(svec.begin(), svec.end(), mem_fn(&string::empty));
+```
+
+<span style="background-color:#FFFF00">The callable generated by mem_fn can be called on either an object or a pointer</span>. 可以想象```mem_fn```  generates a callable with an overloaded function call operator: one takes a ```string*``` and other a ```string&```
+
+```c++
+auto f = mem_fn(&string::empty); // f takes a string or a string* 
+
+f(*svec.begin()); // ok: passes a string object; f uses .* to call empty 
+
+f(&svec[0]); // ok: passes a pointer to string; f uses .-> to call empty
+
+```
+
+
+**3. Using bind to Generate a Callable**
+
+```c++
+// bind each string in the range to the implicit first argument to empty 
+
+auto it = find_if(svec.begin(), svec.end(),
+    bind(&string::empty, _1));
+
+auto f = bind(&string::empty, _1);
+f(*svec.begin()); // ok: argument is a string f will use .* to call empty 
+
+f(&svec[0]); // ok: argument is a pointer to string f will use .-> to call empty
+
+```
+#### (e). Nested Classes
+
+
+
+
+
+
+
 
 
 
