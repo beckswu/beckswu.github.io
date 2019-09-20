@@ -17303,7 +17303,6 @@ class enclose::nested2 { }; // definition of nested class
 return QueryResult(sought, loc->second, file);
 ```
 
-
 #### (f). Union: A Space-Saving Class
 
 - 可以有multiple data members, 但是在任意时刻<span style="color:red">只有一个 member have a value</span>. 
@@ -17324,7 +17323,13 @@ return QueryResult(sought, loc->second, file);
 - **Anonymous unions**: is unamed union 在右括号和分号之间没有任何声明, 一旦定义了 anonymous union compiler <span style="color:red">自动create an unnamed object</span> of newly defined union type
     - member of anonymous union <span style="color:red">可以被 access directly 在in anonymous union 定义的 scope </span>.
     - An anonymous union <span style="color:red">cannot have **private** or **protected** members</span>, <span style="color:red">nor can define member functions</span>
-
+- for built-in type member, 
+    - can ordinary assignment to change value of union hold 
+    - compiler <span style="color:red">synthesize</span> memberwise <span style="color:red">**default constructor**</span> or <span style="color:red">copy-control member</span>
+- for union that have members of nontrivial class, 
+    - switch<span style="color:red"> to class type 需要run constructor</span>, s<span style="color:red">witch from class</span> to 其他值, must destory that member by <span style="color:red">running destructor</span>
+    - for member class that defines its default constructor or 至少一个 copy-control member. <span style="color:red">compiler 把union自己定义的 copy member 定义为 delete</span>
+        - 比如 string 定义了5个copy-control and default constructor, 如果union 包含string, 却没有定义 default constructor and copy control member, <span style="color:red">compiler synthesize 这些missing member as deleted</span> 
 
 **Defining a union**
 
@@ -17383,7 +17388,289 @@ ival = 42; // that object now holds the value 42
 
 **unions with Members of Class Type**
 
-- union with members that define own constructors / copy-control members are more complicated to use than union that have members of built-type
+- 因为 complexity invovled in constructing / destroying members of class type, <span style="color:red">union with class-type 通常 embedde inside another class
+</span>
+    - 比如we add string member to union, 定义 union as anonymous union and make it member of a class ```Token```. The ```Token``` class will manage union member 
+    - to keep track of <span style="color:red">what type value union holds</span>, <span style="color:red">定义separate object known as **discriminate**</span>
+    - 下面例子定义 enumeartion type to keep track union member state (discriminate)
+    - class need 定义 default constructor, copy-control members and assignment operator that assign a value of one union types to union member
+
+
+下面例子 
+- 定义一个 unnamed, unscoped enumeration, define ```tok``` as unnamed enum type 
+    - use ```tok``` as our discriminant. 当 union hold int, tok have value ```INT```, when union has string, tok is ```STR```
+- class default constructor initialize discriminant and union hold int as 0
+- 因为union 的string with destructor, must define our own destructor to destroy string member. 
+    - 不像class type, 因为union member class 有destructor, union destructor synthesized deleted. string member 不会自动被destroyed. 因为destructor no wya to know which type union hold, cannot know which member to destroy. 
+    - 自己定义destructor check if object being destroyed hold string. if so, destructor explicitly call string destructor to free memory. if hold built-in type, no work for union 
+
+```c++
+class Token{
+public:
+    // copy control needed because our class has a union with a string member
+
+    // defining the move constructor and move-assignment operator is left as an exercise
+
+    Token(): tok(INT), ival{0} { }
+    Token(const Token &t): tok(t.tok) { copyUnion(t); }
+    Token &operator=(const Token&);
+
+    // if the union holds a string, we must destroy it; 
+    
+    ~Token() { if (tok == STR) sval.~string(); }
+    // assignment operators to set the differing members of the union
+    
+    Token &operator=(const std::string&);
+    Token &operator=(char);
+    Token &operator=(int);
+    Token &operator=(double);
+private:
+    enum {INT, CHAR, DBL, STR} tok; // discriminant
+    union { // anonymous union
+        
+        char cval;
+        int ival;
+        double dval;
+        std::string sval;
+    }; // each Token object has an unnamed member of this unnamed union type
+    
+    // check the discriminant and copy the union member as appropriate
+    
+    void copyUnion(const Token&);
+};
+```
+
+If current value in union is string, 必须destroy that string before assign new value. <span style="color:red">after assign value, update discriminat</span>. 对string assignment, 如果已经是string, can use normal string assignment operator. 否则 no exisiting string object, <span style="background-color:#FFFF00">must construct new string in the memory that holds the union by **using replacement new** to construct a string at location which ```sval``` resides</span>. initialize string as copy of string parameter. Then update discriminant and return 
+
+```c++
+Token &Token::operator=(int i)
+{
+    if (tok == STR) sval.~string(); // if we have a string, free it
+
+    ival = i; // assign to the appropriate member
+    
+    tok = INT; // update the discriminant
+    
+    return *this;
+}
+Token &Token::operator=(const std::string &s)
+{
+    if (tok == STR) // if we already hold a string, just do an assignment
+
+        sval = s;
+    else
+        new(&sval) string(s); // otherwise construct a string
+
+    tok = STR; // update the discriminant
+
+    return *this;
+}
+```
+
+**Managing Union Members That Require Copy Control**
+
+- 当<span style="color:red">call ```copyUnion``` from copy constructor, union member 被默认初始化</span>, 表示first member of union initialzied. 因为string 不是第一个成员, 所以we know 第一个成员不是string, ```copyUnion``` assume that if parameter hold string, ```copyUnion``` 必须construct its own string
+- 但对于assignment operator, it is possible that union 已经hold a string, 要分三种情况, 两边都是string, 只有左侧是string(需要), 只有右侧是string 
+
+```c++
+void Token::copyUnion(const Token& t)
+{
+    switch (t.tok) {
+        case Token::INT: ival = t.ival; break;
+        case Token::CHAR: cval = t.cval; break;
+        case Token::DBL: dval = t.dval; break;
+        // to copy a string, construct it using placement new; see (§ 19.1.2 (p.
+        824))
+
+        case Token::STR: new(&sval) string(t.sval); break;
+    }
+}
+Token &Token::operator=(const Token &t)
+{
+    // if this object holds a string and t doesn't, we have to free the old string
+    
+    if (tok == STR && t.tok != STR) sval.~string();
+    
+    if (tok == STR && t.tok == STR)
+        sval = t.sval; // no need to construct a new string
+    
+    else
+        copyUnion(t); // will construct a string if t.tok is STR
+    
+    tok = t.tok;
+    return *this;
+}
+```
+
+#### (g). Local Classes
+
+- <span style="background-color:#FFFF00">**local class**</span>: A class can be defined <span style="color:red">inside function body</span>. 
+    - only <span style="color:red">visible in the scope in which it is defined</span>. 
+- <span style="color:red">**All members**</span>, including functions, of a local class must be completely <span style="color:red"> **defined inside**</span> the class body. 因此, local classes less useful than nested classes.
+    - code may difficult for reader to understand
+- local class <span style="color:red">不能定义 static data members</span>, 
+- Name Lookup: 
+    - Local Classes只能使用 **type names**, <span style="color:red">static varaibles</span> and <span style="color:red">enumerators</span> defined <span style="color:red">within enclosing local scope</span>
+    - Local Classes <span style="color:red">不能使用 variables from function scope where class defined </span>
+    - enclosing function 不能access private member of local class. local class 可以  make enclosing function friend, 
+    - 通常上local class 定义member as public, 因为a local class 已经encapsulated within scope of function. 进一步 encapsulation 没什么必要 
+    - 查找顺序与其他class 一样： named used in member defintion can appear anywhere in class. 如果 a nmae not found in class member, then search enclosing scope then search out of the scoping enclosing the function
+- possible have nested class inside a local class, <span style="color:red">nested class 的 defintion 可以appear otuside local-class body</span>, 但是nested class 必须被定义在 same scope as local class defined (比如 不能定义在function  外面), 
+    - 因为nested class in local class 也是local class <span style="color:red">so all members of nested class 必须defined inside the body of nested class</span>
+
+
+Name Lookup: 
+
+```c++
+int a, val;
+void foo(int val)
+{
+    static int si;
+    enum Loc { a = 1024, b };
+    // Bar is local to foo
+    
+    struct Bar {
+        Loc locVal; // ok: uses a local type name
+
+        int barVal;
+        void fooBar(Loc l = a) // ok: default argument is Loc::a
+
+        {
+            barVal = val; // error: val is local to foo
+
+            barVal = ::val; // ok: uses a global object
+
+            barVal = si; // ok: uses a static local object
+
+            locVal = b; // ok: uses an enumerator
+
+        }
+    };
+}
+```
+
+Nested class: As usual, when define member outside a class, must indicate scope of name. ```Bar::Nested```
+
+```c++
+void foo()
+{
+    class Bar {
+    public:
+        class Nested; // declares class Nested
+
+    };
+    // definition of Nested
+
+    class Bar::Nested {
+    // ...
+    
+    };
+}
+
+```
+
+#### (h). Inherently Nonportable Features
+
+- **inherently nonportable feature**: 是指因机器而定的特性 (machine specific). 
+    - 当 program 含有 nonportable features moved from 一个machine 到另一个machine, 通常需要重写程序
+    - Size of arithmetic types 是一个, vary across the machines
+
+
+1. **Bit-fields**
+
+
+
+
+**1. Bit-fields**
+
+- A class can <span style="color:red">define a **non-static** data member as **bit-field**</span>. 一个 bit-field holds a <span style="color:red">specified number of bits</span>.
+- Bit-fields are normally used when a program needs to <span style="color:red">pass binary data to another program or to a hardware device</span>.
+- The memory layout of a bit-field is machine dependent (bit-fields 在内存中布局与机器相关)
+- A bit-field must have <span style="color:red">**integral**</span> or <span style="color:red">**enumeration** type</span>
+    - 通常用 <span style="color:red">**unsigned type**</span> to hold a bit-field, 因为behavior of signed bit-field is implementation defined. 
+- 定义方法是 :  ```member_name ： val```, val 是 <span style="color:red">constant expression specifying the number of bits </span>
+- Bit-fields defined in consecutive order within the class body are, if possible, packed within adjacent bits of the same integer, thereby providing for storage compaction. 在类内部连续定义的 bit-field 可能被压缩到同一个整数的相邻位, 从而提供存储压缩.
+    - 例如下面例子: 连续定义的5个bit-field 可能存储到 single unsigned int. <span style="background-color:#FFFF00">Whether and how the bits are packed into the integer is **machine dependent** </span>
+- address-of operator(```&```) 不能用于 bit-field. 因为no pointers referring to class bit-fields
+- class defined bit-field member 通常有 <span style="background-color:#FFFF00">set of **inline** member functions</span> to <span style="background-color:#FFFF00">test and set value of bit-field</span>
+
+
+例子: 
+
+```c++
+typedef unsigned int Bit;
+class File {
+    Bit mode: 2; // mode has 2 bits
+
+    Bit modified: 1; // modified has 1 bit
+
+    Bit prot_owner: 3; // prot_owner has 3 bits
+
+    Bit prot_group: 3; // prot_group has 3 bits
+
+    Bit prot_world: 3; // prot_world has 3 bits
+
+    // operations and data members of File
+
+public:
+    // file modes specified as octal literals; see § 2.1.3 (p. 38)
+
+    enum modes { READ = 01, WRITE = 02, EXECUTE = 03 };
+    File &open(modes);
+    void close();
+    void write();
+    bool isRead() const;
+    void setWrite();
+};
+```
+
+**Using Bit-fields**
+
+bit-field is accessed in the same way as other data members of a class
+
+```c++
+void File::write()
+{
+    modified = 1;
+    // . . .
+
+}
+void File::close()
+{
+    if (modified)
+    // . . . save contents
+
+}
+```
+
+<span style="background-color:#FFFF00">bit-fields with more than one bit are usually manipluated using built-in bitwise operators
+</span>
+
+```c++
+File &File::open(File::modes m)
+{
+    mode |= READ; // set the READ bit by default
+
+    // other processing
+    
+    if (m & WRITE) // if opening READ and WRITE
+    
+    // processing to open the file in read/write mode
+    
+    return *this;
+}
+
+```
+
+class defined bit-field member 通常有 <span style="background-color:#FFFF00">set of **inline** member functions</span> to <span style="background-color:#FFFF00">test and set value of bit-field</span>
+
+```c++
+inline bool File::isRead() const { return mode & READ; }
+inline void File::setWrite() { mode |= WRITE; }
+```
+
+
+
 
 
 
