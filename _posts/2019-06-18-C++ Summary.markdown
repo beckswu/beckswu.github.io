@@ -17145,13 +17145,245 @@ f(&svec[0]); // ok: argument is a pointer to string f will use .-> to call empty
 ```
 #### (e). Nested Classes
 
+- <span style="background-color:#FFFF00">**Nested class**</span>(**nested type**): A class can be defined within another class.
+    - 通常 define implementatin classes
+- Nested class 是 independent class and 与外层enclosing class没什么关系
+    - <span style="background-color:#FFFF00">no connection between objects of enclosing class and object of nested class</span>. 
+        - A nested-type object 只含有 members defined inside nested type. 
+        - an object of enclosing class has only  members defined by enclosing class. 没有data members of any nested classes
+        - 当nested type class 内可以通过lookup 找到 outside class member. 
+    - <span style="color:red">nested class is visible within closing class scope</span> but not outside the class. nested class 不会和其他scope 中同一个名字冲突
+    - Enclosing class 没有特殊访问权限 对于 nested class, and nested class has no special access to members of its enclosing class.
+- Access:
+    - 如果 a nested class define **public** part of enclosing class, can be used anywhere. 
+    - A nested class define in **protected**    part of enclosing class, accessible only by enclosing class, its friends, and its derived classes. 
+    - A **private** nested class of enclosing class: accessible only to members and friends of enclosing class
+- 如果 actual definition of nested class <span style="color:red">定义(可以outside class define) 被看见之前, nested class is an **imcomplete type**</span>
+- nested class **static** member, <span style="color:red">defintion ouside scope of nested class</span>
+- **Name Lookup**: <span style="color:red">nested class has additional enclosing class scope to search</span>.  而且 nested class can <span style="color:red">access enclosing class scope member wihout specifiying the enclosing class</span>. 
+    - 只能<span style="background-color:#FFFF00">access **type names**, **static** members, and **enumerators** from the enclosing class without specify enclosing class objec</span>t.(明天看)
 
 
 
+**Declaring a Nested Class**
+
+下面例子: 如果 ```QueryResult``` 用作其他purpose 没有实际意义, 所以定义为 ```TextQuery``` 的 member, 因为```QueryResult``` as ```TextQuery```, we nmust declare ```QueryResult``` before we use it as the return type for ```query``` member
+
+```c++
+class TextQuery { 
+public:
+    class QueryResult; // nested class to be defined later
+    
+    // other members as in § 12.3.2 (p. 487) 
+
+};
+```
+
+**Defining a Nested Class outside of the Enclosing Class**
+
+唯一改变是 不需要定义 ```QueryResult::line_no```, 因为 ```QueryResult``` can access that name direct from ```TextQuery``` (enclosing class)
+
+```c++
+// we're defining the QueryResult class that is a member of  class TextQuery 
+
+class TextQuery::QueryResult {
+    // in class scope, we don't have to qualify the name of the QueryResult parameters
+
+    friend std::ostream&
+                print(std::ostream&, const QueryResult&);
+public:
+    // no need to define QueryResult::line_no; a nested class can use a member 
+    
+    // of its enclosing class without needing to qualify the member's name
+    
+    QueryResult(std::string,
+                std::shared_ptr<std::set<line_no>>,
+    std::shared_ptr<std::vector<std::string>>); 
+    // other members as in § 12.3.2 (p. 487)
+
+};
+```
+
+define ```QueryResult``` constructor: need to provide enclosing class and nested class name  
+
+```c++
+// defining the member named QueryResult for the class named QueryResult 
+
+// that is nested inside the class TextQuery 
+
+TextQuery::QueryResult::QueryResult(string s,
+    shared_ptr<set<line_no>> p,
+    shared_ptr<vector<string>> f): sought(s), lines(p), file(f) { }
+```
+
+static member 
+```c++
+// defines an int static member of QueryResult
+
+// which is a class nested inside TextQuery
+
+int TextQuery::QueryResult::static_mem = 1024;
+```
+
+Name Lookup  in Nested Class Scope: 因为<span style="background-color:#FFFF00">return type not yet in scope of the class,</span> we start by noting out function returns a ```TextQuery::QueryResult``` . 但是在function 内部, 可以 refer to ```QueryResult``` directly. 只有```typedef```  is typename 可以被access without specifiy object
+
+```c++
+TextQuery::QueryResult
+TextQuery::query(const string &sought) const
+{
+    // we'll return a pointer to this set if we don't find sought
+
+    static shared_ptr<set<line_no>> nodata(new set<line_no>); 
+        // use find and not a subscript to avoid adding words to wm!
+
+    auto loc = wm.find(sought);
+
+    if (loc == wm.end())
+        return QueryResult(sought, nodata, file); // not found
+
+    else
+        return QueryResult(sought, loc->second, file);
+}
+```
+
+```c++
+int x,y; // globals
+
+class enclose { // enclosing class
+
+    int x; // note: private members
+
+    static int s;
+ public:
+    struct inner { // nested class
+
+        void f(int i) {
+            x = i; // Error: can't write to non-static enclose::x without instance
+
+            int a = sizeof x; // Error until C++11,
+
+                              // OK in C++11: operand of sizeof is unevaluated,
+
+                              // this use of the non-static enclose::x is allowed.
+
+            s = i;   // OK: can assign to the static enclose::s
+
+            ::x = i; // OK: can assign to global x
+
+            y = i;   // OK: can assign to global y
+
+        }
+        void g(enclose* p, int i) {
+            p->x = i; // OK: assign to enclose::x
+
+        }
+    };
+};
+```
+
+Nested class can be forwarded-declared and later defined 
+```c++
+class enclose {
+    class nested1; // forward declaration
+
+    class nested2; // forward declaration
+
+    class nested1 {}; // definition of nested class
+
+};
+class enclose::nested2 { }; // definition of nested class
+
+```
+
+**The Nested and Enclosing Classes Are Independent**
+
+因为 nested class  ```QueryResult``` 中不含有  enclosing class ```QueryResult``` 成员, 所以用 enclosing class member 初始化 ```QueryResult``` 作为return statement 
+
+```c++
+return QueryResult(sought, loc->second, file);
+```
+
+
+#### (f). Union: A Space-Saving Class
+
+- 可以有multiple data members, 但是在任意时刻<span style="color:red">只有一个 member have a value</span>. 
+    - when a vlaue is <span style="color:red">assigned to one</span> member of union, <span style="color:red">all other members become undefined.</span>
+- The amount of union storage 至少是跟 largest data member 一样大
+- Like any class, a union defines a new type.
+- A union <span style="background-color:#FFFF00">cannot have a refernece member</span>
+    - under new standard, class types that have constructors or destructors  可以是 union member
+- A nuion 可以specify to make members **public**, **private**, **protected**. 
+    - Like struct,<span style="color:red"> 默认 member of a union are public</span>. 
+- A union <span style="color:red">可以定义 member functions</span>, including constructors and destructors. 
+- union <span style="color:red">不能inherit from another class 或者 作为 base class</span>. 
+    - <span style="color:red">所以 a union 不能有virtual function</span>
+- union offer a convenient way to represent <span style="color:red">a set of mutually exclusive values of **different types**</span>. 见下面例子
+- Like built-in types, <span style="color:red">by default union are uninitialized (未初始化的）</span>. can explicitly initialize a union like explicitly initialize aggregate classes by enclosing the initializer in curly braces
+    - If an initializer is present, it is <span style="color:red">used to initialize the **first member**</span>. 下例子
+    - <span style="color:red">assign value to a data member of union object 使其他 member undefined</span>. 因此 when we use a union, must <span style="color:red">know what type</span> of value <span style="color:red">currently stored</span> in union. 如果retieving or assigning value stored in union through wrong member can lead to a crash or other incorrect program behavior
+- **Anonymous unions**: is unamed union 在右括号和分号之间没有任何声明, 一旦定义了 anonymous union compiler <span style="color:red">自动create an unnamed object</span> of newly defined union type
+    - member of anonymous union <span style="color:red">可以被 access directly 在in anonymous union 定义的 scope </span>.
+    - An anonymous union <span style="color:red">cannot have **private** or **protected** members</span>, <span style="color:red">nor can define member functions</span>
+
+
+**Defining a union**
+
+比如have a process that handles different kinds of numeric or character data. 下面例子deinfes a union that can hold a value that is either a ```char```, an ```int```, or a ```double```
+
+```c++
+// objects of type Token have a single member, which could be of any of the listed types
+
+ union Token {
+    // members are public by default
+
+    char cval; 
+    int ival; 
+    double dval;
+};
+```
+
+**Using a union Type**
+
+Like built-in types, by default union are uninitialized (未初始化的）, 可以像初始化aggregate class 一样初始化 union. If an initializer is present, it is used to initialize the first member, 所以 ```first_token``` gives a value to ```cval``` member
+
+```c++
+Token first_token = {'a'}; // initializes the cval member
+
+Token last_token; // uninitialized Token object
+
+Token *pt = new Token; // pointer to an uninitialized Token object
+
+```
+
+using member access operator to access member of union type object
+
+```c++
+last_token.cval = 'z'; 
+pt->ival = 42;
+```
 
 
 
+**Anonymous union**: 成员可以在被定义的scope 直接使用
 
+```c++
+union { // anonymous union 
+
+    char cval;
+    int ival
+    double dval;
+    
+}; // defines an unnamed object, whose members we can access directly
+
+cval = 'c'; // assigns a new value to the unnamed, anonymous union object 
+
+ival = 42; // that object now holds the value 42
+
+```
+
+**unions with Members of Class Type**
+
+- union with members that define own constructors / copy-control members are more complicated to use than union that have members of built-type
 
 
 
