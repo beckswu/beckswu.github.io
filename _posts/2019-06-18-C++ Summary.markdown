@@ -17577,7 +17577,7 @@ void foo()
 
 
 1. **Bit-fields**
-
+2. **volatile Qualifier**
 
 
 
@@ -17669,11 +17669,75 @@ inline bool File::isRead() const { return mode & READ; }
 inline void File::setWrite() { mode |= WRITE; }
 ```
 
+**2. volatile Qualifier**
+
+- precise meaning of ```volatile``` is inherently machine dependent 需要read compiler documentation. 
+    - <span style="color:red">Programs use volatile must be changed when move to new machine or compiler</span>
+- program deal with hardware 通常有<span style="color:red">data elements whose value controlled by processes outside direct control of the program</span>
+    - 例如 a program contain a variable updated by system clock. 
+- A object should be declared as <span style="color:red">```volatile```</span> when its <span style="color:red">value changed outside the control or detection of program</span>
+- volatile is directive to compiler that <span style="color:red">should **not perform optimizations** on such object</span>
+- volatile used the same as ```const``` qualifer, additional modifier to a type
+    - <span style="color:red">no interaction</span> between the const and volatile type qualifiers. A type <span style="color:red">can be both const and volatile</span>
+    - 一个class member 可以被定义成 volatile. <span style="background-color:#FFFF00">Only volatile member functions may be called on volatile objects </span>
+    - 可以declare pointers that are volatile, pointers to volatile objects, and volatile pointer point to volatile objects
+        - 与const 一样, <span style="color:red">只能assign the **address** of a volatile object only to a pointer to volatile</span>
+- One important different between const and volatile:
+    - <span style="color:red">**synthesized** copy/move and assignment operators</span> <span style="color:red">cannot</span> be used to<span style="color:red"> initialize or assign from a volatile object</span>
+        - 因为synthesized member parameter 是 nonvolatile, 不能 bind a nonvolatile to volatile ( <span style="color:red">nonvolatile <-- volatile **Error**</span>)
+    - 如果想要一个volatile objects to be copied, moved, or assigned, 必须 define its own version of copy / move operations. 那么parameter 是 const volatile reerences,
+        - 尽管可以定义拷贝 volatile object, 是不是copy volatile 对象有意义, 不同程序使用volatile 目的各不相同, 对这个问题回答与使用目的相关
 
 
+```c++
+volatile int display_register; // int value that might change
 
+volatile Task *curr_task; // curr_task points to a volatile object
 
+volatile int iax[max_size]; // each element in iax is volatile
 
+volatile Screen bitmapBuf; // each member of bitmapBuf is volatile
+
+```
+
+volatile pointer, pointers to volatile objects, and volatile pointer point to volatile objects. 
+
+```
+volatile int v; // v is a volatile int
+
+int *volatile vip; // vip is a volatile pointer to int
+
+volatile int *ivp; // ivp is a pointer to volatile int
+
+// vivp is a volatile pointer to volatile int
+
+volatile int *volatile vivp;
+
+int *ip = &v; // error: must use a pointer to volatile
+
+*ivp = &v; // ok: ivp is a pointer to volatile
+
+vivp = &v; // ok: vivp is a volatile pointer to volatile
+
+```
+
+因为synthesized version parameter 是 nonvolatile, 所以不能copy/assign volatile object, 所以需要自己定义copy-control member, parameter type 是 const volatile reference
+    
+```c++
+class Foo {
+public:
+Foo(const volatile Foo&); // copy from a volatile object
+
+// assign from a volatile object to a nonvolatile object
+
+Foo& operator=(volatile const Foo&);
+// assign from a volatile object to a volatile object
+
+Foo& operator=(volatile const Foo&) volatile;
+    // remainder of class Foo
+
+};
+```
 
 
 
