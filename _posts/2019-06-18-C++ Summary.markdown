@@ -17578,7 +17578,7 @@ void foo()
 
 1. **Bit-fields**
 2. **volatile Qualifier**
-
+3. **Linkage Directives: extern "C"**
 
 
 **1. Bit-fields**
@@ -17738,6 +17738,159 @@ Foo& operator=(volatile const Foo&) volatile;
 
 };
 ```
+
+
+
+**3. Linkage Directives: extern "C"**
+
+- C++ 有时需要call functions written in another porgramming language (c++). The name of that function must be declared, specify return type and parameter list. Compiler checks calls to functions written in another language in the same way handles ordinary C++ functions. 但是生成的代码有所区别. C++ use <span style="color:red">**linkage directives**</span> to indicate langauge used for non-C++ function
+- Mixing C++ with code written in any other language, including C, 需要有权access该语言compiler 且与 C++ 兼容
+
+**Declaring a Non-C++ Function**
+
+- linkage directive 可以两种形式: single or compound. 
+- linkage directive <span style="color:red">不能出现在 class or function definition</span>. <span style="color:red">The same linkage directive</span> must appear on <span style="color:red">every declartion of a function</span>
+
+
+linkage directive 形式是 extern + string literal(the language in which function is written) + ordinary function declaration. 下面例子 A compiler 需要 support linkage directive for C. A compiler may provide linkage specifications for other languages 比如 ```extern "Ada"```, ```extern "FORTRAN"```
+
+
+
+
+```c++
+// illustrative linkage directives that might appear in the C++ header <cstring> 
+
+// single-statement linkage directive
+
+extern "C" size_t strlen(const char *); 
+// compound-statement linkage directive
+
+extern "C" {
+    int strcmp(const char*, const char*); 
+    char *strcat(char*, const char*);
+}
+```
+
+
+
+**Linkage Directives and Headers**
+
+
+- can give the <span style="color:red">same linkage to several functions at once</span> 用curly braces.  
+    -  These braces serve to <span style="color:red">group the declarations to which the linkage directive applies</span>. 
+    -  若linkage directive not apply, braces are ignored, function names within braces are visiable as if declared outside the braces
+- muliple declaration form can be applied to entire header  比如下面例子 C++ ```cstring``` header
+    - 当一个 ```#include directive ``` enclosed in compound-linkage directive,<span style="color:red"> header 中所有functions 被认为是由 linkage directive 语言编写的</span>。 
+- linkage direcitive <span style="color:red">can be nested</span>, 比如一个header contains a function with its own linkage directive, likage of that function is unaffected.
+- C++ 继承的 C library 是<span style="color:red">可以定义成 C 函数但并非必须</span>, C++ implementation 决定 whether to implement C library functions in C or C++
+
+```c++
+// compound-statement linkage directive
+
+extern "C" {
+#include <string.h> // C functions that manipulate C-style strings 
+
+}
+```
+
+**Pointers to extern "C" Functions**
+
+- The language in which a function is written is part of its type. 因此 <span style="color:red">function declaration</span> with a linkage directive<span style="color:red"> 必须用一样的 linkage directive </span>
+  - <span style="color:red">**pointer**</span> to function written in other language must be <span style="color:red">declared with the same linkage directive as function</span>
+  - 比如 ```extern "C" void (*pf)(int);```, function call compiler 认定 call to a C function. <span style="color:red">A pointer to C function cannot be initialized or assigned to point to a C++ function</span>
+    - It's <span style="color:red">**error**</span> to <span style="color:red">assign two pointers with different linkage directive</span>
+
+对于下面例子 ```pf1 = pf2```, 有些compiler 会接受，但严格上讲是 illegal的
+
+```c++
+void (*pf1)(int); // points to a C++ function 
+
+extern "C" void (*pf2)(int); // points to a C function 
+
+pf1 = pf2; // error: pf1 and pf2 have different types
+
+```
+
+**Linkage Directives Apply to the Entire Declaration**
+
+- When use linkage directive, it applies to <span style="color:red">**return type** and as a **parameter type**</span> for function and function pointers
+- 如果想pass a pointer to a C function to a C++ function, 必须用type alias, 因为linkage directive applies to all functions in declartion
+
+比如下面例子, the linage directive applies to parameter, a function pointer ; when call ```f1```, <span style="background-color:#FFFF00">must pass the name of C function or a pointer to a C function</span>
+
+
+
+```c++
+// f1 is a C function; its parameter is a pointer to a C function 
+
+extern "C" void f1(void(*)(int));
+```
+
+pass a pointer to a C function to a C++ function, must type alias
+
+```c++
+// FC is a pointer to a C function
+
+extern "C" typedef void FC(int);
+// f2 is a C++ function with a parameter that is a pointer to a C function 
+
+void f2(FC *);
+```
+
+
+**Exporting Our C++ Functions to Other Languages**
+
+- By using the <span style="color:red">linkage directive on a **function definition**</span>, we can<span style="color:red"> make a C++ function available to another language program</span>
+    - When the compiler generates code for this function, it will <span style="color:red">generate code appropriate to the indicated language</span>.
+- 值得注意是: 可被共享的函数 reurn type and parameter type are often constrained. 比如, 我们不能pass objects a nontrivial C++ class to C program. C program won't know about constructors, destructors, other class -specific operations
+- To allow the same source file to be c<span style="color:red">ompiled under either C or C++</span>, the preprocessor defines ```_ _cplusplus``` (two underscores) when we compile C++. Using this variable, we can <span style="color:red">conditionally include code when we are compiling C++</span>:
+
+```c++
+// the calc function can be called from C programs
+
+extern "C" double calc(double dparm) { /* ... */ }
+```
+
+```c++
+#ifdef __cplusplus // ok: we're compiling C++
+
+extern "C"
+#endif
+int strcmp(const char*, const char*);
+```
+
+**Overloaded Functions and Linkage Directives**
+
+- 如果target language 支持overloaded function, it is likely that a compiler that implements linage directives for that language would support overloading of these function from C++. 
+    - interaction between linkage directives and function overloading 取决于 target language.
+- <span style="color:red"> C language 不支持 function overloading</span>, C linkage directive can be specified for only one funcion in a set of overloaded functions
+
+```c++
+// error: two extern "C" functions with the same name 
+
+extern "C" void print(const char*); 
+extern "C" void print(int);
+```
+如果一组overloading function 有一个是 C 函数, 其他都是 C++ function.<span style="background-color:#FFFF00"> The C version of calc can be called from C programs</span> and from C++ programs.  The additional functions are C++ functions with class parameters that can be called only from C++ programs. <span style="background-color:#FFFF00">The **order** of the declarations is not significant</span>.
+
+```c++
+class SmallInt{/* ... */}; 
+class BigNum{/* ... */};
+// the C function can be called from C and C++ programs
+
+// the C++ functions overload that function and are callable from C++
+
+extern "C" double calc(double);
+extern SmallInt calc(const SmallInt&); 
+extern BigNum calc(const BigNum&);
+```
+
+
+
+
+
+
+
 
 
 
