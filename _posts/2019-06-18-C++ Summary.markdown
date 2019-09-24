@@ -711,6 +711,58 @@ public:
 
 ***
 
+19.Specialized Tools and Techniques
+
+- ```dynamic_cast``` pointer/reference base type into derived type 
+    - ```dynamic_cast<type*>(e)```, ```dynamic_cast<type&>(e)```
+        - e 必须是 public derived from type, public base of type, or type itself
+    - dynmaic_cast to pointer type fails, result is 0. to reference type fails, throws ```bad_cast```
+    - pointer-type dynamic_cast: 
+        - <span style="color:red">**至少一个 virtual function and Derived public derived Base**</span>
+- typeid operator, returns the type of given expression, ```typeid(e)```
+    - ```e``` is any expression or a type name 
+    - 返回是 reference to const object of ```type_info``` or type publicly derived from ```type_info```
+    - top-level const 被忽略
+    - apply to array or function, not convert to pointer
+    - 当apply not class or class without virtual functions, 返回是 static type
+    - 当operand 是 class type has 至少一个 virtual function, evaluate at runtime  static type 可能不同于 dynamic type 
+    - typeid(*p) 返回是 static, compile-type of pointer
+    - typeid(*p) 如果 p point to a type 没有 virtual functions, p 无须是valid pointer, 如果 p 是null pointer, throws ```bad_typeid``` exception
+    - 注意比较pointer 类型需要加 deference pointer, 否则比较是 pointer type to class type , never equal
+        - 比如 ```typeid(bp) == typeid(Derived)``` always fail, 正确是 ```typeid(*bp) == typeid(Derived)```
+- ```type_info``` 
+    - provide a public virtual destructor
+    - 当compiler provide 额外type information, normally does in a class derived from ```type_info```
+    -  <span style="color:red">no type_info default constructor, copy/move constructor / assignment operators are defined as deleted</span>
+        - 唯一constructed 方法是 through ```typeid``` operator
+    - typeid(id).name() 返回 C-style character string that is a printable version of the type name.
+        - Guarantee: it returns a unique string for each type. not required to match the type names as used in program
+- Enumeration:
+    - group together sets of <span style="color:red">**integral constants**</span>
+    - Enumerator are const, initializer 必须是 constant expression 
+        - 比如定义 ```constexpr```, switch, 可以 use an enumeration type as anontype template parameter, 可以initialize class static data members of enumeration type inside class definition
+    - like class, each enumeration defines a new type
+    - are literal type
+    - **Scope Enumeration**: ```enum class```
+        - 可以像class 一样定义object
+        - Names of enumerators inaccessiable outside enumeration, Access 需要 enumeration name + scope operator
+        - Enumerator 不会自动 convert to integral type 
+    - **Unscope Enumeration**
+        - 只能define objects only as part of the enum definition.
+        - Names of enumerators in the same scope as enumeration
+        - unscope enumeration type object 自动 conver to integral type 
+          - 可以pass unscope enum to function with integral type parameter
+    - Enumerator value 不需要 unique, 如果忽略initializer, enumerator 默认值是比前一个大1 
+    - Enumerator 只能被 enumerators or another enum type assign / initialize, 不能被integral type 初始化
+    - underlying type: ```enum intValues : int ... ```
+        - scope : int, unscope: no default but enough big to hold enumerator values 
+        - error: 如果 enumerator > specified underlying type 
+    - forward declarations: 必须specify underlying type (explicitly or implicitly(scoped))
+        - unscope no default, 必须specify type for unscope 
+        -  size of one enum 必须一样 for all declarations and definition
+        - 不可以declare a name as unscope enum in one context and redeclare it as scoped enum later
+
+***
 
 ## 2. Variable and Basic Types
 
@@ -16433,7 +16485,7 @@ dynamic_cast<type&&>(e)
 
 - ```type``` must be class type and 通常含有 virtual fucntions 
 - 第一个情况, ```e``` must be a valid pointer,  第二个情况, ```e``` must be valid lvalue, 第三个 ```e``` <span style="color:red">must not be lvalue</span>
-- In all cases, ```e``` must be either a class type that is <span style="color:red">**publicly derived**</span> from target type or <span style="color:red">same target type</span>. 如果 ```e``` 满足这些types, cast succeed. 否则 cast fails. 
+- In all cases, ```e``` must be either a class type that is <span style="color:red">**publicly derived**</span> from target type, <span style="color:red">a public base class of the target type</span>, or <span style="color:red">same target type</span>. 如果 ```e``` 满足这些types, cast succeed. 否则 cast fails. 
     - if a dynamic_cast to a <span style="color:red">**pointer**</span> type **fails**, <span style="color:red">result is ```0```</span>.
     - if a dynamic_cast to a <span style="color:red">**reference**</span> type fails, <span style="color:red">operator throws an exception of type ```bad_cast```</span>
 - can do a dynamic_cast on <span style="background-color:#FFFF00">**null pointer**</span>. <span style="color:red">result is a null pointer of the requested type</span>
@@ -16468,8 +16520,8 @@ if (Derived *dp = dynamic_cast<Derived*>(bp))
 
 ```c++
 void f(const Base & b){
-    try {c
-        onst Derived &d = dynamic_cast<const Derived&>(b); 
+    try {
+        const Derived &d = dynamic_cast<const Derived&>(b); 
         // use the Derived object to which b referred  
 
     } catch (bad_cast) {
@@ -16485,8 +16537,8 @@ void f(const Base & b){
     -  ```e``` is any expression or a type name
     - result is a <span style="color:red">reference to a const object</span> of ```type_info```(defined in ```typeinfo``` header), or a <span style="color:red">type publicly derived</span> from ```type_info``` 
     - ```typeid``` 可以被用于expressions of any type. 像平常一样, top-level const is ignored. 
-    - 当expression is reference, ```typeid``` returns type to which reference referes. 
-    - 当apply to array of function, <span style="color:red">standard conversion to pointer not done</span>. if we take ```typeid(a)``` and ```a``` is an array, result describes an array, not pointer
+    - 当expression is reference, ```typeid``` returns type to which reference refers. 
+    - 当apply to array or function, <span style="color:red">standard conversion to pointer not done</span>. if we take ```typeid(a)``` and ```a``` is an array, result describes an array, not pointer
     - 当operand is **not class type** or class **without virtual** functions, ```typeid``` operator 表示 static type of operand. 
     - 当operand 是lvalue of a class type that 定义了至少一个**virtual function**, type is <span style="background-color:#FFFF00">**evaluate at run time**</span>
     - Whether typeid requires a <span style="color:red">**run-time check** determines</span> whether the <span style="color:red">expression is evaluated</span>.
@@ -16670,6 +16722,7 @@ enum color {red, yellow, green}; // unscoped enumeration
 
 enum {floatPrec = 6, doublePrec = 10, double_doublePrec = 10};
 //define object
+
 enum {floatPrec = 6, doublePrec = 10, double_doublePrec = 10} a, b;
 ```
 
