@@ -761,7 +761,10 @@ public:
         - unscope no default, 必须specify type for unscope 
         -  size of one enum 必须一样 for all declarations and definition
         - 不可以declare a name as unscope enum in one context and redeclare it as scoped enum later
-
+- Pointer to class:
+    - can point to a nonstatic member 
+    - static class member 不是object 一部分. <span style="color:red">Pointer to static members are ordinary pointer</span>
+    - ```string Screen::*pdata;```: ```*```表示是 declaring a pointer
 ***
 
 ## 2. Variable and Basic Types
@@ -16840,7 +16843,7 @@ newf(uc); // calls newf(unsigned char)
 - **A pointer to member** can point to a <span style="color:red">**nonstatic** member of a class</span>. 
     - 通常pointer points to an object, A pointer to member identifies a member of a class, not an object of class
     - <span style="color:red">**static class**</span> members are not part of any object, no special syntax is needed. <span style="color:red">Pointer to static members are ordinary pointer</span>
-- They of a pointer to member 含有 both <span style="color:red">type of class</span> and <span style="color:red">type of member of that class</span>
+- a pointer to member 含有 both <span style="color:red">type of class</span> and <span style="color:red">type of member of that class</span>
     - Initialize pointer to member <span style="color:red">不用 指定 an object that member belongs</span>. When <span style="color:red">use it</span>, <span style="color:red">supply the object</span> whose member we use
 
 
@@ -16863,7 +16866,7 @@ private:
 
 - declare a **pointer to member** using a ```*``` to indicate declaring a pointer. 
 - Unlike ordinary pointers, a pointer to member also <span style="color:red">**incorporates the class**</span> that contains the member.
-- 因此用 ```classname::``` 在 ```*``` 之前 表示 dointer can point to a member of ```classname```
+- 因此用 ```classname::``` 在 ```*``` 之前 表示 pointer can point to a member of ```classname```
 - initialize: 需要指定所指成员 and apply <span style="background-color:#FFFF00">**address-of operator(```&```)**</span> not to an object in memory but to a member of the class
 - when <span style="color:red">**initialize**</span> or <span style="color:red">**assign**</span> a pointer to member, that pointer <span style="color:red">not yet point to any data</span>. It i<span style="color:red">dentifies a specific member but not the object that members</span>. 
   - <span style="background-color:#FFFF00">Supply object when **dereference**</span> the pointer to member, 
@@ -16904,9 +16907,9 @@ Screen myScreen, *pScreen = &myScreen;
 // .* dereferences pdata to fetch the contents member from the object myScreen 
 
 auto s = myScreen.*pdata;
-// ->* dereferences pdata to fetch contents from the object to which pScreen
+// ->* dereferences pdata to fetch contents from the object to which pScreen points 
 
-points s = pScreen->*pdata
+s = pScreen->*pdata
 ```
 
 **A Function Returning a Pointer to Data Member**
