@@ -764,7 +764,95 @@ public:
 - Pointer to class:
     - can point to a nonstatic member 
     - static class member 不是object 一部分. <span style="color:red">Pointer to static members are ordinary pointer</span>
-    - ```string Screen::*pdata;```: ```*```表示是 declaring a pointer
+    - pointer to member data
+        - 当initialize or assign pointer to member, no need to provide specific object.
+        - when dereference a pointer to member 再supply object.
+        - format: ```string Screen::*pdata;```: ```*``` declaring a pointer to member
+        - ```const string Screen::*pdata;``` underlying data is const, pointer is not const 
+        - if underlying data is private, must use pointer-to-member inside class, or error
+    - pointer to member function
+        - const member or reference member, must include const or reference in pointer declaration 
+        - must use ```&``` to initialize or assign,  no conversion from member function to pointer to member
+        - if function overload, must declare explicitly, cannot use auto.
+        - pointer to function member can be used as return type or parameter (可以有default parameter)
+        - ```(pScreen->*pmf)();```: 括号不可少, bc precedence
+    - callable object 
+        - bc call a pointer to member, must use ```.*``` or ```->*``` operators to bind pointer to specific object. a pointer to member is not a callable object, cannot pass to algorithm
+        - Method 1: function tempolate: first parameter represent the object which member will run
+            - must specified either pass as pointer or reference
+        - Method 2: ```mem_fn```:
+            - 与 function 一样: mem_fn: generate a callable object from a pointer to member
+            - 与 function 不同: mem_fn deduce the type of callable from the type of the pointer to member
+            - can be called either on object or pointer
+        - Method 3: bind 
+            - Like mem_fn, the first argument can be a pointer or a reference
+- Nested Class
+    - no connection between enclosing class and nested class
+    - if definition of nested class outside before seen, it is imcomplete type
+    - static member definition outside enclosing class
+    - namelookup: <span style="background-color:#FFFF00">只能access type names, static members, and enumerators from enclosing class without specifying enclosing class</span>.
+    - if define member outside enclosing scope, need to provde enclosing and nested class name
+    - nested class cannot access enclosing name, but can access global name
+- Union: <span style="color:red">offer mutually exclusive values of different types</span>
+    - multiple data members, but only one member have a value. when one member is assigned, all other undefined 
+        - must know what type of value currently stored in union, retrive or assign value from/to wrong memeber, crash 
+    - storage of union is at least largest data member
+    - A union cannot have reference member
+    - class have constructor or desturctor can be union member
+    - A union members can be public, private, protected. Like struct, default public 
+    - union cannot inherit from another class, or as base class, no virtual 
+    - By default union is uninitilized. when initializer present, used to initialize first member. 
+    - Anonymous unions:  compiler create an unnamed object of newly defined union type
+        - member cannot be private/protected member, 不能define member functions 
+        - member can be accessed directly in anonymous union defined scope 
+    - for built-in type member:
+        - compiler synthesize memberwise default constructor / copy-control member 
+    - for union that have nontrivial class：
+        - switch to class need to run constructor, switch from class, run destructor
+        - member class that defines it default constructor or at least one copy-control member, compiler synthesized copy member as deleted
+- local class: A class defined inside function body.
+    - only visible in scope in which it is defined
+    - <span style="color:red">all members must be defined inside class body</span>
+        - if nested class defined inside local class, nested class must in the same scope as local class defined.
+    - <span style="color:red">cannot have static data members</span>\
+    - namelookup: only type names, static variables, and numerators defined within enclosing scope 
+    - usually make it function as public, bc local class is encapsulation, no furthur encapsulation.
+- Bit-fields: a bit-field holds a specified number of bits    
+    - often used when program need to pass binary data to another program or hardware device 
+    - the memory layout of a bit-field is machine dependent 
+    - A bit-field must have integral or enumeration type
+        - 通常用 unsigned type to hold a bit-field, 因为behavior of signed bit-field is implementation defined.
+    - 定义方法是 : ```member_name ： val```: val 是 constant expression, number of bits
+    - multiple bit-fields defined in consecutive order packed within adjacent bits of single integer
+    - cannot apply ```&``` address-of, bc no pointers refer to bit-fields
+    - usually use inline function to test / set value of bit-field 
+- volatile:   inherently machine dependent
+    - value controlled by processes outside direct control of the program
+        - 比如 value updated by system clock
+    - tell compiler not perform optimizations on such object
+    - a object can be defined both const and volatile 
+    - only volatile member functions can be called on volatile objects
+        - <span style="color:red">can overload function based on volatile</span>
+    - only assign address of a volatile object to a pointer to volatile 
+    - difference between const and volatile: 
+        - synthesized copy/move operations cannot used to initialized or assign from volatile object, 因为synthesized member parameter is nonvolatile, cannot make nonvolatile <-- volatile, Error 
+        - if want to make volatile objects copied, moved, or assigned, must define own copy/move operations. parameter 是 const volatile reerences,
+- Linkage Directives: extern “C”:
+    - mix C++ with code like C need compiler access C and C++ compatible
+    - linkage directive <span style="color:red">cannot be in class or function definition</span>. The same linkage directive must appear on every function declartion
+    - inkage directive 形式是 extern + string literal\
+    - header: 当一个 #include directive enclosed in compound-linkage directive, header 中所有functions 被认为是由 linkage directive 语言编写的。
+        - linkage directive can be nested, if function has own linkage directive in that header, function linkage directive unaffected
+    - <span style="color:red">pointer to function must be declared with the same linkage directive as function</span>
+    - error to assign two pointers with different linkage directive
+    - <span style="color:red">when use linkage directive, apply to both return / parameter type </span>
+        - when want to pass a pointer of C function to C++ function, must use type alias
+    - 值得注意是: 可被共享的函数 reurn type and parameter type are often constrained. 比如, 我们不能pass objects a nontrivial C++ class to C program.
+    - ```_ _cplusplus```: 即使是 ```extern "C"``` is compiled under C++
+    - interaction between linkage directives and function overloading 取决于 target language.
+        - 比如 C 不支持 function overloading.
+        - 可以是定义一组function, ```extern "C"``` 只被 C called, 其他的被C++ called
+	
 ***
 
 ## 2. Variable and Basic Types
@@ -16867,9 +16955,9 @@ private:
 - declare a **pointer to member** using a ```*``` to indicate declaring a pointer. 
 - Unlike ordinary pointers, a pointer to member also <span style="color:red">**incorporates the class**</span> that contains the member.
 - 因此用 ```classname::``` 在 ```*``` 之前 表示 pointer can point to a member of ```classname```
-- initialize: 需要指定所指成员 and apply <span style="background-color:#FFFF00">**address-of operator(```&```)**</span> not to an object in memory but to a member of the class
-- when <span style="color:red">**initialize**</span> or <span style="color:red">**assign**</span> a pointer to member, that pointer <span style="color:red">not yet point to any data</span>. It i<span style="color:red">dentifies a specific member but not the object that members</span>. 
-  - <span style="background-color:#FFFF00">Supply object when **dereference**</span> the pointer to member, 
+- when <span style="color:red">**initialize**</span> or <span style="color:red">**assign**</span> a pointer to member, that pointer <span style="color:red">not yet point to any data</span>. It <span style="color:red">identifies a specific member but not the object that members belong</span>.
+  - initialize: apply <span style="background-color:#FFFF00">**address-of operator(```&```)**</span> not to an object in memory but to a member of the class
+- <span style="background-color:#FFFF00">Supply object when **dereference**</span> the pointer to member, 
   - ```.*``` and ```->*``` let us <span style="color:red">supply an object</span> and <span style="color:red">dereference</span> the pointer to <span style="color:red">fetch a member </span>of that object
   - 如果a pointer to member 的 member 是 <span style="color:red">**private**</span>, the use of pointer must inside a <span style="color:red">member</span> or <span style="color:red">friend</span> of class, 否则是error
     - 因为一些 member are private, can't get a pointer to data member directly. Instead would <span style="color:red">define a function to return a pointer</span> to that member: 可以定义成**static**
@@ -16912,7 +17000,7 @@ auto s = myScreen.*pdata;
 s = pScreen->*pdata
 ```
 
-**A Function Returning a Pointer to Data Member**
+**A Function Returning a Pointer to Data Member** (比较重要例子)
 
 Read return type from right to left, ```data``` returns a pointer to a member of class ```Screen``` that is const string. Function body applies the address-of operator to the ```contents``` member, functions 返回 a pointer to the ```contents``` member of ```Screen```. 注意, ```pdata``` points to a member of class ```Screen``` but<span style="color:red"> **not to actual data**</span>. To use ```pdata```, 必须 <span style="color:red">**bind it to an object**</span> of type ```Screen```
 
@@ -16951,7 +17039,7 @@ auto pmf = &Screen::get_cursor;
 - specifies the return type and parameter list 
 - If the member function is a <span style="color:red">**const member**</span> or a <span style="color:red">**reference member**</span>, <span style="background-color:#FFFF00">must include the const or reference as well</span> in pointer declaration 
 - If the member function **overloaded**, 必须 <span style="color:red">declaring the type **explicitly**</span>. 不能用```auto```
-- Unlike ordinary function pointers, **no automatic conversion** <span style="color:red">between a member function and a pointer to that member</span>, 必须用 <span style="background-color:#FFFF00">address-of operator</span>
+- Unlike ordinary function pointers, **no automatic conversion** <span style="color:red">from a member function and a pointer to that member</span>, 必须用 <span style="background-color:#FFFF00">address-of operator</span>
 - pointer to function member can be used as return type or parameter (可以有default parameter)
 
 如果member function overload, 必须declare the type explicitly, 比如下面例子, 根据function pointer 确定point to which member function. 
@@ -16982,7 +17070,7 @@ pmf = Screen::get; // error: no conversion to pointer for member functions
 
 - As a pointer to a data member,  we use ```.*``` or ```->``` operator to call a member function through a pointer to member
 - ```(myScreen->*pmf)()``` <span style="color:red">外层括号不可少</span>, 因为precedence of call operator higher than precedence of the pointer to member operators
-    - 没有 paratheses, ```myScreen.*pmf()``` would be interpreted as ```myScreen.*(pmf())```: use function ```pmf``` return value as operand of pointer-to-member operator ```.*``` 因为 ```pmf``` no function, is error
+    - 没有 paratheses, ```myScreen.*pmf()``` would be interpreted as ```myScreen.*(pmf())```: use function ```pmf``` return value as operand of pointer-to-member operator ```.*``` 因为 ```pmf``` not function, error
 
 ```c++
 Screen myScreen,*pScreen = &myScreen;
@@ -17102,7 +17190,7 @@ myScreen.move(Screen::DOWN); // invokes myScreen.down
   - let compiler <span style="color:red">**deduce the member's type**</span> by using another library facility ```mem_fn``` like ```function```, 定义在 ```functional``` header
   - 与 ```function``` 一样地方: ```mem_fn```: generate a callable object from a pointer to member 
   - 与 ```function``` 不同地方: ```mem_fn``` deduce the type of callable from the type of the pointer to member 
-  - THe callable generated by ```mem_fn``` can be <span style="color:red">called on either an **object** or a **pointer**</span>
+  - The callable generated by ```mem_fn``` can be <span style="color:red">called on either an **object** or a **pointer**</span>
 - 方法三: Using bind to Generate a Callable
   - 跟```function``` 一样, must <span style="color:red">make 通常implicit parameter (that represents object will operate) explicit </span>.
   - Like ```mem_fn```, the first argument to callable generated by ```bind``` can be a pointer or a reference 
@@ -17207,23 +17295,22 @@ f(&svec[0]); // ok: argument is a pointer to string f will use .-> to call empty
     - <span style="background-color:#FFFF00">no connection between objects of enclosing class and object of nested class</span>. 
         - A nested-type object 只含有 members defined inside nested type. 
         - an object of enclosing class has only  members defined by enclosing class. 没有data members of any nested classes
-        - 当nested type class 内可以通过lookup 找到 outside class member. 
-    - <span style="color:red">nested class is visible within closing class scope</span> but not outside the class. nested class 不会和其他scope 中同一个名字冲突
+    - <span style="color:red">nested class is visible within enclosing class scope</span> but not outside the class. nested class 不会和其他scope 中同一个名字冲突
     - Enclosing class 没有特殊访问权限 对于 nested class, and nested class has no special access to members of its enclosing class.
 - Access:
     - 如果 a nested class define **public** part of enclosing class, can be used anywhere. 
     - A nested class define in **protected**    part of enclosing class, accessible only by enclosing class, its friends, and its derived classes. 
     - A **private** nested class of enclosing class: accessible only to members and friends of enclosing class
 - 如果 actual definition of nested class <span style="color:red">定义(可以outside class define) 被看见之前, nested class is an **imcomplete type**</span>
+- nested class cannot access enclosing name, but can access global name, 见下面例子
 - nested class **static** member, <span style="color:red">defintion ouside scope of nested class</span>
 - **Name Lookup**: <span style="color:red">nested class has additional enclosing class scope to search</span>.  而且 nested class can <span style="color:red">access enclosing class scope member wihout specifiying the enclosing class</span>. 
-    - 只能<span style="background-color:#FFFF00">access **type names**, **static** members, and **enumerators** from the enclosing class without specify enclosing class objec</span>t.(明天看)
-
+    - 只能<span style="background-color:#FFFF00">access **type names**, **static** members, and **enumerators** from the enclosing class without specify enclosing class object</span>
 
 
 **Declaring a Nested Class**
 
-下面例子: 如果 ```QueryResult``` 用作其他purpose 没有实际意义, 所以定义为 ```TextQuery``` 的 member, 因为```QueryResult``` as ```TextQuery```, we nmust declare ```QueryResult``` before we use it as the return type for ```query``` member
+下面例子: 如果 ```QueryResult``` 用作其他purpose 没有实际意义, 所以定义为 ```TextQuery``` 的 member, 因为```QueryResult``` as ```TextQuery```, we must declare ```QueryResult``` before we use it as the return type for ```query``` member
 
 ```c++
 class TextQuery { 
@@ -17362,19 +17449,19 @@ return QueryResult(sought, loc->second, file);
 #### (f). Union: A Space-Saving Class
 
 - 可以有multiple data members, 但是在任意时刻<span style="color:red">只有一个 member have a value</span>. 
-    - when a vlaue is <span style="color:red">assigned to one</span> member of union, <span style="color:red">all other members become undefined.</span>
+    - when a value is <span style="color:red">assigned to one</span> member of union, <span style="color:red">all other members become undefined.</span>
 - The amount of union storage 至少是跟 largest data member 一样大
 - Like any class, a union defines a new type.
-- A union <span style="background-color:#FFFF00">cannot have a refernece member</span>
+- A union <span style="background-color:#FFFF00">cannot have a reference member</span>
     - under new standard, class types that have constructors or destructors  可以是 union member
-- A nuion 可以specify to make members **public**, **private**, **protected**. 
+- A union 可以specify to make members **public**, **private**, **protected**. 
     - Like struct,<span style="color:red"> 默认 member of a union are public</span>. 
 - A union <span style="color:red">可以定义 member functions</span>, including constructors and destructors. 
 - union <span style="color:red">不能inherit from another class 或者 作为 base class</span>. 
     - <span style="color:red">所以 a union 不能有virtual function</span>
 - union offer a convenient way to represent <span style="color:red">a set of mutually exclusive values of **different types**</span>. 见下面例子
 - Like built-in types, <span style="color:red">by default union are uninitialized (未初始化的）</span>. can explicitly initialize a union like explicitly initialize aggregate classes by enclosing the initializer in curly braces
-    - If an initializer is present, it is <span style="color:red">used to initialize the **first member**</span>. 下例子
+    - If an initializer is present, it is <span style="color:red">used to initialize the **first member**</span>. 下面例子
     - <span style="color:red">assign value to a data member of union object 使其他 member undefined</span>. 因此 when we use a union, must <span style="color:red">know what type</span> of value <span style="color:red">currently stored</span> in union. 如果retieving or assigning value stored in union through wrong member can lead to a crash or other incorrect program behavior
 - **Anonymous unions**: is unamed union 在右括号和分号之间没有任何声明, 一旦定义了 anonymous union compiler <span style="color:red">自动create an unnamed object</span> of newly defined union type
     - member of anonymous union <span style="color:red">可以被 access directly 在in anonymous union 定义的 scope </span>.
@@ -17444,11 +17531,11 @@ ival = 42; // that object now holds the value 42
 
 **unions with Members of Class Type**
 
-- 因为 complexity invovled in constructing / destroying members of class type, <span style="color:red">union with class-type 通常 embedde inside another class
+- 因为 complexity invovled in constructing / destroying members of class type, <span style="color:red">union with class-type 通常 embeded inside another class
 </span>
     - 比如we add string member to union, 定义 union as anonymous union and make it member of a class ```Token```. The ```Token``` class will manage union member 
     - to keep track of <span style="color:red">what type value union holds</span>, <span style="color:red">定义separate object known as **discriminate**</span>
-    - 下面例子定义 enumeartion type to keep track union member state (discriminate)
+    - 下面例子定义 enumeration type to keep track union member state (discriminate)
     - class need 定义 default constructor, copy-control members and assignment operator that assign a value of one union types to union member
 
 
@@ -17482,6 +17569,7 @@ public:
     Token &operator=(double);
 private:
     enum {INT, CHAR, DBL, STR} tok; // discriminant
+    
     union { // anonymous union
         
         char cval;
@@ -17525,7 +17613,7 @@ Token &Token::operator=(const std::string &s)
 
 **Managing Union Members That Require Copy Control**
 
-- 当<span style="color:red">call ```copyUnion``` from copy constructor, union member 被默认初始化</span>, 表示first member of union initialzied. 因为string 不是第一个成员, 所以we know 第一个成员不是string, ```copyUnion``` assume that if parameter hold string, ```copyUnion``` 必须construct its own string
+- 当<span style="color:red">call ```copyUnion``` from copy constructor, union member 被默认初始化</span>, 表示first member of union initialized. 因为string 不是第一个成员, 所以we know 第一个成员不是string, ```copyUnion``` assume that if parameter hold string, ```copyUnion``` 必须construct its own string
 - 但对于assignment operator, it is possible that union 已经hold a string, 要分三种情况, 两边都是string, 只有左侧是string(需要), 只有右侧是string 
 
 ```c++
@@ -17570,7 +17658,7 @@ Token &Token::operator=(const Token &t)
     - Local Classes <span style="color:red">不能使用 variables from function scope where class defined </span>
     - enclosing function 不能access private member of local class. local class 可以  make enclosing function friend, 
     - 通常上local class 定义member as public, 因为a local class 已经encapsulated within scope of function. 进一步 encapsulation 没什么必要 
-    - 查找顺序与其他class 一样： named used in member defintion can appear anywhere in class. 如果 a nmae not found in class member, then search enclosing scope then search out of the scoping enclosing the function
+    - 查找顺序与其他class 一样： named used in member defintion can appear anywhere in class. 如果 a name not found in class member, then search enclosing scope then search out of the scoping enclosing the function
 - possible have nested class inside a local class, <span style="color:red">nested class 的 defintion 可以appear otuside local-class body</span>, 但是nested class 必须被定义在 same scope as local class defined (比如 不能定义在function  外面), 
     - 因为nested class in local class 也是local class <span style="color:red">so all members of nested class 必须defined inside the body of nested class</span>
 
@@ -17738,7 +17826,7 @@ inline void File::setWrite() { mode |= WRITE; }
     - 一个class member 可以被定义成 volatile. <span style="background-color:#FFFF00">Only volatile member functions may be called on volatile objects </span>
     - 可以declare pointers that are volatile, pointers to volatile objects, and volatile pointer point to volatile objects
         - 与const 一样, <span style="color:red">只能assign the **address** of a volatile object only to a pointer to volatile</span>
-- One important different between const and volatile:
+- One important difference between const and volatile:
     - <span style="color:red">**synthesized** copy/move and assignment operators</span> <span style="color:red">cannot</span> be used to<span style="color:red"> initialize or assign from a volatile object</span>
         - 因为synthesized member parameter 是 nonvolatile, 不能 bind a nonvolatile to volatile ( <span style="color:red">nonvolatile <-- volatile **Error**</span>)
     - 如果想要一个volatile objects to be copied, moved, or assigned, 必须 define its own version of copy / move operations. 那么parameter 是 const volatile reerences,
@@ -17758,7 +17846,7 @@ volatile Screen bitmapBuf; // each member of bitmapBuf is volatile
 
 volatile pointer, pointers to volatile objects, and volatile pointer point to volatile objects. 
 
-```
+```c++
 volatile int v; // v is a volatile int
 
 int *volatile vip; // vip is a volatile pointer to int
@@ -17837,7 +17925,7 @@ extern "C" {
     -  若linkage directive not apply, braces are ignored, function names within braces are visiable as if declared outside the braces
 - muliple declaration form can be applied to entire header  比如下面例子 C++ ```cstring``` header
     - 当一个 ```#include directive ``` enclosed in compound-linkage directive,<span style="color:red"> header 中所有functions 被认为是由 linkage directive 语言编写的</span>。 
-- linkage direcitive <span style="color:red">can be nested</span>, 比如一个header contains a function with its own linkage directive, likage of that function is unaffected.
+- linkage direcitive <span style="color:red">can be nested</span>, 比如一个header contains a function with its own linkage directive, lnikage of that function is unaffected.
 - C++ 继承的 C library 是<span style="color:red">可以定义成 C 函数但并非必须</span>, C++ implementation 决定 whether to implement C library functions in C or C++
 
 ```c++
@@ -17851,7 +17939,7 @@ extern "C" {
 
 **Pointers to extern "C" Functions**
 
-- The language in which a function is written is part of its type. 因此 <span style="color:red">function declaration</span> with a linkage directive<span style="color:red"> 必须用一样的 linkage directive </span>
+- The language in which a function is written is part of its type. 因此 <span style="color:red">function declaration</span> with a linkage directive<span style="color:red"> 必须用一样的 linkage directive </span> pointer
   - <span style="color:red">**pointer**</span> to function written in other language must be <span style="color:red">declared with the same linkage directive as function</span>
   - 比如 ```extern "C" void (*pf)(int);```, function call compiler 认定 call to a C function. <span style="color:red">A pointer to C function cannot be initialized or assigned to point to a C++ function</span>
     - It's <span style="color:red">**error**</span> to <span style="color:red">assign two pointers with different linkage directive</span>
@@ -17917,7 +18005,7 @@ int strcmp(const char*, const char*);
 
 **Overloaded Functions and Linkage Directives**
 
-- 如果target language 支持overloaded function, it is likely that a compiler that implements linage directives for that language would support overloading of these function from C++. 
+- 如果target language 支持overloaded function, it is likely that a compiler that implements linkage directives for that language would support overloading of these function from C++. 
     - interaction between linkage directives and function overloading 取决于 target language.
 - <span style="color:red"> C language 不支持 function overloading</span>, C linkage directive can be specified for only one funcion in a set of overloaded functions
 
