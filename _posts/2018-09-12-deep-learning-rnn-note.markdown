@@ -269,18 +269,27 @@ For RRN,  <span style="color:red">三层已经是very deep</span>, $$a^{\left[{1
 - <span style="background-color: #FFFF00">T-SNE</span> 把3000vector visualize 到2-D, analogy tends to close
 
 Embedding training dataset 需要很大的，会发现比如durian 和orange， farmer 和cultivator是同义词, 
-1. 所以当training set有限的时候，可以先train 从网上的文本（10billion 个）or use pre-training embedding online，
-2. 然后再apply <span style="background-color: #FFFF00">transfer learning</span> 到你的task上(size = 100K), then use 300 dimension vector（位置一表示性别，位置二表示color...） to represent word instead of one hot vector(dimension: 10000),<span style="background-color: #FFFF00">**advantage**</span>: use low dimension feature vector.  
-3. continue to fine-tune word embeddings with new data(only 你的task dataset is large)
+1. 所以当training set有限的时候，可以先train 从网上的文本（100 billion 个）or use pre-training embedding from online，
+2. 然后再apply <span style="background-color: #FFFF00">transfer learning</span> 到你的task上(<span style="background-color:#FFFF00">size smaller than the set used for training embedding </span> ), then use 300 dimension embedding vector（位置一表示性别，位置二表示color...） to represent word instead of one hot vector(dimension: 10000),<span style="background-color: #FFFF00">**advantage**</span>: use low dimension feature vector (size 300) rather than one-hot vector (size = 10000).  
+3. Optional: continue to fine-tune word embeddings with new data(only your task dataset is really large) 
+
+Application: for many NLP task, such as named Entity Recognition, text summarization, co-reference resolution, parsing. Less useful for language modeling, machine traslation especially having large dataset
+
+Difference between face recognition and word embedding: 
+- face recognition can have neural network to compute an encoding for new picture
+- word embedding, 比如 we have 10000 word vocabularies, only learn those 10000 word embedding in our vocabularies (fetaures)
 
 
 **Cosine Similarity**: 
 
-比如 $$e_{man} - e_{woman} \approx e_{king} - e_{?} 用similarity function $$ $$sim\left( e_{w}, e_{king} - e_{man} + e_{woman} \right)$$, <br/>
-$$sim\left( u, v \right)  = \frac{u^Tv}{||u||_2 ||v||_2 } $$ <br/>
-如果u,v similar, similarity will be large, 因为$$u^Tv$$表示他们的夹角(cos), 
+比如 $$e_{man} - e_{woman} \approx e_{king} - e_{?} 用similarity function $$ 
+
+$$argmax_{w} sim\left( e_{w}, e_{king} - e_{man} + e_{woman} \right)$$, <br/>
+$$sim\left( u, v \right)  = \frac{u^Tv}{||u||_2 ||v||_2 } $$ 
+
+The idea is if u,v similar, similarity will be large, 因为$$u^Tv$$表示他们的夹角(cos), 
  <br/>or measure dissimilarity Euclidian distance:
-$${||u-v||}^2$$ 通常measure dissimilarity than similarity
+$${||u-v||}^2$$ 通常 <span style="background-color:#FFFF00">measure dissimilarity than similarity</span>. Cosine Similarity being used often.
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week2pic2.png)
 
@@ -288,17 +297,27 @@ $${||u-v||}^2$$ 通常measure dissimilarity than similarity
 **Embedding Matrix**:
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week2pic3.png)
-可以用embedding matrix 乘以one hot vector得到属于现在词的embedding vector,但是通常不用，因为不efficient, in practice用just lookup 那个word的emdding matrix column e
+what we learn is 300 features by 10000 words vocabulares. The goal to learn 300 x 10000 embedding matrix (E) is to <span style="color:red">intialize E **randomly**</span> and use <span style="color:red">gradient descent</span> to learn all the parameter in E. $$E \dot o_j = e_j $$ , $$o_j$$ is <span style="color:red">**one-hot vector**</span> and $$e_j$$ is <span style="color:red">**embedding vector**</span>
+
+
+但是通常不用matrix multiplication to get embedding vector，因为不efficient, <span style="color:red">in practice用just lookup 那个word的emdding matrix column e</span>
 
 #### Word2vec & Negative Sampling & GloVe
 
 **Word2Vec**:
 
-fixed history: 比如I want a glass of orange ___ , 预测填入的是juice，把前四个word, a glass of orange 代入network, 每个词都是300维的embedded vector(来自same embedded matrix),把4个300 stack together, 带入hidden layer, 再用softmax predict;  <span style="background-color: #FFFF00">Advantage</span>: can deal with arbitrary long 句子，因为input size is fixed 
+<span style="background-color:#FFFF00">**Fixed window**</span>: 比如I want a glass of orange ___ , 
+1. only use 4 words fixed window, 预测填入的是juice，只代入把前四个word, a glass of orange 的 one-hot vector(size 10000) 
+2. lookup get 300 dimension **embedded vector** (e.g $$e_{4343}, e_{9665}$$) from embedding-matrix ($$E$$: is the same for all training examples)
+3. take those embedding vector into neural network, then predicting using softmax classifier among 10000 possible outputs. 代入network on, 把4个300 stack together, 带入hidden layer, 再用softmax predict;  
+4. can use backprop to perform gradient descent to maximize likelihood of training set
+5. repeatedly predict given four words in a sequence, what is the next word in your text corpus
+
+<span style="background-color: #FFFF00">Advantage</span>: can deal with arbitrary long 句子，因为input size is fixed 
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week2pic4.png)
 
-Context/target pairs:   Context可以是 last 4 words; Context也可以是4 word on left & right; Context也可以是nearby one word
+Context/target pairs:   Context可以是 last 4 words; Context也可以是4 word on left & right; Context也可以是nearby one word (work suprising well. 比如 I want a glass of orange __ , only look at glass)
 
 **Skip-grams**:
 
