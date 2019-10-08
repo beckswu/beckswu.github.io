@@ -152,7 +152,7 @@ Sample from distribution to generate noble sequences of words
     - 比如$$\hat y^{<{1}>}$$sample = The, 把the 作为input，得到另一个softmax distribution P( _ \| the), 再sample $$\hat y^{<{2}>}$$,  把sample的 pass 到next time step. 
 3. <span style="color: red">**When to end**:</span>,
    - keep sampling until generate EOS token. 
-   - 如果没有设置EOS. then decide to sample 20 个或者100个words 知道到达这个次数(20 or 100 words). 有时可能生成unknown word token, 可以确保algorithm 生成sample 不是unknown token，遇到unknown token就继续keep sampling until get non-unknown word
+   - 如果没有设置EOS. then decide to sample 20 个或者100个words 知道到达这个次数(20 or 100 words). 有时可能生成unknown word token, 可以确保algorithm 生成sample 不是unknown token，遇到unknown token, reject and keep sampling until get non-unknown word. can leave it in output if don't mind having unknown word output
 
 字典除了是vocabulary，也可以是character base， 如果想build character level 而不是word level 的，$$y^{<{1}>}, y^{<{2}>}, y^{<{3}>}$$是individual characters， E.g. Cat average. $$y^{<1>} = c$$, $$y^{<2>} = a$$ , $$y^{<3>} = t$$, $$y^{<4>} = space$$   
 
