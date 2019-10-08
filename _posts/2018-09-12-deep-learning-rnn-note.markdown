@@ -62,35 +62,40 @@ problems:
 1. Input, output can be <span style="color:red">different lengths</span> in different example (不是所有的input的都是一样长度)
 2. Doesn't share features learned across <span style="color:red">**different positions**</span> of text(也许word Harry在位置1，但是也许Harry也许出现在位置7)
 
-在time 0, have some eith made-up activation or 全部是0的vector. <br/>
+
+
+- At time 0, have some either made-up activation( initialized randomly or 全部是0的vector) as $$a^{<{0}>}$$. <br/>
 - step 1: Take a word(first word) to a neural network layer, then try to predict if this word is name or not. <br/>
 - step 2: Use activation value from step 1 and $$x_{2}$$ to predict $$y_2$$. Then take activation value from step 2 to step 3. 
-- The activation parameters (vertical的, $$W_{ax}$$, 用x得到a like quantity) used in each step are shared. Activation (horizontal的,$$W_{aa}$$) is the same. $$W_{ya}$$ (用x得到y like quantity) 控制governs the output prediction
+- The <span style="color:red">activation parameters</span> () used in each step are <span style="color:red">**shared**</span>. 
+  - $$W_{ax}$$, (from x to activation) govern the connection between $$x_{<i+1>}$$ $$x_{<i>}$$
+  - $$W_{aa}$$, (from activation to activation) govern the horizontal activation connection  
+  - $$W_{ya}$$ (from activition to y) (用x得到y like quantity) 控制governs the output prediction
+
+Below structure $$T_x = T_y$$,  e.g.  $$y_{<3>}$$ not only get infomation from $$x_{<3>}$$ but aslo from $$x_{<1>}$$ and $$x_{<2>}$$
+
+One <span style="color:red">**weakness**</span> for RNN: only use <span style="color:red">information</span> that is <span style="color:red">earlier</span> in the sequence to make a prediction （Bidirection RNN (BRNN) 可以解决这个问题）e.g. when prediciting  $$y_{<3>}$$ not use  $$x_{<4>}$$
+
 
 ![][pic3]
 
-<span style="background-color: #FFFF00">
-One weakness: only use information that is earlier in the sequence to make a prediction （Bidirection RNN (BRNN) 可以解决这个问题）
-</span>
 
-Forward Propagation:
+**Forward Propagation**:
 
 $$\begin{align} a^{<{0}>} &= \vec0  \\
-a^{<{1}>} &= g_1\left(W_{aa}\cdot a^{<{0}>}+ W_{ax}\cdot X^{<{a}>} + b_aa \right) \\
+a^{<{1}>} &= g_1\left(W_{aa}\cdot a^{<{0}>}+ W_{ax}\cdot X^{<{a}>} + b_a \right) \\
 y^{<{1}>} &= g_2\left(W_{ya}\cdot a^{<{1}>} + b_y \right)
 \end{align}$$ <br/>
-从$$a^{<{t-1}>} $$和 $$x^{<{t}>}$$ 生成$$a^{<{t}>}$$ 的可以是<span style="color: red">tanh</span>, 从$$a^{<{t}>}$$ 到$$y^{<{t}>}$$的是<span style="color: red">softmax</span>
+从$$a^{<{t-1}>} $$和 $$x^{<{t}>}$$ 生成$$a^{<{t}>}$$ 的可以是<span style="color: red">tanh/Relu</span>, 从$$a^{<{t}>}$$ 到$$y^{<{t}>}$$的是<span style="color: red">softmax</span>
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week1pic4.png)
 
 简化符号
 ![](/img/post/Deep_Learning-Sequence_Model_note/week1pic5.png)
 
-<br/> activations function often use tanh or Relu. if it is binary classification, can use sigmoid function. 
-<span style="background-color: #FFFF00">The choice of activation 取决于what type of output y you have </span>
 
 
-#### Backpropagation through time
+#### Backpropagation Through Time
 
 Single Loss Function: $$ L^{<{t}>}\left( \hat y^{<{t}>},  y^{<{t}>} \right) = - y^{<{t}>}log \left( \hat y^{<{t}>} \right) - 
     \left( 1- y^{<{t}>} \right) log\left(1- \hat y^{<{t}>} \right) $$<br/>
@@ -102,36 +107,63 @@ Overall Loss Function:  $$ L \left(  \hat y , y \right) =  \displaystyle \sum_{t
 foward propation goes from left to right. back propagation go from right to left 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week1pic6.png)
 
-<span style="color: red">Many to Many Architectures</span>: 比如word识别名字，输入的每word，都有输出0，1; 注：many-to-many, input length 和 Output length可以相同，也可以不同，比如翻译先把法语(encoder)句子读完，然后一个一个generate 英语(decoder)的 <br/>
-<span style="color: red">Many to One Architectures</span>:  Sentiment Classification: 给一个word，只最后输出0-5代表几个星<br/>
-<span style="color: red">One to One Architectures</span>: standard neural network<br/>
-<span style="color: red">One to Many Architectures</span>: output set of notes 代表a piece of music (x 可以是null)
+
+#### RNN Architectures
+
+<span style="color: red">**Many to Many** Architectures</span>: 比如word识别名字，输入的每word，都有输出0，1; 注：many-to-many, input length 和 Output length可以相同，也可以不同，比如翻译先把法语(encoder)句子读完，然后一个一个generate 英语(decoder), English and French sentences can be different length <br/>
+<span style="color: red">**Many to One** Architectures</span>:  Sentiment Classification: 给一个word，只最后输出0-5代表几个星<br/>
+<span style="color: red">**One to One** Architectures</span>: standard neural network<br/>
+<span style="color: red">**One to Many** Architectures</span>: e.g. music generation output set of notes 代表a piece of music (x 可以是null)
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week1pic7.png)
 
 #### Sequence generation
-Language Model:
+Language Model: the way that speech recognition pick words based on probability. Output only sentences that are likely. 比如, then pick the second sentences<br/>
+P(The apple and pair salad) = $$3.2\times10^{-13} $$<br/>
+P(The apple and pair salad) = $$5.7\times10^{-10} $$
 
-analyze the probbility of sequence of words, 比如<br/>
-P(The apple nd pair salad) = $$3.2\times10^{-13} $$<br/>
-P(The apple nd pair salad) = $$5.7\times10^{-10} $$
-
-Training Set: large corpus (set) of English text; >首先<span style="background-color: #FFFF00"> tokenize </span>把word map到字典上，生成vector. 有时add extra token EOS 表示句子的结尾。 也可以决定是否把标点符号也tokenize. 如果word 不在字典中，用<span style="color: red">UNK</span> stands for unknown word
+Training Set: large corpus of English text; corpus: NLP terminalogy means a large body/set. 
+- 首先<span style="background-color: #FFFF00"> **tokenize** </span>把word map到字典上，生成vector. 有时add extra token EOS 表示句子的结尾。 也可以决定是否把标点符号也tokenize. 如果word 不在字典中，用<span style="color: red">UNK</span> substitue for unknown word
  
 RNN Model:
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week1pic8.png)
 
-speech generation. 从$$a^{<{1}>} $$到 $$\hat y^{<{1}>}$$ 是softmax matrix，得到字典中每个字的概率， $$y^{<{1}>}$$是一个10002(10000 + unknown + EOS) vector，到了$$a^{<{2}>}$$, given the first correct answer, what is the distribution of P(__ \| cats); 到了$$a^{<{3}>}$$, given the first correct answer, P(__ \| cats, average);到最后一个predict P(_ \|....前面所有的), cost function is softmax cost function; given the first word, $$P\left( y^{<{1}>}, y^{<{2}>}, y^{<{3}>} \right) = P\left( y^{<{1}>}\right) \cdot P\left(y^{<{2}>} \| y^{<{1}>} \right)\cdot  P\left(y^{<{3}>} \| y^{<{1}>}, y^{<{2}>} \right) $$
+Training
+
+1. 从$$a^{<{1}>} $$到 $$\hat y^{<{1}>}$$ 是softmax matrix, <span style="color:red">得到字典中每个字的概率</span>， $$y^{<{1}>}$$是一个10002(10000 + unknown + EOS) vector，到了$$a^{<{2}>}$$, 
+2. At $$a^{<{2}>}$$, <span style="color:red">given the first correct answer</span>, what is the distribution of P(__ \| cats); 
+3. At $$a^{<{3}>}$$, given the first correct answer, P(__ \| cats, average);
+4. At the last one, predict P(_ \|....前面所有的), 
+
+cost function is softmax cost function; $$L\left( \hat y^{t}, y^{t} \right) = - \sum_{i} {y_i^{t} log \hat y_i^{t} } $$, $$ L = \sum_{t} {L^{t} \left( \hat y^{t}, y^{t} \right)}
+
+given the first word, $$P\left( y^{<{1}>}, y^{<{2}>}, y^{<{3}>} \right) = P\left( y^{<{1}>}\right) \cdot P\left(y^{<{2}>} \mid y^{<{1}>} \right)\cdot  P\left(y^{<{3}>} \mid y^{<{1}>}, y^{<{2}>} \right) $$
 
 
 #### Sampling novel Sequence:
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week1pic9.png)
- 
- 得到$$\hat y^{<{1}>}$$后，random sample 选取y 根据softmax的distribution(a的概率多大，aaron的概率多大)， 然后得到的sample在next time step作为input,再得到$$\hat y^{<{2}>}$$; 比如$$\hat y^{<{1}>}$$sample = The, 把the 作为input，得到另一个softmax distribution P( _ \| the), 再sample $$\hat y^{<{2}>}$$,  把sample的 pass 到next time step. <span style="color: red">When to stop:</span>, keep sampling until generate EOS token. 如果没有设置EOS. then decide to sample 20 个或者100个words 知道到达这个次数(20 or 100). 有时可能生成unknown word token, 可以确保algorithm 生成sample 不是unknown token，遇到unknown token就继续keep sampling until get non-unknown word
 
-字典除了是vocabulary，也可以是character base， 如果想build character level 而不是word level 的，$$y^{<{1}>}, y^{<{2}>}, y^{<{3}>}$$是individual characters， <span style="background-color: #FFFF00">character 就不会遇见unknown word的情况. Disadvantage: 1. end up much longer sequence. </span> 一句话可能有10个词，但会有很多的char，<span style="background-color: #FFFF00"> 2. character level 不如word level 能capture long range dependencies between how the earlier parts of sentence aslo affect the later part of the sentence. </span> 3. character level more computationally expensive to train. 当计算机变得越来越快，more people look at character level models (not widespread today for character level)
+Sample from distribution to generate noble sequences of words
+ 
+1. 得到$$\hat y^{<{1}>}$$后，random sample according to softmax的distribution(a的概率多大，aaron的概率多大)，```np.random.choice``` to sample according to this distribution. 
+2. take the $$\hat y^{<{1}>}$$ you just sample in step 1 to pass as input to next timestamp.再得到$$\hat y^{<{2}>}$$; 
+    - 比如$$\hat y^{<{1}>}$$sample = The, 把the 作为input，得到另一个softmax distribution P( _ \| the), 再sample $$\hat y^{<{2}>}$$,  把sample的 pass 到next time step. 
+3. <span style="color: red">**When to end**:</span>,
+   - keep sampling until generate EOS token. 
+   - 如果没有设置EOS. then decide to sample 20 个或者100个words 知道到达这个次数(20 or 100 words). 有时可能生成unknown word token, 可以确保algorithm 生成sample 不是unknown token，遇到unknown token就继续keep sampling until get non-unknown word
+
+字典除了是vocabulary，也可以是character base， 如果想build character level 而不是word level 的，$$y^{<{1}>}, y^{<{2}>}, y^{<{3}>}$$是individual characters， E.g. Cat average. $$y^{<1>} = c$$, $$y^{<2>} = a$$ , $$y^{<3>} = t$$, $$y^{<4>} = space$$   
+
+Advantage: 
+- <span style="background-color: #FFFF00">character 就不会遇见unknown word的情况</span>. 比如 Mau, not in vocabulary, assign unknown, for character letter, 不会是unknown
+  
+Disadvantage: 
+
+- end up much **longer sequence**.  一句话可能有10个词，但会有很多的characters，
+- Character level 不如word level 能capture long range dependencies between how the earlier parts of sentence aslo affect the later part of the sentence.
+-  Character level more <span style="color:red">**computationally expensive**</span> to train. 当计算机变得越来越快，more people look at character level models (not widespread today for character level)
 
 
 #### Vanishing gradients
