@@ -27,13 +27,13 @@ Examples of sequence data:
 
 sometimes 输入X 和 输出Y 可以是不同的长度，sometimes X和Y(example 4,7)是同样长度的, sometimes 只有X或者只有Y是sequence的 (example 2)
 <script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"> </script>
-#### notation: 
+#### Notation: 
 
-[//]: <> (![](/img/post/Deep_Learning-Sequence_Model_note/week1pic1.png))
+![](/img/post/Deep_Learning-Sequence_Model_note/week1pic1.png)
 
 
 example: given a sentence 判断哪个是人名<br/> 
-$$x^{({i})<{t}>}$$:  表示第i个training example 中第t个word, t 表示temporal sequences althought whether sequences are temporal one or not<br/> 
+$$x^{({i})<{t}>}$$:  表示第i个training example 中第t个word <br/> 
 $$y^{({i})<{t}>}$$:  表示第i个training example 中第t个word的输出label<br/> 
 $$T_x^{i}$$:  表示第i个training example的长度<br/> 
 $$T_y^{i}$$:  表示第i个training example的ouput长度<br/> 
@@ -42,27 +42,30 @@ $$T_y^{i}$$:  表示第i个training example的ouput长度<br/>
 **representing words:** <br/>
 
 use dictionary and give each word an index, <br/>
-$$x^{<{t}>}$$:  是one hot vector, 比如字典的长度是10000, x = apple, apple出现在字典的100位, $$x^{<{t}>} = \begin{bmatrix}
+$$x^{<{t}>}$$:  是one hot vector(meaning: only one in one position, everywhere else 0), 比如字典的长度是10000, x = apple, apple出现在字典的100位, $$x^{<{t}>} = \begin{bmatrix}
     0 \\
     \vdots \\
     1  \\
 	\vdots\\
     \end{bmatrix}
-$$ vector长度是10000， 只有第100位是1，剩下都是0. if 遇见了word不在字典中，create a new token or a new fake word called unknown word
+$$ 只有第100位是1，剩下都是0. if 遇见了word不在字典中，create a new token or a new fake word called unknown word e.g. ```<unk>```
+
+Note: Some internet company use dictionary maybe 1 million or een bigger than that 
 
 比如下面看是不是name的，output是长度为9，0代表不是name, 1代表是name
 ![](/img/post/Deep_Learning-Sequence_Model_note/week1pic2.png)
 
 
 #### Recurrent Neural Network Model:
-<span style="background-color: #FFFF00">Why not a standard network?</span> <br/>
+<span style="background-color: #FFFF00">Why not a standard network?</span>(e.g. sentiment in NLP ) <br/>
 problems:
-1. Input, output can be different lengths in different example (不是所有的input的都是一样长度)
-2. Doesn't share features learned across different positions of text(也许word Harry在位置1，但是也许Harry也许出现在位置7)
+1. Input, output can be <span style="color:red">different lengths</span> in different example (不是所有的input的都是一样长度)
+2. Doesn't share features learned across <span style="color:red">**different positions**</span> of text(也许word Harry在位置1，但是也许Harry也许出现在位置7)
 
 在time 0, have some eith made-up activation or 全部是0的vector. <br/>
-step 1: Take a word(first word) to a neural network layer, then try to predict if this word is name or not. <br/>
-step 2: 到了第二个位置, instead of predicting y2 using only x2, it aslo gets some input 从step 1. Deactivation value from step 1 被pass 到了step 2. <br/>The activation parameters (vertical的, $$W_{ax}$$, 用x得到a like quantity) used in each step are shared. Activation (horizontal的,$$W_{aa}$$) is the same. $$W_{ya}$$ (用x得到y like quantity) 控制governs the output prediction
+- step 1: Take a word(first word) to a neural network layer, then try to predict if this word is name or not. <br/>
+- step 2: Use activation value from step 1 and $$x_{2}$$ to predict $$y_2$$. Then take activation value from step 2 to step 3. 
+- The activation parameters (vertical的, $$W_{ax}$$, 用x得到a like quantity) used in each step are shared. Activation (horizontal的,$$W_{aa}$$) is the same. $$W_{ya}$$ (用x得到y like quantity) 控制governs the output prediction
 
 ![][pic3]
 
