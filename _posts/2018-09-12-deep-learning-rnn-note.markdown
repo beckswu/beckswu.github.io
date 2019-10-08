@@ -172,6 +172,7 @@ languages that comes earlier 可以影响 later的， e.g.  choose was or were
 
 The cat which .... was full <br/>
 The cats which .... were full
+
 The basic RNN <span color="style:red">not very good at capturing very long-term dependency</span>.  because for very deep neural network e.g. 100 layers, <span style="color:red">later layer</span> had <span style="color:red">hard time propagating back</span> to affect the weights of these earlier layers. 
 
 It means the output only influenced by close input, $$y^{<20>}$$ is affected by $$x^{<20>},x^{<19>}, x^{<18>} $$, not $$x^{<1>}$$. The errors associated at latter timestep to affect computation that are eariler. e.g. cats or cat affect was, were.
@@ -257,11 +258,15 @@ For RRN,  <span style="color:red">三层已经是very deep</span>, $$a^{\left[{1
 
 #### Word Embedding:
 <span style="background-color: #FFFF00">Word Embedding: </span> 让algorithm学会同义词：比如男人vs女人，king vs queen<br/> 
-<span style="background-color: #FFFF00">One hot vector的缺点</span>: 10000中(10000是字典)，只有1个为1表示这个词，不能表示gender. age, fruit..., 因为任何两个one-hot vector的inner product是zero
+<span style="background-color: #FFFF00">One hot vector的缺点</span>: 10000中(10000是字典)，只有1个为1表示这个词，不能表示gender. age, fruit..., 因为任何两个one-hot vector的inner product是zero and Eludian distance between any pair is the same.
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week2pic1.png)
 
-可能apple 和orange有的feature不一样比如color，但是a lot feature是一样的， <span style="background-color: #FFFF00">T-SNE</span> 把3000vector visualize 到2-D, analogy tends to close
+- featurized representation (**embeddings**) with each of these words, 比如一个 vocabulary dictionary size 10000, 而每个word 比如有3000 feature, feature vector size = 3000, 
+   - e.g. Gender 在 第0个位置, Age 在第2个位置, 比如man 的feature vector \[0] = -1,  woman 的feature vector \[0] = 1, King 的 feature vector \[2] = 0.7, Queen 的 feature vector \[2] = 0.69.  
+- Featurized representaion will be similar for analogy. e.g. Apple vs Orange, Kings vs Queens
+- In practice, feature(word embedding)  that used for learning won't have a easy interpretation like gender, age, food ...
+- <span style="background-color: #FFFF00">T-SNE</span> 把3000vector visualize 到2-D, analogy tends to close
 
 Embedding training dataset 需要很大的，会发现比如durian 和orange， farmer 和cultivator是同义词, 
 1. 所以当training set有限的时候，可以先train 从网上的文本（10billion 个）or use pre-training embedding online，
