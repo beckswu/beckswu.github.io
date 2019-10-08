@@ -168,64 +168,89 @@ Disadvantage:
 
 #### Vanishing gradients
 
-languages that comes earlier 可以影响 later的，比如前面提到cats, 十个单词后可能需要用were 而不是was， 除了vanishing gradient的问题，也有explode gradient的问题（expoentially large gradients can cause parameters become so large 导致 parameters blow up, often see NaNs, have overflow in neural network computation),  <span style="background-color: #FFFF00"> exploding gradient 可以用gradient clipping</span>，<span style="color: red">当超过某个threshold得时候，rescale避免too large. thare are clips according to some 最大值</span>, 比如gradient超过[-10,10], 就让gradient 保持10 or -10
+languages that comes earlier 可以影响 later的， e.g.  choose was or were
+
+The cat which .... was full <br/>
+The cats which .... were full
+The basic RNN <span color="style:red">not very good at capturing very long-term dependency</span>.  because for very deep neural network e.g. 100 layers, <span style="color:red">later layer</span> had <span style="color:red">hard time propagating back</span> to affect the weights of these earlier layers. 
+
+It means the output only influenced by close input, $$y^{<20>}$$ is affected by $$x^{<20>},x^{<19>}, x^{<18>} $$, not $$x^{<1>}$$. The errors associated at latter timestep to affect computation that are eariler. e.g. cats or cat affect was, were.
+
+Exploding Gradient: aslo happen for RNN, increase exponentially with the number of layers go through. Whereas Vanish Gradient tends to a bigger problem for RNN 
+    - 导致 parameters blow up, often see NaNs, have overflow in neural network computation,  
+    - <span style="background-color: #FFFF00"> exploding gradient 可以用**gradient clipping**</span>，<span style="color: red">当超过某个threshold得时候，rescale避免too large. thare are clips 不超过最大值</span>, 比如gradient超过$$\left[-10,10\right]$$, 就让gradient 保持10 or -10
+
 
 
 
 #### GRU && LSTM
 
-**GRU**:
+**GRU**: Gated Recurrent Unit, capture long range connection and solve Vanishing Gradient
 
  $$\begin{align} \tilde c^{<{t}>} &= tanh \left( W_c \left[ \Gamma_r \times c^{<{t-1}>}, x^{<{t}>}  \right] + b_c \right) \\ \Gamma_r &= \sigma \left( W_r \left[ c^{<{t-1}>}, x^{<{t}>}  \right] + b_r \right) \\  \Gamma_u &= \sigma \left( W_u \left[ c^{<{t-1}>}, x^{<{t}>}  \right] + b_u \right) \\ c^{<{t}>} &= \Gamma_u \cdot \tilde c^{<{t}>}  + \left( 1 - \Gamma_u \right) \cdot  c^{<{t-1}>}  \\ a^{<{t}>} &= c^{<{t}>}  \end{align}$$  
 
 
 1. c是memory cell, a 是output cell, c = memory cell 比如记录cat 是单数还是复数, 用于后面记录是was or were 
 2. $$\tilde c^{<{t}>}$$是candidate value 代替$$c^{<{t}>}$$， 
-3. $$\Gamma_u$$是表示gate, 如果gate = 1, $$c^{<{t}>}$$ 更新值为 candidate 值 $$\tilde c^{<{t}>}$$, 比如遇到cat gate = 1更新 $$c^{<{t}>}$$为1表示单数, the cat, which already ate.... was full, 从cat 到was, gate =0, means don't update, 直到was, $$c^{<{t}>}$$还为1 (without vanishing)
+3. $$\Gamma_u$$是表示gate, value between 0 and 1, For most of possible range, it will very close to 0 or very close to 1. The job of $$\Gamma_u$$ is to decide when to update $$c^{<t>}$$ value, 如果gate = 1, $$c^{<{t}>}$$ 更新值为 candidate 值 $$\tilde c^{<{t}>}$$, 比如遇到cat gate = 1更新 $$c^{<{t}>}$$为1表示单数, the cat, which already ate.... was full, 从cat 到was, gate =0, means don't update, 直到was, $$c^{<{t}>}$$还为1 . Because $$\Gamma_u$$ can be so close to zero, <span style="color:red">it won't suffer that vanish gradient problem </span>, allow nerual network to learn long range dependency
 4. sigmoid function for $$\Gamma_u$$ easy to set zero, 只要 $$ W_u \left[ c^{<{t-1}>}, x^{<{t}>}  \right] + b_u $$ 是非常大的负数
-5. $$c^{<{t}>}$$可以是vector (比如100维，100维都是bits), then$$\Gamma_u$$,$$\tilde c^{<{t}>}$$都是same dimension,  $$ \Gamma_u \cdot \tilde c^{<{t}>}  + \left( 1 - \Gamma_u \right) \cdot  c^{<{t-1}>} $$ 是element wise operation, 点乘告诉哪个bit需要update，哪个保持上一个value，比如用第一个维度代表单数复数，第二维度代表是不是food
+5. $$c^{<{t}>}$$可以是vector (比如100维，100维都是bits), then$$\Gamma_u$$,$$\tilde c^{<{t}>}$$都是same dimension,  $$ \Gamma_u \cdot \tilde c^{<{t}>}  + \left( 1 - \Gamma_u \right) \cdot  c^{<{t-1}>} $$ 是 <span style="color:red">**element wise operation**</span>, to tell bit需要update, to keep some bits as before and update other bits，哪个保持上一个value，比如用第一个维度代表单数复数，第二维度代表是不是food
 6. $$\Gamma_r $$: relevance, how relevant $$c^{<{t-1}>}$$ to update $$c^{<{t}>}$$
 
 
-**LSTM**:
+**LSTM**: Long Short Term Memory
 
- $$\begin{align} \tilde c^{<{t}>} &= tanh \left( W_c \left[ \Gamma_r \times a^{<{t-1}>}, x^{<{t}>}  \right] + b_c \right) \\ \Gamma_u &= \sigma \left( W_u \left[ a^{<{t-1}>}, x^{<{t}>}  \right] + b_u \right) \\  c\\  \Gamma_o &= \sigma \left( W_o \left[ a^{<{t-1}>}, x^{<{t}>}  \right] + b_o \right) \\ c^{<{t}>} &= \Gamma_u \cdot \tilde c^{<{t}>}  + \Gamma_f  \cdot  c^{<{t-1}>}  \\ a^{<{t}>} &= \Gamma_o \cdot tanh\left(c^{<{t}>} \right) \end{align}$$  
+ $$\begin{align} \tilde c^{<{t}>} &= tanh \left( W_c \left[ \Gamma_r \times a^{<{t-1}>}, x^{<{t}>}  \right] + b_c \right) \\ \Gamma_u &= \sigma \left( W_u \left[ a^{<{t-1}>}, x^{<{t}>}  \right] + b_u \right) \\ 
+ \\  \Gamma_f &= \sigma \left( W_f \left[ a^{<{t-1}>}, x^{<{t}>}  \right] + b_f \right) 
+ \\  \Gamma_o &= \sigma \left( W_o \left[ a^{<{t-1}>}, x^{<{t}>}  \right] + b_o \right) \\ c^{<{t}>} &= \Gamma_u \cdot \tilde c^{<{t}>}  + \Gamma_f  \cdot  c^{<{t-1}>}  \\ a^{<{t}>} &= \Gamma_o \cdot tanh\left(c^{<{t}>} \right) \end{align}$$  
 
 
 
-1. $$\Gamma_u$$是表示update gate,  $$\Gamma_o$$是表示forget gate, $$\Gamma_o$$是表示output gate
-2. peephole connection($$c^{<{t-1}>}$$): gate value may not only depend on $$a^{<{t-1}>}$$ & $$x^{<{t}>}$$, 也可能depend on $$c^{<{t-1}>}$$, $$\Gamma_o = \sigma \left( W_o \left[ a^{<{t-1}>}, x^{<{t}>}, c^{<{t-1}>}  \right] + b_o \right)$$
+1. $$\Gamma_u$$是表示update gate,  $$\Gamma_f$$是表示forget gate, $$\Gamma_o$$是表示output gate. Different from GRU, <span style="color: red">LSTM use separate update and forget gate</span>.
+2. One variation: **peephole connection** ($$c^{<{t-1}>}$$): gate value may not only depend on $$a^{<{t-1}>}$$ & $$x^{<{t}>}$$, 也可能depend on $$c^{<{t-1}>}$$, $$\Gamma_o = \sigma \left( W_o \left[ a^{<{t-1}>}, x^{<{t}>}, c^{<{t-1}>}  \right] + b_o \right)$$
+
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week1pic10.png)
  
+ 上图 四个小方块依次是 forget gate, update gate, tanh, and output gate
 
 | GRU | LSTM |
 | ------:| -----------:|
 | $$c^{<{t}>} $$ 等于 $$a^{<{t}>} $$ | $$c^{<{t}>} $$ 不等于 $$a^{<{t}>} $$ |
 | update $$c^{<{t}>} $$是由gate $$\Gamma_u$$控制，如果不update, gate = 0, $$c^{<{t}>} $$ = $$c^{<{t-1}>} $$   | 有三个gate  $$\Gamma_u$$,$$\Gamma_f$$,$$\Gamma_o$$ 分别控制update, forget, 和output |
 
-when use GRU or LSTM: isn't widespread consensus in this; Andrew: GRU is simpler model than LSTM, <span style="background-color: #FFFF00">easy to build much bigger network</span> than LSFT, LSTM is <span style="background-color: #FFFF00">more powerful and effective</span> since it has three gates instead of two. LSTM is move historical proven
+when use GRU or LSTM: isn't widespread consensus in this(some problem GRU win and some problem LST win); Andrew: GRU is simpler model than LSTM and GRU is recently invention than LSTM, <span style="background-color: #FFFF00">easy to build much bigger network</span> than LSFT, LSTM is <span style="background-color: #FFFF00">more powerful and effective</span> since it has three gates instead of two. LSTM is more historical proven， default first try. Now more and more team use GRU, more simpler but work as well.
 
 
 #### Bidirection RNN && Deep RNNS:
 
-单向的RNN的问题，比如 He said "Teddy bears are on sale"; He said “Teddy Roosevelt was a great President". Teddy都是第三个单词且前两个都一样，而只有第二句话的Teddy表示名字<br/>
-Bidirection RNN: part forward prop从左向右，part forward prop从右向左, 每个Bidirection RNN block还可以是GRU or LSTM的block
+单向的RNN的问题，比如 
+
+He said "Teddy bears are on sale"; <br/>
+He said “Teddy Roosevelt was a great President".<br/>
+Teddy都是第三个单词且前两个都一样，而只有第二句话的Teddy表示名字
+
+Bidirection RNN: forward prop从左向右 and 从右向左, 每个Bidirection RNN block还可以是GRU or LSTM的block
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week1pic11.png)
 
  $$ \tilde y^{<{t}>} = g\left( W_y\left[ \overrightarrow a^{<{t}>}, \overleftarrow a^{<{t}>}   \right] + b_y \right)$$  
 
-<span style="background-color: #FFFF00">disadvantage</span>: 需要entire sequence of data before you can make prediction; 比如speech recognition: 需要person 停止讲话 to get entire utterance before process and make prediction
+Lots of NLP problem, BRNN with LSTM are commonly used
+
+<span style="background-color: #FFFF00">Disadvantage</span>: 需要entire sequence of data before you can make prediction; 比如speech recognition: 需要person 停止讲话 to get entire utterance before process and make prediction
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week1pic12.png)
 
-For RRN, 三层已经是very deep, $$a^{\left[{1}\right]<{0}>}$$表示第1层第0个input，在output layer也可以有stack recurrent layer，但这些layer没有horizon connection， 每个block 也可以是GRU, 也可以是LSTM, 也可以build deep version of bidirectional RNN, <span style="background-color: #FFFF00">Disadvantage: computational expensive to train</span>
+For RRN,  <span style="color:red">三层已经是very deep</span>, $$a^{\left[{1}\right]<{0}>}$$表示第1层第0个input，在output layer也可以有stack recurrent layer，但这些layer没有horizon connection， 每个block 也可以是GRU, 也可以是LSTM, 也可以build deep version of bidirectional RNN, 
 
 比如计算$$a^{\left[{2}\right]<{3}>}$$:   $$a^{\left[{2}\right]<{3}>} = g\left( W_a^2 \left[a^{\left[{2}\right] <{2}>}, a^{\left[ {1}  \right] <{3}>}  \right] \right)$$
 
+<span style="background-color: #FFFF00">**Disadvantage**: computational expensive to train</span>
+
 <br/><br/><br/>
 
+***
 
 ## Week2 NLP & Word Embedding
 
