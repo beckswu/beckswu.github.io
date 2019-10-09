@@ -611,7 +611,7 @@ Measure the degree how similar / overlap the machine translated sentences with h
 
 | unigram | n-gram |
 | ------:| -----------:|
-|$$\displaystyle p_1 = \frac{ \sum_{unigram \in \hat y }^{} { Count_{clip} \left( unigram \right)} }{ \sum_{unigram \in \hat y }^{} { Count\left( unigram \right)} }  $$ | $$ \displaystyle p_n = \frac{ \sum_{unigram \in \hat y }^{} { Count_{clip} \left( n-gram \right)} }{ \sum_{unigram \in \hat y }^{} { Count\left( { n-gram \right)} }  $$ |
+|$$\displaystyle p_1 = \frac{ \sum_{unigram \in \hat y }^{} { Count_{clip} \left( unigram \right)} }{ \sum_{unigram \in \hat y }^{} { Count\left( unigram \right)} }  $$ | $$ \displaystyle p_n = \frac{ \sum_{\text{n-gram}\in \hat y }^{} { Count_{clip} \left( \text{n-gram} \right)} }{ \sum_{\text{n-gram}\in \hat y }^{} { Count\left( \text{n-gram} \right)} } $$ |
 
  <span style="background-color: #FFFF00"> 如果机器翻译的跟reference 1 or reference 2完全一样, $$P_1$$ and $$P_n$$ 都等于1</span>
 
@@ -644,12 +644,20 @@ E.g French translate to English
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week3pic9.png)
 
-- $$ \overrightarrow a^{<{0}>}$$,  $$\overleftarrow a^{<{6}>}$$是zero vector, 用$$ a^{<{t}>}$$ 表示foward 和backword features
-- $$ \sum_{ t }^{} {\alpha^{<{1, t'}>}} = 1$$ all weights which used to generate 第一个的词的和等于1 (适用于每个词)
+**Attention Model Training**
+
+- $$ \overrightarrow a^{<{0}>}$$,  $$\overleftarrow a^{<{6}>}$$是zero vector, 用$$ a^{<{t'}>} = \left(\overrightarrow a^{<{t'}>}, \overleftarrow a^{<{t'}>} \right)$$ 表示foward 和backword features, use $$t'$$ to index word in French sentence
+- to generate $$y_{1}$$, have input context C which depends on $$\alpha_{<{1,1}>}, \alpha_{<{1,2}>}, \alpha_{<{1,3}>}$$, these alpha parameter tell how much context would depend on features we're getting or activation we're getting from different time steps
+   - $$c = \sum{t'}^{} {alpha^{<{t,t'}>}} a^{<{t'}>}$$ where $$a^{<{t'}>}$$ come from $$\left(\overrightarrow a^{<{t'}>}, \overleftarrow a^{<{t'}>} \right)$$
+- <span style="background-color: #FFFF00">$$\alpha^{<{t, t'}>}$$ is **amount of attention** $$y^{<{t}>} should pay to $$a^{<{t'}>}$$</span>
+   - $$ \sum_{ t }^{} {\alpha^{<{1, t'}>}} = 1$$ all weights which used to generate 第一个的词的和等于1 (适用于每个词)
+   - $$\alpha^{<{t,t'}>} = \frac{ exp\left( e^{<{t,t'}>} \right) } { \sum_{t' = 1}^{T_x} { exp\left( e^{<{t,t'}>} \right } }$$ is softmax, ensure the sume of weight equal 1
+   - to compute $$e^{<{t,t'}>}$$, use small nerual network(通常只有一个hidden layer). input is $$s^{<{t-1}>}$$ hidden state from previous time step,  $$a^{<{t'}>}$$ the feature from timestep $$t'$$
+- 下面network 是BRNN, 上面network 是standarad RNN
 - content 是weight sum of activation ($$a^{<{t}>}$$)
 - compute alpha  $$\alpha^{<{t, t'}>}$$用softmax 
-- generate $$e^{<{t, t'}>}$$用smaller neural network(通常只有一个hidden layer): input: feature from $$\alpha^{<{t'}>}$$  and $$s^{<{t-1}>}$$ is hidden state 来自上个rnn output, $$s^{<{t-1}>}$$也是现在rnn的input
-- <span style="background-color: #FFFF00">Downside</span>: take quadratic time to run this algorithm
+- generate $$e^{<{t, t'}>}$$用smaller neural network(): input: feature from $$\alpha^{<{t'}>}$$  and $$s^{<{t-1}>}$$ is hidden state 来自上个rnn output, $$s^{<{t-1}>}$$也是现在rnn的input
+- <span style="background-color: #FFFF00">**Downside**</span>: take <span style="color: red"> **quadratic time**</span> to run this algorithm
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week3pic10.png)
 
