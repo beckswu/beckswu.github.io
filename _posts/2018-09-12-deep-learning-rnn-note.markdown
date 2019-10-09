@@ -611,7 +611,7 @@ Measure the degree how similar / overlap the machine translated sentences with h
 
 | unigram | n-gram |
 | ------:| -----------:|
-|$$\displaystyle p_1 = \frac{ \sum_{unigram \in \hat y }^{} { Count_{clip} \left( unigram \right)} }{ \sum_{unigram \in \hat y }^{} { Count\left( unigram \right)} }  $$ | $$ \displaystyle p_n = \frac{ \sum_{unigram \in \hat y }^{} { Count_{clip} \left( \text{n-gram} \right)} }{ \sum_{unigram \in \hat y }^{} { Count\left( { \text{n-gram} \right)} }  $$ |
+|$$\displaystyle p_1 = \frac{ \sum_{unigram \in \hat y }^{} { Count_{clip} \left( unigram \right)} }{ \sum_{unigram \in \hat y }^{} { Count\left( unigram \right)} }  $$ | $$ \displaystyle p_n = \frac{ \sum_{unigram \in \hat y }^{} { Count_{clip} \left( n-gram \right)} }{ \sum_{unigram \in \hat y }^{} { Count\left( { n-gram \right)} }  $$ |
 
  <span style="background-color: #FFFF00"> 如果机器翻译的跟reference 1 or reference 2完全一样, $$P_1$$ and $$P_n$$ 都等于1</span>
 
@@ -631,15 +631,20 @@ Measure the degree how similar / overlap the machine translated sentences with h
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week3pic8.png)
 
+E.g French translate to English 
 
-- 用bidirectional RNN, 对于不同位置, 可以得到rick features around the word; 
-- 再用另一组rnn generate translation, 用$$s^{<{t}>}$$ 表示hidden state,  $$s^{<{2}>}$$ 需要 $$s^{<{1}>}$$ (generate的第一个词） 作为input。 
-- 比如当生成第一个词时, 不太用着at the end of 句子的word, 用attention weight 比如$$\alpha^{<{1,1}>}$$表示产生第一个词时，来自一个features (bidirection rnn output的) 的weight, $$\alpha^{<{1,2}>}$$ how much weight(attention) need to put on second input to generate first word;  $$\alpha^{<{t,t'}>}$$ amount of attention $$y^{<{t}>}$$ should pay to $$a^{<{t'}>}$$
+- 用bidirectional RNN, 对于不同位置, 可以得到rich features around the word; 
+- 再用另一组rnn generate English translation, 用$$s^{<{t}>}$$ 表示hidden state,  $$s^{<{2}>}$$ 需要 $$s^{<{1}>}$$ (generate的第一个词） 作为input。 
+- 比如当生成第一个词时, 不太用着at the end of 句子的word, 用<span style="color: red">**attention weight**</span> 
+   - 比如$$\alpha^{<{1,1}>}$$表示 generate first English word，<span style="color: red">how much should be paying atttention</span> to the first piece information from (bidirection rnn output的), 
+   - $$\alpha^{<{1,2}>}$$ how much weight(attention) need to put on second input to generate first word;  
+   - $$\alpha^{<{t,t'}>}$$ amount of attention $$y^{<{t}>}$$ should pay to $$a^{<{t'}>}$$
+- to generate second English word, use first generated English word $$y_{<1>}$$, $$a_{<1>}, a_{<2>}, a_{<3>} $$ (output from BRNN) as input
 - 最后generate EOS
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week3pic9.png)
 
-- $$ \overrightarrow a^{<{0}>}$$,  $$\overrightarrow a^{<{6}>}$$是zero vector, 用$$ a^{<{t}>}$$ 表示foward 和backword features
+- $$ \overrightarrow a^{<{0}>}$$,  $$\overleftarrow a^{<{6}>}$$是zero vector, 用$$ a^{<{t}>}$$ 表示foward 和backword features
 - $$ \sum_{ t }^{} {\alpha^{<{1, t'}>}} = 1$$ all weights which used to generate 第一个的词的和等于1 (适用于每个词)
 - content 是weight sum of activation ($$a^{<{t}>}$$)
 - compute alpha  $$\alpha^{<{t, t'}>}$$用softmax 
