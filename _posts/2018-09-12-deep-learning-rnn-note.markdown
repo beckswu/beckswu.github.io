@@ -302,7 +302,7 @@ what we learn is 300 features by 10000 words vocabulares. The goal to learn 300 
 
 但是通常不用matrix multiplication to get embedding vector，因为不efficient, <span style="color:red">in practice用just lookup 那个word的emdding matrix column e</span>
 
-#### Word2vec & Negative Sampling & GloVe
+#### Word2vec 
 
 **Word2Vec**:
 
@@ -319,55 +319,88 @@ what we learn is 300 features by 10000 words vocabulares. The goal to learn 300 
 
 Context/target pairs:   Context可以是 last 4 words; Context也可以是4 word on left & right; Context也可以是nearby one word (work suprising well. 比如 I want a glass of orange __ , only look at glass)
 
-**Skip-grams**:
+#### Skip-grams:
 
-比如句子: I want a glass of orange juice to go along with my cereal; 先去<span style="color: red">context word</span> 比如选取了word: orange, 随机pick another word within some window as <span style="color: red">target word</span>  比如前后的5个或者10个词; 比如 context: orange -> target: juice; context: orange -> target: glass; context: orange -> target: my; 
+比如句子: I want a glass of orange juice to go along with my cereal; 
+- 先pick<span style="color: red">context word</span> e.g. orange, 
+- Then <span style="color: red">randomly pick another word **within some window** as **target word**</span>  比如前后的5个或者10个词; 
+- e.g 1. context: orange -> target: juice; 
+- e.g 2. context: orange -> target: glass; 
+- e.g 3. context: orange -> target: my; 
+- Not a easy learning problem. Because there are too many different words that can be chosen within windows
 
-Goal: learn from content to target;  vocabulary size  = 10,000, context: orange (vector index 6257) ->  target: juice (4834)  
+Goal: learn from content to target;  vocabulary size  = 10,000, context: orange (word index 6257) ->  target: juice (word index 4834)  
 
 Model:  $$ O_c \rightarrow E \rightarrow e_c \rightarrow softmax \rightarrow \hat y$$   <br/>
-Softmax: $$ p(t |c) = \frac{ \theta_t^T e_c }{ \sum_{j=1}^{10,000} { e^{ \theta_j^T e_c  }  } } $$  $$\theta_t$$ is parameter associated with output t <br/>
-Loss function: $$ L \left(\hat y , y \right) = - \sum_{i=1}^{10,000} { y_i log\hat{y_i}  }$$ 
+Softmax: $$ p(t |c) = \frac{ \theta_t^T e_c }{ \sum_{j=1}^{10,000} { e^{ \theta_j^T e_c  }  } } $$ ,  $$\theta_t$$ is parameter associated with output t, the chance of word t being label <br/>
+Loss function: $$ L \left(\hat y , y \right) = - \sum_{i=1}^{10,000} { y_i log\hat{y_i}  }$$ it is dot product, where  $$log\hat{y_i}$$ one hot vector with only position which correctly labeled as 1, $$y_i, log\hat{y_i}$$ both are 10000 dimenional
 
-<span style="background-color: #FFFF00">Problem with softmax classification</span>: softmax的分母每次都要sum over all words in vocabulary; solution1: hierarchical softmax:有点像segment tree, 把所有的单词分成一半，再分一半。。。每一个parent 记录所有的softmax的和of all childs; complexity: log|v| ; 通常不是balanced tree, common words 在top, less common 在deeper(因为不common的，通常不用go that deep in the tree)
+$$ O_c$$ one hot vector, $$ E $$ embedde matrix, $$ e_c$$ embeded vector
+
+<span style="background-color: #FFFF00">**Problem with softmax classification**</span>: 
+- computationtal speed, every time need to calculate $$ \sum_{j=1}^{10,000} { e^{ \theta_j^T e_c  }  } $$ if use vocabulary size is 1 million, it gets really slow
+
+solution hierarchical softmax, [link](https://www.youtube.com/watch?v=B95LTf2rVWM)
+- 如下面图，有点像segment tree, tell you if target word in first 5000 or second 5000 vocabulary, then find if it in [0,2500), or [2500, 5000), then find the target node and calculate the probability without dividing sum over all words in vocabulary  每一个parent 记录所有的susoftmax的和of all childs; complexity: log|v| ; 
+- In practice, don't use perfectly balanced tree or symmetric tree, more common word on the top, less common on the bottom, 如下图右侧的图 
+   
 ![](/img/post/Deep_Learning-Sequence_Model_note/week2pic5.png)
 
-How to find context c: 如果我们random 选择from training corpus, 可能会选择很多the, a, of, and, to,但我们更想让model训练比如orange, durian这样的词 
+   
 
 
-**Negative Sampling**:
+How to choose <span style="background-color:#FFFF00">**context word**</span> c: 如果我们random sample from training corpus, 可能会选择很多the, a, of, and, to,但我们更想让model训练比如orange, durian这样的词 . In practice, <span style="background-color:#FFFF00">the **distribution** of words is not entirely uniform</span>. Instead, there are different heuristics that you could use in order to balance out something from common words together with less common words
 
 
-Given word: orange & juice. Is context - target pair?<br/>
-比如: I want a glass of orange juice to go along with my cereal. 
+#### Negative Sampling
+
+
+Create a new supervise learning problem. Given word: orange & juice. Is context - target pair?<br/>
+比如: I want a glass of orange juice to go along with my cereal.  Create sample of context and target word. first choose **context word**, then look around window to choose **target word**
 
 | Context | Target | target? |
-| ------:| -----------:| ------:|
+| ------| -----------| ------|
 |orange | juice | 1  |
 |orange | king | 0 |
 |orange | book | 0 |
 |orange | of | 0 |
 
-sample context and target word; <span style="color: red">Positive example</span> generated: look at context within windows (5 or 10 word around); <span style="color: red">Negative example: take the same context word. then pick a word randomly from dictionary </span>; 注意: 上面最后一个例子，"of" is zero even if we have "of"; <br/>
-<span style="background-color: #FFFF00">Generate training set</span>: 先generate positive example. 再生成k个negative examples, it is okay 如果生成的negative example 在context +-5，+-10 window出现; k = [5,20] for small dataset, k = [2,5] for large dataset
+sample context and target word; 
 
-**Model**: $$ \theta_t^{T} $$ one parameter theta for each target word, $$ e_c $$ for embedding vector. Instead of 10000 way softmax which is expensive to compute, <span style="background-color: #FFFF00">instead we have 10000 binary classification problem</span>
+- <span style="color: red">Positive example</span>: pick <span style="color:red">**context word**</span>  and look at context within windows (5 or 10 word around) to pick <span style="color:red">**target word**</span> then label as 1 
+- <span style="color: red">**Negative example**</span>: take <span style="color:red">the same context word</span>. then pick k words randomly from dictionary and have k negative trainingset and label as 0. 注意: 上面最后一个例子，"of" is chosen from dictinary for negative example even if we have "of" near orange(it's okay);
+- create supervise learning problem, <span style="color:red">x is context and word</span>, <span style="color:red">y as label</span>. Try to distinguish the <span style="color:red">**distribution** from chosen near context and chose from dictionary</span>
+- k = [5,20] for small dataset, k = [2,5] for large dataset
+
+**Model**: $$ \theta_t^{T} $$ one parameter vector theta for each possible target word, $$ e_c $$ for embedding vector. Instead of 10000 way softmax which is expensive to compute (given orange, predict 10000 all vocabulary), <span style="background-color: #FFFF00">instead we have 10000 binary classification problem. On every iteration, only train k+1 example</span> (1 positive example, k randomly negative example: given orange, predict juice + k negative example randomly from dictionary)
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week2pic6.png)
 
-Select examples: If you choose words 根据its frequence, 可能end up with the, of, and; use $$ P(W_i) =  \frac{ f \left(w_i \right)^{3/4} }{ \sum_{j=1}^{10,000} { f\left(w_i \right)^{3/4}  } } $$ 这个分布选取
+Select samples: If you choose words 根据its empirical frequence, 可能有很多词 如 the, of, and; use $$ P(W_i) =  \frac{ f \left(w_i \right)^{3/4} }{ \sum_{j=1}^{10,000} { f\left(w_i \right)^{3/4}  } } $$ 这个分布选取, $$f \left(w_i \right)$$ is frequency of each word in English text
 
 
 
-**GloVe**:
+#### GloVe
 
-$$X_{ij} $$ = times  i (target) appears in context of j (context)， i 在j的上下文出现多少次; 如果上下文是前后10个词的话,  也许得到symmetric relationship $$X_{ij} = X_{ji} $$; 当如果只选word before it, may not get symmetric relation ship
+Glove stands for global vector for word presentation
+
+$$X_{ij} $$ = the number of times  i (target) appears in context of j (context)， i 在j的上下文出现多少次; 如果上下文是前后10个词的话,  也许得到symmetric relationship $$X_{ij} = X_{ji} $$; 当如果只选word before it, may not get symmetric relationship
+
+Objective function: 
+
+$$minimize :  \sum_{i = 1}^{10,000} \sum_{j = 1}^{10,000} {f\left(X_{ij} \right) \left( \theta_i^T e_j + b_i + b_j - log X_{ij} \right)^2} $$
+
+- want to tell how related word i and j (target and content) 
+- $$f\left(X_{ij} \right)$$ is weighting term, 当 $$X_{ij} = 0 $$,$$f\left(X_{ij} \right) = 0$$ ,  避免 当 $$X_{ij} = 0$$时, $$log\left( 0\right)$$ undefined, 
+  - also, $$f\left(X_{ij} \right)$$ give more weight to less frequent word like durian, and give less weight for common word like this, is, of, a
+- the role of  $$b_i, b_j$$ from math are completely symmetric, 可以把他们两个value 对调, they actually end up the <span style="color:red">same optmization objective</span> 
+  - when you done the training, $$e_w^{final} = \frac{\left( e_w + \theta_w \right)} {2} $$
 
 Model:  use gradient descent to minimize below function; 为了避免log0 出现, 乘以weight term $$f\left(X_{ij}\right)$$; $$\theta_j$$ 和 $$e_j$$是symmetric的，可以reversed or 对调，会得到同样的目标函数， when do gradient descent, 所以可以取个平均值; <span style="background-color: #FFFF00">Initialize</span> both $$\theta_i$$ 和 $$ e_j $$ randomly uniformly at beginning 
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week2pic7.png)
 
-Aslo cannot 保证embeded vector是可以解释的,parallelogram for analogies still works
+<span style="color:red">Cannot 保证embeded vector是可以解释的(interruptable)</span>. The first feature might be combination of age, gender, and royal. parallelogram for analogies still works
 
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week2pic8.png)
