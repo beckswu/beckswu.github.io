@@ -410,51 +410,92 @@ Model:  use gradient descent to minimize below function; 为了避免log0 出现
 
 **Sentiment Classification**
 
-<span style="background-color: #FFFF00">Chanllenge: </span> not have a huge dataset
+<span style="background-color: #FFFF00">Chanllenge: </span> not have a huge dataset, 1 millon is not common, sometimes around 10000 words
 
-Simple Sentiment Classification Model: 用embedded vector which from large training set: so 不通常出现的word 也可以label 他们
+下面两个方法都用到embedding matrix, if embeding matrix is trained from large training set(e,g 1 million), it can learn feature for infrequent word even the word not in Sentiment classification training set (比如 durian not in Sentiment classification training dataset, but in embedding matrix dataset, 下面两种方法预测sentiment都可以 get right and generalize better result like durian)
 
+Method 1: Simple Sentiment Classification Model: <span style="color:red">
 
-1. use average of each words output: used for review that are short or long; <span style="background-color: #FFFF00">Problem: Ignore order </span>：比如: completely lacking good service an dgood ambience, 即使有两个good，也是1星review
-2. RNN for sentiment Classification:  <span style="background-color: #FFFF00">many-to-one architecture </span>
+1. use one hot vector, lookup embedding matrix then get embedded vector e.g$$e_{8928}$$
+2. then get all embedded word in a word, then take average or sum of all embedded vector as input layer, 
+   - because <span style="background-color: #FFFF00">take sum or average, it works for review sentences that short or long</span>
+3. Output layer is star value
 
+<span style="background-color: #FFFF00">**Problem: Ignore order** </span>：比如: completely lacking good taste, good service an good ambience, 即使有3个good，也是1星review. So if ignore the order, and sum or average, then end up having a lot of representation of good in final feature vector then classifer think it's a good review
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week2pic9.png)
+
+Method 2: RNN for sentiment Classification:  <span style="background-color: #FFFF00">many-to-one architecture </span> :  consider order
+
+1. use one hot vector, lookup embedding matrix then get embedded vector e.g$$e_{8928}$$, 
+2. then feed those embedded vector into RNN. 
+3. it can train to realize "lack of good" and "not good" is negative review
+
+
+
 ![](/img/post/Deep_Learning-Sequence_Model_note/week2pic10.png)
 
-**Debiasing Word Embeddings**
+#### Debiasing Word Embeddings
 
-比如消除性别的歧视， 比如 man: programmer as Woman: Homemaker; 比如 man: Doctor as Mother: Nurse; Word embeddings可以reflect gender, ethnicity ages... biases of text used to train to model; 
+- bias here not meaning bias or variance,<span style="color:red"> means the gender, ethnicity, sexual orientation bias</span>. 
+   - 比如 man: programmer as Woman: Homemaker; 比如 man: Doctor as Mother: Nurse; 
+- Word embeddings可以reflect gender, ethnicity ages... <span style="color:red"> biases of text used to train to model</span>.
+- we try to change learning algorithm to diminish as much as possible to eliminiate these types of undesirable biases
+
 
 Address bias: 
 
-1. Identiy bias direction； 比如用 embeded vector $$ e_{he} - e_{she}; e_{male} - e_{female} $$... averge them 得到bias direction(1 dimension), 垂直的bias direction是 non-bias direction(299 dimension)
-2. Neutralize: 对于不是definitional 的word (_definitional的是grandmother, grandfather, 不是definitional比如 doctor, babysitter_), project to get rid of bias, project them到non-bias direction; 对于如何选取什么word neutralized, author的看法；train a classifier to try to figure out 什么word是definitional 什么不是; 大多数英语单词都是non-definitional的
-3. Equalize pairs: 比如 grandfather vs grandmother, boy vs girl, 比如下图中 babysitter 的project的点距离grandmother比grandfather 更近, which is a bias; 所以移动grandfather 和 grandmother to pair points (到距离Non-bias direction的距离一样的点); 选取equalized pairs不会很多，可以hand-picked
+1. <span style="background-color:#FFFF00">**Identiy bias direction**</span>-
+   - 比如用 embeded vector $$ e_{he} - e_{she}; e_{male} - e_{female} $$... then averge them(In original paper, use Singular Value Decomposition instead of average) 
+   - average 得到<span style="color:red">**bias direction**</span>(1 dimension. In original paper, bias direction can be higher than 1 dimensional), 垂直的bias direction是 non-bias direction(299 dimension)
+2. <span style="background-color:#FFFF00">**Neutralization**</span>: 
+   - _definitional e.g gender is intrinsic in definition 的是grandmother, grandfather, 不是definitional比如 doctor, babysitter_
+   - 对于non-definitional 的word， <span style="color:red">**project** them to get rid of bias 到**non-bias direction**</span>; 
+   - 对于如何选取什么word neutralized,, e,g, doctor is not gender specific whereas grandfather / grandmother should not made non-gender specific. 再比如 Beard should be close to male not female  author的看法；train a classifier to try to figure out 什么word是definitional 什么不是; 大多数英语单词都是non-definitional的
+3. <span style="background-color:#FFFF00">**Equalize pairs**</span>: 
+   - 比如 grandfather vs grandmother, boy vs girl(only difference in embedding is gender), 比如下图中 babysitter 的project的点距离grandmother比grandfather 更近, which is a bias; 
+    - 所以移动grandfather 和 grandmother to <span style="color:red">pair points</span> (到距离Non-bias direction的距离一样的点); 
+    - 选取equalized pairs不会很多，可以hand-picked
 
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week2pic11.png)
 
 <br/><br/><br/>
 
+***
 
 ## Week3 Sequence Models & Attention Mechanism
 
-**Sequence to Sequence Model**
+#### Sequence to Sequence Model
 
-Machine translation: RNN先用<span style="color: red">encoder network</span> (input one word 每次), figure out some representation of sentence. 再output 一个 vector代表input sentence，用这个vector作为<span style="color: red">decode netork</span>的开始, 再用decode network 一个一个output 翻译的单词，  <span style="background-color: #FFFF00">difference from synthesizing novel text using language model: 不需要randomly choose translation, want the most likely translation. </span>
+Machine translation: 
+- RNN先用<span style="color: red">encoder network</span> can be GRU or LSTM input 需要被翻译的 one word each time, then RNN generates a vector than represents the input sentence. figure out some representation of sentence.\
+- Use generated vector in previous step 作为<span style="color: red">decode netork</span>的开始, 再用decode network 一个一个output 翻译的单词. Then at the end of sentence, decoder stops.  
+- <span style="background-color: #FFFF00">difference from synthesizing novel text using language model: 不需要randomly choose translation, want the most likely translation. </span>
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week3pic1.png)
 
-can think machine translation as building a conditional language model. Machine translation model的decode network 很接近language model. Encode network model the probability $$P \left( y ^{<{1}>}, y ^{<{2}>},\cdots,  y ^{<{T_x}>}\vert x ^{<{1}>}, \cdots \right)$$, output the probability of English Translation condition on some input French sentence
 
-<span style="background-color: #FFFF00"> Finding the most likely translation </span>: 不能用random sample output from $$y^{<{t-1}>}$$ to $$y^{<{t}>}$$, 有时候可能得到好的，有时候得到不好的翻译; instead: the goal should maximize the probability  $$P \left( y ^{<{1}>}, y ^{<{2}>},\cdots,  y^{<{T_x}>}\vert x \right)$$
+Machine Learning Model: 
+
+- difference between Language Model: it starts at encoded network to figure out representation of input sentences and take that input sentences and <span style="color:red">start the decoded network with that vector representation rather than representation of all zero</span>
+- can think machine translation as building a <span style="color:red">**conditional**</span> language model. Machine translation model的decode network 很接近language model. Encode network model the probability $$P \left( y ^{<{1}>}, y ^{<{2}>},\cdots,  y ^{<{T_x}>}\vert x ^{<{1}>}, \cdots \right)$$, output the probability of English Translation condition on some input French sentence
+
+Finding the most likely translation : 
+<span style="background-color: #FFFF00"> 不能用random sample output </span>from $$y^{<{t-1}>}$$ to $$y^{<{t}>}$$, 有时候可能得到好的，有时候得到不好的翻译; 
+
+The goal should maximize the probability  $$P \left( y ^{<{1}>}, y ^{<{2}>},\cdots,  y^{<{T_x}>}\vert x \right)$$
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week3pic2.png)
 
-**Why not Greedy Search** Greedy Search: 在pick 第一个word 后，选择概率最高的第二个单词，再选择概率最高的第三个单词，我们需要的是最大化joint probability $$ P \left( y ^{<{1}>}, y ^{<{2}>},\cdots,  y ^{<{T_x}>} \vert  x \right) $$, 这么选出的word组成的句子 不一定是接近最大的joint proability 的句子; 比如翻译的句子是 Jane is visiting Africa in September这个是perfect翻译, 但是greedy翻译出来的是 Jane is going to be visiting Africa in September. 因为Jane is goint 的概率大于Jane is visiting
+**Why not Greedy Search** 
 
-不能run 全部combination of words，算哪个概率最大， 比如有10000个词组成的字典，句子长度为10，总共有 $$10000^{10} $$种组合, 所以需要approximate search algorithm，可能不是总成功，不同 try to find sentences to maximize joint conditional probability.
+Greedy Search: 
+- after pick first word，选择概率最高的第二个单词，再选择概率最高的第三个单词
+- bc need to maximimize joint probability $$ P \left( y ^{<{1}>}, y ^{<{2}>},\cdots,  y ^{<{T_x}>} \vert  x \right) $$, 这么选出的word组成的句子 不一定是接近最大的joint proability 的句子;
+- 比如翻译的句子是 Jane is visiting Africa in September这个是perfect翻译, 但是greedy翻译出来的是 Jane is going to be visiting Africa in September. 因为Jane is goint 的概率大于Jane is visiting
+
+<span style="color: red">不能run 全部combination of words，算哪个概率最大</span>， 比如有10000个词组成的字典，句子长度为10，总共有 $$10000^{10} $$种组合, 所以需要approximate search algorithm，it won't always succeed，不同 try to find sentences to maximize joint conditional probability.
 
 
 #### Beam Search
@@ -463,38 +504,65 @@ can think machine translation as building a conditional language model. Machine 
 **Beam Search Algorithm**, <span style="background-color: #FFFF00"> B = beam width</span>: 不像greedy search 每次只考虑最大可能的一个词，beam search 会考虑最大可能的B个词； 注: 当B=1, 相当于greedy search
 
 Example： B = 3
-1. Step1: evulate $$ P\left(y^{<{1}>} \vert x\right) $$, 发现 in, jane, september是根据概率最的可能的三个词, keep [in, jane, september]
-2. Step2: evulate $$ P\left(y^{<{2}>} \vert y^{<{1}>}, x\right) $$, $$ P\left(y^{<{1}>},  y^{<{1}>} \vert x\right) = P\left(y^{<{1}>} \vert x\right) P\left(y^{<{2}>} \vert y^{<{1}>}, x\right) $$  比如字典有10000个词，考虑来自step1三个词作为开始，只用考虑10000*3个词, then pick top3; 比如发现算上第二词 最大可能性的三个词 [In september, jane is, jane visit] -> reject september 作为第一个词的可能
+1. Step1: using decoder network to evulate $$ P\left(y^{<{1}>} \vert x\right) $$, 发现 in, jane, september是根据概率最的可能的三个词, keep [in, jane, september]
+2. Step2:  using decoder network to  evulate $$ P\left(y^{<{2}>} \vert y^{<{1}>}, x\right) $$ given the $$ \hat y_{1}$$ from step 1 的 3 results , $$ P\left(y^{<{1}>},  y^{<{1}>} \vert x\right) = P\left(y^{<{1}>} \vert x\right) P\left(y^{<{2}>} \vert y^{<{1}>}, x\right) $$  
+   - 比如字典有10000个词，考虑来自step1三个词作为开始，只用考虑10000*3个词, then pick top3; 比如发现算上第二词 最大可能性的三个词 [In september, jane is, jane visit] -> reject september 作为第一个词的可能
+3. Step 3: decoder ends at the sentence e.g. Jane visits africa in september <EOS>
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week3pic3.png)
 
 
 **Length normalization**,
 
-可能$$ P\left(y^{<{t}>} \vert x, y^{<{1}>}, y^{<{2}>}, \cdots, y^{<{t-1}>}    \right) $$概率的乘积越来的越小，不好记录，与其记录乘积，也可记录sum of log, more stable to avoid overflow and numeric rounding error;  <span style="background-color: #FFFF00">problem: 可能prefer更短的句子, 因为probability都是小于1，句子越长概率乘积越小，同样log都是小于0，句子越长sum越小</span>, <span style="background-color: #FFFF00">Solution: normalize 概率，除以句子长度</span> $$ 1/{T_y^\alpha}$$, maybe $$\alpha$$ = 0.7, 当$$\alpha$$=1, complete normalize by length; 当$$\alpha$$=0, $$ 1/{T_y^\alpha} = 1/1$$: not normalized at all. 0.7是between full normalization and no normalization; <span style="color: red">同时alpha也可以作为hyperparameter 用来tune</span>
+Problem 1: 可能概率的乘积越来的越小, result in tiny number which can result in <span style="color: red">numerical **underflow**</span>, floating part representation maynot store accurately 
+
+$$P\left( y^{<1>} \vert x \right) P\left( y^{<2>} \mid x, y^{<1>} \right) ... P\left(y^{<{t}>} \vert x, y^{<{1}>}, y^{<{2}>}, \cdots, y^{<{t-1}>}    \right) $$
+
+Solution: In practice, instead of taking product, we <span style="color:red">take logs to get more stable numerica value less prone to rounding error</span>
+
+$$arg max_{y} \sum_{y=1}^{T_y} log P\left(y^{<{t}>} \vert x, y^{<{1}>}, y^{<{2}>}, \cdots, y^{<{t-1}>}    \right) $$
+
+Problem 2: <span style="color: red"> 可能prefer更短的句子, 因为probability都是小于1，句子越长概率乘积越小，同样log都是小于0，句子越长sum越小</span>
+
+Solution: <span style="background-color: #FFFF00">Solution: use **normalized** log likelihood objective function，除以句子长度</span>, reduce penalty of otput longer translation. 
+- maybe $$\alpha = 0.7$$, 表示 $$T_y$$ 的0.7 次方. 0.7是between full normalization and no normalization; 
+- 当$$\alpha$$=1, complete normalize by length; 
+- 当$$\alpha$$=0, $$ 1/{T_y^\alpha} = 1/1$$: not normalized at all.
+-  <span style="color: red">同时alpha也可以作为hyperparameter 用来tune</span>
+
+
+$$arg max_{y} \frac{1}{T_y^{\alpha}} \sum_{y=1}^{T_y} log P\left(y^{<{t}>} \vert x, y^{<{1}>}, y^{<{2}>}, \cdots, y^{<{t-1}>}    \right) $$
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week3pic4.png)
 
-比如beam = 3， 看所有top three possibilities of length 1, 2, ...,30 against 上面的normalized probability score, pick the one 有最高score的( <span style="background-color: #FFFF00">highest normalized log likelihood objective</span>) 作为final translation output
+Run Beam Research 
+
+- you find a lot of sentences ends up length of 1, 2, ..., 30. 比如beam = 3，
+- <span style="color: red">keep track of top 3 possibilies for each of these possible length</span> (比如lengths from 1:30 and beam = 3, 共90个选择), 
+- pick the one 有最高score的( <span style="background-color: #FFFF00">highest normalized log likelihood objective</span>) 作为final translation output
 
 How to choose Beam width B? 在实际中可能选择around 10;  100 consider be large; 1000, 3000是not common的, 用越来越大的B, it is diminishing returns; 比如gain很大 当beam从1->3->10, 但是gain不是很大了, 当beam 从1000->3000,
 - large B: pro: better result, con: slower
 - small B: pro: run faster,  con: worse result
 
-<span style="background-color: #FFFF00"> 不像BFS, DFS. Beam Search runs faster 但是不确保find exact maximum for 最大化 P(y\|x) </span>
+不像BFS, DFS. Beam Search runs faster 但是不确保find exact maximum for 最大化 P(y\|x) 
 
 **Beam Search Error Analysis**
 
 Example: <br/>
 Jane visite l'Afrique en septembre. <br/>
-Human 翻译: Jane visits Africa in September ($$y^{*}$$) <br/>
+Human 翻译: Jane visits Africa in September ($$y^{*}$$) **better** <br/>
 Algorithm 翻译: Jane visited Africa last September ($$\hat y$$)
+
+Is it RNN error or beam search error? Can get more data or incream beam width increase performance? Increasing beam width might not get the same result as you want
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week3pic6.png)
 
-用RNN 计算 $$P\left( y^{*} \vert x \right) $$, $$P\left( \hat y \vert x \right) $$
-1. Case 1:  $$P \left( y^{*} \vert x \right) $$ > $$P\left(\hat y \vert x \right)$$ : Beam choose $$\hat y$$, 但是 $$y^{*}$$ attains 更高的 P(y\|x); <span style="background-color: #FFFF00"> Beam search is at fault </span>
-2. Case 2: $$P\left( y^{*}\vert x \right) $$ <=  $$P\left(\hat y \vert x \right)$$:  $$y^{*}$$  better translation than $$\hat y$$, 但是 RNN预测相反, <span style="background-color: #FFFF00"> RNN is at fault </span>
+用RNN 计算 $$P\left( y^{*} \vert x \right) $$ (plugin human translation result into decoder to calculate ), $$P\left( \hat y \vert x \right) $$, 可以用length normilization 
+1. Case 1:  $$P \left( y^{*} \vert x \right) $$ > $$P\left(\hat y \vert x \right)$$ : Beam choose $$\hat y$$, 但是 $$y^{*}$$ attains 更高的 P(y\|x); <span style="background-color: #FFFF00"> Beam search is at fault </span> (beam search job: choose maximized probability )
+   - increase beam width
+2. Case 2: $$P\left( y^{*}\vert x \right) $$ <=  $$P\left(\hat y \vert x \right)$$:  $$y^{*}$$  better translation than $$\hat y$$, 但是 RNN预测相反, <span style="background-color: #FFFF00"> RNN (objection function) is at fault </span>
+   - add regulartion, get more training data, try different network architecture
 
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week3pic5.png)
@@ -503,23 +571,33 @@ Algorithm 翻译: Jane visited Africa last September ($$\hat y$$)
 
 #### Bleu Score
 
-given French sentence, 有几个英语翻译，how to measure? Bleu: Bilingual evalutation understudy
+- given French sentence, 有几个英语翻译，how to measure multiple equally good translation? Bleu: Bilingual evalutation understudy. 
+- <span style="background-color: #FFFF00"> **Bleu Score**</span>: If given machine generated translation, <span style="color: red">to compute a score that measures how good</span> is that machine tranlation
+    - if machine tranlation close to references provided by human -> High Score
+- human provided reference is part of dev/test set, to see if machine generated word appear at least once in human providede reference
+- is pretty good <span style="color: red">**single real number evaluation metric**</span>
+- In practice, few people implement from sratch, many ioeb source implementations
 
 French: Le chat est sur le tapis <br/>
 Reference 1: The cat is on the mat.<br/>
 Reference 2: There is a cat on the mat.<br/>
 MT output: the the the the the the the.<br/>
 
-**Precision**: each word either appear in reference 1 or reference 2 / total word.  MT = $$\frac{7}{7} = 1 $$  <span style="background-color: #FFFF00"> (not a particularly useful measure) </span><br/>
-**Modified Precision**: credit only up to maximum appearance in reference 1 or reference. 上面MT翻译中 the 在1中出现了2回, MT = $$\frac{2}{7} $$
+**Look At Isolated Words**
+
+**Precision**: each word either appear in reference 1 or reference 2 / total word.  MT = $$\frac{7}{7} = 1 $$  <span style="color: red"> (not a particularly useful measure) </span><br/>
+**Modified Precision**: credit only up to maximum appearance in reference 1 or reference. 上面MT翻译中 the 在1中出现了2回, MT = $$\frac{2}{7} $$, 分子是 (numerator): the maximum number of times the word "the" appears in reference 1 or 2 (the appear twice in reference 1) and max/clip count, 分母(denominator)是 the total count of number words in machine tranlated sentence
+
+**Look At Pairs Words**
 
 French: Le chat est sur le tapis <br/>
 Reference 1: The cat is on the mat.<br/>
 Reference 2: There is a cat on the mat.<br/>
 MT output: the cat the cat on the mat.<br/>
 
-**Bleu score on bigrams**: 两个两个词连在一起看有没有在reference 1 or 2中出现， 比如the cat, cat the, cat on...   MT $$ = \frac{4}{6} $$,
+**Bleu score on bigrams**: bigram 两个两个词连在一起看有没有在reference 1 or 2中出现， 比如the cat, cat the, cat on...   MT $$ = \frac{4}{6} $$, 三个连在一起叫 trigram
 
+**Count** column 指的是在 <span style="color: red">the number of appearance in machine translation</span>. **Count Clip** is <span style="color: red">the maximum number of appearance of the pair in reference 1 or reference 2 </span>
 
 | Context | Count | Count Clip |
 | ------:| -----------:| ------:|
@@ -529,14 +607,18 @@ MT output: the cat the cat on the mat.<br/>
 |on the | 1 | 1 |
 |the mat | 1 | 1 |
 
+Measure the degree how similar / overlap the machine translated sentences with human references
 
 | unigram | n-gram |
 | ------:| -----------:|
-|$$\displaystyle p_1 = \frac{ \sum_{unigram \in \hat y }^{} { Count_{clip} \left( unigram \right)} }{ \sum_{unigram \in \hat y }^{} { Count\left( unigram \right)} }  $$ | $$ \displaystyle p_n = \frac{ \sum_{unigram \in \hat y }^{} { Count_{clip} \left( n-gram \right)} }{ \sum_{unigram \in \hat y }^{} { Count\left( n-gram \right)} }  $$ |
+|$$\displaystyle p_1 = \frac{ \sum_{unigram \in \hat y }^{} { Count_{clip} \left( unigram \right)} }{ \sum_{unigram \in \hat y }^{} { Count\left( unigram \right)} }  $$ | $$ \displaystyle p_n = \frac{ \sum_{unigram \in \hat y }^{} { Count_{clip} \left( \text{n-gram} \right)} }{ \sum_{unigram \in \hat y }^{} { Count\left( { \text{n-gram} \right)} }  $$ |
 
  <span style="background-color: #FFFF00"> 如果机器翻译的跟reference 1 or reference 2完全一样, $$P_1$$ and $$P_n$$ 都等于1</span>
 
- BP: 表示brevity penalty: if output is short, 容易得到high precision; BP is adjustment factor 避免too short
+
+ Combined Blue score: $$BP \dot exp\left( \sum_{n=1}{4} \frac{1/4} {P_n} \right)$$, 比如we have $$P_1,P_2, P_3,P_4 $$
+ - BP: 表示brevity penalty: if output is short, 容易得到high precision Bleu Score; BP is adjustment factor 避免too short
+ 
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week3pic7.png)
 
