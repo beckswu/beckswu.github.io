@@ -341,7 +341,7 @@ $$ O_c$$ one hot vector, $$ E $$ embedde matrix, $$ e_c$$ embeded vector
 - computationtal speed, every time need to calculate $$ \sum_{j=1}^{10,000} { e^{ \theta_j^T e_c  }  } $$ if use vocabulary size is 1 million, it gets really slow
 
 solution hierarchical softmax, [link](https://www.youtube.com/watch?v=B95LTf2rVWM)
-- 如下面图，有点像segment tree, tell you if target word in first 5000 or second 5000 vocabulary, then find if it in [0,2500), or [2500, 5000), then find the target node and calculate the probability without dividing sum over all words in vocabulary  每一个parent 记录所有的susoftmax的和of all childs; complexity: log|v| ; 
+- 如下面图，有点像segment tree, tell you if target word in first 5000 or second 5000 vocabulary, then find if it in \[0,2500), or \[2500, 5000), then find the target node and calculate the probability without dividing sum over all words in vocabulary  每一个parent 记录所有的susoftmax的和of all childs; complexity: $$log \mid v\mid$$ ; 
 - In practice, don't use perfectly balanced tree or symmetric tree, more common word on the top, less common on the bottom, 如下图右侧的图 
    
 ![](/img/post/Deep_Learning-Sequence_Model_note/week2pic5.png)
