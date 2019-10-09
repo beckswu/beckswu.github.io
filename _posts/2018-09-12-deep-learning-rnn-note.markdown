@@ -651,11 +651,10 @@ E.g French translate to English
 - to generate $$y_{1}$$, have input <span style="color:red">**context C**</span> which depends on $$\alpha^{<{1,1}>}, \alpha^{<{1,2}>}, \alpha^{<{1,3}>}$$, these alpha parameter tell how much context depend on features or activation from different time steps
    - $$c = \sum{t'}^{} {\alpha^{<{t,t'}>}} a^{<{t'}>}$$ where $$a^{<{t'}>}$$ come from $$\left(\overrightarrow a^{<{t'}>}, \overleftarrow a^{<{t'}>} \right)$$
 - <span style="background-color: #FFFF00">$$\alpha^{<{t, t'}>}$$ is **amount of attention** $$y^{<{t}>}$$ should pay to $$a^{<{t'}>}$$</span>
-   - $$ \sum_{ t }^{} {\alpha^{<{1, t'}>}} = 1$$ all weights which used to generate 第一个的词的和等于1 (适用于每个词)
+   - $$ \displaystyle \sum_{ t }^{} {\alpha^{<{1, t'}>}} = 1$$ all weights which used to generate 第一个的词的和等于1 (适用于每个词)
    - $$\alpha^{<{t,t'}>} = \frac{ exp\left( e^{<{t,t'}>} \right) } { \sum_{t' = 1}^{T_x} { exp\left( e^{<{t,t'}>} \right) } }$$  is softmax, ensure the sum of all weight equal 1
-   - to compute $$e^{<{t,t'}>}$$, use small nerual network(通常只有一个hidden layer). input is $$s^{<{t-1}>}$$ hidden state from previous time step in above RNN,  $$a^{<{t'}>}$$ the feature from timestep $$t'$$
-- generate $$e^{<{t, t'}>}$$用smaller neural network(): input: feature from $$\alpha^{<{t'}>}$$  and $$s^{<{t-1}>}$$ is hidden state 来自上个rnn output, $$s^{<{t-1}>}$$也是现在rnn的input
-- <span style="background-color: #FFFF00">**Downside**</span>: take <span style="color: red"> **quadratic time**</span> to run this algorithm
+   - to compute $$e^{<{t,t'}>}$$, use small nerual network(通常只有一个hidden layer). input is $$s^{<{t-1}>}$$ hidden state from previous time step in above RNN,  $$a^{<{t'}>}$$ the feature from timestep $$t'$$. The intuition is to calculate attention for t from $$t'$$, it depends on the what is hiddden state activation from previous timestep and hidden stages RNN generating to look at French word feature
+- <span style="background-color: #FFFF00">**Downside**</span>: take <span style="color: red"> **quadratic time**</span> to run this algorithm. total number of attention parameter is $$T_x$$ x $$T_y$$
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week3pic10.png)
 
@@ -663,14 +662,31 @@ E.g French translate to English
 
 #### Speech recognition
 
+- Audio Clip: horizontal axis is time, y-axis is air pressure detectde by microphone. 
+- Because human doesn't process raw wave forms. Human ears measures the intensity of different frequency.
+- <span style="color: red">A common step to preprocess audio data is to run raw audio clip and generate a spectrogram</span>.  
+   - x-axis is time, y-axis is frequencies, intensify of different colors shows the amount of energy(how loud the sound, different frequecies at different time?)
+- need large dataset, academic dataset on speech recognition might be 3000 hrs. Best commerical system now train over 10000 hrs and somestiems over 100,000 hours of audio
 
-**CTC cost for speech recognition (CTC: connectionist temporal classification)** Rule: collapse repeated characters not separated by "blank"
+**Way to build Speech Recognition Model**
 
-In speech recognition, input time steps are much bigger than output time steps; 比如10 seconds audio, feature come at 100 hertz so 100 samples每秒; 10 seconds audio clip has 1000 inputs; \_ : called special character, \|\_\|: space character; 为了让 1000 inputs has 1000 output,生成words like 下面图片中, 但把output word ( ttt_h_eee \_ \_ \_ \|_\| \_ \_ \_ qqq \_ \_ ) collapse一起 (the q), end up much shorter output 文本
+Method 1: **Attention Model**
+
+Method 2: **CTC cost for speech recognition (CTC: connectionist temporal classification)** Rule: collapse repeated characters not separated by "blank"
+
+- In speech recognition, <span style="color: red"> input time steps are much bigger than output time steps</span>; 
+   - 比如10 seconds audio, feature come at 100 hertz so 100 samples每秒; 10 seconds audio clip has 1000 inputs, but output don't have 1000 outputs for 1000 characters; 
+- CTC cost function is to <span style="color: red">collapse repeated not separated by blank</span>. Then can have for example a thousand outputs by repeating characters to end up short transcrapt. 
+   - \_ : called special character, \|\_\|: space character; 
+   - e.g. ```the_h_eee___|_|___qqq__``` end up ```the|_|q```
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week3pic12.png)
 
-**Trigger Word Detection** 比如amazon echo; 用audio clip 计算spectrogram to generate features; to define target label y before trigger word as 0, after as 1
+**Trigger Word Detection** 
+
+- 比如amazon echo; 用audio clip 计算spectrogram to generate features; to define target label y before trigger word as 0, after as 1
+   - could work. not work well, because it creates <span style="color: red"> very imbalanced training set</span>, a lots of zero than 1
+   - Solution: instead of setting single timestep as 1, make it 1 for a fixed period of time before revert back to 0.
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week3pic13.png)
 
