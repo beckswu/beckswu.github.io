@@ -63,6 +63,16 @@ File in Linux system are arranged in **hierarchical directory structure**: organ
 
 ## 初始化 LS
 
+| 字符   |  Meaning |
+|:----------:|:-------------|
+|\* |	匹配 0 或多个字符 |
+| ? |	匹配任意一个字符 |
+| \[list] |	匹配 list 中的任意单一字符 |
+| \[^list] |	匹配 除list 中的任意单一字符以外的字符 |
+| \[c1-c2] |	匹配 c1-c2 中的任意单一字符 如：\[0-9] \[a-z] |
+| {string1,string2,...}	| 匹配 string1 或 string2 (或更多)其一字符串 |
+| {c1..c2} |	匹配 c1-c2 中全部字符 如{1..10} |
+
 
 ```shell
 按键	作用
@@ -300,6 +310,7 @@ touch f7.txt #建立一个新的txt, 名字是f7
 
 touch file1.txt #修改file1.txt的timestamp, 不修改内容，只修改了timestamp
 
+touch file{1..10}.txt #创建 file1.txt , file2.txt , ... ,file10.txt
 
 ```
 
