@@ -173,6 +173,7 @@ cat Hello World #会打印 echo Hello world
 #Ctrl D means the end of cat command 
 
 cat list1.txt #显示list1.txt 所有内容
+cat list1.txt | sort #显示list1.txt 根据每行sort 后的顺序打印
 cat list1.txt list2.txt #显示list1.txt 和list2.txt所有内容，先显示list1的再显示list2的
 
 cat -b list1.txt #把list1.txt的 不是blank的line(空行) 显示序号
@@ -404,7 +405,7 @@ kill process
 
 kill -flags pid # syntax
 
-piodf unity-control-center #lookup pid by name
+pidof unity-control-center #lookup pid by name
 
 kill 3286 # kill pid = 3286 process
 
