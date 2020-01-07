@@ -61,7 +61,13 @@ Command Line or Shell: aslo called **CLI(Command Line Interface)**
 
 File in Linux system are arranged in **hierarchical directory structure**: organized in a tree-like pattern
 
-## 初始化 LS
+## Linux  基础
+
+cat list1.txt #显示list1.txt 所有内容: ```group_name:password:GID:user_list```: 比如 ```sudo:x:27```, 密码一般不显示，用```x``` 代替. 如果用户的 GID 等于用户组的 GID，那么最后一个字段 user_list 就是空的
+
+
+
+
 
 | 字符   |  Meaning |
 |:----------:|:-------------|
@@ -446,9 +452,29 @@ echo -e 'some \text' #-e use escape,  \t -> tab,   print:  some     ext
 drwxr-xr-x 1 beckswu staff 22 Jul 23 18:56 file: d means directory <br/>
 -rw-rw-r- 1 beckswu staff 没有d 表示normal file, 如果开头是c, 表示character special file。如果是b，表示binary special file
 
-左面第一堆表示owner of file access, 第二堆表示group of file, 第三堆表示permission for everybody else, 1表示symbolic links of the file, 接下来表示owner of the file, next is the group of the file, 22 表示size of the file, July 23 18:56 date of created. file is the name of file
+1表示symbolic links of the file, 接下来表示owner of the file, next is the group of the file, 22 表示size of the file, July 23 18:56 date of created. file is the name of file
 
 symbolic link is a term for any file that contains a reference to another file or directory in the form of an absolute or relative path and that affects pathname resolution
+
+
+第一个字母表示文件类型:
+
+- **d**: 目录
+- **l**: 软连接。 硬链接不常用，软链接相当于windows 快捷方式
+- **b**: 块设备
+- **c**: character file 
+- **s**: socket
+- **p**: 管道
+- **-**: 普通文件
+
+接下来每三个字母或 '-' 是一组, 第一组表示owner access, 第二组表示owner 所属group access, 第三堆表示 everybody else（其他用户）的access, 
+
+- **r** : reading access
+- **w** : writing access
+- **x** : executing access. 执行权限像windows exe 
+
+不过 Linux 上不是通过文件后缀名来区分文件的类型。你需要注意的一点是，一个目录同时具有读权限和执行权限才可以打开并查看内部文件，而一个目录要有写权限才允许在其中创建其它文件，这是因为目录文件实际保存着该目录里面的文件的列表等信息。
+
 
 
 ```shell
@@ -552,7 +578,7 @@ whatis grep #short description, to know what is grep command
 
 
 
-## useradd
+## useradd /adduser
 
 create user
 
@@ -586,6 +612,8 @@ sudo userdel mark #delete user mark (username, password, data), not delete home 
 sudo userdel -r mark #delete user (home directory, username, password, data)
 
 sudo -r /home/mark/  #remove all the data from user
+#或者用
+sudo  deluser mark --remove-home
 
 ```
 ![](/img/post/linux/userdel.png)
