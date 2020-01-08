@@ -137,6 +137,18 @@ ls -R #显示每个子文件夹都包含什么文件
 man ls #显示所有ls 的function, 按Q退出
 
 ```
+
+> FHS（英文：Filesystem Hierarchy Standard 中文：文件系统层次结构标准），多数 Linux 版本采用这种文件组织形式，FHS 定义了系统中每个区域的用途、所需要的最小构成的文件和目录同时还给出了例外处理与矛盾处理。
+
+>  FHS 定义了两层规范，第一层是， / 下面的各个目录应该要放什么文件数据，例如 /etc 应该放置设置文件，/bin 与 /sbin 则应该放置可执行文件等等。
+第二层则是针对 /usr 及 /var 这两个目录的子目录来定义。例如 /var/log 放置系统日志文件，/usr/share 放置共享数据等等。
+
+![](/img/post/linux/FHS2.png)
+
+
+![](/img/post/linux/FHS.png)
+
+
 ## who 
 
 who 显示terminal 信息
@@ -168,11 +180,15 @@ cd 'My Books' #功能与上面一样
 
 
 
-## cat
+## cat ／ tac
+
 
 cat: 1. Display Txt 2. combine Txt file 3. Create new Txt file
 
+tac:  为倒序显示
 syntax: cat options file1 file2 ... 
+
+
 
 ```shell
 cat Hello World #会打印 echo Hello world
@@ -183,6 +199,8 @@ cat list1.txt | sort #显示list1.txt 根据每行sort 后的顺序打印
 cat list1.txt list2.txt #显示list1.txt 和list2.txt所有内容，先显示list1的再显示list2的
 
 cat -b list1.txt #把list1.txt的 不是blank的line(空行) 显示序号
+
+#-n 显示行数
 cat -n list1.txt #把list1.txt的 所有行(空行或者不空行) 都显示序号
 cat -s list1.txt #squeeze 连续 blank line to one blank line
 
@@ -234,6 +252,8 @@ rmdir -p a/b/c/d/e #remove 所有directory structure，
 rm -rv a/b #并显示(verb)remove的进程
 rm -rv a #与上面一行作用是一样的,
 
+rm -f file #强制删除文件
+
 ```
 
 
@@ -266,7 +286,7 @@ cp -vR dir1 dir3 #显示详细的copy 哪些文件
 ![](/img/post/linux/pic1.png)
 
 
-## mv
+## mv ／ rename
 
 mv: rename, move
 
@@ -292,6 +312,17 @@ mv dir2 dir3 #dir2中的内容移动到dir3中，所以dir3中只含有dir1，di
 mv -v file3.txt dir3 #V, verb, 显示具体怎么移动的
 ```
 
+如果想实现批量重命名, mv 就不行了, 不过它要用 perl 正则表达式来作为参数
+
+```shell
+touch file{1..5}.txt #批量创建5个文件
+
+# 批量将这 5 个后缀为 .txt 的文本文件重命名为以 .c 为后缀的文件:
+rename 's/\.txt/\.c/' *.txt
+
+# 批量将这 5 个文件，文件名和后缀改为大写:
+rename 'y/a-z/A-Z/' *.c
+```
 
 ## less
 
