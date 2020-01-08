@@ -475,7 +475,7 @@ symbolic link is a term for any file that contains a reference to another file o
 
 不过 Linux 上不是通过文件后缀名来区分文件的类型。你需要注意的一点是，一个目录同时具有读权限和执行权限才可以打开并查看内部文件，而一个目录要有写权限才允许在其中创建其它文件，这是因为目录文件实际保存着该目录里面的文件的列表等信息。
 
-
+<span style="color:red">**g, o, u 分别表示 group, others 和 user** </span>
 
 ```shell
 
@@ -494,7 +494,19 @@ chmod u+rw, g=rw, o+r file #给user add read write, 给group read, write permiss
 
 ```
 
+二进制数字：
+rwx ->  1\*2\*\*2 +1\*2\*\*1 + 1\*2\*\*0 = 7 
 
+```shell
+chmod 600 file #表示给owner 6 ( r, w), group 0, other user 0 
+```
+
+
+change file ownership 
+
+```shell
+sudo chown becks iphone6 #如果iphone6 不属于becks, 可以改变ownership
+```
 
 ## Directory Permission
 
@@ -599,7 +611,8 @@ sudo passwd mark  #change password for user
 
 ```
 
-
+adduser 和 useradd 的区别是什么？
+答：useradd 只创建用户，创建完了用 当前用户的passwd 去设置新用户的密码。adduser 会创建用户，创建目录，创建密码（提示你设置），做这一系列的操作。其实 useradd、userdel 这类操作更像是一种命令，执行完了就返回。而 adduser 更像是一种程序，需要你输入、确定等一系列操作。
 
 ## userdel
 
