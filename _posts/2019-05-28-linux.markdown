@@ -487,6 +487,15 @@ echo "the value of x is $x" #print the value of x is 10
 echo -e 'some \text' #-e use escape,  \t -> tab,   print:  some     ext
 
 ```
+## file 
+
+file 命令查看文件的类型
+
+```shell
+file /bin/ls
+file file.txt
+```
+
 
 
 ## find
