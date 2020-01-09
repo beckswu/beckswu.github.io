@@ -180,7 +180,7 @@ cd 'My Books' #功能与上面一样
 
 
 
-## cat ／ tac
+## cat ／ tac 
 
 
 cat: 1. Display Txt 2. combine Txt file 3. Create new Txt file
@@ -218,7 +218,20 @@ cat list1.txt >> list2.txt #修改上面一行的error，append list1.txt 到lis
 ```
 
 
+## nl
 
+- ```-b``` : 指定添加行号的方式，主要有两种：
+   - ```-b a```:表示无论是否为空行，同样列出行号("cat -n"就是这种方式)
+   - ```-b t```:只列出非空行的编号并列出（默认为这种方式）
+- ```-n``` : 设置行号的样式，主要有三种：
+    ```-n ln```:在行号字段最左端显示
+    ```-n rn```:在行号字段最右边显示，且不加 0
+    ```-n rz```:在行号字段最右边显示，且加 0
+- ```-w``` : 行号字段占用的位数(默认为 6 位)
+
+```shell
+nl -b a file # 是否空行都列出行号
+```
 
 ## mkdir
 
@@ -344,6 +357,13 @@ less big.txt   #only show the starting point of the file, 然后用键盘的↓�
 
 ```
 
+```shell
+more file
+#Enter 向下滚动一行
+#Space 向下滚动一屏
+#h     帮助
+#q     退出
+```
 
 
 ## touch
@@ -750,10 +770,10 @@ watch -n 0,5 free -m #让free -m command run every 0.5 second
 
 ![](/img/post/linux/watch.png)
 
-## head tail
+## head .tail
 
 Head: output the first part of the file 
-Tail: output the last part of the file
+Tail: output the last part of the file, ```-f``` 不停的读取某个文件并显示
 
 
 ```shell
