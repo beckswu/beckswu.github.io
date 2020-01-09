@@ -149,18 +149,7 @@ man ls #显示所有ls 的function, 按Q退出
 ![](/img/post/linux/FHS.png)
 
 
-## who 
 
-who 显示terminal 信息
-
-| 参数   |  Meaning |
-|:----------:|:-------------|
-| -a |	打印全部 terminal 打开信息，比如 伪终端名称，打开时间. 比如打开了两个terminal, 会显示两行  |
-| -d |	打印死掉的进程 |
-| -m |	同who am i, 显示当前终端打开的信息 |
-| -q |	打印当前所有打开的 terminal 用户数及用户名 |
-| -u |	打印当前所有打开的 terminal 登录用户登录详细信息, 类似 -a |
-| -r |	打印运行等级 ||
 
 ## cd
 
@@ -179,6 +168,99 @@ cd 'My Books' #功能与上面一样
 ```
 
 
+## apt-get
+
+apt-get(urbantu): install, uninstall, update packages. apt: advance packaging tool
+
+对于centos: 用yum, dnf instead of apt-get 
+
+```shell
+
+sudo apt-get update #resync your local package file to the server package file, update all the packages
+
+java -version #check if java installed, and if so check version
+php5 -version #check if php installed, 如果没有install 会给出install的hint
+
+sudo apt-get install php5 #安装首先what is required extra dependency to install php5, 也会显示多少space required to install
+php5 -v #显示php5 version
+
+sudo apt-get remove php5 #remove php5
+sudo apt-get remove --purge php5 #remove all configuration file related to php5
+sudo apt-get autoremove  #auto remove the dependency which required for the package(php5) and no longer needed for other packages
+
+
+
+```
+
+
+## bashrc
+
+bashrc is a script executed whenever a new terminal session start in interactive mode
+
+some linux system， .bashrc file exist when a new terminal session start. Some not
+
+Bashrc file is used for setting up environment variable such as Java. When use git, which repo you checked or cloned, use Bashrc
+
+```shell
+
+ls -a #在home directory ls -a 可以看见有.bashrc
+
+nano .bashrc #查看.bashrc
+gedit .bashrc #查看 .bashrc
+
+```
+
+可以修改 .bashrc file 比如加上alias ls='ls --color=auto -l', 之后open new terminal, 输入ls, 显示long list of ls 
+
+![](/img/post/linux/bashrc.png)
+
+
+![](/img/post/linux/bashrc2.png)
+
+
+
+
+## Bash Script
+
+Script: txt file contain sequence of command
+
+```shell
+
+nano myscript.sh #open editor 
+
+#! /bin/bash  #需要contain location of bash
+which bash #会告诉哪里有bash，give location 
+
+./myscript.sh #./ 是去run bash script
+#显示permission denied 因为file created not have execute permission 
+
+#先给permission 
+chmod +x myscript.sh #give permission for all groups
+./myscript.sh #显示会成功
+
+
+```
+
+![](/img/post/linux/pic8.png)
+
+![](/img/post/linux/bash.png)
+
+
+
+
+## cal
+
+show conventially formatted calendar on your command line
+
+```shell
+
+cal #显示calendar, weekday on the top
+ncal  #显示calendar, weekday on the left 
+cal 2016 #显示2016的calendar
+cal 2 2016 #显示2016年 2月 calendar
+cal -3 #give you current month, previous month and next month calendar
+#default 是 -1, 比如cal, 等于cal -1
+```
 
 ## cat ／ tac 
 
@@ -218,287 +300,7 @@ cat list1.txt >> list2.txt #修改上面一行的error，append list1.txt 到lis
 ```
 
 
-## nl
-
-- ```-b``` : 指定添加行号的方式，主要有两种：
-   - ```-b a```:表示无论是否为空行，同样列出行号("cat -n"就是这种方式)
-   - ```-b t```:只列出非空行的编号并列出（默认为这种方式）
-- ```-n``` : 设置行号的样式，主要有三种：
-    ```-n ln```:在行号字段最左端显示
-    ```-n rn```:在行号字段最右边显示，且不加 0
-    ```-n rz```:在行号字段最右边显示，且加 0
-- ```-w``` : 行号字段占用的位数(默认为 6 位)
-
-```shell
-nl -b a file # 是否空行都列出行号
-```
-
-## mkdir
-
-```shell
-mkdir image #生成image directory
-mkdir image/pic #生成pic directory inside image directory
-mkdir names/mark #当names 不在当前文件夹下，显示error, No such file or directory
-mkdir -p names/mark (mkdir --parents names/mark ) #-p means -- parents, 比如当names 不存在的时候，这样可以建立, 如果不加p, 会报错
-#-p is the same as --parents
-
-mkdir -p names/{john,tom,bob}  #creat several directory inside current directory, 建立三个文件夹,john, tom,bob
-# {john,tom,bob} 不能有空格，否则建立的文件夹是 {john,
-
-
-```
-
-
-
-## rm & rmdir
-
-**rmdir**: remove directory, **rm**: rmove file and directory
-
-```shell
-
-rmdir abc # remove abc的folder
-rmdir a/b/c/d/e #只remove 最后e的directory
-rmdir -p a/b/c/d/e  #remove 所有的directory structure
-rmdir -p a/b/c/d/e #remove 所有directory structure，
-#如果a/b/c/d/e 每个并不是空的文件夹，会显示error, failed to remove directory a/b: Directory not empty
-
-rm -rv a/b #并显示(verb)remove的进程
-rm -rv a #与上面一行作用是一样的,
-
-rm -f file #强制删除文件
-
-```
-
-
-## cp
-
-CP: copy and paste
-
-```shell
-
-cp options source destination
-
-cp file1.txt file2.txt #if file2.txt not exist will creat file2.txt. Content from file1 will copy to file2 
-
-cp file1.txt dir1 # 把file1.txt copy 到directory 1
-
-cp file1.txt file2.txt dir1 # 把file1.txt 和file2.txt copy 到directory 1
-
-cp -i  file1.txt file2.txt dir1 #如果directory 1 里面有file1.txt -i 会ask 是否要overwrite, 选n, 就会只copy file2 不会copy file1
-
-cp ../f1.txt ../f2.txt . #从parent directory copy f1.txt和f2.txt 到现在directory, 因为没有-i, 会overwrite
-
-cp dir1 dir3 # error， 因为dir1 有文件，不能被copy
-cp -R dir1 dir3 # -R means recursive copy,copy everything from dir1 to dir3
-#whenever destination (dir3) doesn't exist, it create destination and copy all content from source
-#如果存在destination, 只copy paste
-cp -vR dir1 dir3 #显示详细的copy 哪些文件
-
-
-```
-![](/img/post/linux/pic1.png)
-
-
-## mv ／ rename
-
-mv: rename, move
-
-```shell
-
-mv options source dest
-
-mv f1.txt f2.txt #rename f1.txt 成f2.txt 
-
-mv f1.txt dir1/ #把f1.txt 移动到dir1
-#如果dir1 中有f1.txt, move 会overwrite 原有的file 内容
-
-mv -i f1.txt dir1 #move f1.txt 到dir1 folder中, 如果要overwrite 会问
-mv -i f1.txt dir1/ #与上面一样的
-
-mv dir1 dir2 #把dir1 移动到dir2 中, content 也会move,  不用-R
-#dir1就现在文件夹下不存在了,dir1 在dir2中
-
-#tricky，如果当dir3 不存在
-mv dir2 dir3 #dir2中的内容移动到dir3中，所以dir3中只含有dir1，dir2也消失了
-#如果dir3 也存在，那么dir3 中有dir2, dir2中有dir1 
-
-mv -v file3.txt dir3 #V, verb, 显示具体怎么移动的
-```
-
-如果想实现批量重命名, mv 就不行了, 不过它要用 perl 正则表达式来作为参数
-
-```shell
-touch file{1..5}.txt #批量创建5个文件
-
-# 批量将这 5 个后缀为 .txt 的文本文件重命名为以 .c 为后缀的文件:
-rename 's/\.txt/\.c/' *.txt
-
-# 批量将这 5 个文件，文件名和后缀改为大写:
-rename 'y/a-z/A-Z/' *.c
-```
-
-## less
-
-read file and search pattern in the file, 比如用cat print整个文件，当文件很大，当print完成，不能显示文件开头，用less，可以看
-
-```shell
-
-less big.txt   #only show the starting point of the file, 然后用键盘的↓，enter show one more row below at one time
-#用键盘的↑，enter show one row above at one time
-#键盘的space show page by page below
-#键盘的shift+B show page by page above
-#键盘的shift+G to the end of file
-#键盘先1 + G or g (without shift) to go to the begining of the file
-#想找文件从上到下，比如找book, type  /book + enter, 找next, type n
-#想找文件从下到上，比如找book, type ?book + enter, 找上一个，type n
-#想退出less command, press q
-
-
-
-```
-
-```shell
-more file
-#Enter 向下滚动一行
-#Space 向下滚动一屏
-#h     帮助
-#q     退出
-```
-
-
-## touch
-
-Touch is the easist way to create new empty file in Linux. It is also used for changing timestamp on existing file or directory 
-
-<span style="background-color: #FFFF00">you cannot create new directory using touch, can only create empty file</span>
-
-```shell
-
-touch file6 #建一个新的empty file6
-touch f7.txt #建立一个新的txt, 名字是f7
-
-touch file1.txt #修改file1.txt的timestamp, 不修改内容，只修改了timestamp
-
-touch file{1..10}.txt #创建 file1.txt , file2.txt , ... ,file10.txt
-
-```
-
-![](/img/post/linux/pic2.png)
-
-
-
-## nano
-
-nano is a small and friendly text editor, besides it has interactive search, replace, go to line, and indentation 
-
-```shell
-nano file.txt #open txt editor, file open but not show has been created, 因为还没有save
-
-#press ctrl + o, -> means write out
-#press ctrl + x  -> quit the file
-#press ctrl + k -> cut
-#press ctrl + u -> paste
-
-nao abc.cpp #会有color, code highlighting, 不光是cpp, 也可以是Java,c 
-
-
-
-```
-
-
-![](/img/post/linux/pic3.png)
-
-![](/img/post/linux/pic4.png)
-
-
-## sudo
-
-sudo: superuser do: allow you some priviledge as adminstrator or a power user
-
-有时候比如mkdir dir, show permission denied error, 用sudo tell linux command to execute as administrator
-
-比如install G++, GCC, will ask user priviledge 
-
-```shell
-
-sudo mkdir dir #需要provide password, run as administrator 
-
-sudo apt-get install g++ # apt-get install : install software
-
-sudo -s #change priviledge from local user to root 
-
-```
-
-
-
-
-
-## top
-
-top: provide you dynamic real time view of running system. Used to see which program take more of your CPU and which program consuming more of your memory
-
-```shell
-top #give you view of system, it refreshing every second
-s # can update time, 输入1 refresh every 1 second
-i # to filter idle process
-k # 把鼠标选中PID, press k, kill process
-q # quit the top view
-
-```
-
-PID: process ID, 同一个程序不同时候run pid 可能不一样的 <br/>
-
-![](/img/post/linux/pic5.png)
-
-
-
-
-
-## kill
-
-kill process
-
-```shell
-
-kill -flags pid # syntax
-
-pidof unity-control-center #lookup pid by name
-
-kill 3286 # kill pid = 3286 process
-
-kill -KILL 3294 #force to kill process
-
-kill -9 3294 # force to kill  process (flag -9)
-
-ps -ux  #find pid; give a long list of running process (current user)
-ps -aux #find pid; give a long list of all running process (all users)
-ps -U  Becks #give all process under User Becks
-ps -C gnome-terminal #give all process related to program gnome-terminal, 可能连着多个instances
-```
-
-
-
-## echo
-
-used for bash scripting to print 
-
-```shell
-
-echo hello world # 在terminal 打印出hello world
-echo "hello world" #与上面一样, better use "" for echo
-
-myvar="Mark" #myvar= 不能有空格, assign variable
-echo $myvar #print variable
-
-x=10
-echo "the value of x is $x" #print the value of x is 10
-
-echo -e 'some \text' #-e use escape,  \t -> tab,   print:  some     ext
-
-```
-
-
-## File Permissions, chmod
+## chmod, File Permissions
 
 drwxr-xr-x 1 beckswu staff 22 Jul 23 18:56 file: d means directory <br/>
 -rw-rw-r- 1 beckswu staff 没有d 表示normal file, 如果开头是c, 表示character special file。如果是b，表示binary special file
@@ -545,12 +347,23 @@ chmod u+rw, g=rw, o+r file #给user add read write, 给group read, write permiss
 
 ```
 
-二进制数字：
+**二进制数字**:
+
 rwx ->  1\*2\*\*2 +1\*2\*\*1 + 1\*2\*\*0 = 7 
+
 
 ```shell
 chmod 600 file #表示给owner 6 ( r, w), group 0, other user 0 
+
+chmod 755 file.txt #give user read, write execute(7), give both group and othe group read and execute access
 ```
+
+Octal & Numerical Permissions
+
+![](/img/post/linux/pic6.png)
+
+![](/img/post/linux/pic7.png)
+
 
 
 change file ownership 
@@ -558,6 +371,63 @@ change file ownership
 ```shell
 sudo chown becks iphone6 #如果iphone6 不属于becks, 可以改变ownership
 ```
+
+
+## cp
+
+CP: copy and paste
+
+```shell
+
+cp options source destination
+
+cp file1.txt file2.txt #if file2.txt not exist will creat file2.txt. Content from file1 will copy to file2 
+
+cp file1.txt dir1 # 把file1.txt copy 到directory 1
+
+cp file1.txt file2.txt dir1 # 把file1.txt 和file2.txt copy 到directory 1
+
+cp -i  file1.txt file2.txt dir1 #如果directory 1 里面有file1.txt -i 会ask 是否要overwrite, 选n, 就会只copy file2 不会copy file1
+
+cp ../f1.txt ../f2.txt . #从parent directory copy f1.txt和f2.txt 到现在directory, 因为没有-i, 会overwrite
+
+cp dir1 dir3 # error， 因为dir1 有文件，不能被copy
+cp -R dir1 dir3 # -R means recursive copy,copy everything from dir1 to dir3
+#whenever destination (dir3) doesn't exist, it create destination and copy all content from source
+#如果存在destination, 只copy paste
+cp -vR dir1 dir3 #显示详细的copy 哪些文件
+
+
+```
+![](/img/post/linux/pic1.png)
+
+
+
+## date
+
+used to print out and change system date and time information
+
+```shell
+
+date #print 现在系统的时间
+
+date -s "11/20/2003 12:48:00" #设置system time 为 11/20/2003 12:48:00
+
+date +%d%h%y #显示13Jan17
+
+date +%d/%h/%y #显示13-Jan-17
+
+man date #可以显示详细的date format的格式
+
+
+date "+Date: %m/%d/y%n" #显示01/13/17 %n 是空行线
+
+
+
+```
+设置时间格式
+![](/img/post/linux/date.png)
+
 
 ## Directory Permission
 
@@ -576,51 +446,499 @@ chmod u-x dir #remove execute access from user
 
 ```
 
+## du, df, free
 
-## Octal & Numerical Permissions
+View Resources
 
-![](/img/post/linux/pic6.png)
 
-![](/img/post/linux/pic7.png)
 
-比如你想给user access read write and x, you need to give number as 7(binary start from right to left for each group)
+
+```shell
+df #the amount of disk space being used by your file system
+df -h #the human readable output, 显示多少G, M, k
+
+du #estimate and display the disk space used by files in details
+du -h #human readable format
+du -sh #-s summary 只给你现在所在directory 文件所占的大小
+sudo du -sh #用sudo 原因是因为可能有的file permission denied 需要用sudo 
+du -sh /etc/ #show summary used space by etc folder
+
+free #display the total amount free and used physical and swap memory in the system as well as buffer in the kernel
+free -b  #-b btye, -k KB, -m MB, -G GB, -T TB
+
+```
+
+
+## echo
+
+used for bash scripting to print 
 
 ```shell
 
-chmod 755 file.txt #give user read, write execute(7), give both group and othe group read and execute access
+echo hello world # 在terminal 打印出hello world
+echo "hello world" #与上面一样, better use "" for echo
+
+myvar="Mark" #myvar= 不能有空格, assign variable
+echo $myvar #print variable
+
+x=10
+echo "the value of x is $x" #print the value of x is 10
+
+echo -e 'some \text' #-e use escape,  \t -> tab,   print:  some     ext
+
+```
+
+
+## find
+
+
+
+```shell
+
+find location -name file_name #syntax
+
+find /home/ -name test.sh #-name search by name, return directory 
+find /home/dir1 -name test.* #search in /home/dir1 folder by name, any file start with test. 可以是.txt, .sh
+find /home/dir1 -name *.txt #search any file extension is txt
+find / -name dmesg #search in the root directory, 也许有permission error 因为有些directory 不允许access
+sudo find / -name dmesg 
+
+find /home  -mtime -1  #look at the file created 1 days before, 也可以用加号，+1, + 2
+
+
+```
+
+## grep
+
+grep: global regular expression print. can be used to search pattern / word in a text file or a number of text file with grep command
+
+```shell
+
+#
+man tar > file.txt 
+
+grep "options" file.txt #keyword I want to search and file name, 
+#grep 是case sensitive的, 上面的search options 不会search Options,
+
+grep -i "options" file.txt #make search not case sensitive, 也会search Options
+
+grep -n "options" file.txt #在file 中search并显示file.txt的options, 并显示在哪行
+
+grep -n "Some options" file.txt #在file 中search并显示Some options
+
+
+#used in multiple files
+grep -n "Some options" f1.txt, f2.txt f3.txt f4.txt #在多个file 中search并显示Some options
+grep -n "Some options" * #在现在folder中的所有file search并显示Some options 的行
+
+grep -nv "Some options" f1.txt #显示f1.txt 不包含Some options的行
+
+grep -help #显示有的flag, options 用grep command
+
+```
+![](/img/post/linux/grep.png)
+
+
+## groups, groupadd, groupdel
+
+group show which group is currently user connected to
+
+```shell
+groups #show which group is currently user connected to
+
+cat /etc/group #show all the group in your system,  group <-> user connected to 
+
+sudo groupadd Java #add newgroup in system
+sudo groupdel Java #delete existing group
+
+#-a add user to group, -d remove user from group
+sudo gpasswd -a mark Java # add mark to the Java group
+sudo gpasswd -d mark Java #remove user from Group
+
+
+```
+
+
+## head .tail
+
+Head: output the first part of the file 
+Tail: output the last part of the file, ```-f``` 不停的读取某个文件并显示
+
+
+```shell
+head log.txt #show first 10 line of file 
+tail log.txt #show last 10 line of file 
+
+
+head -n3 log.txt #show first 3 lines of file
+head -3 log.txt #跟上面一样
+
+tail -n3 log.txt #show last 3 lines of file
+tail -3 log.txt #跟上面一样
+
+tail -f log.txt #output last 10 lines of file. watch the file, whenever file change, will show last 10 lines of code
+ctrl + C #exit 
+head  log.txt kern.log #先print 10 lines of log.txt 再print 10 lines of kern.log
+
+head -3 log.txt kern.log #先print 3 lines of log.txt 再print 3 lines of kern.log
+
 
 ```
 
 
 
 
+## ifconfig
 
-## Bash Script
+ifconfig: interface configuration: used to view and change network interface configuration on your system
 
-Script: txt file contain sequence of command
+```shell
+ifconfig #show you some output
+
+ifconfig eth0 #only show eth0 interface
+
+#up, down to disable internet connection 
+sudo ifconfig eth0 down #internet connection will be down
+
+sudo ifconfig eth0 up #enable internet 
+
+```
+
+ethO: wired internet cable  <br/>
+WLAN0: wireless internet connection <br/>
+0: is the first internet interface. 如果有multiple internet interface, 显示eth1, or WLAN2
+l0: loop back interface. An interface that system use to communcate to excel
+
+
+## kill
+
+kill process
 
 ```shell
 
-nano myscript.sh #open editor 
+kill -flags pid # syntax
 
-#! /bin/bash  #需要contain location of bash
-which bash #会告诉哪里有bash，give location 
+pidof unity-control-center #lookup pid by name
 
-./myscript.sh #./ 是去run bash script
-#显示permission denied 因为file created not have execute permission 
+kill 3286 # kill pid = 3286 process
 
-#先给permission 
-chmod +x myscript.sh #give permission for all groups
-./myscript.sh #显示会成功
+kill -KILL 3294 #force to kill process
+
+kill -9 3294 # force to kill  process (flag -9)
+
+ps -ux  #find pid; give a long list of running process (current user)
+ps -aux #find pid; give a long list of all running process (all users)
+ps -U  Becks #give all process under User Becks
+ps -C gnome-terminal #give all process related to program gnome-terminal, 可能连着多个instances
+```
+
+
+## less
+
+read file and search pattern in the file, 比如用cat print整个文件，当文件很大，当print完成，不能显示文件开头，用less，可以看
+
+```shell
+
+less big.txt   #only show the starting point of the file, 然后用键盘的↓，enter show one more row below at one time
+#用键盘的↑，enter show one row above at one time
+#键盘的space show page by page below
+#键盘的shift+B show page by page above
+#键盘的shift+G to the end of file
+#键盘先1 + G or g (without shift) to go to the begining of the file
+#想找文件从上到下，比如找book, type  /book + enter, 找next, type n
+#想找文件从下到上，比如找book, type ?book + enter, 找上一个，type n
+#想退出less command, press q
+
 
 
 ```
 
-![](/img/post/linux/pic8.png)
+```shell
+more file
+#Enter 向下滚动一行
+#Space 向下滚动一屏
+#h     帮助
+#q     退出
+```
 
-![](/img/post/linux/bash.png)
 
 
+
+
+## mkdir
+
+```shell
+mkdir image #生成image directory
+mkdir image/pic #生成pic directory inside image directory
+mkdir names/mark #当names 不在当前文件夹下，显示error, No such file or directory
+mkdir -p names/mark (mkdir --parents names/mark ) #-p means -- parents, 比如当names 不存在的时候，这样可以建立, 如果不加p, 会报错
+#-p is the same as --parents
+
+mkdir -p names/{john,tom,bob}  #creat several directory inside current directory, 建立三个文件夹,john, tom,bob
+# {john,tom,bob} 不能有空格，否则建立的文件夹是 {john,
+
+
+```
+
+
+## mv ／ rename
+
+mv: rename, move
+
+```shell
+
+mv options source dest
+
+mv f1.txt f2.txt #rename f1.txt 成f2.txt 
+
+mv f1.txt dir1/ #把f1.txt 移动到dir1
+#如果dir1 中有f1.txt, move 会overwrite 原有的file 内容
+
+mv -i f1.txt dir1 #move f1.txt 到dir1 folder中, 如果要overwrite 会问
+mv -i f1.txt dir1/ #与上面一样的
+
+mv dir1 dir2 #把dir1 移动到dir2 中, content 也会move,  不用-R
+#dir1就现在文件夹下不存在了,dir1 在dir2中
+
+#tricky，如果当dir3 不存在
+mv dir2 dir3 #dir2中的内容移动到dir3中，所以dir3中只含有dir1，dir2也消失了
+#如果dir3 也存在，那么dir3 中有dir2, dir2中有dir1 
+
+mv -v file3.txt dir3 #V, verb, 显示具体怎么移动的
+```
+
+如果想实现批量重命名, mv 就不行了, 不过它要用 perl 正则表达式来作为参数
+
+```shell
+touch file{1..5}.txt #批量创建5个文件
+
+# 批量将这 5 个后缀为 .txt 的文本文件重命名为以 .c 为后缀的文件:
+rename 's/\.txt/\.c/' *.txt
+
+# 批量将这 5 个文件，文件名和后缀改为大写:
+rename 'y/a-z/A-Z/' *.c
+```
+
+## nano
+
+nano is a small and friendly text editor, besides it has interactive search, replace, go to line, and indentation 
+
+```shell
+nano file.txt #open txt editor, file open but not show has been created, 因为还没有save
+
+#press ctrl + o, -> means write out
+#press ctrl + x  -> quit the file
+#press ctrl + k -> cut
+#press ctrl + u -> paste
+
+nao abc.cpp #会有color, code highlighting, 不光是cpp, 也可以是Java,c 
+
+
+
+```
+
+
+![](/img/post/linux/pic3.png)
+
+![](/img/post/linux/pic4.png)
+
+
+
+## netstat
+
+netstat is to display network connection, routing tables and a number of network interfaces, and view network protocal states 
+
+```shell
+
+netstat -a #show all connections which are available on your system whether it is TCP or UDP or UNIX connection,
+#上面aslo display the status if it connected, listening, or established
+
+# | means after | whatever second command is used will implement the output of the first command  
+netstat -a | less #use the output of netstat to display with less command 
+
+netstat -at | less #-t means just show the TCP connection
+
+netstat -au | less #-u means just show the UDP connection
+
+netstat -l | less #-l means just show listenning state
+
+netstat  -lt | less #-lt means just show listening and TCP connection
+
+netstat -lu | less #-lu means just show listenning and UDP connection
+
+netstat -s | less  #-s show the statistic of connection, you can see which type of connection it is and properties of the packet what is happening
+
+netstat -st | less #-st show the statistic of TCP connection
+
+netstat -su | less #-su show the statistic of UDP connection 
+
+netstat -pt | less #-pt show PID of TCP connection 
+
+netstat -px | less #-px show PID of UNIX connection
+
+netstat -n  | less #-n show the numeric port of connection
+
+netstat -c # show the connection continuously, it refresh by itself
+
+netstat -ie   #-ie extended interface, it is the same output as ifconfig 
+
+netstat -an | grep ":80"  #-an show numeric port of all conection and search which port has :80 
+
+```
+
+
+## nl
+
+- ```-b``` : 指定添加行号的方式，主要有两种：
+   - ```-b a```:表示无论是否为空行，同样列出行号("cat -n"就是这种方式)
+   - ```-b t```:只列出非空行的编号并列出（默认为这种方式）
+- ```-n``` : 设置行号的样式，主要有三种：
+    ```-n ln```:在行号字段最左端显示
+    ```-n rn```:在行号字段最右边显示，且不加 0
+    ```-n rz```:在行号字段最右边显示，且加 0
+- ```-w``` : 行号字段占用的位数(默认为 6 位)
+
+```shell
+nl -b a file # 是否空行都列出行号
+```
+
+
+## rm & rmdir
+
+**rmdir**: remove directory, **rm**: rmove file and directory
+
+```shell
+
+rmdir abc # remove abc的folder
+rmdir a/b/c/d/e #只remove 最后e的directory
+rmdir -p a/b/c/d/e  #remove 所有的directory structure
+rmdir -p a/b/c/d/e #remove 所有directory structure，
+#如果a/b/c/d/e 每个并不是空的文件夹，会显示error, failed to remove directory a/b: Directory not empty
+
+rm -rv a/b #并显示(verb)remove的进程
+rm -rv a #与上面一行作用是一样的,
+
+rm -f file #强制删除文件
+
+```
+
+
+## sudo
+
+sudo: superuser do: allow you some priviledge as adminstrator or a power user
+
+有时候比如mkdir dir, show permission denied error, 用sudo tell linux command to execute as administrator
+
+比如install G++, GCC, will ask user priviledge 
+
+```shell
+
+sudo mkdir dir #需要provide password, run as administrator 
+
+sudo apt-get install g++ # apt-get install : install software
+
+sudo -s #change priviledge from local user to root 
+
+```
+
+
+
+## tar
+
+tar: Tape Archive, compress and extract file 
+
+
+```shell
+
+tar -cvf test.tar test #cvf: create verb, f filename, 把test folder compress 成命名为test tar 压缩文件
+tar -xvf test.tar #xvf x: extract v verb, f filename,  把test.tar extract 压缩文件
+
+#有时候用 tar.gz  gz stands for gzip format
+
+tar -cvfz test.tar.gz f.txt #z 表示生成gz file, z必须在c flag 之后, 压缩文件成tar.gz 
+tar -xvfz test.tar.gz f.txt #解压 gz 文件
+
+man tar > tar.txt #把tar 的man output 到tar.txt 中
+
+```
+
+## top
+
+top: provide you dynamic real time view of running system. Used to see which program take more of your CPU and which program consuming more of your memory
+
+```shell
+top #give you view of system, it refreshing every second
+s # can update time, 输入1 refresh every 1 second
+i # to filter idle process
+k # 把鼠标选中PID, press k, kill process
+q # quit the top view
+
+```
+
+PID: process ID, 同一个程序不同时候run pid 可能不一样的 <br/>
+
+![](/img/post/linux/pic5.png)
+
+
+
+## touch
+
+Touch is the easist way to create new empty file in Linux. It is also used for changing timestamp on existing file or directory 
+
+<span style="background-color: #FFFF00">you cannot create new directory using touch, can only create empty file</span>
+
+```shell
+
+touch file6 #建一个新的empty file6
+touch f7.txt #建立一个新的txt, 名字是f7
+
+touch file1.txt #修改file1.txt的timestamp, 不修改内容，只修改了timestamp
+
+touch file{1..10}.txt #创建 file1.txt , file2.txt , ... ,file10.txt
+
+```
+
+![](/img/post/linux/pic2.png)
+
+
+
+## watch
+
+run scripts for command at a regular interval or repeatedly
+
+
+```shell
+
+watch free -m #可以看见几秒会更新一次
+Ctrl + C #exit watch command
+watch -n 1 free -m #让free -m command run every 1 second
+watch -n 0,5 free -m #让free -m command run every 0.5 second
+
+
+```
+![](/img/post/linux/watch.png)
+
+
+## wc
+
+wc: world count, print a count of lines, words and characters for each files
+
+
+```shell
+
+wc test.txt #打出#lines, #words, #characters
+wc -c test.txt #只打出#characters
+wc -l test.txt #只打出#lines
+wc -w test.txt #只打出#words
+
+wc -L test.txt #只给出number of character in longest line
+
+
+```
+
+1, 6, 42: 1 number of line, 6 number of words, 42 number of characters
+
+![](/img/post/linux/wc.png)
 
 ## which & what
 
@@ -638,6 +956,21 @@ whatis ls # short description, to know what ls doing command
 whatis grep #short description, to know what is grep command
 
 ```
+
+
+
+## who 
+
+who 显示terminal 信息
+
+| 参数   |  Meaning |
+|:----------:|:-------------|
+| -a |	打印全部 terminal 打开信息，比如 伪终端名称，打开时间. 比如打开了两个terminal, 会显示两行  |
+| -d |	打印死掉的进程 |
+| -m |	同who am i, 显示当前终端打开的信息 |
+| -q |	打印当前所有打开的 terminal 用户数及用户名 |
+| -u |	打印当前所有打开的 terminal 登录用户登录详细信息, 类似 -a |
+| -r |	打印运行等级 ||
 
 
 
@@ -684,203 +1017,26 @@ sudo  deluser mark --remove-home
 
 
 
-## groups, groupadd, groupdel
 
-group show which group is currently user connected to
 
-```shell
-groups #show which group is currently user connected to
 
-cat /etc/group #show all the group in your system,  group <-> user connected to 
 
-sudo groupadd Java #add newgroup in system
-sudo groupdel Java #delete existing group
 
-#-a add user to group, -d remove user from group
-sudo gpasswd -a mark Java # add mark to the Java group
-sudo gpasswd -d mark Java #remove user from Group
 
 
-```
 
 
 
 
-## bashrc
 
-bashrc is a script executed whenever a new terminal session start in interactive mode
 
-some linux system， .bashrc file exist when a new terminal session start. Some not
 
-Bashrc file is used for setting up environment variable such as Java. When use git, which repo you checked or cloned, use Bashrc
 
-```shell
 
-ls -a #在home directory ls -a 可以看见有.bashrc
 
-nano .bashrc #查看.bashrc
-gedit .bashrc #查看 .bashrc
 
-```
 
-可以修改 .bashrc file 比如加上alias ls='ls --color=auto -l', 之后open new terminal, 输入ls, 显示long list of ls 
 
-![](/img/post/linux/bashrc.png)
-
-
-![](/img/post/linux/bashrc2.png)
-
-## du, df, free
-
-View Resources
-
-
-
-
-```shell
-df #the amount of disk space being used by your file system
-df -h #the human readable output, 显示多少G, M, k
-
-du #estimate and display the disk space used by files in details
-du -h #human readable format
-du -sh #-s summary 只给你现在所在directory 文件所占的大小
-sudo du -sh #用sudo 原因是因为可能有的file permission denied 需要用sudo 
-du -sh /etc/ #show summary used space by etc folder
-
-free #display the total amount free and used physical and swap memory in the system as well as buffer in the kernel
-free -b  #-b btye, -k KB, -m MB, -G GB, -T TB
-
-```
-
-
-## watch
-
-run scripts for command at a regular interval or repeatedly
-
-
-```shell
-
-watch free -m #可以看见几秒会更新一次
-Ctrl + C #exit watch command
-watch -n 1 free -m #让free -m command run every 1 second
-watch -n 0,5 free -m #让free -m command run every 0.5 second
-
-
-```
-
-![](/img/post/linux/watch.png)
-
-## head .tail
-
-Head: output the first part of the file 
-Tail: output the last part of the file, ```-f``` 不停的读取某个文件并显示
-
-
-```shell
-head log.txt #show first 10 line of file 
-tail log.txt #show last 10 line of file 
-
-
-head -n3 log.txt #show first 3 lines of file
-head -3 log.txt #跟上面一样
-
-tail -n3 log.txt #show last 3 lines of file
-tail -3 log.txt #跟上面一样
-
-tail -f log.txt #output last 10 lines of file. watch the file, whenever file change, will show last 10 lines of code
-ctrl + C #exit 
-head  log.txt kern.log #先print 10 lines of log.txt 再print 10 lines of kern.log
-
-head -3 log.txt kern.log #先print 3 lines of log.txt 再print 3 lines of kern.log
-
-
-```
-
-
-
-## find
-
-
-
-```shell
-
-find location -name file_name #syntax
-
-find /home/ -name test.sh #-name search by name, return directory 
-find /home/dir1 -name test.* #search in /home/dir1 folder by name, any file start with test. 可以是.txt, .sh
-find /home/dir1 -name *.txt #search any file extension is txt
-find / -name dmesg #search in the root directory, 也许有permission error 因为有些directory 不允许access
-sudo find / -name dmesg 
-
-find /home  -mtime -1  #look at the file created 1 days before, 也可以用加号，+1, + 2
-
-
-```
-
-
-
-## wc
-
-wc: world count, print a count of lines, words and characters for each files
-
-
-```shell
-
-wc test.txt #打出#lines, #words, #characters
-wc -c test.txt #只打出#characters
-wc -l test.txt #只打出#lines
-wc -w test.txt #只打出#words
-
-wc -L test.txt #只给出number of character in longest line
-
-
-```
-
-1, 6, 42: 1 number of line, 6 number of words, 42 number of characters
-
-![](/img/post/linux/wc.png)
-
-
-## cal
-
-show conventially formatted calendar on your command line
-
-```shell
-
-cal #显示calendar, weekday on the top
-ncal  #显示calendar, weekday on the left 
-cal 2016 #显示2016的calendar
-cal 2 2016 #显示2016年 2月 calendar
-cal -3 #give you current month, previous month and next month calendar
-#default 是 -1, 比如cal, 等于cal -1
-```
-
-
-
-## date
-
-used to print out and change system date and time information
-
-```shell
-
-date #print 现在系统的时间
-
-date -s "11/20/2003 12:48:00" #设置system time 为 11/20/2003 12:48:00
-
-date +%d%h%y #显示13Jan17
-
-date +%d/%h/%y #显示13-Jan-17
-
-man date #可以显示详细的date format的格式
-
-
-date "+Date: %m/%d/y%n" #显示01/13/17 %n 是空行线
-
-
-
-```
-设置时间格式
-![](/img/post/linux/date.png)
 
 
 ## Run Multiple Terminal(; && || )
@@ -910,148 +1066,12 @@ CAL || pwd #CAL command failure, pwd 会被run
 <span style="background-color: #FFFF00">Difference</span>: ; run every command regardless success/failure of each command. && 如果中间的failure, does not go to the next command
 
 
-## apt-get
 
-apt-get(urbantu): install, uninstall, update packages. apt: advance packaging tool
 
-对于centos: 用yum, dnf instead of apt-get 
 
-```shell
 
-sudo apt-get update #resync your local package file to the server package file, update all the packages
 
-java -version #check if java installed, and if so check version
-php5 -version #check if php installed, 如果没有install 会给出install的hint
 
-sudo apt-get install php5 #安装首先what is required extra dependency to install php5, 也会显示多少space required to install
-php5 -v #显示php5 version
-
-sudo apt-get remove php5 #remove php5
-sudo apt-get remove --purge php5 #remove all configuration file related to php5
-sudo apt-get autoremove  #auto remove the dependency which required for the package(php5) and no longer needed for other packages
-
-
-
-```
-
-
-
-
-## ifconfig
-
-ifconfig: interface configuration: used to view and change network interface configuration on your system
-
-```shell
-ifconfig #show you some output
-
-ifconfig eth0 #only show eth0 interface
-
-#up, down to disable internet connection 
-sudo ifconfig eth0 down #internet connection will be down
-
-sudo ifconfig eth0 up #enable internet 
-
-```
-
-ethO: wired internet cable  <br/>
-WLAN0: wireless internet connection <br/>
-0: is the first internet interface. 如果有multiple internet interface, 显示eth1, or WLAN2
-l0: loop back interface. An interface that system use to communcate to excel
-
-
-## tar
-
-tar: Tape Archive, compress and extract file 
-
-
-```shell
-
-tar -cvf test.tar test #cvf: create verb, f filename, 把test folder compress 成命名为test tar 压缩文件
-tar -xvf test.tar #xvf x: extract v verb, f filename,  把test.tar extract 压缩文件
-
-#有时候用 tar.gz  gz stands for gzip format
-
-tar -cvfz test.tar.gz f.txt #z 表示生成gz file, z必须在c flag 之后, 压缩文件成tar.gz 
-tar -xvfz test.tar.gz f.txt #解压 gz 文件
-
-man tar > tar.txt #把tar 的man output 到tar.txt 中
-
-```
-
-
-
-## grep
-
-grep: global regular expression print. can be used to search pattern / word in a text file or a number of text file with grep command
-
-```shell
-
-#
-man tar > file.txt 
-
-grep "options" file.txt #keyword I want to search and file name, 
-#grep 是case sensitive的, 上面的search options 不会search Options,
-
-grep -i "options" file.txt #make search not case sensitive, 也会search Options
-
-grep -n "options" file.txt #在file 中search并显示file.txt的options, 并显示在哪行
-
-grep -n "Some options" file.txt #在file 中search并显示Some options
-
-
-#used in multiple files
-grep -n "Some options" f1.txt, f2.txt f3.txt f4.txt #在多个file 中search并显示Some options
-grep -n "Some options" * #在现在folder中的所有file search并显示Some options 的行
-
-grep -nv "Some options" f1.txt #显示f1.txt 不包含Some options的行
-
-grep -help #显示有的flag, options 用grep command
-
-```
-![](/img/post/linux/grep.png)
-
-
-## netstat
-
-netstat is to display network connection, routing tables and a number of network interfaces, and view network protocal states 
-
-```shell
-
-netstat -a #show all connections which are available on your system whether it is TCP or UDP or UNIX connection,
-#上面aslo display the status if it connected, listening, or established
-
-# | means after | whatever second command is used will implement the output of the first command  
-netstat -a | less #use the output of netstat to display with less command 
-
-netstat -at | less #-t means just show the TCP connection
-
-netstat -au | less #-u means just show the UDP connection
-
-netstat -l | less #-l means just show listenning state
-
-netstat  -lt | less #-lt means just show listening and TCP connection
-
-netstat -lu | less #-lu means just show listenning and UDP connection
-
-netstat -s | less  #-s show the statistic of connection, you can see which type of connection it is and properties of the packet what is happening
-
-netstat -st | less #-st show the statistic of TCP connection
-
-netstat -su | less #-su show the statistic of UDP connection 
-
-netstat -pt | less #-pt show PID of TCP connection 
-
-netstat -px | less #-px show PID of UNIX connection
-
-netstat -n  | less #-n show the numeric port of connection
-
-netstat -c # show the connection continuously, it refresh by itself
-
-netstat -ie   #-ie extended interface, it is the same output as ifconfig 
-
-netstat -an | grep ":80"  #-an show numeric port of all conection and search which port has :80 
-
-```
 
 
 
