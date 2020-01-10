@@ -661,6 +661,27 @@ crontab -r
 ![](/img/post/linux/crontab5.png)
 
 
+**深入 crontab**
+每个用户使用 ```crontab -e``` 添加计划任务，都会在 ```/var/spool/cron/crontabs`` 中添加一个该用户自己的任务文档，这样目的是为了隔离。
+
+![](/img/post/linux/crontab6.png)
+
+如果是系统级别的定时任务，应该如何处理？只需要以 ```sudo``` 权限编辑 ```/etc/cronta``` 文件就可以。
+
+cron 服务监测时间最小单位是分钟，所以 cron 会每分钟去读取一次 ```/etc/crontab``` 与 ```/var/spool/cron/crontabs``` 里面的內容。
+
+在 /etc 目录下，cron 相关的目录有下面几个：
+
+![](/img/post/linux/crontab7.png)
+
+每个目录的作用：(系统默认执行时间可以根据需求进行修改)
+
+- ```/etc/cron.daily```，目录下的脚本会每天执行一次，在每天的6点25分时运行；
+- ```/etc/cron.hourly```，目录下的脚本会每个小时执行一次，在每小时的17分钟时运行；
+- ```/etc/cron.monthly```，目录下的脚本会每月执行一次，在每月1号的6点52分时运行；
+- ```/etc/cron.weekly```，目录下的脚本会每周执行一次，在每周第七天的6点47分时运行；
+
+
 
 
 ## date
