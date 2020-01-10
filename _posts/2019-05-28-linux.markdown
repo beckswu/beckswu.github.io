@@ -662,6 +662,7 @@ crontab -r
 
 
 **深入 crontab**
+
 每个用户使用 ```crontab -e``` 添加计划任务，都会在 ```/var/spool/cron/crontabs`` 中添加一个该用户自己的任务文档，这样目的是为了隔离。
 
 ![](/img/post/linux/crontab6.png)
