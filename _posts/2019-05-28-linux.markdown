@@ -566,6 +566,102 @@ cp -vR dir1 dir3 #显示详细的copy 哪些文件
 ![](/img/post/linux/pic1.png)
 
 
+## crontab
+
+
+```crontab``` 命令常见于 Unix 和类 Unix 的操作系统之中（Linux 就属于类 Unix 操作系统），用于设置周期性被执行的指令。
+
+crontab 命令从输入设备读取指令，并将其存放于 crontab 文件中，以供之后读取和执行。通常，crontab 储存的指令被守护进程激活，crond 为其守护进程，crond 常常在后台运行，每一分钟会检查一次是否有预定的作业需要执行。
+
+通过 crontab 命令，我们可以在固定的间隔时间执行指定的系统指令或 shell　script 脚本。时间间隔的单位可以是分钟、小时、日、月、周的任意组合。
+
+这里我们看一看crontab 的格式
+
+```
+# Example of job definition:
+# .---------------- minute (0 - 59)
+# |  .------------- hour (0 - 23)
+# |  |  .---------- day of month (1 - 31)
+# |  |  |  .------- month (1 - 12) OR jan,feb,mar,apr ...
+# |  |  |  |  .---- day of week (0 - 6) (Sunday=0 or 7) OR sun,mon,tue,wed,thu,fri,sat
+# |  |  |  |  |
+# *  *  *  *  * user-name command to be executed
+```
+
+crontab 在本实验环境中需要做一些特殊的准备，首先我们会启动 ```rsyslog```，以便我们可以通过日志中的信息来了解我们的任务是否真正的被执行了（在本实验环境中需要手动启动，而在自己本地中 Ubuntu 会默认自行启动不需要手动启动）
+
+```shell
+sudo apt-get install -y rsyslog
+sudo service rsyslog start
+```
+在本实验环境中 crontab 也是不被默认启动的，同时不能在后台由 upstart 来管理，所以需要我们来启动它:
+
+```shell
+sudo cron -f &
+```
+
+**crontab 使用**
+
+```shell
+crontab -e
+```
+
+![](/img/post/linux/crontab.png)
+
+
+文档的最后一排加上这样一排命令,该任务是每分钟我们会在/home/shiyanlou目录下创建一个以当前的年月日时分秒为名字的空白文件
+
+```shell
+*/1 * * * * touch /home/shiyanlou/$(date +\%Y\%m\%d\%H\%M\%S) #数字1
+```
+
+注意 ``` %``` 在 crontab 文件中，有结束命令行、换行、重定向的作用，前面加 ``` \ ``` 符号转义，否则，```%``` 符号将执行其结束命令行或者换行的作用，并且其后的内容会被做为标准输入发送给前面的命令。
+
+添加成功后我们会得到最后一排 installing new crontab 的一个提示
+
+![](/img/post/linux/crontab2.png)
+
+通过这样的一个指令来查看我们添加了哪些任务
+```shell
+crontab -l 
+```
+
+但是如果 cron 的守护进程并没有启动，它根本都不会监测到有任务，当然也就不会帮我们执行，我们可以通过以下2种方式来确定我们的 cron 是否成功的在后台启动，默默的帮我们做事，若是没有就得执行上文准备中的第二步了
+
+```shell
+ps aux | grep cron
+
+# or
+
+pgrep cron
+```
+
+![](/img/post/linux/crontab3.png)
+
+我们通过这样一个命令可以查看到执行任务命令之后在日志中的信息反馈
+
+
+```shell
+sudo tail -f /var/log/syslog
+```
+
+从图中我们可以看到分别在13点28、29、30分的01秒为我们在 shiyanlou 用户的家目录下创建了文件
+
+![](/img/post/linux/crontab4.png)
+
+**结束 crontab**
+
+当我们并不需要这个任务的时候我们可以使用这么一个命令去删除任务
+```shell
+crontab -r
+```
+
+通过图中我们可以看出我们删除之后再查看任务列表，系统已经显示该用户并没有任务哦
+
+![](/img/post/linux/crontab5.png)
+
+
+
 
 ## date
 
@@ -1019,7 +1115,7 @@ WLAN0: wireless internet connection <br/>
 l0: loop back interface. An interface that system use to communcate to excel
 
 
-## kill
+## kill / ps
 
 kill process
 
