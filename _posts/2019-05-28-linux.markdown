@@ -592,10 +592,55 @@ chmod u-x dir #remove execute access from user
 
 ## du, df, free
 
+du（estimate file space usage）命令与df（report file system disk space usage）
+
 View Resources
 
+```df``` : 查看磁盘容量, 
+![](/img/post/linux/df1.png)
+
+但在实际的物理主机上会更像这样：
+
+![](/img/post/linux/df2.png)
+
+物理主机上的 /dev/sda2 是对应着主机硬盘的分区，<span style="color:red">后面的数字表示分区号，数字前面的字母 a 表示第几块硬盘（也可能是可移动磁盘）</span>，你如果主机上有多块硬盘则可能还会出现 /dev/sdb，/dev/sdc 这些磁盘设备都会在 /dev 目录下以文件的存在形式。
+
+接着你还会看到"1k-块"这个陌生的东西，它表示以磁盘块大小的方式显示容量，后面为相应的以块大小表示的已用和可用容量，在你了解 Linux 的文件系统之前这个就先不管吧，我们以一种你应该看得懂的方式展示：
+
+```df -h```: human reable 显示
+
+![](/img/post/linux/df3.png)
 
 
+**使用 du 命令查看目录的容量**
+
+| Flag | 	说明| 
+| :---: | :--- |
+| ```-a```| 同```--all``` 显示目录中所有文件的大小 |
+| ```-d``` | 参数指定查看目录的深度 |
+| ```-h``` | 同 ```--human-readable``` 以K，M，G为单位，提高信息的可读性 | 
+| ```-s``` |  #同 ```--summarize``` 仅显示总计，只列出最后加总的值 |
+
+```
+# 默认同样以 块 的大小展示
+du 
+# 加上`-h`参数，以更易读的方式展示
+du -h
+
+
+# 只查看1级目录的信息
+du -h -d 0 ~
+# 查看2级
+du -h -d 1 ~
+```
+常用参数
+
+```shell
+du -a #同```--all``` 显示目录中所有文件的大小 
+du -s #同--summarize 仅显示总计，只列出最后加总的值。
+```
+
+![](/img/post/linux/df4.png)
 
 ```shell
 df #the amount of disk space being used by your file system
@@ -1748,5 +1793,9 @@ sudo apt-get update; sudo apt-get install cmatrix
 cmatrix -C red
 ```
 
-
+火炉
+```shell
+sudo apt-get install libaa-bin 
+aafire
+```
 
