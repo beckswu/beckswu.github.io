@@ -150,7 +150,7 @@ man ls #显示所有ls 的function, 按Q退出
 
 
 
-**环境变量**
+#### 环境变量
 
 注意：为了与普通变量区分，通常我们习惯将环境变量名设为大写。
 
@@ -273,7 +273,7 @@ $ path=${path%*/mybin}
 $ unset temp
 ```
 
-**搜索文件**
+#### 搜索文件
 
 - ```whereis```:  简单快速. 这个搜索很快，因为它并没有从硬盘中依次查找，而是直接从数据库中查询。```whereis``` 只能搜索二进制文件(-b)，man 帮助文件(-m)和源代码文件(-s)。
 - ```locate```: 快而全: 通过“ /var/lib/mlocate/mlocate.db ”数据库查找，不过这个数据库也不是实时更新的，系统会使用定时任务每天自动执行 updatedb 命令更新一次，所以有时候你刚添加的文件，它可能会找不到，需要手动执行一次 updatedb 命令
@@ -282,8 +282,28 @@ $ unset temp
 
 
 
+#### 内建命令与外部命令
 
+> **内建命令**实际上是 shell 程序的一部分，其中包含的是一些比较简单的 Linux 系统命令，这些命令是写在bash源码的builtins里面的，由 shell 程序识别并在 shell 程序内部完成运行，通常在 Linux 系统加载运行时 shell 就被加载并驻留在系统内存中。而且解析内部命令 shell 不需要创建子进程，因此其执行速度比外部命令快。比如：```history、cd、exit``` 等等。
 
+> **外部命令** 是 Linux 系统中的实用程序部分，因为实用程序的功能通常都比较强大，所以其包含的程序量也会很大，在系统加载时并不随系统一起被加载到内存中，而是在需要时才将其调入内存。虽然其不包含在 shell 中，但是其命令执行过程是由 shell 程序控制的。外部命令是在 Bash 之外额外安装的，通常放在/bin，/usr/bin，/sbin，/usr/sbin等等。比如：```ls、vi```等。
+
+简单来说就是：一个是天生自带的天赋技能，一个是后天得来的附加技能。我们可以使用　```type``` 命令来区分命令是内建的还是外部的。例如这两个得出的结果是不同的
+
+```shell
+type exit
+
+type vim
+
+#得到这样的结果说明是内建命令，正如上文所说内建命令都是在 bash 源码中的 builtins 的.def中
+xxx is a shell builtin
+
+#得到这样的结果说明是外部命令，正如上文所说，外部命令在/usr/bin or /usr/sbin等等中
+xxx is /usr/bin/xxx
+
+#若是得到alias的结果，说明该指令为命令别名所设定的名称；
+xxx is an alias for xx --xxx
+```
 
 
 ## cd
@@ -572,6 +592,115 @@ date "+Date: %m/%d/y%n" #显示01/13/17 %n 是空行线
 设置时间格式
 ![](/img/post/linux/date.png)
 
+
+## dd
+
+```dd```命令用于转换和复制文件，不过它的复制不同于```cp```。 Linux 的很重要的一点，一切即文件，在 Linux 上，硬件的设备驱动（如硬盘）和特殊设备文件（如/dev/zero和/dev/random）都像普通文件一样，只是在各自的驱动程序中实现了对应的功能，```dd``` 也可以读取文件或写入这些文件。这样，```dd```也可以用在备份硬件的引导扇区、获取一定数量的随机数据或者空数据等任务中。```dd```程序也可以在复制时处理数据，例如转换字节序、或在 ASCII 与 EBCDIC 编码间互换。
+
+```dd```的命令行语句与其他的 Linux 程序不同，因为它的命令行选项格式为```选项=值```，而不是更标准的```--选项 值```或```-选项=值 (比如tar -f file)```。```dd```默认从标准输入中读取，并写入到标准输出中，但可以用选项```if（input file，输入文件)```和```of（output file，输出文件）```改变。
+
+| 命令 | 	说明| 
+| :---: | :--- |
+| ```of``` | 输出流 |
+| ```if``` | 输入流 |
+| ```bs``` | block size, 用于指定块大小（缺省单位为 Byte，也可为其指定如'K'，'M'，'G'等单位）
+| ```count``` | 用于指定块数量 | 
+前面说到dd在拷贝的同时还可以实现数据转换，那下面就举一个简单的例子：将输出的英文字符转换为大写再写入文件：| 
+| :---: | :--- | |
+
+
+<span style="color:red">下面两个例子在打完了这个命令后，继续在终端打字，作为你的输入</span>
+
+```shell
+# 输出到文件
+$ dd of=test bs=10 count=1 # 或者 dd if=/dev/stdin of=test bs=10 count=1
+# 输出到test 文件,  总共有10 bytes
+
+# 输出到标准输出
+$ dd if=/dev/stdin of=/dev/stdout bs=10 count=1
+
+```
+
+指定只读取总共 10 个字节的数据，当我输入了“hello shiyanlou”之后加上空格回车总共 16 个字节（一个英文字符占一个字节）内容，显然超过了设定大小。使用du和cat命令看到的写入完成文件实际内容确实只有 10 个字节（那个黑底百分号表示这里没有换行符）,而其他的多余输入将被截取并保留在标准输入。
+
+
+![](/img/post/linux/dd.gif)
+
+
+前面说到dd在拷贝的同时还可以实现<span style="background-color:#FFFF00">**数据转换**</span>，那下面就举一个简单的例子：将输出的英文字符转换 -> 大写再写入文件：
+
+```shell
+ dd if=/dev/stdin of=test bs=10 count=1 conv=ucase
+ ```
+![](/img/post/linux/dd2.gif)
+
+
+**使用 dd 命令创建虚拟镜像文件**
+
+从/dev/zero设备创建一个容量为 256M 的空文件：
+```shell
+dd if=/dev/zero of=virtual.img bs=1M count=256
+du -h virtual.img
+```
+
+使用 ```mkfs``` 命令格式化磁盘（我们这里是自己创建的虚拟磁盘镜像）
+
+你可以在命令行输入 ```sudo mkfs``` 然后按下```Tab```键，你可以看到很多个以 ```mkfs``` 为前缀的命令，这些不同的后缀其实就是表示着不同的文件系统，可以用 ```mkfs``` 格式化成的文件系统。 我们可以简单的使用下面的命令来将我们的虚拟磁盘镜像格式化为ext4文件系统：
+
+```shell
+sudo mkfs.ext4 virtual.img
+```
+![](/img/post/linux/dd3.png)
+
+可以看到实际 mkfs.ext4 是使用 mke2fs 来完成格式化工作的。mke2fs 的参数很多，不过我们也不会经常格式化磁盘来玩，所以就掌握这基本用法吧，等你有特殊需求时，再查看 man 文档解决。
+
+更多关于文件系统的知识，请查看wiki： [文件系统](https://zh.wikipedia.org/wiki/%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F#Linux_.E6.94.AF.E6.8F.B4.E7.9A.84.E6.AA.94.E6.A1.88.E7.B3.BB.E7.B5.B1)  [ext3](https://zh.wikipedia.org/wiki/Ext3), [ext4](https://zh.wikipedia.org/wiki/Ext4)
+
+如果你想知道 Linux 支持哪些文件系统你可以输入```ls -l /lib/modules/$(uname -r)/kernel/fs```（我们的环境中无法查看）查看。
+
+
+**使用 mount 命令挂载磁盘到目录树**
+
+用户在 Linux/UNIX 的机器上打开一个文件以前，包含该文件的文件系统必须先进行挂载的动作，此时用户要对该文件系统执行 mount 的指令以进行挂载。该指令通常是使用在 USB 或其他可移除存储设备上，而根目录则需要始终保持挂载的状态。又因为 Linux/UNIX 文件系统可以对应一个文件而不一定要是硬件设备，所以可以挂载一个包含文件系统的文件到目录树。
+
+Linux/UNIX 命令行的 mount 指令是告诉操作系统，对应的文件系统已经准备好，可以使用了，而该文件系统会对应到一个特定的点（称为挂载点）。挂载好的文件、目录、设备以及特殊文件即可提供用户使用。
+
+我们先来使用mount来查看下主机已经挂载的文件系统
+
+```shell
+sudo mount
+```
+![](/img/post/linux/mount.png)
+
+输出的结果中每一行表示一个设备或虚拟设备,每一行最前面是设备名，然后是 on 后面是挂载点，type 后面表示文件系统类型，再后面是挂载选项（比如可以在挂载时设定以只读方式挂载等等）。
+
+那么我们如何挂载真正的磁盘到目录树呢，mount命令的一般格式如下：
+```shell
+mount [options] [source] [directory]
+```
+一些常用操作：
+```
+mount [-o [操作选项]] [-t 文件系统类型] [-w|--rw|--ro] [文件系统源] [挂载点]
+```
+现在直接来挂载我们创建的虚拟磁盘镜像到/mnt目录：
+
+```shell
+mount -o loop -t ext4 virtual.img /mnt 
+# 也可以省略挂载类型，很多时候 mount 会自动识别
+
+# 以只读方式挂载
+mount -o loop --ro virtual.img /mnt
+# 或者mount -o loop,ro virtual.img /mnt
+```
+
+使用 umount 命令卸载已挂载磁盘
+
+```shell
+# 命令格式 sudo umount 已挂载设备名或者挂载点，如：
+sudo umount /mnt
+```
+
+[具体见 Chapter 7.3.1](https://www.shiyanlou.com/courses/1/learning/?id=62)
 
 ## Directory Permission
 
@@ -1220,7 +1349,9 @@ touch file{1..10}.txt #创建 file1.txt , file2.txt , ... ,file10.txt
 ![](/img/post/linux/pic2.png)
 
 
+## type 
 
+区分内建命令与外部命令, 详见Linux基础,  内建命令与外部命令
 
 
 ## useradd /adduser
