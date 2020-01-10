@@ -956,7 +956,46 @@ head -3 log.txt kern.log #先print 3 lines of log.txt 再print 3 lines of kern.l
 ```
 
 
+## help
 
+zsh 中没有help, 进入bash 中，输入
+
+```shell
+bash
+
+help ls
+```
+
+```help ls``` 显示error
+![](/img/post/linux/help.png)
+
+因为 help 命令是用于显示 <span style="background-color:#FFFF00">shell **内建命令**的简要帮助信息</span>, ```ls```是外部命令。帮助信息中显示有该命令的简要说明以及一些参数的使用以及说明，不然就会得到你刚刚得到的结果。
+
+那如果是外部命令怎么办，不能就这么抛弃它呀。其实外部命令基本上都有一个参数```--help```
+
+```shell
+ls --help
+```
+
+![](/img/post/linux/help2.png)
+
+
+## info 
+
+要是你觉得```man```显示的信息都还不够，满足不了你的需求，那试试 info 命令. 
+
+```shell
+# 安装 info
+sudo apt-get update
+sudo apt-get install info
+
+# 查看 ls 命令的 info
+info ls
+```
+
+得到的信息是不是比 ```man``` 还要多了，```info``` 来自自由软件基金会的 GNU 项目，是 GNU 的超文本帮助系统，能够更完整的显示出 GNU 信息。所以得到的信息当然更多
+
+```man``` 和 ```info``` 就像两个集合，它们有一个交集部分，但与 ```man``` 相比，```info``` 工具可显示更完整的　GNU　工具信息。若 ```man``` 页包含的某个工具的概要信息在 ```info``` 中也有介绍，那么 ```man``` 页中会有“请参考 ```info``` 页更详细内容”的字样。
 
 ## ifconfig
 
@@ -1048,9 +1087,33 @@ more file
 #q     退出
 ```
 
+## man
 
+```shell 
+ls 
 
+```
+![](/img/post/linux/man.png)
 
+得到的内容比用 ```help```更多更详细，而且 <span style="background-color#FFFF00">　```man```　没有内建与外部命令的区分</span>，因为 man 工具是显示系统手册页中的内容，也就是一本电子版的字典，这些内容大多数都是对命令的解释信息，还有一些相关的描述。通过查看系统文档中的 man 也可以得到程序的更多相关信息和 Linux 的更多特性。
+
+是不是好用许多，当然也不代表 help 就没有存在的必要，当你非常紧急只是忘记该用哪个参数的时候，help 这种显示简单扼要的信息就特别实用，若是不太紧急的时候就可以用 man 这种详细描述的查询方式
+
+在尝试上面这个命令时我们会发现最左上角显示“ LS （1）”，在这里，“ LS ”表示手册名称，而“（1）”表示该手册位于第一章节。这个章节又是什么？在 man 手册中一共有这么几个章节
+
+| 章节数 |	说明 |
+| :---: | :--- |
+| 1 | 	Standard commands （标准命令） | 
+| 2 | 	System calls （系统调用） | 
+| 3 | 	Library functions （库函数） | 
+| 4 | 	Special devices （设备说明） | 
+| 5 | 	File formats （文件格式） | 
+| 6 | 	Games and toys （游戏和娱乐） | 
+| 7 | 	Miscellaneous （杂项） | 
+| 8 | 	Administrative Commands （管理员命令） | 
+| 9 | 	其他（Linux特定的）， 用来存放内核例行程序的文档 | 
+
+打开手册之后我们可以通过 ```pgup``` 与 ```pgdn``` 或者上下键来上下翻看，可以按 ```q``` 退出当前页面
 
 ## mkdir
 
