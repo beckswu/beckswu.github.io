@@ -211,6 +211,81 @@ ls -a
 
 ![](/img/post/linux/ev.png)
 
+
+**添加到environment variable**
+
+<span style="color:red">注意这里一定要使用绝对路径。</span>
+
+```shell
+$ PATH=$PATH:/home/shiyanlou/mybin 
+#如果有程序在mybin 中 可以执行程序用
+hello.sh #而不是用./hello.sh
+
+```
+
+上面的方法一旦关闭terminal, 下次再打开，之前定义的Path就没有用了, 解决办法：
+
+在每个用户的 home 目录中有一个 Shell 每次启动时会默认执行一个配置脚本，以初始化环境，包括添加一些用户自定义环境变量等等。<span style="background-color:#FFFF00">zsh 的配置文件是 .zshrc，相应 Bash 的配置文件为 .bashrc</span>。它们在 etc 下还都有一个或多个全局的配置文件，不过我们一般只修改用户目录下的配置文件
+
+我们可以简单地使用下面命令直接添加内容到 .zshrc 中：
+
+```shell
+$ echo "PATH=$PATH:/home/shiyanlou/mybin" >> .zshrc #>> append
+```
+
+**如何让环境变量立即生效**
+
+在 Shell 中修改了比如 zsh 的配置文件 home 目录下的 .zshrc），每次都要退出终端重新打开甚至重启主机之后其才能生效，很是麻烦，我们可以使用 ```source ``` 命令来让其立即生效，如
+
+```shell
+source .zshrc
+
+#source 命令还有一个别名就是 .，上面的命令如果替换成 . 的方式就该是：
+. ./.zshrc
+#在使用.的时候，需要注意与表示当前路径的那个点区分开。 
+```
+
+
+**修改删除已有变量**
+
+| 命令 | 	说明| 
+| :---: | :--- |
+| ```${变量名#匹配字串}```| 	从头向后开始匹配，删除符合匹配字串的最短数据 |
+| ```${变量名##匹配字串}```| 	从头向后开始匹配，删除符合匹配字串的最长数据 | 
+| ```${变量名%匹配字串}```| 	从尾向前开始匹配，删除符合匹配字串的最短数据 |
+| ```${变量名%%匹配字串}```| 	从尾向前开始匹配，删除符合匹配字串的最长数据 |
+| ```${变量名/旧的字串/新的字串}```| 	将符合旧字串的第一个字串替换为新的字串 |
+| ```${变量名//旧的字串/新的字串}```| 	将符合旧字串的全部字串替换为新的字串 | 
+
+比如要修改我们前面添加到 ```PATH``` 的环境变量。为了避免操作失误导致命令找不到，我们先将 ```PATH``` 赋值给一个新的自定义变量 ```path```：
+
+```shell
+$ path=$PATH
+$ echo $path
+$ path=${path%/home/shiyanlou/mybin}
+# 或使用通配符,*表示任意多个任意字符
+$ path=${path%*/mybin}
+```
+变量删除
+可以使用 ```unset``` 命令删除一个环境变量：
+
+```
+$ unset temp
+```
+
+**搜索文件**
+
+- ```whereis```:  简单快速. 这个搜索很快，因为它并没有从硬盘中依次查找，而是直接从数据库中查询。```whereis``` 只能搜索二进制文件(-b)，man 帮助文件(-m)和源代码文件(-s)。
+- ```locate```: 快而全: 通过“ /var/lib/mlocate/mlocate.db ”数据库查找，不过这个数据库也不是实时更新的，系统会使用定时任务每天自动执行 updatedb 命令更新一次，所以有时候你刚添加的文件，它可能会找不到，需要手动执行一次 updatedb 命令
+- ```which``` 小而精: 只从 PATH 环境变量指定的路径中去搜索命令
+- ```find``` 精而细: ```find``` 应该是这几个命令中最强大的了，它不但可以通过文件类型、文件名进行查找而且可以根据文件的属性（如文件的时间戳，文件的权限等）进行搜索
+
+
+
+
+
+
+
 ## cd
 
 **home directory和root directory** 不一样, root是/, home 是 /Users/ username 的文件夹
@@ -560,7 +635,40 @@ file file.txt
 
 ## find
 
+find 应该是这几个命令中最强大的了，它不但可以通过文件类型、文件名进行查找而且可以根据文件的属性（如文件的时间戳，文件的权限等）进行搜索
 
+这条命令表示去 /etc/ 目录下面 ，搜索名字叫做 interfaces 的文件或者目录。这是 find 命令最常见的格式，千万记住 find 的第一个参数是要搜索的地方：
+
+
+```shell
+sudo find /etc/ -name interfaces
+```
+> 注意 find 命令的路径是作为第一个参数的， 基本命令格式为 ```find [path] [option] [action]```。
+
+与时间相关的命令参数：
+
+| 命令 | 	说明| 
+| :---: | :--- |
+|```-atime```| 	最后访问时间 |
+|```-ctime```| 	最后修改文件内容的时间 |
+|```-mtime```| 	最后修改文件属性的时间 |
+
+下面以 -mtime 参数举例：
+
+- ```-mtime n```：n 为数字，表示为在 n 天之前的“一天之内”修改过的文件
+- ```-mtime +n```：列出在 n 天之前（不包含 n 天本身）被修改过的文件
+- ```-mtime -n```：列出在 n 天之内（包含 n 天本身）被修改过的文件
+- ```-newer file```：file 为一个已存在的文件，列出比 file 还要新的文件名
+
+![](/img/post/linux/find.png)
+
+```shell
+#列出 home 目录中，当天（24 小时之内）有改动的文件：
+find ~ -mtime 0
+
+#列出用户家目录下比 Code 文件夹新的文件：
+find ~ -newer /home/shiyanlou/Code
+```
 
 ```shell
 
@@ -576,6 +684,16 @@ find /home  -mtime -1  #look at the file created 1 days before, 也可以用加�
 
 
 ```
+
+## gedit
+
+gedit is the default text editor
+
+```shell
+touch shell.sh
+gedit shell.sh #打开shell.sh 文件进行编辑
+```
+
 
 ## grep
 
@@ -701,6 +819,23 @@ ps -U  Becks #give all process under User Becks
 ps -C gnome-terminal #give all process related to program gnome-terminal, 可能连着多个instances
 ```
 
+## locate
+
+通过“ /var/lib/mlocate/mlocate.db ”数据库查找，不过这个数据库也不是实时更新的，系统会使用定时任务每天自动执行 updatedb 命令更新一次，所以有时候你刚添加的文件，它可能会找不到，需要手动执行一次 updatedb 命令（在我们的环境中必须先执行一次该命令）。它可以用来查找指定目录下的不同文件类型，如查找 /etc 下所有以 sh 开头的文件：(注意，它不只是在 /etc 目录下查找，还会自动递归子目录进行查找)
+
+```shell
+sudo apt-get update
+sudo apt-get install locate
+locate /etc/sh
+```
+
+查找 /usr/share/ 下所有 jpg 文件：
+```shell
+$ locate /usr/share/\*.jpg #注意要添加 * 号前面的反斜杠转义，否则会无法找到。
+```
+
+如果想只统计数目可以加上 ```-c``` 参数，```-i``` 参数可以忽略大小写进行查找，whereis 的 ```-b```、```-m```、```-s``` 同样可以使用。
+
 
 ## less
 
@@ -762,6 +897,8 @@ mv f1.txt f2.txt #rename f1.txt 成f2.txt
 
 mv f1.txt dir1/ #把f1.txt 移动到dir1
 #如果dir1 中有f1.txt, move 会overwrite 原有的file 内容
+
+mv f1.txt f2.txt dir1/ #move 多个文件到dir1
 
 mv -i f1.txt dir1 #move f1.txt 到dir1 folder中, 如果要overwrite 会问
 mv -i f1.txt dir1/ #与上面一样的
@@ -1367,7 +1504,26 @@ wc -L test.txt #只给出number of character in longest line
 
 ![](/img/post/linux/wc.png)
 
+
+## whereis 
+
+简单快速搜索
+
+```shell
+whereis who #找who command 来自哪个文件夹
+
+whereis find 
+
+```
+
+你会看到 whereis find 找到了三个路径，两个可执行文件路径和一个 man 在线帮助文件所在路径，<span style="background-color:#FFFF00">这个搜索很快，因为它并没有从硬盘中依次查找，而是直接从数据库中查询</span>。whereis 只能搜索二进制文件(-b)，man 帮助文件(-m)和源代码文件(-s)。如果想要获得更全面的搜索结果可以使用 locate 命令。
+
+![](/img/post/linux/whereis.png)
+
 ## which & what
+
+which 本身是 Shell 内建的一个命令，我们通常使用 which 来确定是否安装了某个指定的软件，</span style="background-color:#FFFF00">因为它只从 PATH 环境变量指定的路径中去搜索命令《/span>：
+
 
 which: where software/command located
 
@@ -1435,12 +1591,21 @@ CAL || pwd #CAL command failure, pwd 会被run
 
 
 
+## FUN
 
+《黑客帝国》电影里满屏幕代码的“数字雨”，在 Linux 里面你也可以轻松实现这样的效果，你只需要一个命令 cmatrix 。
 
+```shell
+sudo apt-get update; sudo apt-get install cmatrix
+```
 
+装好之后先不要急着执行，为了看到更好的效果，我们需要先修改终端的主题配色，在终端上面的【选项】中修改，修改为黑底绿字：
 
+还可以改变代码的颜色：
 
-
+```shell
+cmatrix -C red
+```
 
 
 
