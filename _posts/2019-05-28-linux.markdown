@@ -609,6 +609,16 @@ crontab -e
 ![](/img/post/linux/crontab.png)
 
 
+**Cron time Format**: five values separated by spaces
+
+| Character | 	Descriptor | 	Acceptable values | 
+| :---: | :---: | :--- |
+| 1 | 	Minute | 	0 to 59, or \* (no specific value)  | 
+| 2 | 	Hour  | 	0 to 23, or \* for any value. All times UTC. | 
+| 3 | 	Day of the month  | 	1 to 31, or \* (no specific value) | 
+| 4 | 	Month	 | 1 to 12, or \* (no specific value) | 
+| 5 | 	Day  |  of the week	0 to 7 (0 and 7 both represent Sunday), or \* (no specific value) | 
+
 文档的最后一排加上这样一排命令,该任务是每分钟我们会在/home/shiyanlou目录下创建一个以当前的年月日时分秒为名字的空白文件
 
 ```shell
