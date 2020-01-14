@@ -11,6 +11,19 @@ tags:
     - 学习笔记
 ---
 
+在python 文件开头加上
+```shell
+#!user/bin/python3 
+```
+运行python, 可以用
+```shell
+./mypython.py
+#而不用，
+python3 mypython.py
+```
+
+
+
 ```shell
 
 Ctrl + d # open new terminal window tab
@@ -325,6 +338,8 @@ cd 'My Books' #功能与上面一样
 
 ## apt-get
 
+sudo apt-get install chromium-broswer #install chrome 
+
 apt-get(urbantu): install, uninstall, update packages. apt: advance packaging tool
 
 对于centos: 用yum, dnf instead of apt-get 
@@ -464,6 +479,8 @@ drwxr-xr-x 1 beckswu staff 22 Jul 23 18:56 file: d means directory <br/>
 
 symbolic link is a term for any file that contains a reference to another file or directory in the form of an absolute or relative path and that affects pathname resolution
 
+如果没有r access, 不能用```cat``` 打印file
+
 
 第一个字母表示文件类型:
 
@@ -483,7 +500,7 @@ symbolic link is a term for any file that contains a reference to another file o
 
 不过 Linux 上不是通过文件后缀名来区分文件的类型。你需要注意的一点是，一个目录同时具有读权限和执行权限才可以打开并查看内部文件，而一个目录要有写权限才允许在其中创建其它文件，这是因为目录文件实际保存着该目录里面的文件的列表等信息。
 
-<span style="color:red">**g, o, u 分别表示 group, others 和 user** </span>
+<span style="color:red">**u, g, o, a  分别表示user,  group, others 和 all users** </span>
 
 ```shell
 
@@ -561,6 +578,7 @@ cp -R dir1 dir3 # -R means recursive copy,copy everything from dir1 to dir3
 #如果存在destination, 只copy paste
 cp -vR dir1 dir3 #显示详细的copy 哪些文件
 
+cp file* folder2/ #把当前文件夹下所有以file 开头文件都copy 
 
 ```
 ![](/img/post/linux/pic1.png)
@@ -609,7 +627,7 @@ crontab -e
 ![](/img/post/linux/crontab.png)
 
 
-**Cron time Format**: five values separated by spaces
+**Cron time Format**: five values separated by spaces, 必须保证有五位, <span style="background-color:#FFFF00">如果想重复run 比如每两分钟, append a slash ```*/``` </span>, 
 
 | Character | 	Descriptor | 	Acceptable values | 
 | :---: | :---: | :--- |
@@ -618,6 +636,15 @@ crontab -e
 | 3 | 	Day of the month  | 	1 to 31, or \* (no specific value) | 
 | 4 | 	Month	 | 1 to 12, or \* (no specific value) | 
 | 5 | 	Day  |  of the week	0 to 7 (0 and 7 both represent Sunday), or \* (no specific value) | 
+
+
+Cron time string |	Description |
+| :---: | :--- |
+| ```30 * * * *``` |	Execute a command at 30 minutes past the hour, every hour. | 
+| ```0 13 * * 1``` |	Execute a command at 1:00 p.m. UTC every Monday. |
+| ```*/5 * * * *``` |	Execute a command every five minutes. |
+| ```0 */2 * * *``` |	Execute a command every second hour, on the hour. | 
+
 
 文档的最后一排加上这样一排命令,该任务是每分钟我们会在/home/shiyanlou目录下创建一个以当前的年月日时分秒为名字的空白文件
 
@@ -1400,7 +1427,58 @@ rm -rv a #与上面一行作用是一样的,
 
 rm -f file #强制删除文件
 
+rm -i file1 file2  #会询问是否删除
+
+rm -I file1 file2 #如果删除大于3个文件会显示是否删除文件 且只问一次，如果小于3个文件，不会显示
+
+rm * #删除现在文件夹下所有文件
+
 ```
+
+## ssh 
+
+在linux 上安装
+
+```shell
+sudo apt-get install openssh-server
+```
+获取ip 地址通过```ifconfig```, inet 后面有ip 
+
+![](/img/post/linux/ssh.png) 
+
+```shell
+#在mac上
+ssh becks@192.168.0.108 #becks 是linux 的用户名
+```
+
+然后mac terminal 就可以控制linux terminal 了
+
+![](/img/post/linux/ssh2.png) 
+
+在mac 输入 退出ssh 
+
+```shell
+exit 
+```
+
+**避免在mac上每次登陆 重复输入密码**
+
+```shell
+ssh-keygen 
+```
+
+Enter passphrase 表示用的密码代替实际用的密码，避免密码的话，直接回车
+
+![](/img/post/linux/ssh3.png)
+
+把在mac 上的public key 推送到linux
+
+```shell
+ssh-copy-id -i y.pub becks@@具体的ip #y.pub 是上面储存的file
+#If the -i option is given then the identity file (defaults to ~/.ssh/id_rsa.pub) is used, regardless of whether there are any keys in your ssh-agent. 
+```
+
+
 
 
 ## sudo
@@ -1525,6 +1603,8 @@ PID: process ID, 同一个程序不同时候run pid 可能不一样的 <br/>
 Touch is the easist way to create new empty file in Linux. It is also used for changing timestamp on existing file or directory 
 
 <span style="background-color: #FFFF00">you cannot create new directory using touch, can only create empty file</span>
+
+不能用于创建folder, 显示error: setting times of foldername, 因为无法创建时间对于folder
 
 ```shell
 
