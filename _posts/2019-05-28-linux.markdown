@@ -306,21 +306,77 @@ xxx is an alias for xx --xxx
 ```
 
 
-## cd
-
-**home directory和root directory** 不一样, root是/, home 是 /Users/ username 的文件夹
+#### 执行多条语句
 
 ```shell
-cd / #go to root directory
-cd ~ #home directory
-cd .. #到parent directory
-cd Documents #go to Document Directory
-cd /home/programming/Documents/ #功能与上面一样, Go to Document Directory
-cd My\ Books # go to My Books folder, 在My Books中间有空格
-cd "My Books" #功能与上面一样
-cd 'My Books' #功能与上面一样
+$ sudo apt-get update
+# 等待——————————然后输入下面的命令
+$ sudo apt-get install some-tool //这里some-tool是指具体的软件包
+# 等待——————————然后输入下面的命令
+$ some-tool
+```
+
+这时你可能就会想：要是我可以一次性输入完，让它自己去依次执行各命令就好了，这就是我们这一小节要解决的问题。
+
+简单的顺序执行你可以使用```;```来完成，比如上述操作你可以：
+
+```shell
+$ sudo apt-get update;sudo apt-get install some-tool;some-tool
+# 让它自己运行
+```
+
+**有选择的执行命令**
+
+- ```$?``` 获取上次语句执行结果, 返回0或者1 
+- ```&&``` : 如果上个语句返回0 （true)， 执行```&&```后面的
+- ```||``` : 如果上个语句返回1， 执行```||``` 后面的
+
+```shell
+which cowsay 
+返回: cowsay not found 
+$? 
+返回: 1
+
+which cat 
+返回: /bin/cat
+$? 
+返回:0
+
+
+$ which cowsay>/dev/null || echo "cowsay has not been install, please run 'sudo apt-get install cowsay' to install"
+返回 "cowsay has not been install, please run 'sudo apt-get install cowsay' to install"
+```
+
+```shell
+which cowsay>/dev/null && echo "exist" || echo "not exist"
+```
+
+![](/img/post/linux/multiple.png)
+
+
+如果把 ```&&``` 和```||``` 顺序倒过来, 逻辑与其他语言一样， 只是```0``` 代表```true```, ```1``` 代表```false```
+
+
+```shell
+which cowsay>/dev/null || echo "exist" && echo "not exist"
+返回: exist
+      not exis
+```
+
+
+#### 管道
+
+管道是什么？管道是一种通信机制，通常用于进程间的通信（也可通过socket进行网络通信），就是将前面每一个进程的输出(stdout)直接作为下一个进程的输入(stdin)。管道又分为匿名管道和具名管道, 我们在使用一些过滤程序时经常会用到的就是匿名管道，在命令行中由```|```分隔符表示
+
+E.g. 通过管道将前一个命令(```ls```)的输出作为下一个命令(```less```)的输入，然后就可以一行一行地看。
+
+```shell
+ls -al /etc | less
 
 ```
+
+
+
 
 
 ## apt-get
@@ -453,6 +509,24 @@ cat list1.txt list2.txt > list2.txt #这样是不行的，不能把input 当成o
 cat list1.txt >> list2.txt #修改上面一行的error，append list1.txt 到list2.txt
 
 ```
+
+
+## cd
+
+**home directory和root directory** 不一样, root是/, home 是 /Users/ username 的文件夹
+
+```shell
+cd / #go to root directory
+cd ~ #home directory
+cd .. #到parent directory
+cd Documents #go to Document Directory
+cd /home/programming/Documents/ #功能与上面一样, Go to Document Directory
+cd My\ Books # go to My Books folder, 在My Books中间有空格
+cd "My Books" #功能与上面一样
+cd 'My Books' #功能与上面一样
+
+```
+
 
 
 ## chmod, File Permissions
@@ -693,6 +767,35 @@ cron 服务监测时间最小单位是分钟，所以 cron 会每分钟去读取
 - ```/etc/cron.weekly```，目录下的脚本会每周执行一次，在每周第七天的6点47分时运行；
 
 
+
+## cut 
+
+打印```/etc/passwd```文件中以```:```为分隔符的第1个字段和第6个字段分别表示用户名和其家目录
+
+| Flag | 	说明| 
+| :---: | :--- |
+| ```c``` | character, select only these character | 
+| ```d``` | delimilter, use delimiter instead of TAB as delimiter | 
+| ```f``` | select only these field | 
+
+```shell
+$ cut /etc/passwd -d ':' -f 1,6
+```
+
+![](/img/post/linux/cut.png)
+
+打印/etc/passwd文件中每一行的前N个字符：
+
+```shell
+# 前五个（包含第五个）
+cut /etc/passwd -c -5
+# 前五个之后的（包含第五个）
+cut /etc/passwd -c 5-
+# 第五个
+cut /etc/passwd -c 5
+# 2到5之间的（包含第五个）
+cut /etc/passwd -c 2-5
+```
 
 
 ## date
@@ -1007,6 +1110,31 @@ gedit shell.sh #打开shell.sh 文件进行编辑
 
 
 ## grep
+
+
+| Flag | 	说明| 
+| :---: | :--- |
+| ```--exclude=GLOB``` | skip files whose base name matches GLOB (using wildcard matching).  can use ```*, ?,``` and ```[...]``` as wildcards |
+| ```--exclude-from=FILE``` | skip files whose matches any FILE can use GLOB |
+| ```--exclude-dir=DIR``` | Exclude directories matching the pattern DIR from recursive searches | 
+| ```-I``` | 忽略binary file , 等于```binary-files=without-match``` option|
+| ```-i``` | ignore case sensitive | 
+| ```-n``` | print the line number | 
+| ```-v``` | Invert sense of matching, only select non-matching line | 
+| ```-r``` | recursively find all files under each directory recursively |
+
+还是先体验一下，我们搜索/home/shiyanlou目录下所有包含"shiyanlou"的文本文件，并显示出现在文本中的行号：
+```
+grep -rnI "shiyanlou" ~
+```
+
+![](/img/post/linux/grep.png)
+
+查看环境变量中以"yanlou"结尾的字符串, 其中```$```就表示一行的末尾。
+```
+$ export | grep ".*yanlou$"
+```
+![](/img/post/linux/grep2.png)
 
 grep: global regular expression print. can be used to search pattern / word in a text file or a number of text file with grep command
 
@@ -1957,7 +2085,7 @@ whereis find
 
 ## which & what
 
-which 本身是 Shell 内建的一个命令，我们通常使用 which 来确定是否安装了某个指定的软件，</span style="background-color:#FFFF00">因为它只从 PATH 环境变量指定的路径中去搜索命令《/span>：
+which 本身是 Shell 内建的一个命令，我们通常使用 which 来确定是否安装了某个指定的软件，<span style="background-color:#FFFF00">因为它只从 PATH 环境变量指定的路径中去搜索命令 </span>：
 
 
 which: where software/command located
