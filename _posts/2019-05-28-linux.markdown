@@ -1162,7 +1162,7 @@ grep -nv "Some options" f1.txt #显示f1.txt 不包含Some options的行
 grep -help #显示有的flag, options 用grep command
 
 ```
-![](/img/post/linux/grep.png)
+
 
 
 ## groups, groupadd, groupdel
@@ -1234,6 +1234,18 @@ ls --help
 ```
 
 ![](/img/post/linux/help2.png)
+
+
+## history 
+
+看看最近都执行了什么命令,实际为读取```${SHELL}_history```文件,如我们环境中的```~/.zsh_history```文件），
+
+
+```shell
+history
+```
+
+![](/img/post/linux/history.png)
 
 
 ## info 
@@ -1530,6 +1542,37 @@ rm -f file #强制删除文件
 
 ```
 
+## sort
+
+| flag | 	说明| 
+| :---: | :--- |
+| ```-b``` | ignore leading blank |
+| ```-d``` | dictionary order, 只考虑blanks 和 alphabets | 
+| ```-f``` | ignore case 忽略大小写 |
+| ```-H``` |  month sort, 比如 (unknown)'' < 'JAN' < 'DEC' |
+| ```-h``` | Human readable sort, 比如 （2K, 1G)
+| ```-i``` | ignore nonprinting 不考虑空格 |
+| ```-k``` | sort via a key, key gives location and type. e.g. ```-k 3 ``` 表示第三位 | 
+| ```-n``` | compare to string numerical value |
+| ```-R``` | random sort, shuffle | 
+| ```-r``` | sort on reversed order |
+| ```-t --field-separator=SEP``` | field separator, use SEP instead of nonblank |
+| ```-u```` | unique | 
+
+```shell
+#认为字典排序：
+$ cat /etc/passwd | sort
+
+#反转排序：
+$ cat /etc/passwd | sort -r
+
+#按特定字段排序：
+$ cat /etc/passwd | sort -t':' -k 3 -n 
+```
+上面的```-t```参数用于指定字段的分隔符，这里是以":"作为分隔符；```-k``` 字段号用于指定对哪一个字段进行排序。这里/etc/passwd文件的第三个字段为数字，默认情况下是以字典序排序的，如果要按照数字排序就要加上```-n```参数：, 结果按照0，1，3，4，5... 顺序排序， 如果不加```-n``` 按照 0, 100, 10,  101, ... 2, 200, 顺序排序
+
+![](/img/post/linux/sort.png)
+
 
 ## sudo
 
@@ -1671,6 +1714,48 @@ touch file{1..10}.txt #创建 file1.txt , file2.txt , ... ,file10.txt
 ## type 
 
 区分内建命令与外部命令, 详见Linux基础,  内建命令与外部命令
+
+
+
+## uniq 
+
+uniq命令可以用于过滤或者输出重复行。
+
+| flag | 	说明| 
+| :---: | :--- |
+| ```-c``` | prefix lines by the number of occurence | 
+| ```-d``` | print only duplicated lines, one for each group |
+| ```-D``` | print all duplicated lines |
+| ```-f --skip-fields=N``` | avoid comparing first N fields |
+| ```-i``` | ignore cases when comparing 忽略大小写 |
+| ```-s --skip-chars=N``` | avoid comparing first N characters |
+| ```－u``` | print only unique line |
+| ```-w --check-chars=N``` | compare no more than N characters in lines |
+
+过滤重复行
+我们可以使用```history```命令查看最近执行过的命令,不过你可能只想查看使用了哪个命令而不需要知道具体干了什么，那么你可能就会要想去掉命令后面的参数然后去掉重复的命令：
+```shell
+$ history | cut -c 8- | cut -d ' ' -f 1 | uniq
+
+#cut -c 8-  除去前8 char 的编号 和 空格的对齐
+# cut -d ' ' -f 1： 以' '为分界，split 只要第一个，比如echo '123', 只留下echo
+```
+
+<span style="background-color:#FFFF00">**```uniq```命令只能去连续重复的行，不是全文去重**</span>，所以要达到预期效果，我们先排序：
+
+```shell
+$ history | cut -c 8- | cut -d ' ' -f 1 | sort | uniq
+# 或者$ history | cut -c 8- | cut -d ' ' -f 1 | sort -u
+```
+这就是 Linux/UNIX 哲学吸引人的地方，大繁至简，一个命令只干一件事却能干到最好。
+
+```shell
+输出重复行
+# 输出重复过的行（重复的只输出一个）及重复次数
+$ history | cut -c 8- | cut -d ' ' -f 1 | sort | uniq -dc
+# 输出所有重复的行
+$ history | cut -c 8- | cut -d ' ' -f 1 | sort | uniq -D
+```
 
 
 ## useradd /adduser
@@ -2050,6 +2135,37 @@ watch -n 0,5 free -m #让free -m command run every 0.5 second
 
 wc: world count, print a count of lines, words and characters for each files
 
+
+| flag | 	说明| 
+| :---: | :--- |
+| ```-c``` | print bytes count  字节数 | 
+| ```-m``` | print chars count 字符数  |
+| ```-l``` | print lines 行数 |
+| ```-L``` | print max line length 最长行的字节数 |
+| ```-w``` | print the word count |
+
+<span style="color:red">**注意**</span>：对于西文字符来说，一个字符就是一个字节，但对于中文字符一个汉字是大于2个字节的，具体数目是由字符编码决定的
+
+```shell
+# 行数
+wc -l /etc/passwd
+# 单词数
+wc -w /etc/passwd
+# 字节数
+wc -c /etc/passwd
+# 字符数
+wc -m /etc/passwd
+# 最长行字节数
+wc -L /etc/passwd
+```
+
+![](/img/post/linux/wc.png)
+
+```shell
+ls -dl /etc/*/ | wc -l #打印ls -dl /etc/*/ 有多少行 
+```
+
+![](/img/post/linux/wc.png)
 
 ```shell
 
