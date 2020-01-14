@@ -319,21 +319,77 @@ xxx is an alias for xx --xxx
 ```
 
 
-## cd
-
-**home directory和root directory** 不一样, root是/, home 是 /Users/ username 的文件夹
+#### 执行多条语句
 
 ```shell
-cd / #go to root directory
-cd ~ #home directory
-cd .. #到parent directory
-cd Documents #go to Document Directory
-cd /home/programming/Documents/ #功能与上面一样, Go to Document Directory
-cd My\ Books # go to My Books folder, 在My Books中间有空格
-cd "My Books" #功能与上面一样
-cd 'My Books' #功能与上面一样
+$ sudo apt-get update
+# 等待——————————然后输入下面的命令
+$ sudo apt-get install some-tool //这里some-tool是指具体的软件包
+# 等待——————————然后输入下面的命令
+$ some-tool
+```
+
+这时你可能就会想：要是我可以一次性输入完，让它自己去依次执行各命令就好了，这就是我们这一小节要解决的问题。
+
+简单的顺序执行你可以使用```;```来完成，比如上述操作你可以：
+
+```shell
+$ sudo apt-get update;sudo apt-get install some-tool;some-tool
+# 让它自己运行
+```
+
+**有选择的执行命令**
+
+- ```$?``` 获取上次语句执行结果, 返回0或者1 
+- ```&&``` : 如果上个语句返回0 （true)， 执行```&&```后面的
+- ```||``` : 如果上个语句返回1， 执行```||``` 后面的
+
+```shell
+which cowsay 
+返回: cowsay not found 
+$? 
+返回: 1
+
+which cat 
+返回: /bin/cat
+$? 
+返回:0
+
+
+$ which cowsay>/dev/null || echo "cowsay has not been install, please run 'sudo apt-get install cowsay' to install"
+返回 "cowsay has not been install, please run 'sudo apt-get install cowsay' to install"
+```
+
+```shell
+which cowsay>/dev/null && echo "exist" || echo "not exist"
+```
+
+![](/img/post/linux/multiple.png)
+
+
+如果把 ```&&``` 和```||``` 顺序倒过来, 逻辑与其他语言一样， 只是```0``` 代表```true```, ```1``` 代表```false```
+
+
+```shell
+which cowsay>/dev/null || echo "exist" && echo "not exist"
+返回: exist
+      not exis
+```
+
+
+#### 管道
+
+管道是什么？管道是一种通信机制，通常用于进程间的通信（也可通过socket进行网络通信），就是将前面每一个进程的输出(stdout)直接作为下一个进程的输入(stdin)。管道又分为匿名管道和具名管道, 我们在使用一些过滤程序时经常会用到的就是匿名管道，在命令行中由```|```分隔符表示
+
+E.g. 通过管道将前一个命令(```ls```)的输出作为下一个命令(```less```)的输入，然后就可以一行一行地看。
+
+```shell
+ls -al /etc | less
 
 ```
+
+
+
 
 
 ## apt-get
@@ -470,6 +526,24 @@ cat list1.txt >> list2.txt #修改上面一行的error，append list1.txt 到lis
 ```
 
 
+## cd
+
+**home directory和root directory** 不一样, root是/, home 是 /Users/ username 的文件夹
+
+```shell
+cd / #go to root directory
+cd ~ #home directory
+cd .. #到parent directory
+cd Documents #go to Document Directory
+cd /home/programming/Documents/ #功能与上面一样, Go to Document Directory
+cd My\ Books # go to My Books folder, 在My Books中间有空格
+cd "My Books" #功能与上面一样
+cd 'My Books' #功能与上面一样
+
+```
+
+
+
 ## chmod, File Permissions
 
 drwxr-xr-x 1 beckswu staff 22 Jul 23 18:56 file: d means directory <br/>
@@ -553,6 +627,23 @@ chmod becks newfile.txt #把文件修改为becks 为onwer
 sudo chmod becks newfile.txt 
 ```
 
+## col 
+
+```col``` 命令可以将Tab换成对等数量的空格键，或反转这个操作。 (filter reversed line from input)
+
+使用方式： ```col [option]```
+
+| 命令 | 	说明| 
+| :---: | :--- |
+| ```-x```|	 将Tab转换为空格 |
+| ```-h``` |	将空格转换为Tab（默认选项） |
+
+```shell
+# 查看 /etc/protocols 中的不可见字符，可以看到很多 ^I ，这其实就是 Tab 转义成可见字符的符号
+$ cat -A /etc/protocols
+# 使用 col -x 将 /etc/protocols 中的 Tab 转换为空格,然后再使用 cat 查看，你发现 ^I 不见了
+$ cat /etc/protocols | col -x | cat -A
+```
 
 ## cp
 
@@ -720,6 +811,35 @@ cron 服务监测时间最小单位是分钟，所以 cron 会每分钟去读取
 - ```/etc/cron.weekly```，目录下的脚本会每周执行一次，在每周第七天的6点47分时运行；
 
 
+
+## cut 
+
+打印```/etc/passwd```文件中以```:```为分隔符的第1个字段和第6个字段分别表示用户名和其家目录
+
+| Flag | 	说明| 
+| :---: | :--- |
+| ```c``` | character, select only these character | 
+| ```d``` | delimilter, use delimiter instead of TAB as delimiter | 
+| ```f``` | select only these field | 
+
+```shell
+$ cut /etc/passwd -d ':' -f 1,6
+```
+
+![](/img/post/linux/cut.png)
+
+打印/etc/passwd文件中每一行的前N个字符：
+
+```shell
+# 前五个（包含第五个）
+cut /etc/passwd -c -5
+# 前五个之后的（包含第五个）
+cut /etc/passwd -c 5-
+# 第五个
+cut /etc/passwd -c 5
+# 2到5之间的（包含第五个）
+cut /etc/passwd -c 2-5
+```
 
 
 ## date
@@ -1035,6 +1155,31 @@ gedit shell.sh #打开shell.sh 文件进行编辑
 
 ## grep
 
+
+| Flag | 	说明| 
+| :---: | :--- |
+| ```--exclude=GLOB``` | skip files whose base name matches GLOB (using wildcard matching).  can use ```*, ?,``` and ```[...]``` as wildcards |
+| ```--exclude-from=FILE``` | skip files whose matches any FILE can use GLOB |
+| ```--exclude-dir=DIR``` | Exclude directories matching the pattern DIR from recursive searches | 
+| ```-I``` | 忽略binary file , 等于```binary-files=without-match``` option|
+| ```-i``` | ignore case sensitive | 
+| ```-n``` | print the line number | 
+| ```-v``` | Invert sense of matching, only select non-matching line | 
+| ```-r``` | recursively find all files under each directory recursively |
+
+还是先体验一下，我们搜索/home/shiyanlou目录下所有包含"shiyanlou"的文本文件，并显示出现在文本中的行号：
+```
+grep -rnI "shiyanlou" ~
+```
+
+![](/img/post/linux/grep.png)
+
+查看环境变量中以"yanlou"结尾的字符串, 其中```$```就表示一行的末尾。
+```
+$ export | grep ".*yanlou$"
+```
+![](/img/post/linux/grep2.png)
+
 grep: global regular expression print. can be used to search pattern / word in a text file or a number of text file with grep command
 
 ```shell
@@ -1061,7 +1206,7 @@ grep -nv "Some options" f1.txt #显示f1.txt 不包含Some options的行
 grep -help #显示有的flag, options 用grep command
 
 ```
-![](/img/post/linux/grep.png)
+
 
 
 ## groups, groupadd, groupdel
@@ -1135,6 +1280,18 @@ ls --help
 ![](/img/post/linux/help2.png)
 
 
+## history 
+
+看看最近都执行了什么命令,实际为读取```${SHELL}_history```文件,如我们环境中的```~/.zsh_history```文件），
+
+
+```shell
+history
+```
+
+![](/img/post/linux/history.png)
+
+
 ## info 
 
 要是你觉得```man```显示的信息都还不够，满足不了你的需求，那试试 info 命令. 
@@ -1173,6 +1330,39 @@ WLAN0: wireless internet connection <br/>
 0: is the first internet interface. 如果有multiple internet interface, 显示eth1, or WLAN2
 l0: loop back interface. An interface that system use to communcate to excel
 
+## join 
+
+学过数据库的用户对这个应该不会陌生，这个命令就是用于将两个文件中包含相同内容的那一行合并在一起。使用方式： ```join [option]... file1 file2```
+
+常用的选项有：
+
+| 选项 |	说明 |
+| :---: | :--- |
+| ```-a NUM ``` | <span style="background-color:#FFFF00>**默认是inner join**</span>, 没有pair上不显示, ```-a 1``` left join, ```-a 2``` right join|
+| ```-t 'delimiter'```| 	指定分隔符，默认为空格 |
+| ```-i```| 	忽略大小写的差异 |
+| ```-1 NUM```| 	第一个file 哪个column 作为join的key, 默认对比第一个字段,  |
+| ```-2 NUM```|     第二个file 哪个column 作为join的key，默认对比第一个字段 |
+| ```nocheck-order``` | 默认情况下会检查file 是不是按照key的顺序sorted，如果不是会report, 这个会不check if sorted |
+
+[link for example](https://www.howtoforge.com/tutorial/linux-join-command/)
+
+```shell
+$ cd /home/shiyanlou
+
+# 创建两个文件
+$ echo '1 hello' > file1
+$ echo '1 shiyanlou' > file2
+$ join file1 file2
+# print 1 hello shiyanlou
+
+# 将/etc/passwd与/etc/shadow两个文件合并，指定以':'作为分隔符
+$ sudo join -t':' /etc/passwd /etc/shadow
+
+# 将/etc/passwd与/etc/group两个文件合并，指定以':'作为分隔符, 分别比对第4和第3个字段
+$ sudo join -t':' -1 4 /etc/passwd -2 3 /etc/group
+
+```
 
 ## kill / ps
 
@@ -1467,6 +1657,7 @@ exit
 ssh-keygen 
 ```
 
+<<<<<<< HEAD
 Enter passphrase 表示用的密码代替实际用的密码，避免密码的话，直接回车
 
 ![](/img/post/linux/ssh3.png)
@@ -1479,6 +1670,38 @@ ssh-copy-id -i y.pub becks@@具体的ip #y.pub 是上面储存的file
 ```
 
 
+=======
+## sort
+
+| flag | 	说明| 
+| :---: | :--- |
+| ```-b``` | ignore leading blank |
+| ```-d``` | dictionary order, 只考虑blanks 和 alphabets | 
+| ```-f``` | ignore case 忽略大小写 |
+| ```-H``` |  month sort, 比如 (unknown)'' < 'JAN' < 'DEC' |
+| ```-h``` | Human readable sort, 比如 （2K, 1G)
+| ```-i``` | ignore nonprinting 不考虑空格 |
+| ```-k``` | sort via a key, key gives location and type. e.g. ```-k 3 ``` 表示第三位 | 
+| ```-n``` | compare to string numerical value |
+| ```-R``` | random sort, shuffle | 
+| ```-r``` | sort on reversed order |
+| ```-t --field-separator=SEP``` | field separator, use SEP instead of nonblank |
+| ```-u```` | unique | 
+
+```shell
+#认为字典排序：
+$ cat /etc/passwd | sort
+
+#反转排序：
+$ cat /etc/passwd | sort -r
+
+#按特定字段排序：
+$ cat /etc/passwd | sort -t':' -k 3 -n 
+```
+上面的```-t```参数用于指定字段的分隔符，这里是以":"作为分隔符；```-k``` 字段号用于指定对哪一个字段进行排序。这里/etc/passwd文件的第三个字段为数字，默认情况下是以字典序排序的，如果要按照数字排序就要加上```-n```参数：, 结果按照0，1，3，4，5... 顺序排序， 如果不加```-n``` 按照 0, 100, 10,  101, ... 2, 200, 顺序排序
+
+![](/img/post/linux/sort.png)
+>>>>>>> 6631a026434e99de4e466ca913de40e2e3593a6c
 
 
 ## sudo
@@ -1620,9 +1843,92 @@ touch file{1..10}.txt #创建 file1.txt , file2.txt , ... ,file10.txt
 ![](/img/post/linux/pic2.png)
 
 
+
+## tr
+
+```tr``` 命令可以用来删除一段文本信息中的某些文字。或者将其进行转换。translation
+
+使用方式：
+```tr [option]...SET1 [SET2]```
+
+
+| 选项 |	说明 |
+| :---: | :--- |
+| ```-d or --delete```|	删除和```set1```匹配的字符， <span style="color:red">注意不是全词匹配也不是按字符顺序匹配</span> |
+| ```-s or --squeeze-repeat``` |	去除```set1```指定的在输入文本中连续并重复的字符 |
+| ```[:alnum:]``` | 全部转为数字或字母 |
+| ```[:alpha:]``` | 全部转为字母 |
+| ```[:digit:]``` | 全部转为数字 |
+| ```'[:lower:]' or '[a-z]'``` | 全部转为小写 |
+| ```'[:upper:]' or '[A-Z]``` | 全部转化为大写 |
+
+```shell
+# 删除 "hello shiyanlou" 中所有的'o','l','h'
+$ echo 'hello shiyanlou' | tr -d 'olh'
+
+# 将"hello" 中的ll,去重为一个l
+$ echo 'hello' | tr -s 'l'
+
+# 将输入文本，全部转小写为大写输出
+$ echo 'input some text here' | tr '[:lower:]' '[:upper:]'
+# 上面的'[:lower:]' '[:upper:]'你也可以简单的写作'[a-z]' '[A-Z]',当然反过来将大写变小写也是可以的
+
+echo 'This is a  test  ' | tr -s '[a-z]' '9'
+# 返回: 'T9 9 9  9  '
+```
+
+![](/img/post/linux/tr.png)
+
+```shell
+$ tr '{}' '()' < inputfile > outputfile
+```
+The above command will read each character from “inputfile”, translate if it is a brace, and write the output in “outputfile”.
+
 ## type 
 
 区分内建命令与外部命令, 详见Linux基础,  内建命令与外部命令
+
+
+
+## uniq 
+
+uniq命令可以用于过滤或者输出重复行。
+
+| flag | 	说明| 
+| :---: | :--- |
+| ```-c``` | prefix lines by the number of occurence | 
+| ```-d``` | print only duplicated lines, one for each group |
+| ```-D``` | print all duplicated lines |
+| ```-f --skip-fields=N``` | avoid comparing first N fields |
+| ```-i``` | ignore cases when comparing 忽略大小写 |
+| ```-s --skip-chars=N``` | avoid comparing first N characters |
+| ```－u``` | print only unique line |
+| ```-w --check-chars=N``` | compare no more than N characters in lines |
+
+过滤重复行
+我们可以使用```history```命令查看最近执行过的命令,不过你可能只想查看使用了哪个命令而不需要知道具体干了什么，那么你可能就会要想去掉命令后面的参数然后去掉重复的命令：
+```shell
+$ history | cut -c 8- | cut -d ' ' -f 1 | uniq
+
+#cut -c 8-  除去前8 char 的编号 和 空格的对齐
+# cut -d ' ' -f 1： 以' '为分界，split 只要第一个，比如echo '123', 只留下echo
+```
+
+<span style="background-color:#FFFF00">**```uniq```命令只能去连续重复的行，不是全文去重**</span>，所以要达到预期效果，我们先排序：
+
+```shell
+$ history | cut -c 8- | cut -d ' ' -f 1 | sort | uniq
+# 或者$ history | cut -c 8- | cut -d ' ' -f 1 | sort -u
+```
+这就是 Linux/UNIX 哲学吸引人的地方，大繁至简，一个命令只干一件事却能干到最好。
+
+```shell
+输出重复行
+# 输出重复过的行（重复的只输出一个）及重复次数
+$ history | cut -c 8- | cut -d ' ' -f 1 | sort | uniq -dc
+# 输出所有重复的行
+$ history | cut -c 8- | cut -d ' ' -f 1 | sort | uniq -D
+```
 
 
 ## useradd /adduser
@@ -2003,6 +2309,37 @@ watch -n 0,5 free -m #让free -m command run every 0.5 second
 wc: world count, print a count of lines, words and characters for each files
 
 
+| flag | 	说明| 
+| :---: | :--- |
+| ```-c``` | print bytes count  字节数 | 
+| ```-m``` | print chars count 字符数  |
+| ```-l``` | print lines 行数 |
+| ```-L``` | print max line length 最长行的字节数 |
+| ```-w``` | print the word count |
+
+<span style="color:red">**注意**</span>：对于西文字符来说，一个字符就是一个字节，但对于中文字符一个汉字是大于2个字节的，具体数目是由字符编码决定的
+
+```shell
+# 行数
+wc -l /etc/passwd
+# 单词数
+wc -w /etc/passwd
+# 字节数
+wc -c /etc/passwd
+# 字符数
+wc -m /etc/passwd
+# 最长行字节数
+wc -L /etc/passwd
+```
+
+![](/img/post/linux/wc.png)
+
+```shell
+ls -dl /etc/*/ | wc -l #打印ls -dl /etc/*/ 有多少行 
+```
+
+![](/img/post/linux/wc.png)
+
 ```shell
 
 wc test.txt #打出#lines, #words, #characters
@@ -2037,7 +2374,7 @@ whereis find
 
 ## which & what
 
-which 本身是 Shell 内建的一个命令，我们通常使用 which 来确定是否安装了某个指定的软件，</span style="background-color:#FFFF00">因为它只从 PATH 环境变量指定的路径中去搜索命令《/span>：
+which 本身是 Shell 内建的一个命令，我们通常使用 which 来确定是否安装了某个指定的软件，<span style="background-color:#FFFF00">因为它只从 PATH 环境变量指定的路径中去搜索命令 </span>：
 
 
 which: where software/command located
