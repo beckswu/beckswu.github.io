@@ -465,11 +465,43 @@ $ cat Documents/test.c hello.c > somefile
 
 ```shell
 # 将标准错误重定向到标准输出，再将标准输出重定向到文件，注意要将重定向到文件写到前面
-$ cat Documents/test.c hello.c >somefile  2>&1
+$ cat Documents/test.c hello.c >somefile  2>&1 
 # 或者只用bash提供的特殊的重定向符号"&"将标准错误和标准输出同时重定向到文件
 $ cat Documents/test.c hello.c &>somefilehell
 ```
-注意你应该在输出重定向文件描述符前加上```&```,否则shell会当做重定向到一个文件名为1的文件中
+```2>&1```, 看上面的文件描述符,<span style="color:red">```2``` 是标准错误, ```1``` 是标准输出</span>, 注意你应该在输出重定向文件描述符前加上```&```,否则shell会当做重定向到一个文件名为1的文件中
+
+
+
+**永久重新定向**
+
+- ```exec```: 你应该可以看出我们前面的重定向操作都只是临时性的，即<span style="color:red">只对当前命令有效</span>，那如何做到“永久”有效呢，我们可以使用```exec```命令实现“永久”重定向。
+
+
+**创建输出文件描述符**
+
+在 Shell 中有9个文件描述符。<span style="color:red">上面我们使用了也是它默认提供的0,1,2号文件描述符</span>。另外我们还可以使用3-8的文件描述符，只是它们默认没有打开而已。你可以使用下面命令查看当前 Shell 进程中打开的文件描述符：
+
+$ cd /dev/fd/;ls -Al
+copy
+同样使用exec命令可以创建新的文件描述符：
+
+$ zsh
+$ exec 3>somefile
+# 先进入目录，再查看，否则你可能不能得到正确的结果，然后再回到上一次的目录
+$ cd /dev/fd/;ls -Al;cd -
+# 注意下面的命令>与&之间不应该有空格，如果有空格则会出错
+$ echo "this is test" >&3
+$ cat somefile
+$ exit
+
+
+
+
+
+
+
+
 
 
 
@@ -486,6 +518,9 @@ x11vnc -usepw -forever
 ```
 
 在mac 上搜索screen sharing 打开, 输入```ip地址``` (```ifconfig``` 显示的), 这个```ip``` 是内网，只能在同一个路由器下面使用
+
+
+
 
 
 
@@ -1178,6 +1213,29 @@ echo "the value of x is $x" #print the value of x is 10
 echo -e 'some \text' #-e use escape,  \t -> tab,   print:  some     ext
 
 ```
+
+## exec 
+
+```exec```命令的作用是使用指定的命令替换当前的 Shell，即使用一个进程替换当前进程，或者指定新的重定向, replace current process image with a new process image
+
+
+
+```shell
+# 先开启一个子 Shell
+$ zsh
+
+# 使用exec替换当前进程的重定向，将标准输出重定向到一个文件
+$ exec 1>somefile
+# 后面你执行的命令的输出都将被重定向到文件中,直到你退出当前子shell，或取消exec的重定向（后面将告诉你怎么做）
+
+$ ls
+$ exit
+$ cat somefile
+
+```
+
+![](/img/post/linux/exec.png)
+
 ## file 
 
 file 命令查看文件的类型
@@ -1921,8 +1979,23 @@ tar -xvfz test.tar.gz f.txt #解压 gz 文件
 man tar > tar.txt #把tar 的man output 到tar.txt 中
 
 ```
+## tee
+
+| 选项 |	说明 |
+| :---: | :--- |
+| ```-a```| append to file not overwrite |
+
+read from standard input and write to standard output and file 
+
+你可能还有这样的需求，除了需要将输出重定向到文件,也需要将信息打印在终端。那么你可以使用tee命令来实现：
 
 
+
+```shell
+$ echo 'hello shiyanlou' | tee hello
+```
+
+![](/img/post/linux/tee.png)
 
 ## top
 
