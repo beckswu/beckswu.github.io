@@ -390,9 +390,11 @@ ls -al /etc | less
 
 #### 数据流重定向
 
-```<<``` is known as here-document structure. 告诉program what is **ending text**, and whenever that delimiter is seen, the program will read all the stuff you've given to the program as input and perform a task upon it.
+- ```<``` 从右侧传入文件到左侧command, 比如 ```grep 'int' < somefile``` 
+- ```<<``` is known as here-document structure. 告诉program what is **ending text**, and whenever that delimiter is seen, the program will read all the stuff you've given to the program as input and perform a task upon it.
 
 
+```<``` 输入重新定向, ```>>``` 和 ```>``` 输出重新定向，我们在简单地用```<```或```>```时，相当于使用 ```0<``` (到输入) 或 ```1>```(到输出)
 
 － ```stdin```: 标准输入,对应于你在终端的输入
 - ```stdout```: 标准输出，对应于终端的输出
@@ -480,29 +482,80 @@ $ cat Documents/test.c hello.c &>somefilehell
 
 **创建输出文件描述符**
 
-在 Shell 中有9个文件描述符。<span style="color:red">上面我们使用了也是它默认提供的0,1,2号文件描述符</span>。另外我们还可以使用3-8的文件描述符，只是它们默认没有打开而已。你可以使用下面命令查看当前 Shell 进程中打开的文件描述符：
+在 Shell 中有9个文件描述符。<span style="color:red">上面我们使用了也是它默认提供的0,1,2号文件描述符. 另外我们还可以使用3-8的文件描述符，只是它们默认没有打开而已</span>。你可以使用下面命令查看当前 Shell 进程中打开的文件描述符：
 
+```shell
 $ cd /dev/fd/;ls -Al
-copy
+```
 同样使用exec命令可以创建新的文件描述符：
 
+```shell
 $ zsh
 $ exec 3>somefile
+
 # 先进入目录，再查看，否则你可能不能得到正确的结果，然后再回到上一次的目录
 $ cd /dev/fd/;ls -Al;cd -
+
 # 注意下面的命令>与&之间不应该有空格，如果有空格则会出错
 $ echo "this is test" >&3
 $ cat somefile
 $ exit
+```
+
+![](/img/post/linux/exec2.png)
+
+
+**关闭文件描述符**
+
+如上面我们打开的3号文件描述符，可以使用如下操作将它关闭：
+
+```shell
+$ exec 3>&-
+$ cd /dev/fd;ls -Al;cd -
+```
 
 
 
+在 Linux 中有一个被称为“黑洞”的设备文件,所有导入它的数据都将被“吞噬”。
+
+> 在类 UNIX 系统中，```/dev/null```，或称空设备，是一个特殊的设备文件，它通常被用于丢弃不需要的输出流，或作为用于输入流的空文件，这些操作通常由重定向完成。读取它则会立即得到一个EOF。
+
+我们可以利用```/dev/null```屏蔽命令的输出：
+
+```shell
+$ cat Documents/test.c 1>/dev/null 2>&1
+```
+上面这样的操作将使你得不到任何输出结果
 
 
+- ```* cmd > file```: 把cmd命令的输出重定向到文件file中。如果file已经存在，则清空原有文件，使用bash的noclobber选项可以防止复盖原有文件。
+```* cmd >> file```: 把cmd命令的输出重定向到文件file中，如果file已经存在，则把信息加在原有文件後面。
+```* cmd < file```: 使cmd命令从file读入
+```* cmd << text```: 从命令行读取输入，直到一个与text相同的行结束。除非使用引号把输入括起来，此模式将对输入内容进行shell变量替换。如果使用<<- ，则会忽略接下来输入行首的tab，结束行也可以是一堆tab再加上一个与text相同的内容，可以参考後面的例子。
+```* cmd <<< word```: 把word（而不是文件word）和後面的换行作为输入提供给cmd。
+```* cmd <> file```: 以读写模式把文件file重定向到输入，文件file不会被破坏。仅当应用程序利用了这一特性时，它才是有意义的。
+```* cmd >| file```: 功能同 ```>```，但即便在设置了noclobber时也会复盖file文件，注意用的是```|```而非一些书中说的!，目前仅在csh中仍沿用>!实现这一功能。
+: > filename 把文件"filename"截断为0长度.# 如果文件不存在, 那么就创建一个0长度的文件(与'touch'的效果相同).
+```cmd >&n```: 把输出送到文件描述符n
+```cmd m>&n```: 把输出 到文件符m的信息重定向到文件描述符n
+```cmd >&-```: 关闭标准输出
+```cmd <&n```: 输入来自文件描述符n
+```cmd m<&n```: m来自文件描述各个n
+```cmd <&-```: 关闭标准输入
+```cmd <&n-```: 移动输入文件描述符n而非复制它。（需要解释）
+```cmd >&n-```: 移动输出文件描述符 n而非复制它。（需要解释）
+
+注意： ```>&```实际上复制了文件描述符，这使得```cmd > file 2>&1```与```cmd 2>&1 >file```的效果不一样。更多Linux知识可参考《Linux就该这么学》。
+
+```cmd>file 2>&1```
+1）```cmd>file```: ```stdout-->file```，```stdout```重定向到file，将标准输出信息写入到file文件；
+2）```2>&1```:   ```1```表示stdout,```2```表示stderr,stderr重定向到stdout，由于之前已经将stdout已经重定向到file，所以stderr信息也会写入到
 
 
-
-
+```cmd 2>&1 >file```：
+1）```2>&1```: ```stderr-->stdout```，stderr重定向到stdout，将错误信息写入到stdout中；
+2）```>file``` :  这里```>file```相当于 cmd>file，也就是 ```stdout>file```，将stdout重定向到file; 
+该命令只是把stdout重定向到file,并没有把stderr信息写入到file。
 
 
 #### access Linux by VNC
@@ -2601,6 +2654,18 @@ who 显示terminal 信息
 | -q |	打印当前所有打开的 terminal 用户数及用户名 |
 | -u |	打印当前所有打开的 terminal 登录用户登录详细信息, 类似 -a |
 | -r |	打印运行等级 ||
+
+
+## xargs
+
+```xargs``` 是一条 UNIX 和类 UNIX 操作系统的常用命令。它的作用是将参数列表转换成小块分段传递给其他命令，以避免参数列表过长的问题。
+
+这个命令在有些时候十分有用，特别是当用来处理产生大量输出结果的命令如 find，locate 和 grep 的结果，详细用法请参看 man 文档。
+
+```shell
+$ cut -d: -f1 < /etc/passwd | sort | xargs echo
+```
+上面这个命令用于将/etc/passwd文件按:分割取第一个字段排序后，使用echo命令生成一个列表。
 
 
 ## zip / unzip
