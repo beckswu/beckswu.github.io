@@ -682,6 +682,56 @@ sudo apt-get autoremove  #auto remove the dependency which required for the pack
 ```
 
 
+## awk
+
+```awk```所有的操作都是基于pattern(模式)—action(动作)对来完成的，如下面的形式：
+
+```shell
+$ pattern {action}
+```
+
+你可以看到就如同很多编程语言一样，它将所有的动作操作用一对```{}```花括号包围起来。其中pattern通常是表示用于匹配输入的文本的“关系式”或“正则表达式”，action则是表示匹配后将执行的动作。在一个完整awk操作中，这两者可以只有其中一个，
+
+- 如果没有pattern则默认匹配输入的全部文本，
+- 如果没有action则默认为打印匹配内容到屏幕。
+
+```awk```处理文本的方式，是将文本分割成一些“字段”，然后再对这些字段进行处理，默认情况下，```awk```以空格作为一个字段的分割符，不过这不是固定的，你可以任意指定分隔符，下面将告诉你如何做到这一点
+
+**awk命令基本格式**
+```
+awk [-F fs] [-v var=value] [-f prog-file | 'program text'] [file...]
+```
+
+其中```-F```参数用于预先指定前面提到的字段分隔符（还有其他指定字段的方式） ，```-v```用于预先为awk程序指定变量，```-f```参数用于指定awk命令要执行的程序文件，或者在不加```-f```参数的情况下直接将程序语句放在这里，最后为```awk```需要处理的文本输入，且可以同时输入多个文本文件
+
+
+先用vim新建一个文本文档
+```shell
+$ vim test
+```
+包含如下内容：
+```shell
+I like linux
+www.shiyanlou.com
+```
+
+使用awk将文本内容打印到终端
+```shell
+# "quote>" 不用输入
+$ awk '{
+> print
+> }' test
+
+# 或者写到一行
+$ awk '{print}' test
+```
+![](/img/post/linux/awk.png)
+
+
+在这个操作中省略了pattern，所以```awk```会默认匹配输入文本的全部内容，然后在```{}```花括号中执行动作，即print打印所有匹配项，这里是全部文本内容
+
+
+
 ## bashrc
 
 bashrc is a script executed whenever a new terminal session start in interactive mode
