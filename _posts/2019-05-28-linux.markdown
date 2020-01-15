@@ -573,7 +573,23 @@ x11vnc -usepw -forever
 在mac 上搜索screen sharing 打开, 输入```ip地址``` (```ifconfig``` 显示的), 这个```ip``` 是内网，只能在同一个路由器下面使用
 
 
+**避免在mac上每次登陆 重复输入密码**
 
+```shell
+ssh-keygen 
+```
+
+<<<<<<< HEAD
+Enter passphrase 表示用的密码代替实际用的密码，避免密码的话，直接回车
+
+![](/img/post/linux/ssh3.png)
+
+把在mac 上的public key 推送到linux
+
+```shell
+ssh-copy-id -i y.pub becks@@具体的ip #y.pub 是上面储存的file
+#If the -i option is given then the identity file (defaults to ~/.ssh/id_rsa.pub) is used, regardless of whether there are any keys in your ssh-agent. 
+```
 
 
 
@@ -1884,26 +1900,10 @@ ssh becks@192.168.0.108 #becks 是linux 的用户名
 exit 
 ```
 
-**避免在mac上每次登陆 重复输入密码**
-
-```shell
-ssh-keygen 
-```
-
-<<<<<<< HEAD
-Enter passphrase 表示用的密码代替实际用的密码，避免密码的话，直接回车
-
-![](/img/post/linux/ssh3.png)
-
-把在mac 上的public key 推送到linux
-
-```shell
-ssh-copy-id -i y.pub becks@@具体的ip #y.pub 是上面储存的file
-#If the -i option is given then the identity file (defaults to ~/.ssh/id_rsa.pub) is used, regardless of whether there are any keys in your ssh-agent. 
-```
 
 
-=======
+
+
 ## sort
 
 | flag | 	说明| 
@@ -1934,7 +1934,7 @@ $ cat /etc/passwd | sort -t':' -k 3 -n
 上面的```-t```参数用于指定字段的分隔符，这里是以":"作为分隔符；```-k``` 字段号用于指定对哪一个字段进行排序。这里/etc/passwd文件的第三个字段为数字，默认情况下是以字典序排序的，如果要按照数字排序就要加上```-n```参数：, 结果按照0，1，3，4，5... 顺序排序， 如果不加```-n``` 按照 0, 100, 10,  101, ... 2, 200, 顺序排序
 
 ![](/img/post/linux/sort.png)
->>>>>>> 6631a026434e99de4e466ca913de40e2e3593a6c
+
 
 
 ## sudo
