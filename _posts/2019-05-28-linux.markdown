@@ -388,6 +388,90 @@ ls -al /etc | less
 
 ```
 
+#### 数据流重定向
+
+```<<``` is known as here-document structure. 告诉program what is **ending text**, and whenever that delimiter is seen, the program will read all the stuff you've given to the program as input and perform a task upon it.
+
+
+
+－ ```stdin```: 标准输入,对应于你在终端的输入
+- ```stdout```: 标准输出，对应于终端的输出
+- ```stderr```: 标准错误输出，对应于终端的输出
+
+| 文件描述符 |	设备文件 |	说明 |
+| :---: | :---: | :---: |
+| ```0``` |	```/dev/stdin```	 | 标准输入 |
+ | ```1``` |	```/dev/stdout``` |	标准输出 |
+| ```2```  | ```/dev/stderr```	| 标准错误 |
+
+>文件描述符：文件描述符在形式上是一个非负整数。实际上，它是一个索引值，指向内核为每一个进程所维护的该进程打开文件的记录表。当程序打开一个现有文件或者创建一个新文件时，内核向进程返回一个文件描述符。在程序设计中，一些涉及底层的程序编写往往会围绕着文件描述符展开。但是文件描述符这一概念往往只适用于 UNIX、Linux 这样的操作系统。
+
+我们可以这样使用这些文件描述符：
+
+默认<span color="background-color:#FFFF00">使用终端的标准输入作为命令的输入和标准输出作为命令的输出</span>
+
+```shell
+$ cat 
+（按Ctrl+C退出）
+```
+
+将cat的连续输出（heredoc方式）重定向到一个文件
+
+```
+$ mkdir Documents
+$ cat > Documents/test.c <<EOF #输入EOF 自动结束输入, EOF 不会写进file
+# cat > Documents/test.c <<EOD #输入EOD 自动结束输入，EOD 不会写进file
+
+#include <stdio.h>
+
+int main()
+{
+    printf("hello world\n");
+    return 0;
+}
+
+EOF
+```
+
+
+将echo命令通过管道传过来的数据作为cat命令的输入，将标准输出作为命令的输出
+```shell
+$ echo 'hi' | cat
+# 返回 hi
+```
+
+**注意**不要将管道和重定向混淆，<span style="background-color:#FFFF00">**管道默认是连接前一个命令的输出到下一个命令的输入，而重定向通常是需要一个文件来建立两个命令的连接**</span>
+
+![](/img/post/linux/redirect.png)
+
+
+
+**标准错误重定向**
+
+标准输出和标准错误都被指向伪终端的屏幕显示，所以我们经常看到的一个命令的输出通常是同时包含了标准输出和标准错误的结果的。比如下面的操作：
+
+```shell
+# 使用cat 命令同时读取两个文件，其中一个存在(test.c)，另一个不存在(hello.c)
+$ cat Documents/test.c hello.c
+# 你可以看到除了正确输出了前一个文件的内容，还在末尾出现了一条错误信息
+# 下面我们将输出重定向到一个文件
+$ cat Documents/test.c hello.c > somefile
+```
+
+![](/img/post/linux/stderr.png)
+
+
+我们就是要隐藏某些错误或者警告，那又该怎么做呢
+
+```shell
+# 将标准错误重定向到标准输出，再将标准输出重定向到文件，注意要将重定向到文件写到前面
+$ cat Documents/test.c hello.c >somefile  2>&1
+# 或者只用bash提供的特殊的重定向符号"&"将标准错误和标准输出同时重定向到文件
+$ cat Documents/test.c hello.c &>somefilehell
+```
+注意你应该在输出重定向文件描述符前加上```&```,否则shell会当做重定向到一个文件名为1的文件中
+
+
 
 #### access Linux by VNC
 
