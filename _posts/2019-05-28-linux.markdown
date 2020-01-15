@@ -389,6 +389,20 @@ ls -al /etc | less
 ```
 
 
+#### access Linux by VNC
+
+在linux 上装vnc server
+```shelll
+sudo apt-get install x11vnc
+x11vnc -storepassword #输入vnc 以后连接密码
+x11vnc -usepw #要求用密码形式开启VNC server
+
+#如果VNC 有闪屏问题, 频繁挑出VNC现象, 尝试开启x11vnc时候输入下面参数让它永远运行
+x11vnc -usepw -forever 
+```
+
+在mac 上搜索screen sharing 打开, 输入```ip地址``` (```ifconfig``` 显示的), 这个```ip``` 是内网，只能在同一个路由器下面使用
+
 
 
 
@@ -1600,6 +1614,30 @@ nl -b a file # 是否空行都列出行号
 ```
 
 
+## paste
+
+```paste```这个命令与```join``` 命令类似，<span style="background-color:#FFFF00">**它是在不对比数据的情况下，简单地将多个文件合并一起**</span>，以Tab隔开
+
+使用方式： ```paste [option] file...```
+
+
+常用的选项有：
+
+| 选项 |	说明 |
+| ```-d or --delimiters=LIST``` |	 指定合并的分隔符，默认为Tab |
+| ```-s```|	不合并到一行，每个文件为一行 |
+
+```shell
+$ echo hello > file1
+$ echo shiyanlou > file2
+$ echo www.shiyanlou.com > file3
+$ paste -d ':' file1 file2 file3
+$ paste -s file1 file2 file3
+```
+
+![](/img/post/linux/paste.png)
+
+
 ## rm & rmdir
 
 **rmdir**: remove directory, **rm**: rmove file and directory
@@ -2538,3 +2576,10 @@ sudo apt-get install libaa-bin
 aafire
 ```
 
+**Space Invaders**: 类似在小霸王上面玩的小蜜蜂游戏
+```
+sudo apt-get install ninvaders
+$ /usr/games/ninvaders
+```
+
+![](/img/post/linux/space_invaders.gif)
