@@ -570,6 +570,10 @@ $ cat Documents/test.c 1>/dev/null 2>&1
 在不同的linux发行版上面在线安装方式会有一些差异包括使用的命令及它们的包管理工具，因为我们的开发环境是基于ubuntu, ubuntu又是基于debian的发行版，它使用的是debian的包管理工具```dpkg```，所以一些操作也适用与debian。而在一些采用其它包管理工具的发行版如redhat，centos,fedora等将不适用(redhat和centos使用```rpm)```。
 
 
+**从二进制包安装**
+
+二进制包的安装比较简单，我们需要做的只是将从网络上下载的二进制包解压后放到合适的目录，然后将包含可执行的主程序文件的目录添加进```PATH```环境变量即可，
+
 #### access Linux by VNC
 
 在linux 上装vnc server
@@ -3371,3 +3375,14 @@ $ /usr/games/ninvaders
 ```
 
 ![](/img/post/linux/space_invaders.gif)
+
+bb
+
+```
+$ sudo apt-get update
+$ sudo apt-get install bb
+$ /usr/games/bb
+```
+
+![](/img/post/linux/bb.gif)
+
