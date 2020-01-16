@@ -631,7 +631,7 @@ sudo apt-get autoremove  #auto remove the dependency which required for the pack
 
 ## awk
 
-```awk```所有的操作都是基于```pattern(模式)—action(动作)```对来完成的，如下面的形式：
+
 
 ```shell
 pattern {action}
