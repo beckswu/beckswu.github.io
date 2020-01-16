@@ -1588,6 +1588,7 @@ PCRE（Perl Compatible Regular Expressions中文含义：perl语言兼容正则�
 | ```--exclude=GLOB``` | skip files whose base name matches GLOB (using wildcard matching).  can use ```*, ?,``` and ```[...]``` as wildcards |
 | ```--exclude-from=FILE``` | skip files whose matches any FILE can use GLOB |
 | ```--exclude-dir=DIR``` | Exclude directories matching the pattern DIR from recursive searches | 
+| ```-E``` or ```--extended-regexp``` | Interpret Pattern as an extended regular expression |
 | ```-I``` | 忽略binary file , 等于```binary-files=without-match``` option|
 | ```-i``` | ignore case sensitive 忽略大小写 | 
 | ```-n``` | print the line number,显示匹配文本所在行的行号 | 
