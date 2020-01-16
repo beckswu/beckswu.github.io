@@ -631,7 +631,7 @@ sudo apt-get autoremove  #auto remove the dependency which required for the pack
 
 ## awk
 
-所有的操作都是基于 ```pattern(模式)—action(动作)```对来完成的，如下面的形式
+awk 所有的操作都是基于 ```pattern(模式)—action(动作)```对来完成的，如下面的形式
 
 
 ```shell
@@ -667,12 +667,12 @@ www.shiyanlou.com
 使用awk将文本内容打印到终端
 ```shell
 # "quote>" 不用输入
-$ awk '{
+awk '{
 > print
 > }' test
 
 # 或者写到一行
-$ awk '{print}' test
+awk '{print}' test
 ```
 ![](/img/post/linux/awk.png)
 
@@ -686,18 +686,27 @@ $ awk '{print}' test
 ```shell
 $ awk '{
 > if(NR==1){
+
 > print $1 "\n" $2 "\n" $3
+
 > } else {
+
 > print}
+
 > }' test
 
 # 或者
 $ awk '{
 > if(NR==1){
+
 > OFS="\n"
+
 > print $1, $2, $3
+
 > } else {
+
 > print}
+
 > }' test
 ```
 
