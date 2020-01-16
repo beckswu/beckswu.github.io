@@ -1618,14 +1618,14 @@ PCRE（Perl Compatible Regular Expressions中文含义：perl语言兼容正则�
 ![](/img/post/linux/grep3.png)
 
 还是先体验一下，我们搜索/home/shiyanlou目录下所有包含"shiyanlou"的文本文件，并显示出现在文本中的行号：
-```
+```shell
 grep -rnI "shiyanlou" ~
 ```
 
 ![](/img/post/linux/grep.png)
 
 查看环境变量中以"yanlou"结尾的字符串, 其中```$```就表示一行的末尾。
-```
+```shell
 $ export | grep ".*yanlou$"
 ```
 ![](/img/post/linux/grep2.png)
