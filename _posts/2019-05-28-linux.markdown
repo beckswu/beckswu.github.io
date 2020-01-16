@@ -11,12 +11,630 @@ tags:
     - 学习笔记
 ---
 
+在python 文件开头加上
+```shell
+#!user/bin/python3 
+```
+运行python, 可以用
+```shell
+./mypython.py
+#而不用，
+python3 mypython.py
+```
+
+
+
+```shell
+
+Ctrl + d # open new terminal window tab
+
+```
+
+**cp**: copy and paste  <br/>
+**mv**: move and rename <br/>
+**Less**:  View some part of the file (lookup, view line by line / page by page) <br/>
+**Touch**: create new file(cannot create directory), change file timestamp   <br/>
+**Nano(or gedit)**: txt/code editor   <br/>
+**sudo**: grant super user priviledge <br/>
+**Top**: provide you dynamic real time view of running system <br/>
+**Echo** print, can include variable in "" <br/>
+**chmod** add/remove access for user, group, others (u,g,o), 可以是给octal(数字的形式) <br/>
+**which**: where software/command located <br/>
+**whatis**: display short manual(man command) page description <br/>
+**useradd**: create new user  <br/>
+**passwd**: change password for user <br/>
+**userdel**: delete exisiting user <br/>
+**groups**: show which group is currently user connected to <br/>
+**groupadd**: add new group in system <br/>
+**groupdel**: delete existing group <br/>
+**gpasswd -a**: add user to exisiting group <br/>
+**gpasswd -d**: delete user from exisiting group <br/>
+**df**: the amount of disk space being used by your file system <br/>
+**du**: estimate and display the disk space used by files in details <br/>
+**free**: display the total amount free and used physical and swap memory in the system  <br/>
+**watch**: run command at a regular interval or repeatedly <br/>
+**head/tail**: print first / last part of the file <br/>
+**find**: Find the file (by name, by time) <br/>
+**wc**: print a count of lines, words and characters for each files <br/>
+**Cal**: 显示calendar <br/>
+**Date**: print  and change system date and time information <br/>
+**Multiple Command** ; &&  ||  <br/>
+**ifconfig**: interface configuration: used to view and change network interface configuration on your system <br/>
+**tar**: 压缩/解压 文件夹/文件 <br/>
+**grep**: search and print pattern / word in a text file or a number of text file <br/>
+**netstat**: display network connection, routing tables and a number of network interfaces, and view network protocal states 
+
+
+
+**Shell**: a program that take commands from keyboard and give them to operating system to perform;
+
+Command Line or Shell: aslo called **CLI(Command Line Interface)**
+
+**Terminal**: a tool which you can use to pass your shell commands.  A program that opens a window and lets you interact with the shell
+
+File in Linux system are arranged in **hierarchical directory structure**: organized in a tree-like pattern
+
+## Linux  基础
+
+cat list1.txt #显示list1.txt 所有内容: ```group_name:password:GID:user_list```: 比如 ```sudo:x:27```, 密码一般不显示，用```x``` 代替. 如果用户的 GID 等于用户组的 GID，那么最后一个字段 user_list 就是空的
+
+
+
+
+
+| 字符   |  Meaning |
+|:----------:|:-------------|
+|\* |	匹配 0 或多个字符 |
+| ? |	匹配任意一个字符 |
+| \[list] |	匹配 list 中的任意单一字符 |
+| \[^list] |	匹配 除list 中的任意单一字符以外的字符 |
+| \[c1-c2] |	匹配 c1-c2 中的任意单一字符 如：\[0-9] \[a-z] |
+| {string1,string2,...}	| 匹配 string1 或 string2 (或更多)其一字符串 |
+| {c1..c2} |	匹配 c1-c2 中全部字符 如{1..10} |
+
+
+```shell
+按键	作用
+Ctrl+d	键盘输入结束或退出终端
+Ctrl+s	暂停当前程序，暂停后按下任意键恢复运行
+Ctrl+z	将当前程序放到后台运行，恢复到前台为命令fg
+Ctrl+a	将光标移至输入行头，相当于Home键
+Ctrl+e	将光标移至输入行末，相当于End键
+Ctrl+k	删除从光标所在位置到行末
+Alt+Backspace	向前删除一个单词
+Shift+PgUp	将终端显示向上滚动
+Shift+PgDn	将终端显示向下滚动
+```
+
+```shell
+#Open Terminal 快捷键
+press ctrl alt T
+
+#show current(home) directory
+pwd
+
+clear #clear terminal
+
+
+# 给options 再到directory
+ls [options] [name of directory]
+
+#list all file in current directory
+ls
+ls ~ #跟上面作用一样，显示home directory
+
+ls Documents/ #Documents必须在当前文件夹下，显示Documents文件夹所有文件
+ls Documents/*.html #显示Documents中只包含.html的文件
+ls Documents/*.* #show all the files
+
+ls / #显示root的所有文件，注意root的directory跟现在文件夹可能不同
+
+ls .. #显示parent directory 所有文件
+
+ls ../.. #显示parent 的parent directory所有文件
+cd ../.. #Go to parent's parent folder
+
+ls -l #list all directory in long format, 显示详细的信息, user, what is rights of files (write? read?), size of file,Date of creating
+#drwxr-xr-x: drwxr directory (r) read (w)write, x(execute), read,  -xr (group right): only execute and read, -x (others): only execute 
+
+ls -a # give hidden files also, in linux, .表示hidden files
+ls -al #show hidden file and show long format
+
+ls -lS #sort directory by size and show long format
+ls -lS > out.txt #put all the show into out.txt file
+
+ls -d */ #只显示所有的directory
+
+ls -R #显示每个子文件夹都包含什么文件
+
+man ls #显示所有ls 的function, 按Q退出
+
+```
+
+> FHS（英文：Filesystem Hierarchy Standard 中文：文件系统层次结构标准），多数 Linux 版本采用这种文件组织形式，FHS 定义了系统中每个区域的用途、所需要的最小构成的文件和目录同时还给出了例外处理与矛盾处理。
+
+>  FHS 定义了两层规范，第一层是， / 下面的各个目录应该要放什么文件数据，例如 /etc 应该放置设置文件，/bin 与 /sbin 则应该放置可执行文件等等。
+第二层则是针对 /usr 及 /var 这两个目录的子目录来定义。例如 /var/log 放置系统日志文件，/usr/share 放置共享数据等等。
+
+![](/img/post/linux/FHS2.png)
+
+
+![](/img/post/linux/FHS.png)
+
+
+
+#### 环境变量
+
+注意：为了与普通变量区分，通常我们习惯将环境变量名设为大写。
+
+```shell
+declare tmp #创建一个名为tmp 变量
+#其实也可以不用 declare 预声明一个变量，直接即用即创建，
+# 这里只是告诉你 declare 的作用，这在创建其它指定类型的变量（如数组）时会用到。
+
+tmp=shiyanlou
+
+echo $tmp
+
+```
+
+在所有的 UNIX 和类 UNIX 系统中，每个进程都有其各自的环境变量设置，且默认情况下，当一个进程被创建时，除了创建过程中明确指定的话，<span style="color:red">它将继承其父进程的绝大部分环境设置。Shell 程序也作为一个进程运行在操作系统之上，而我们在 Shell 中运行的大部分命令都将以 Shell 的子进程的方式运行
+    
+通常我们会涉及到的变量类型有三种：
+- 当前 Shell 进程私有用户自定义变量，如上面我们创建的 tmp 变量，只在当前 Shell 中有效。
+- Shell 本身内建的变量。
+- 从自定义变量导出的环境变量。
+
+| 字符   |  Meaning |
+|:----------:|:-------------|
+| ```set```| 	显示当前 Shell 所有变量，包括其内建环境变量（与 Shell 外观等相关），用户自定义变量及导出的环境变量。|
+| ```env```| 	显示与当前用户相关的环境变量，还可以让命令在指定环境中运行。 | 
+| ```export```| 	显示从 Shell 中把变量 导出成 环境变量的变量，也能通过它将自定义变量导出为环境变量 | 
+
+你可以更直观的使用 vimdiff 工具比较一下它们之间的差别：
+
+```shell
+$ temp=shiyanlou
+$ export temp_env=shiyanlou
+$ env|sort>env.txt
+$ export|sort>export.txt
+$ set|sort>set.txt
+```
+
+上述操作将命令输出通过管道 | 使用 sort 命令排序，再重定向到对象文本文件中。
+
+```shell
+$ vimdiff env.txt export.txt set.txt
+```
+
+按变量的生存周期来划分，Linux 变量可分为两类：
+
+- **永久的**：需要修改配置文件，变量永久生效；
+- **临时的**：使用 export 命令行声明即可，变量在关闭 shell 时失效。
+
+这里介绍两个重要文件 /etc/bashrc（有的 Linux 没有这个文件） 和 /etc/profile ，它们分别存放的是 shell 变量和环境变量。还有要注意区别的是每个用户目录下的一个隐藏文件：
+
+```shell
+.profile 可以用 ls -a 查看
+cd /home/shiyanlou
+ls -a 
+```
+
+<span style="color:red"> 这个 .profile 只对当前用户永久生效。而写在 /etc/profile 里面的是对所有用户永久生效</span>，所以如果想要添加一个永久生效的环境变量，只需要<span style="background-color:#FFFF00"> 打开 /etc/profile，在最后加上你想添加的环境变量就好啦</span>。
+
+![](/img/post/linux/ev.png)
+
+
+**添加到environment variable**
+
+<span style="color:red">注意这里一定要使用绝对路径。</span>
+
+```shell
+$ PATH=$PATH:/home/shiyanlou/mybin 
+#如果有程序在mybin 中 可以执行程序用
+hello.sh #而不是用./hello.sh
+
+```
+
+上面的方法一旦关闭terminal, 下次再打开，之前定义的Path就没有用了, 解决办法：
+
+在每个用户的 home 目录中有一个 Shell 每次启动时会默认执行一个配置脚本，以初始化环境，包括添加一些用户自定义环境变量等等。<span style="background-color:#FFFF00">zsh 的配置文件是 .zshrc，相应 Bash 的配置文件为 .bashrc</span>。它们在 etc 下还都有一个或多个全局的配置文件，不过我们一般只修改用户目录下的配置文件
+
+我们可以简单地使用下面命令直接添加内容到 .zshrc 中：
+
+```shell
+$ echo "PATH=$PATH:/home/shiyanlou/mybin" >> .zshrc #>> append
+```
+
+**如何让环境变量立即生效**
+
+在 Shell 中修改了比如 zsh 的配置文件 home 目录下的 .zshrc），每次都要退出终端重新打开甚至重启主机之后其才能生效，很是麻烦，我们可以使用 ```source ``` 命令来让其立即生效，如
+
+```shell
+source .zshrc
+
+#source 命令还有一个别名就是 .，上面的命令如果替换成 . 的方式就该是：
+. ./.zshrc
+#在使用.的时候，需要注意与表示当前路径的那个点区分开。 
+```
+
+
+**修改删除已有变量**
+
+| 命令 | 	说明| 
+| :---: | :--- |
+| ```${变量名#匹配字串}```| 	从头向后开始匹配，删除符合匹配字串的最短数据 |
+| ```${变量名##匹配字串}```| 	从头向后开始匹配，删除符合匹配字串的最长数据 | 
+| ```${变量名%匹配字串}```| 	从尾向前开始匹配，删除符合匹配字串的最短数据 |
+| ```${变量名%%匹配字串}```| 	从尾向前开始匹配，删除符合匹配字串的最长数据 |
+| ```${变量名/旧的字串/新的字串}```| 	将符合旧字串的第一个字串替换为新的字串 |
+| ```${变量名//旧的字串/新的字串}```| 	将符合旧字串的全部字串替换为新的字串 | 
+
+比如要修改我们前面添加到 ```PATH``` 的环境变量。为了避免操作失误导致命令找不到，我们先将 ```PATH``` 赋值给一个新的自定义变量 ```path```：
+
+```shell
+$ path=$PATH
+$ echo $path
+$ path=${path%/home/shiyanlou/mybin}
+# 或使用通配符,*表示任意多个任意字符
+$ path=${path%*/mybin}
+```
+变量删除
+可以使用 ```unset``` 命令删除一个环境变量：
+
+```
+$ unset temp
+```
+
+#### 搜索文件
+
+- ```whereis```:  简单快速. 这个搜索很快，因为它并没有从硬盘中依次查找，而是直接从数据库中查询。```whereis``` 只能搜索二进制文件(-b)，man 帮助文件(-m)和源代码文件(-s)。
+- ```locate```: 快而全: 通过“ /var/lib/mlocate/mlocate.db ”数据库查找，不过这个数据库也不是实时更新的，系统会使用定时任务每天自动执行 updatedb 命令更新一次，所以有时候你刚添加的文件，它可能会找不到，需要手动执行一次 updatedb 命令
+- ```which``` 小而精: 只从 PATH 环境变量指定的路径中去搜索命令
+- ```find``` 精而细: ```find``` 应该是这几个命令中最强大的了，它不但可以通过文件类型、文件名进行查找而且可以根据文件的属性（如文件的时间戳，文件的权限等）进行搜索
+
+
+
+#### 内建命令与外部命令
+
+> **内建命令**实际上是 shell 程序的一部分，其中包含的是一些比较简单的 Linux 系统命令，这些命令是写在bash源码的builtins里面的，由 shell 程序识别并在 shell 程序内部完成运行，通常在 Linux 系统加载运行时 shell 就被加载并驻留在系统内存中。而且解析内部命令 shell 不需要创建子进程，因此其执行速度比外部命令快。比如：```history、cd、exit``` 等等。
+
+> **外部命令** 是 Linux 系统中的实用程序部分，因为实用程序的功能通常都比较强大，所以其包含的程序量也会很大，在系统加载时并不随系统一起被加载到内存中，而是在需要时才将其调入内存。虽然其不包含在 shell 中，但是其命令执行过程是由 shell 程序控制的。外部命令是在 Bash 之外额外安装的，通常放在/bin，/usr/bin，/sbin，/usr/sbin等等。比如：```ls、vi```等。
+
+简单来说就是：一个是天生自带的天赋技能，一个是后天得来的附加技能。我们可以使用　```type``` 命令来区分命令是内建的还是外部的。例如这两个得出的结果是不同的
+
+```shell
+type exit
+
+type vim
+
+#得到这样的结果说明是内建命令，正如上文所说内建命令都是在 bash 源码中的 builtins 的.def中
+xxx is a shell builtin
+
+#得到这样的结果说明是外部命令，正如上文所说，外部命令在/usr/bin or /usr/sbin等等中
+xxx is /usr/bin/xxx
+
+#若是得到alias的结果，说明该指令为命令别名所设定的名称；
+xxx is an alias for xx --xxx
+```
+
+
+#### 执行多条语句
+
+```shell
+$ sudo apt-get update
+# 等待——————————然后输入下面的命令
+$ sudo apt-get install some-tool //这里some-tool是指具体的软件包
+# 等待——————————然后输入下面的命令
+$ some-tool
+```
+
+这时你可能就会想：要是我可以一次性输入完，让它自己去依次执行各命令就好了，这就是我们这一小节要解决的问题。
+
+简单的顺序执行你可以使用```;```来完成，比如上述操作你可以：
+
+```shell
+$ sudo apt-get update;sudo apt-get install some-tool;some-tool
+# 让它自己运行
+```
+
+**有选择的执行命令**
+
+- ```$?``` 获取上次语句执行结果, 返回0或者1 
+- ```&&``` : 如果上个语句返回0 （true)， 执行```&&```后面的
+- ```||``` : 如果上个语句返回1， 执行```||``` 后面的
+
+```shell
+which cowsay 
+返回: cowsay not found 
+$? 
+返回: 1
+
+which cat 
+返回: /bin/cat
+$? 
+返回:0
+
+
+$ which cowsay>/dev/null || echo "cowsay has not been install, please run 'sudo apt-get install cowsay' to install"
+返回 "cowsay has not been install, please run 'sudo apt-get install cowsay' to install"
+```
+
+```shell
+which cowsay>/dev/null && echo "exist" || echo "not exist"
+```
+
+![](/img/post/linux/multiple.png)
+
+
+如果把 ```&&``` 和```||``` 顺序倒过来, 逻辑与其他语言一样， 只是```0``` 代表```true```, ```1``` 代表```false```
+
+
+```shell
+which cowsay>/dev/null || echo "exist" && echo "not exist"
+返回: exist
+      not exis
+```
+
+
+#### 管道
+
+管道是什么？管道是一种通信机制，通常用于进程间的通信（也可通过socket进行网络通信），就是将前面每一个进程的输出(stdout)直接作为下一个进程的输入(stdin)。管道又分为匿名管道和具名管道, 我们在使用一些过滤程序时经常会用到的就是匿名管道，在命令行中由```|```分隔符表示
+
+E.g. 通过管道将前一个命令(```ls```)的输出作为下一个命令(```less```)的输入，然后就可以一行一行地看。
+
+```shell
+ls -al /etc | less
+
+```
+
+#### 数据流重定向
+
+- ```<``` 从右侧传入文件到左侧command, 比如 ```grep 'int' < somefile``` 
+- ```<<``` is known as here-document structure. 告诉program what is **ending text**, and whenever that delimiter is seen, the program will read all the stuff you've given to the program as input and perform a task upon it.
+
+
+```<``` 输入重新定向, ```>>``` 和 ```>``` 输出重新定向，我们在简单地用```<```或```>```时，相当于使用 ```0<``` (到输入) 或 ```1>```(到输出)
+
+－ ```stdin```: 标准输入,对应于你在终端的输入
+- ```stdout```: 标准输出，对应于终端的输出
+- ```stderr```: 标准错误输出，对应于终端的输出
+
+| 文件描述符 |	设备文件 |	说明 |
+| :---: | :---: | :---: |
+| ```0``` |	```/dev/stdin```	 | 标准输入 |
+ | ```1``` |	```/dev/stdout``` |	标准输出 |
+| ```2```  | ```/dev/stderr```	| 标准错误 |
+
+>文件描述符：文件描述符在形式上是一个非负整数。实际上，它是一个索引值，指向内核为每一个进程所维护的该进程打开文件的记录表。当程序打开一个现有文件或者创建一个新文件时，内核向进程返回一个文件描述符。在程序设计中，一些涉及底层的程序编写往往会围绕着文件描述符展开。但是文件描述符这一概念往往只适用于 UNIX、Linux 这样的操作系统。
+
+我们可以这样使用这些文件描述符：
+
+默认<span color="background-color:#FFFF00">使用终端的标准输入作为命令的输入和标准输出作为命令的输出</span>
+
+```shell
+$ cat 
+（按Ctrl+C退出）
+```
+
+将cat的连续输出（heredoc方式）重定向到一个文件
+
+```
+$ mkdir Documents
+$ cat > Documents/test.c <<EOF #输入EOF 自动结束输入, EOF 不会写进file
+# cat > Documents/test.c <<EOD #输入EOD 自动结束输入，EOD 不会写进file
+
+#include <stdio.h>
+
+int main()
+{
+    printf("hello world\n");
+    return 0;
+}
+
+EOF
+```
+
+
+将echo命令通过管道传过来的数据作为cat命令的输入，将标准输出作为命令的输出
+```shell
+$ echo 'hi' | cat
+# 返回 hi
+```
+
+**注意**不要将管道和重定向混淆，<span style="background-color:#FFFF00">**管道默认是连接前一个命令的输出到下一个命令的输入，而重定向通常是需要一个文件来建立两个命令的连接**</span>
+
+![](/img/post/linux/redirect.png)
+
+
+
+**标准错误重定向**
+
+标准输出和标准错误都被指向伪终端的屏幕显示，所以我们经常看到的一个命令的输出通常是同时包含了标准输出和标准错误的结果的。比如下面的操作：
+
+```shell
+# 使用cat 命令同时读取两个文件，其中一个存在(test.c)，另一个不存在(hello.c)
+$ cat Documents/test.c hello.c
+# 你可以看到除了正确输出了前一个文件的内容，还在末尾出现了一条错误信息
+# 下面我们将输出重定向到一个文件
+$ cat Documents/test.c hello.c > somefile
+```
+
+![](/img/post/linux/stderr.png)
+
+
+我们就是要隐藏某些错误或者警告，那又该怎么做呢
+
+```shell
+# 将标准错误重定向到标准输出，再将标准输出重定向到文件，注意要将重定向到文件写到前面
+$ cat Documents/test.c hello.c >somefile  2>&1 
+# 或者只用bash提供的特殊的重定向符号"&"将标准错误和标准输出同时重定向到文件
+$ cat Documents/test.c hello.c &>somefilehell
+```
+```2>&1```, 看上面的文件描述符,<span style="color:red">```2``` 是标准错误, ```1``` 是标准输出</span>, 注意你应该在输出重定向文件描述符前加上```&```,否则shell会当做重定向到一个文件名为1的文件中
+
+
+
+**永久重新定向**
+
+- ```exec```: 你应该可以看出我们前面的重定向操作都只是临时性的，即<span style="color:red">只对当前命令有效</span>，那如何做到“永久”有效呢，我们可以使用```exec```命令实现“永久”重定向。
+
+
+**创建输出文件描述符**
+
+在 Shell 中有9个文件描述符。<span style="color:red">上面我们使用了也是它默认提供的0,1,2号文件描述符. 另外我们还可以使用3-8的文件描述符，只是它们默认没有打开而已</span>。你可以使用下面命令查看当前 Shell 进程中打开的文件描述符：
+
+```shell
+$ cd /dev/fd/;ls -Al
+```
+同样使用exec命令可以创建新的文件描述符：
+
+```shell
+$ zsh
+$ exec 3>somefile
+
+# 先进入目录，再查看，否则你可能不能得到正确的结果，然后再回到上一次的目录
+$ cd /dev/fd/;ls -Al;cd -
+
+# 注意下面的命令>与&之间不应该有空格，如果有空格则会出错
+$ echo "this is test" >&3
+$ cat somefile
+$ exit
+```
+
+![](/img/post/linux/exec2.png)
+
+
+**关闭文件描述符**
+
+如上面我们打开的3号文件描述符，可以使用如下操作将它关闭：
+
+```shell
+$ exec 3>&-
+$ cd /dev/fd;ls -Al;cd -
+```
+
+
+
+在 Linux 中有一个被称为“黑洞”的设备文件,所有导入它的数据都将被“吞噬”。
+
+> 在类 UNIX 系统中，```/dev/null```，或称空设备，是一个特殊的设备文件，它通常被用于丢弃不需要的输出流，或作为用于输入流的空文件，这些操作通常由重定向完成。读取它则会立即得到一个EOF。
+
+我们可以利用```/dev/null```屏蔽命令的输出：
+
+```shell
+$ cat Documents/test.c 1>/dev/null 2>&1
+```
+上面这样的操作将使你得不到任何输出结果
+
+
+- ```*cmd > file```: 把cmd命令的输出重定向到文件file中。如果file已经存在，则清空原有文件，使用bash的noclobber选项可以防止复盖原有文件。
+- ```* cmd >> file```: 把cmd命令的输出重定向到文件file中，如果file已经存在，则把信息加在原有文件後面。
+- ```* cmd < file```: 使cmd命令从file读入
+- ```* cmd << text```: 从命令行读取输入，直到一个与text相同的行结束。除非使用引号把输入括起来，此模式将对输入内容进行shell变量替换。如果使用<<- ，则会忽略接下来输入行首的tab，结束行也可以是一堆tab再加上一个与text相同的内容，可以参考後面的例子。
+- ```* cmd <<< word```: 把word（而不是文件word）和後面的换行作为输入提供给cmd。
+- ```* cmd <> file```: 以读写模式把文件file重定向到输入，文件file不会被破坏。仅当应用程序利用了这一特性时，它才是有意义的。
+- ```* cmd >| file```: 功能同 ```>```，但即便在设置了noclobber时也会复盖file文件，注意用的是```|```而非一些书中说的!，目前仅在csh中仍沿用```>!```实现这一功能。
+- ```: > filename``` 把文件"filename"截断为0长度.# 如果文件不存在, 那么就创建一个0长度的文件(与'touch'的效果相同).
+- ```cmd >&n```: 把输出送到文件描述符n
+- ```cmd m>&n```: 把输出 到文件符m的信息重定向到文件描述符n
+- ```cmd >&-```: 关闭标准输出
+- ```cmd <&n```: 输入来自文件描述符n
+- ```cmd m<&n```: m来自文件描述各个n
+- ```cmd <&-```: 关闭标准输入
+- ```cmd <&n-```: 移动输入文件描述符n而非复制它。（需要解释）
+- ```cmd >&n-```: 移动输出文件描述符 n而非复制它。（需要解释）
+
+注意： ```>&```实际上复制了文件描述符，这使得```cmd > file 2>&1```与```cmd 2>&1 >file```的效果不一样。更多Linux知识可参考《Linux就该这么学》。
+
+```cmd>file 2>&1```
+1）```cmd>file```: ```stdout-->file```，```stdout```重定向到file，将标准输出信息写入到file文件；
+2）```2>&1```:   ```1```表示stdout,```2```表示stderr,stderr重定向到stdout，由于之前已经将stdout已经重定向到file，所以stderr信息也会写入到
+
+
+```cmd 2>&1 >file```：
+1）```2>&1```: ```stderr-->stdout```，stderr重定向到stdout，将错误信息写入到stdout中；
+2）```>file``` :  这里```>file```相当于 cmd>file，也就是 ```stdout>file```，将stdout重定向到file; 
+该命令只是把stdout重定向到file,并没有把stderr信息写入到file。
+
+
+#### access Linux by VNC
+
+在linux 上装vnc server
+```shelll
+sudo apt-get install x11vnc
+x11vnc -storepassword #输入vnc 以后连接密码
+x11vnc -usepw #要求用密码形式开启VNC server
+
+#如果VNC 有闪屏问题, 频繁挑出VNC现象, 尝试开启x11vnc时候输入下面参数让它永远运行
+x11vnc -usepw -forever 
+```
+
+在mac 上搜索screen sharing 打开, 输入```ip地址``` (```ifconfig``` 显示的), 这个```ip``` 是内网，只能在同一个路由器下面使用
+
+
+**避免在mac上每次登陆 重复输入密码**
+
+```shell
+ssh-keygen 
+```
+
+
+Enter passphrase 表示用的密码代替实际用的密码，避免密码的话，直接回车
+
+![](/img/post/linux/ssh3.png)
+
+把在mac 上的public key 推送到linux
+
+```shell
+ssh-copy-id -i y.pub becks@@具体的ip #y.pub 是上面储存的file
+#If the -i option is given then the identity file (defaults to ~/.ssh/id_rsa.pub) is used, regardless of whether there are any keys in your ssh-agent. 
+```
+
+#### Regular Expression
+
+
+
+
+
+
+
+
+
+
+## apt-get
+
+sudo apt-get install chromium-broswer #install chrome 
+
+apt-get(urbantu): install, uninstall, update packages. apt: advance packaging tool
+
+对于centos: 用yum, dnf instead of apt-get 
+
+```shell
+
+sudo apt-get update #resync your local package file to the server package file, update all the packages
+
+java -version #check if java installed, and if so check version
+php5 -version #check if php installed, 如果没有install 会给出install的hint
+
+sudo apt-get install php5 #安装首先what is required extra dependency to install php5, 也会显示多少space required to install
+php5 -v #显示php5 version
+
+sudo apt-get remove php5 #remove php5
+sudo apt-get remove --purge php5 #remove all configuration file related to php5
+sudo apt-get autoremove  #auto remove the dependency which required for the package(php5) and no longer needed for other packages
+
+
+
+```
 
 
 
 ## awk
 
-```awk```所有的操作都是基于```pattern(模式)—action(动作)```对来完成的，如下面的形式：
+```awk```
+
+
 
 ```shell
 pattern {action}
