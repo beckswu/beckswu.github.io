@@ -2537,6 +2537,121 @@ $ paste -s file1 file2 file3
 ![](/img/post/linux/paste.png)
 
 
+## PS
+
+
+| 内容 | 	解释 | 	
+| :--: | :--- |
+|```F``` | 		进程的标志（process flags），当 flags 值为 1 则表示此子程序只是 fork 但没有执行 exec，为 4 表示此程序使用超级管理员 root 权限 | 	
+|```USER``` | 		进程的拥有用户 | 	
+|```PID```	 | 	进程的 ID | 	
+|```PPID``` | 		其父进程的 PID, TPGID栏写着```-1```的都是没有控制终端的进程，也就是守护进程 | 	
+|```SID``` | 		session 的 ID | 	
+|```TPGID``` | 		前台进程组的 ID | 	
+|```%CPU``` | 		进程占用的 CPU 百分比 | 	
+|```%MEM``` | 		占用内存的百分比 | 	
+|```NI```	 | 	进程的 NICE 值 | 	
+|```VSZ``` | 		进程使用虚拟内存大小 | 	
+|```RSS``` | 		驻留内存中页的大小 | 	
+|```TTY``` | 		终端 ID | 	
+|```S``` or ```STAT``` | 		进程状态 | 	
+|```WCHAN``` | 		正在等待的进程资源 | 	
+|```START``` | 		启动进程的时间 | 	
+|```TIME``` | 		进程消耗CPU的时间 | 	
+|```COMMAND```	 | 	命令的名称和参数 | 	
+
+
+STAT表示进程的状态，而进程的状态有很多，如下表所示
+
+| 状态 | 		解释 | 	
+| :--: | :--- |
+|```R``` | 		Running.运行中 | 	
+|```S``` | 		Interruptible Sleep.等待调用 | 	
+|```D``` | 		Uninterruptible Sleep.不可中断睡眠 | 	
+|```T```	 | 	Stoped.暂停或者跟踪状态 | 	
+|```X``` | 		Dead.即将被撤销 | 	
+|```Z```	 | 	Zombie.僵尸进程 | 	
+|```W``` | 		Paging.内存交换 | 	
+|```N```	 | 	优先级低的进程 | 	
+|```<``` | 		优先级高的进程 | 	
+|```s``` | 		进程的领导者 | 	
+|```L``` | 		锁定状态 | 	
+|```l``` | 		多线程状态 | 	
+|```+``` | 		前台进程 | 	
+
+> 其中的 D 是不能被中断睡眠的状态，处在这种状态的进程不接受外来的任何 signal，所以<span style="color:red">无法使用 ```kill``` 命令杀掉处于D状态的进程</span>，无论是 ```kill```，```kill -9``` 还是```kill -15```，一般处于这种状态可能是进程 I/O 的时候出问题了。
+
+ps 工具有许多的参数，下面给大家解释部分常用的参数
+
+| Flag | 解释 |
+| :--: | :--- |
+| ```-a``` | select all processes except both session leaders |
+
+
+使用 -l 参数可以显示自己这次登录的 bash 相关的进程信息罗列出来
+```shell
+ps -l
+```
+
+![](/img/post/linux/ps.png)
+
+他将会罗列出所有的进程信息
+```shell
+ps aux
+```
+
+![](/img/post/linux/psaux.png)
+
+若是查找其中的某个进程的话，我们还可以配合着 grep 和正则表达式一起使用
+
+```shell
+ps aux | grep zsh
+```
+
+![](/img/post/linux/ps1.png)
+
+
+此外我们还可以查看时，将连同部分的进程呈树状显示出来
+```
+ps axjf
+```
+
+![](/img/post/linux/ps2.png)
+
+
+
+当然如果你觉得使用这样的此时没有把你想要的信息放在一起，我们也可以是用这样的命令，来自定义我们所需要的参数显示
+
+```
+ps -afxo user,ppid,pid,pgid,command
+```
+
+![](/img/post/linux/ps3.png)
+
+
+
+## pstree
+
+通过 pstree 可以很直接的看到相同的进程数量，最主要的还是我们可以看到所有进程之间的相关性。
+
+```shell
+pstree
+```
+![](/img/post/linux/pstree.png)
+
+```shell
+pstree -up
+
+#参数选择：
+#-A  ：各程序树之间以 ASCII 字元來連接；
+#-p  ：同时列出每个 process 的 PID；
+#-u  ：同时列出每个 process 的所屬账户名称。
+```
+
+![](/img/post/linux/pstree2.png)
+
+
+
 ## rm & rmdir
 
 **rmdir**: remove directory, **rm**: rmove file and directory
