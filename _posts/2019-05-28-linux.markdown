@@ -2812,6 +2812,150 @@ $ echo 'hello shiyanlou' | tee hello
 
 ## top
 
+top 工具是我们常用的一个查看工具，能实时的查看我们系统的一些关键信息的变化, top是一个可以交互的
+
+| 常用交互命令 |	解释 |
+| :---: | :--- |
+|```q```| 	退出程序 |
+|```I```| 	切换显示平均负载和启动时间的信息, when in Irix mode, task's CPU usage will be divided by the number of CPUs, 比如4个CPU 除以4 |
+|```P```| 	根据CPU使用百分比大小进行排序 |
+|```M```| 	根据驻留内存大小进行排序 |
+|```i```| 	忽略闲置和僵死的进程，这是一个开关式命令 |
+|```k```| 	终止一个进程，系统提示输入 PID 及发送的信号值。一般终止进程用 15 信号，不能正常结束则使用 9 信号。安全模式下该命令被屏蔽。 |
+
+
+top 是一个在前台执行的程序，所以执行后便进入到这样的一个交互界面，正是因为交互界面我们才可以实时的获取到系统与进程的信息。在交互界面中我们可以通过一些指令来操作和筛选。在此之前我们先来了解显示了哪些信息。
+
+![](/img/post/linux/top.png)
+
+我们看到 top 显示的第一排，
+
+| 内容 |	解释 |
+| :---: | :--- |
+| ```top```|	表示当前程序的名称 |
+| ```11:05:18```| 	表示当前的系统的时间 |
+| ```up 8 days,17:12```| 	表示该机器已经启动了多长时间 |
+| ```1 user```| 	表示当前系统中只有一个用户 |
+| ```load average: 0.29,0.20,0.25```| 	分别对应1、5、15分钟内cpu的平均负载 |
+
+> load average 在 wikipedia 中的解释是 the system load is a measure of the amount of work that a computer system is doing 也就是对当前 CPU 工作量的度量，具体来说也就是指运行队列的平均长度，也就是等待 CPU 的平均进程数相关的一个计算值。
+
+我们该如何看待这个load average 数据呢？
+
+假设我们的系统是单 CPU、单内核的，把它比喻成是一条单向的桥，把CPU任务比作汽车。
+
+- ```load = 0``` 的时候意味着这个桥上并没有车，cpu 没有任何任务；
+- ```load < 1``` 的时候意味着桥上的车并不多，一切都还是很流畅的，cpu 的任务并不多，资源还很充足；
+- ```load = 1``` 的时候就意味着桥已经被车给占满了，没有一点空隙，cpu 的已经在全力工作了，所有的资源都被用完了，当然还好，这还在能力范围之内，只是有点慢而已；
+- ```load > 1``` 的时候就意味着不仅仅是桥上已经被车占满了，就连桥外都被占满了，cpu 已经在全力工作，系统资源的用完了，但是还是有大量的进程在请求，在等待。若是这个值大于２、大于３，表示进程请求超过 CPU 工作能力的 2 到 ３ 倍。而若是这个值 > 5 说明系统已经在超负荷运作了。
+这是单个 CPU 单核的情况，而实际生活中我们需要将得到的这个值除以我们的核数来看。我们可以通过以下的命令来查看 CPU 的个数与核心数
+
+来看 top 的第二行数据，基本上第二行是进程的一个情况统计
+
+| 内容 |	解释 |
+| :---:  | :--- |
+| ```Tasks: 26 total``` | 	进程总数 |
+| ```1 running``` | 	1个正在运行的进程数 |
+| ```25 sleeping``` | 	25个睡眠的进程数 |
+| ```0 stopped``` | 	没有停止的进程数 |
+| ```0 zombie	``` | 没有僵尸进程数 |
+
+来看 top 的第三行数据，这一行基本上是 CPU 的一个使用情况的统计了
+
+| 内容 |	解释 |
+| :---:  | :--- |
+| ```Cpu(s): 1.0%us``` | 	用户空间进程占用CPU百分比 |
+| ```1.0% sy``` | 	内核空间运行占用CPU百分比 |
+| ```0.0%ni``` | 	用户进程空间内改变过优先级的进程占用CPU百分比 |
+| ```97.9%id``` | 	空闲CPU百分比 |
+| ```0.0%wa``` | 	等待输入输出的CPU时间百分比 |
+| ```0.1%hi``` | 	硬中断(Hardware IRQ)占用CPU的百分比 |
+| ```0.0%si``` | 	软中断(Software IRQ)占用CPU的百分比 |
+| ```0.0%st``` | 	(Steal time) 是 hypervisor 等虚拟服务中，虚拟 CPU 等待实际 CPU 的时间的百分比   |
+
+CPU 利用率是对一个时间段内 CPU 使用状况的统计，通过这个指标可以看出在<span style="color:red">某一个时间段内 CPU 被占用的情况</span>，而 Load Average 是 CPU 的 Load，它所包含的信息不是 CPU 的使用率状况，<span style="color:red">而是在一段时间内 CPU 正在处理以及等待 CPU 处理的进程数情况统计信息</span>，这两个指标并不一样。
+
+来看 top 的第四行数据，这一行基本上是内存的一个使用情况的统计了：
+
+| 内容 |	解释 |
+| :---:  | :--- |
+| ```8176740 total``` |	物理内存总量 |
+| ```8032104 used``` |	使用的物理内存总量 |
+| ```144636 free``` |	空闲内存总量 |
+| ```313088 buffers``` |	用作内核缓存的内存量 |
+
+注意 系统中可用的<span style="background-color:#FFFF00"> 物理内存最大值并不是 free 这个单一的值，而是 free + buffers + swap 中的 cached 的和</span>
+
+来看 top 的第五行数据，这一行基本上是交换区的一个使用情况的统计了
+
+| 内容 |	解释 |
+| :---:  | :--- |
+| ```total``` |	交换区总量 |
+| ```used``` |	使用的交换区总量 |
+| ```free ```|	空闲交换区总量 |
+| ```cached```|	缓冲的交换区总量,内存中的内容被换出到交换区，而后又被换入到内存，但使用过的交换区尚未被覆盖 |
+
+再下面就是进程的一个情况了
+
+| 列名 |		解释
+| :---:  | :--- |
+| ```PID```	 |	进程id |
+| ```USER``` |		该进程的所属用户 |	
+| ```PR``` |		该进程执行的优先级 priority 值 |	
+| ```NI```	 |	该进程的 nice 值 |	
+| ```VIRT``` |		该进程任务所使用的虚拟内存的总数 |	
+| ```RES``` |		该进程所使用的物理内存数，也称之为驻留内存数 |	
+| ```SHR``` |		该进程共享内存的大小 |	
+| ```S```	 |	该进程进程的状态: S=sleep R=running Z=zombie |	
+| ```%CPU``` |		该进程CPU的利用率 |	
+| ```%MEM``` |		该进程内存的利用率 |	
+| ```TIME+``` |		该进程活跃的总时间 |	
+| ```COMMAND```	 |	该进程运行的名字 |	
+
+注意
+
+> NICE 值叫做静态优先级，是用户空间的一个优先级值，其取值范围是-20至19。<span style="background-color:#FFFF00">**这个值越小，表示进程”优先级”越高，而值越大“优先级”越低**</span>。nice值中的 -20 到 19，中 -20 优先级最高， 0 是默认的值，而 19 优先级最低
+
+> PR 值表示 Priority 值叫动态优先级，是进程在内核中实际的优先级值，进程优先级的取值范围是通过一个宏定义的，这个宏的名称是 MAX_PRIO，它的值为 140。Linux 实际上实现了 140 个优先级范围，取值范围是从 0-139，<span style="background-color:#FFFF00">**这个值越小，优先级越高**</span>。而这其中的 0 - 99 是实时进程的值，而 100 - 139 是给用户的。
+
+> 其中 PR 中的 100 to 139 值部分有这么一个对应 <span style="background-color:#FFFF00">**PR = 20 + (-20 to +19)**</span>，这里的 -20 to +19 便是nice值，所以说两个虽然都是优先级，而且有千丝万缕的关系，但是他们的值，他们的作用范围并不相同
+
+> VIRT 任务所使用的虚拟内存的总数，其中包含所有的代码，数据，共享库和被换出 swap空间的页面等所占据空间的总数
+
+
+计算load 源代码
+```c
+#define FSHIFT      11          /* nr of bits of precision */
+#define FIXED_1     (1<<FSHIFT) /* 1.0 as fixed-point(定点) */
+#define LOAD_FREQ   (5*HZ)      /* 5 sec intervals，每隔5秒计算一次平均负载值 */
+#define CALC_LOAD(load, exp, n)     \
+         load *= exp;               \
+         load += n*(FIXED_1 - exp); \
+         load >>= FSHIFT;
+
+unsigned long avenrun[3];
+
+EXPORT_SYMBOL(avenrun);
+
+/*
+* calc_load - given tick count, update the avenrun load estimates.
+* This is called while holding a write_lock on xtime_lock.
+*/
+static inline void calc_load(unsigned long ticks)
+{
+        unsigned long active_tasks; /* fixed-point */
+        static int count = LOAD_FREQ;
+        count -= ticks;
+        if (count < 0) {
+                count += LOAD_FREQ;
+                active_tasks = count_active_tasks();
+                CALC_LOAD(avenrun[0], EXP_1, active_tasks);
+                CALC_LOAD(avenrun[1], EXP_5, active_tasks);
+                CALC_LOAD(avenrun[2], EXP_15, active_tasks);
+        }
+}
+```
+
 top: provide you dynamic real time view of running system. Used to see which program take more of your CPU and which program consuming more of your memory
 
 ```shell
@@ -2827,6 +2971,14 @@ PID: process ID, 同一个程序不同时候run pid 可能不一样的 <br/>
 
 ![](/img/post/linux/pic5.png)
 
+
+```shell
+#查看物理CPU的个数
+#cat /proc/cpuinfo |grep "physical id"|sort |uniq|wc -l
+
+#每个cpu的核心数
+cat /proc/cpuinfo |grep "physical id"|grep "0"|wc -l
+```
 
 
 ## touch
