@@ -12,6 +12,220 @@ tags:
 ---
 
 
+## Bash 介绍
+
+```shell
+vim hello.sh
+```
+
+```#!``` 是说明 hello 这个文件的类型，有点类似于 Windows 系统下用不同文件后缀来表示不同文件类型的意思（但不相同）。
+Linux 系统根据 ```#!``` 及该字符串后面的信息确定该文件的类型，可以通过 man magic命令 及 /usr/share/magic 文件来了解这方面的更多内容。 ```#!/bin/bash```这一行是表示使用```/bin/bash```作为脚本的解释器，这行要放在脚本的行首并且<span style="color:red">**不要省略**</span>
+
+在 BASH 中 第一行的 ```#!``` 及后面的 ```/bin/bash``` 就表明该文件是一个 <span style="color:red"> BASH 程序，需要由 /bin 目录下的 bash 程序来解释执行</span>。BASH 这个程序一般是存放在 ```/bin``` 目录下，如果你的 Linux 系统比较特别，bash 也有可能被存放在 ```/sbin``` 、```/usr/local/bin``` 、```/usr/bin``` 、```/usr/sbin``` 或 ```/usr/local/sbin``` 这样的目录下；如果还找不到，你可以用 ```locate bash``` ,```find / -name bash 2>/dev/null``` 或 ```whereis bash``` 这三个命令找出 bash 所在的位置；如果仍然找不到，那你可能需要自己动手安装一个 BASH 软件包了。
+
+第二行的 ```# This is a ...``` 就是 BASH 程序的注释，在 BASH 程序中从```#```号（注意：后面紧接着是```!```号的除外）开始到行尾的部分均被看作是程序的注释。
+
+需要注意的是 BASH 中的绝大多数语句结尾处都没有分号。
+
+
+#### 运行Bash脚本的方式：
+
+```bash
+# 使用shell来执行
+$ sh hello.sh
+
+# 使用bash来执行
+$ bash hello.sh
+
+使用.来执行
+$ . ./hello.sh
+
+使用source来执行
+$ source hello.sh
+
+还可以赋予脚本所有者执行权限，允许该用户执行该脚本
+$ chmod u+rx hello.sh
+$  ./hello.sh
+```
+
+
+使用脚本清除```/var/log```下的log文件
+首先我们看一看```/var/log/wtmp```里面有啥东西
+```bash
+cat /var/log/wtmp
+```
+这个文件中记录了系统的一些信息，现在我们需要写一个脚本把里面的东西清空，但是保留文件
+
+```bash
+$ vim cleanlogs.sh
+```
+
+说明: ```/dev/null```这个东西可以理解为一个黑洞，里面是空的（可以用cat命令看一看）
+
+```bash
+#!/bin/bash
+
+# 初始化一个变量
+LOG_DIR=/var/log
+
+cd $LOG_DIR
+
+cat /dev/null > wtmp
+
+echo "Logs cleaned up."
+
+exit
+```
+运行脚本前，先使用 ```sudo chmod +x cleanlogs.sh``` 授予脚本执行权限，然后再看看 ```/var/log/wtmp``` 文件内是否有内容。运行此脚本后，文件的内容将被清除。
+
+执行
+
+由于脚本中<span style="color:red">含有对系统日志文件内容的清除操作，这要求要有管理员权限.不然会报permission denied错误, 使用sudo命令调用管理员权限才能执行成功</span>：
+```bash
+$ sudo ./cleanlogs.sh
+````
+
+
+脚本正文中以```#```号开头的行都是注释语句，这些行在脚本的实际执行过程中不会被执行。这些注释语句能方便我们在脚本中做一些注释或标记，让脚本更具可读性。
+
+可是你会发现 ```sudo cat /dev/null > /var/log/wtmp``` 一样会提示权限不够，为什么呢？因为```sudo```只能让```cat```命令以```sudo```的权限执行，而对于>这个符号并没有sudo的权限，我们可以使用
+
+```bash
+sudo sh -c "cat /dev/null > /var/log/wtmp " 让整个命令都具有sudo的权限执行
+```
+
+Q: 为什么cleanlogs.sh可以将log文件清除？ <br/>
+A: 因为```/dev/null``` ，里面是空的，重定向到 ```/var/log/wtmp``` 文件后，就清空了 wtmp 文件的内容。
+
+
+
+#### 特殊字符
+
+
+| 字符 | 解释 |
+| :---: | :--- |
+| ```#``` | ```#``` 开头(除```#!```之外)的是注释。```#!```是用于指定当前脚本的解释器，我们这里为bash，且应该指明完整路径，所以为```/bin/bash```, ```\#``` 就不是注释 |
+| ```;``` | <li> 使用分号（;）可以在同一行上写两个或两个以上的命令 </li><li> 终止case选项（双分号）</li> |
+| ```.``` | 点号等价于 source 命令: 当前 bash 环境下读取并执行 FileName.sh 中的命令 |
+|```"``` | 双引号, "STRING" 将会阻止（解释）STRING中大部分特殊的字符。见下面例子 |
+| ```'``` | 单引号, STRING' 将会阻止STRING中<span style="color:red">**所有特殊字符**</span>的解释 | 
+| ```/``` | <li> 斜线（/） 文件名路径分隔符。分隔文件名不同的部分（如/```home/bozo/projects/Makefile```）注意在linux中表示路径的时候，许多个```/```跟一个```/```是一样的。```/home/shiyanlou```等同于```////home///shiyanlou```</li> <li> 也可用来作为除法算术操作符</li>。| 
+| ```\``` |  一种对单字符的引用机制。```\X``` 将会“转义”字符```X```。这等价于```"X"```，也等价于```'X'```。```\``` 通常用来转义双引号（```"```）和单引号（```'```），这样双引号和单引号就不会被解释成特殊含义了。 <br/><li>```\n``` 表示新的一行</li><li>```\r``` 表示回车</li><li>```\t``` 表示水平制表符</li><li>```\v``` 表示垂直制表符</li><li>```\b``` 表示后退符</li><li>```\a``` 表示"alert"(蜂鸣或者闪烁)</li><li>```\0xx``` 转换为八进制的ASCII码, 等价于0xx</li><li>```"``` 表示引号字面的意思 </li>| 
+| ` |  反引号（`） 反引号中的命令会优先执行 |
+
+  
+
+
+**#**
+
+```shell
+#!/bin/bash
+
+echo "The # here does not begin a comment."
+echo 'The # here does not begin a comment.'
+echo The \# here does not begin a comment.
+echo The # 这里开始一个注释
+echo $(( 2#101011 ))     # 数制转换（使用二进制表示），不是一个注释，双括号表示对于数字的处理
+
+```
+
+**;**
+
+e.g.1 使用分号（;）可以在同一行上写两个或两个以上的命令
+
+```bash
+ #!/bin/bash
+ echo hello; echo there
+ filename=ttt.sh
+ if [ -e "$filename" ]; then    # 注意: "if"和"then"需要分隔，-e用于判断文件是否存在
+     echo "File $filename exists."; cp $filename $filename.bak
+ else
+     echo "File $filename not found."; touch $filename
+ fi; echo "File test complete."
+ ```
+ 
+ e.g. 2.终止case选项（双分号）
+
+```shelll
+$ vim test3.sh
+```
+输入如下代码，并保存。
+```
+#!/bin/bash
+
+varname=b
+
+case "$varname" in
+    [a-z]) echo "abc";;
+    [0-9]) echo "123";;
+esac
+```
+执行脚本，查看输出
+```
+$ bash test3.sh
+abc
+```
+
+上面脚本使用case语句，首先创建了一个变量初始化为b,然后使用case语句判断该变量的范围，并打印相关信息。
+ 
+ 
+ **.**
+ 
+ ```
+ $ source test.sh
+Hello World
+$ . test.sh
+Hello World
+```
+
+**引号**
+
+![](/img/post/shell/quote.png)
+
+**反引号**
+
+反引号中的命令会优先执行，如：
+
+```
+$ cp `mkdir back` test.sh back
+$ ls
+```
+
+<span style="background-color:#FFFF00">先创建了 back 目录，然后复制 test.sh 到 back 目录</span>
+
+
+
+#### Comparison 
+
+**Integer Comparison**
+
+| 符号 | 解释 |
+| :---: | :--- | 
+| ```-eq``` | is equal to ```if[ $a -eq $b ]``` |
+| ```-ne``` | is not equal to ```if[ $a -ne $b]``` |
+| ```-gt``` | is greater than ```if[ $a -gt $b ]```|
+| ```>``` | is greater than ```(($a > $b))``` |
+| ```-ge``` | is greater than or equal to ```if[ $a -ge $b ]```|
+| ```>=``` | is greater than or equal to ```(($a >= $b))``` |
+| ```-lt``` | is less than  ```if[ $a -lt $b ]```|
+| ```<``` | is less than ```(($a < $b)``` |
+| ```-le``` | is less than to  ```if[ $a -le $b ]``` |
+| ```<=``` | is less than or equal to ```(($a <= $b))``` |
+
+
+**string comparison**
+| 符号 | 解释 |
+| :---: | :--- | 
+| ```=``` | is equal to ```if[ $a = $b]``` 跟```==``` 一样的 |
+| ```==``` | is equal to ```if[ $a == $b ]```|
+| ```!=``` | is not equal to ```if[ $a != $b ]```|
+| ```<``` | is less than, in ASCII alphabetical order ```if [[ $a < $b ]]```, <span style="background-color:#FFFF00">**注意对比string 大小用 两个bracket**</span>|
+|```>``` | is greater than, in ASCII alphabetical order ```if[[ $a > $b ]]```|
+|```-z```| string is null, zero length |
+
+注意： 多于numeric, ```>=, ==, >, >=``` 比较需要用 双小括号，```(($count > 10))```, 多于string ```==, !=, >, <```, 需要用双中括号 ```[[]]```
+
+
 **\c**: 再echo之后 让cursor继续在这一行，不重新开启一行 <br/>
 **mv**: move and rename <br/>
 
