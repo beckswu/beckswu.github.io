@@ -112,7 +112,7 @@ A: 因为```/dev/null``` ，里面是空的，重定向到 ```/var/log/wtmp``` �
 | ```/``` | 1. 斜线（/） 文件名路径分隔符。分隔文件名不同的部分（如/```home/bozo/projects/Makefile```）注意在linux中表示路径的时候，许多个```/```跟一个```/```是一样的。```/home/shiyanlou```等同于```////home///shiyanlou```<br> 2. 也可用来作为除法算术操作符。| 
 | ```\``` |  一种对单字符的引用机制。```\X``` 将会“转义”字符```X```。这等价于```"X"```，也等价于```'X'```。```\``` 通常用来转义双引号（```"```）和单引号（```'```），这样双引号和单引号就不会被解释成特殊含义了。 <br/> - ```\n``` 表示新的一行<br/> - ```\r``` 表示回车<br/> -```\t``` 表示水平制表符<br/> -```\v``` 表示垂直制表符<br/> -```\b``` 表示后退符<br/> -```\a``` 表示"alert"(蜂鸣或者闪烁)<br/> -```\0xx``` 转换为八进制的ASCII码, 等价于0xx<br/> -```"``` 表示引号字面的意思 | 
 | ``` ` ``` |  反引号（`） 反引号中的命令会优先执行 |
-| ```:``` | 冒号 <br/> 1. 等价于```NOP```（no op，一个什么也不干的命令）。也可以被认为与shell的内建命令<span style="background-color:#FFFF00">true作用相同</span>, 也可以用作站位符 ```if [] then : ```。“:”命令是一个bash的内建命令，它的退出码（exit status）是（0）<br/> 2. 与 ```>``` 重定向操作符结合使用时，将会把一个文件清空，但是并不会修改这个文件的权限<br/> 3. ```$PATH`` 变量中做分隔符 |
+| ```:``` | 冒号 <br/> 1. 等价于```NOP```（no op，一个什么也不干的命令）。也可以被认为与shell的内建命令<span style="background-color:#FFFF00">true作用相同</span>, 也可以用作站位符 ```if [] then : ```。“:”命令是一个bash的内建命令，它的退出码（exit status）是（0）<br/> 2. 与 ```>``` 重定向操作符结合使用时，将会把一个文件清空，但是并不会修改这个文件的权限<br/> 3. ```$PATH``` 变量中做分隔符 |
 | ```?``` |  三元操作符 如 ```(( t=a<50?8:9 ))``` |
 | ```$``` | 变量替换: 引用变量 |
 
@@ -605,40 +605,6 @@ $ ls
 
 
 
-#### Comparison
-
-
-[if primary expressions](http://tldp.org/LDP/Bash-Beginners-Guide/html/sect_07_01.html#sect_07_01_01)
-
-**Integer Comparison**
-
-| 符号 | 解释 |
-| :---: | :--- | 
-| ```-eq``` | is equal to ```if[ $a -eq $b ]``` |
-| ```-ne``` | is not equal to ```if[ $a -ne $b]``` |
-| ```-gt``` | is greater than ```if[ $a -gt $b ]```|
-| ```>``` | is greater than ```(($a > $b))``` |
-| ```-ge``` | is greater than or equal to ```if[ $a -ge $b ]```|
-| ```>=``` | is greater than or equal to ```(($a >= $b))``` |
-| ```-lt``` | is less than  ```if[ $a -lt $b ]```|
-| ```<``` | is less than ```(($a < $b)``` |
-| ```-le``` | is less than to  ```if[ $a -le $b ]``` |
-| ```<=``` | is less than or equal to ```(($a <= $b))``` |
-
-
-**string comparison**
-
-| 符号 | 解释 |
-| :---: | :--- | 
-| ```=``` | is equal to ```if[ $a = $b]``` 跟```==``` 一样的 |
-| ```==``` | is equal to ```if[ $a == $b ]```|
-| ```!=``` | is not equal to ```if[ $a != $b ]```|
-| ```<``` | is less than, in ASCII alphabetical order ```if [[ $a < $b ]]```, <span style="background-color:#FFFF00">**注意对比string 大小用 两个bracket**</span>|
-|```>``` | is greater than, in ASCII alphabetical order ```if[[ $a > $b ]]```|
-|```-z```| string is null, zero length |
-
-注意： 多于numeric, ```>=, ==, >, >=``` 比较需要用 双小括号，```(($count > 10))```, 多于string ```==, !=, >, <```, 需要用双中括号 ```[[]]```
-
 
 **\c**: 再echo之后 让cursor继续在这一行，不重新开启一行 <br/>
 **mv**: move and rename <br/>
@@ -864,9 +830,12 @@ echo value $10val
 
 ## 运算
 
+#### 算术运算符
+
 <span style="color:red">原生bash不支持简单的数学运算</span>，但是可以通过其他命令来实现，例如 ```awk`` 和 ``expr``，``expr`` 最常用。
 
-``expr`` 是一款表达式计算工具，使用它能完成表达式的求值操作. 
+``expr`` 是一款表达式计算工具，使用它能完成表达式的求值操作.  <span style="color:red">**expr 只能用于整数计算**</span>，可以使用 ```bc``` 或者 ```awk``` 进行浮点数运算。
+
 
 - 注意使用的反引号（esc键下边）
 - 表达式和运算符之间<span style="background-color:#FFFF00">**要有空格**</span> ```$a + $b```写成```$a+$b```不行
@@ -913,6 +882,503 @@ b / a : 2
 b % a : 0
 a != b
 ```
+
+浮点数运算: 先安装bc
+
+```shell
+sudo apt-get update
+$ sudo apt-get install bc
+```
+
+```bash
+#!/bin/bash
+
+raduis=2.4
+
+pi=3.14159
+
+girth=$(echo "scale=4; 3.14 * 2 * $raduis" | bc)
+
+area=$(echo "scale=4; 3.14 * $raduis * $raduis" | bc)
+
+echo "girth=$girth"
+
+echo "area=$area"
+```
+
+
+
+
+#### 关系运算符
+
+| 符号 | 解释 |
+| :---: | :--- | 
+| ```-eq``` | is equal to ```if[ $a -eq $b ]``` |
+| ```-ne``` | is not equal to ```if[ $a -ne $b]``` |
+| ```-gt``` | is greater than ```if[ $a -gt $b ]```|
+| ```>``` | is greater than ```(($a > $b))``` |
+| ```-ge``` | is greater than or equal to ```if[ $a -ge $b ]```|
+| ```>=``` | is greater than or equal to ```(($a >= $b))``` |
+| ```-lt``` | is less than  ```if[ $a -lt $b ]```|
+| ```<``` | is less than ```(($a < $b)``` |
+| ```-le``` | is less than to  ```if[ $a -le $b ]``` |
+| ```<=``` | is less than or equal to ```(($a <= $b))``` |
+
+
+注意： 多于numeric, ```>=, ==, >, >=``` 比较需要用 双小括号，```(($count > 10))```, 多于string ```==, !=, >, <```, 需要用双中括号 ```[[]]```
+
+
+<span style="background-color:#FFFF00">**关系运算符只支持数字，不支持字符串，除非字符串的值是数字**</span>。
+
+```bash
+vim test2.sh
+```
+
+```bash
+#!/bin/bash
+
+a=10
+b=20
+
+if [ $a -eq $b ]
+then
+   echo "$a -eq $b : a == b"
+else
+   echo "$a -eq $b: a != b"
+fi
+````
+运行
+
+```bash
+$bash test2.sh
+10 -eq 20: a != b
+```
+
+#### 逻辑运算符
+
+
+```bash
+#!/bin/bash
+a=10
+b=20
+
+if [[ $a -lt 100 && $b -gt 100 ]]
+then
+   echo "return true"
+else
+   echo "return false"
+fi
+
+if [[ $a -lt 100 || $b -gt 100 ]]
+then
+   echo "return true"
+else
+   echo "return false"
+fi
+```
+
+结果
+```bash
+return false
+return true
+```
+
+
+
+#### Logical And
+
+
+
+```shell
+#! /bin/bash
+
+age=25
+
+#Method 1 && 
+if [ $age -gt 18 ] && [ $age -lt 30 ] # 18 < age < 30 
+then 
+    echo "valid age"
+else 
+    echo "age not valid"
+fi 
+
+
+
+if [[ $age -gt 18 && $age -lt 30 ]] # require double [[]]
+then 
+    echo "valid age"
+else 
+    echo "age not valid"
+fi 
+
+
+#Method 2 -a: stands for and 
+
+age=25
+
+if [ $age -gt 18 -a $age -lt 30 ] # 18 < age < 30 
+then 
+    echo "valid age"
+else 
+    echo "age not valid"
+fi 
+
+
+
+```
+
+
+
+#### Logical Or
+
+
+
+```bash
+#! /bin/bash
+
+
+age=60
+
+#Method 1 || 
+if [ $age -gt 18 ] || [ $age -lt 30 ] # 18 < age < 30 
+then 
+    echo "valid age"
+else 
+    echo "age not valid"
+fi 
+
+if [[ $age -eq 18 || $age -eq 30 ]] # require double [[]]
+then 
+    echo "valid age"
+else 
+    echo "age not valid"
+fi 
+
+
+#Method 2 -o: stands for or 
+
+age=60
+
+if [ $age -gt 18 -o $age -lt 30 ] # 18 < age < 30 
+then 
+    echo "valid age"
+else 
+    echo "age not valid"
+fi 
+
+
+
+```
+
+
+
+#### 字符串运算符
+
+
+| 符号 | 解释 |
+| :---: | :--- | 
+| ```=``` | is equal to ```if[ $a = $b]``` 跟```==``` 一样的 |
+| ```==``` | is equal to ```if[ $a == $b ]```|
+| ```!=``` | is not equal to ```if[ $a != $b ]```|
+| ```<``` | is less than, in ASCII alphabetical order ```if [[ $a < $b ]]```, <span style="background-color:#FFFF00">**注意对比string 大小用 两个bracket**</span>|
+|```>``` | is greater than, in ASCII alphabetical order ```if[[ $a > $b ]]```|
+|```-z```|  if string is null, return true if zero length |
+| ```-n``` | if string is null, return true if not zero length  |
+| ```str``` | 检测字符串是否为空, 不为空返回true | 
+
+```bash
+a="abc"
+b="efg"
+
+if [ $a = $b ]
+then
+   echo "$a = $b : a == b"
+else
+   echo "$a = $b: a != b"
+fi
+if [ -n $a ]
+then
+   echo "-n $a : The string length is not 0"
+else
+   echo "-n $a : The string length is  0"
+fi
+if [ $a ]
+then
+   echo "$a : The string is not empty"
+else
+   echo "$a : The string is empty"
+fi
+```
+结果
+```bash
+abc = efg: a != b
+-n abc : The string length is not 0
+abc : The string is not empty
+```
+
+#### 文件测试运算符
+
+![](/img/post/shell/file.png)
+
+
+```bash
+#!/bin/bash
+
+file="/home/shiyanlou/test.sh"
+if [ -r $file ]
+then
+   echo "The file is readable"
+else
+   echo "The file is not readable"
+fi
+if [ -e $file ]
+then
+   echo "File exists"
+else
+   echo "File not exists"
+fi
+```
+结果
+```bash
+The file is readable
+File exists
+```
+
+## 流程控制
+
+
+
+#### if
+
+[if primary expressions](http://tldp.org/LDP/Bash-Beginners-Guide/html/sect_07_01.html#sect_07_01_01)
+
+
+**if 语句语法格式**：
+
+```bash
+if condition
+then
+    command1 
+    command2
+    ...
+    commandN 
+fi
+```
+
+**2. if else 语法格式**：
+
+```bash
+if condition
+then
+    command1 
+    command2
+    ...
+    commandN
+else
+    command
+fi
+```
+
+
+**3. if-elif-else 语法格式**：
+
+```bash
+if condition1
+then
+    command1
+elif condition2 
+then 
+    command2
+else
+    commandN
+fi
+```
+
+<span style="background-color:#FFFF00">**if else语句经常与```test```命令结合使用**</span>
+
+```bash
+num1=$[2*3]
+num2=$[1+5]
+if test $[num1] -eq $[num2]
+then
+    echo 'Two numbers are equal!'
+else
+    echo 'The two numbers are not equal!'
+fi
+```
+输出结果：
+```
+Two numbers are equal!
+```
+
+
+以下实例判断两个变量是否相等：
+
+```bash
+a=10
+b=20
+if [ $a == $b ]
+then
+   echo "a == b"
+elif [ $a -gt $b ]
+then
+   echo "a > b"
+elif [ $a -lt $b ]
+then
+   echo "a < b"
+else
+   echo "Ineligible"
+fi
+```
+输出结果：
+
+```bash
+a < b
+```
+
+
+<span style="background-color:#FFFF00">**注意if 跟方括号```[```之间要有空格**</span>
+
+```bash
+#! /bin/bash
+
+#syntax
+if [ condition ] 
+then 
+    statement
+fi #end of if statement 
+
+count = 10 
+if [$count -eq  10 ]
+then 
+    echo "condition is true"
+fi 
+
+
+#or 
+if (($count >  9))
+then 
+    echo "condition is true"
+else 
+    echo "condition is false"
+fi 
+
+#or
+if (($count ==  10)) #注意不能写成 [ $count == 10 ]会报错
+then 
+    echo "condition is true"
+else 
+    echo "condition is false"
+fi 
+
+
+
+
+#string, == 和 = 都是一样的，是不是相等
+word=abc
+#string 写成 word="abc" or word=abc 都可以
+if [ $word == "abc"]
+then 
+    echo "condition is true"
+fi
+
+word="a"
+if [[ $word == "b" ]]
+then 
+    echo "condition b is true"
+elif [[ $word == "a" ]]
+then
+    echo "condition a is true"
+else 
+    echo "condition is false"
+fi
+
+```
+
+<span style="background-color: #FFFF00">**注意**</span>： 多于numeric, >=,  ==, >, >= 比较需要用 双小括号，(($count > 10)), 多于string ==, !=, >, <, 需要用双中括号 [[]]
+
+<span style="background-color: #FFFF00">**注意**</span>： 写if condition 需要让括号和里面内容有空格，比如 if [[ $word == "a" ]] 是可以的，如果是 if [[ $word == "a"]] 是错误的 
+
+![](/img/post/shell/if.png)
+
+
+
+#### For Loop
+
+
+
+```bash
+#! /bin/bash
+
+for i in 1 2 3 4 5 #number separated by spaces 
+do 
+    echo $i
+done 
+
+#
+
+for i in {1..10} #number from 1 to 10
+do 
+    echo $i
+done 
+
+#can only use for bash over 4.0
+for i in {1..10..2} #number from 1 to 10, increase by 2
+do 
+    echo $i
+done 
+
+#
+
+for (( i=0; i<10; i++ ))
+do 
+    echo $i
+done 
+
+
+
+```
+
+
+![](/img/post/shell/forloop.png)
+
+![](/img/post/shell/forloop1.png)
+
+
+
+#### For loop to execute command
+
+
+
+```bash
+#! /bin/bash
+
+for command in ls pwd date #execute command one by one
+do  #
+    echo "----------$command-----------"
+    $command 
+done 
+
+#print all the directory inside current folder
+for item in * #* every item in the directory
+do #
+    if [ -d $item ]  #if it is directory,  if [ -f $item ] if it is file
+    then #
+        echo $item 
+    fi 
+done 
+
+
+```
+
+
+
+
+
+
+
+
+
 
 
 
@@ -986,72 +1452,6 @@ echo $# #print number of argument passed
 <span style="background-color: #FFFF00">Difference between pass into array and variable</span>,$0 是 file name, 但是array index 0 是first argument
 
 
-
-## if
-
-[if primary expressions](http://tldp.org/LDP/Bash-Beginners-Guide/html/sect_07_01.html#sect_07_01_01)
-
-```bash
-#! /bin/bash
-
-#syntax
-if[ condition ] 
-then 
-    statement
-fi #end of if statement 
-
-count = 10 
-if [$count -eq  10 ]
-then 
-    echo "condition is true"
-fi 
-
-
-#or 
-if (($count >  9))
-then 
-    echo "condition is true"
-else 
-    echo "condition is false"
-fi 
-
-#or
-if (($count ==  10)) #注意不能写成 [$count == 10 ]会报错
-then 
-    echo "condition is true"
-else 
-    echo "condition is false"
-fi 
-
-
-
-
-#string, == 和 = 都是一样的，是不是相等
-word=abc
-#string 写成 word="abc" or word=abc 都可以
-if [ $word == "abc"]
-then 
-    echo "condition is true"
-fi
-
-word="a"
-if [[ $word == "b" ]]
-then 
-    echo "condition b is true"
-elif [[ $word == "a" ]]
-then
-    echo "condition a is true"
-else 
-    echo "condition is false"
-fi
-
-```
-
-<span style="background-color: #FFFF00">**注意**</span>： 多于numeric, >=,  ==, >, >= 比较需要用 双小括号，(($count > 10)), 多于string ==, !=, >, <, 需要用双中括号 [[]]
-
-<span style="background-color: #FFFF00">**注意**</span>： 写if condition 需要让括号和里面内容有空格，比如 if [[ $word == "a" ]] 是可以的，如果是 if [[ $word == "a"]] 是错误的 
-
-![](/img/post/shell/if.png)
 
 
 
@@ -1158,92 +1558,6 @@ chmod +w $filename
 
 
 
-
-
-## Logical And
-
-
-
-```shell
-#! /bin/bash
-
-age=25
-
-#Method 1 && 
-if [ $age -gt 18 ] && [ $age -lt 30 ] # 18 < age < 30 
-then 
-    echo "valid age"
-else 
-    echo "age not valid"
-fi 
-
-
-
-if [[ $age -gt 18 && $age -lt 30 ]] # require double [[]]
-then 
-    echo "valid age"
-else 
-    echo "age not valid"
-fi 
-
-
-#Method 2 -a: stands for and 
-
-age=25
-
-if [ $age -gt 18 -a $age -lt 30 ] # 18 < age < 30 
-then 
-    echo "valid age"
-else 
-    echo "age not valid"
-fi 
-
-
-
-```
-
-
-
-## Logical Or
-
-
-
-```bash
-#! /bin/bash
-
-
-age=60
-
-#Method 1 || 
-if [ $age -gt 18 ] || [ $age -lt 30 ] # 18 < age < 30 
-then 
-    echo "valid age"
-else 
-    echo "age not valid"
-fi 
-
-if [[ $age -eq 18 || $age -eq 30 ]] # require double [[]]
-then 
-    echo "valid age"
-else 
-    echo "age not valid"
-fi 
-
-
-#Method 2 -o: stands for or 
-
-age=60
-
-if [ $age -gt 18 -o $age -lt 30 ] # 18 < age < 30 
-then 
-    echo "valid age"
-else 
-    echo "age not valid"
-fi 
-
-
-
-```
 
 
 
@@ -1629,71 +1943,7 @@ done
 
 
 
-## For Loop
 
-
-
-```bash
-#! /bin/bash
-
-for i in 1 2 3 4 5 #number separated by spaces 
-do 
-    echo $i
-done 
-
-
-for i in {1..10} #number from 1 to 10
-do 
-    echo $i
-done 
-
-#can only use for bash over 4.0
-for i in {1..10..2} #number from 1 to 10, increase by 2
-do 
-    echo $i
-done 
-
-
-for (( i=0; i<10; i++ ))
-do 
-    echo $i
-done 
-
-
-
-```
-
-
-![](/img/post/shell/forloop.png)
-
-![](/img/post/shell/forloop2.png)
-
-
-
-## For loop to execute command
-
-
-
-```bash
-#! /bin/bash
-
-for command in ls pwd date #execute command one by one
-do 
-    echo "----------$command-----------"
-    $command 
-done 
-
-#print all the directory inside current folder
-for item in * #* every item in the directory
-do 
-    if [ -d $item ]  #if it is directory,  if [ -f $item ] if it is file
-    then
-        echo $item 
-    fi 
-done 
-
-
-```
 
 
 
