@@ -105,7 +105,7 @@ A: 因为```/dev/null``` ，里面是空的，重定向到 ```/var/log/wtmp``` �
 | 字符 | 解释 |
 | :---: | :--- |
 | ```#``` | ```#``` 开头(除```#!```之外)的是注释。```#!```是用于指定当前脚本的解释器，我们这里为bash，且应该指明完整路径，所以为```/bin/bash```, ```\#``` 就不是注释 |
-| ```;``` | <li> 使用分号（;）可以在同一行上写两个或两个以上的命令 </li><li> 终止case选项（双分号）</li> |
+| ```;``` | - 使用分号（;）可以在同一行上写两个或两个以上的命令 <br/> - 终止case选项（双分号） |
 | ```.``` | 点号等价于 source 命令: 当前 bash 环境下读取并执行 FileName.sh 中的命令 |
 |```"``` | 双引号, "STRING" 将会阻止（解释）STRING中大部分特殊的字符。见下面例子 |
 | ```'``` | 单引号, STRING' 将会阻止STRING中<span style="color:red">**所有特殊字符**</span>的解释 | 
@@ -335,6 +335,10 @@ $ bash test.sh
 | ```()``` | <li> 在括号中的命令列表，将会作为一个子 shell 来运行, 括号中的变量,对于脚本剩下的部分<span style="background-color:#FFFF00">**是不可用的**</span>.    </li> <li> 初始化数组 </li>  |
 | ```{}``` | <li>文件名扩展 比如 ```touch {1..10}.txt </li> <li> 创建了一个匿名函数, <span style="background-color:#FFFF00">**对于大括号外可见**</span></li> |
 | ```[]``` | <li> if condition</li><li>数组index</li>|
+| ```<  >``` | 重新定向 |
+| ```|``` | 管道 | 
+| ```-``` |  破折号: 在所有的命令内如果想使用选项参数的话的前缀. 2.用于重定向stdin或stdout  |
+| ```~``` | 波浪号: 表示Home |
 
 **1. 小括号()**
 
@@ -492,6 +496,110 @@ echo ${arr[0]}
 $ bash test25.sh
 10
 ```
+
+
+**4. 尖括号 < 和 >**
+
+重定向
+
+```test.sh > filename```：重定向test.sh的输出到文件 filename 中。如果 filename 存在的话，那么将会被覆盖。
+
+```test.sh &> filename```：重定向 test.sh 的 stdout（标准输出）和 stderr（标准错误）到 filename 中。
+
+```test.sh >&2```：重定向 test.sh 的 stdout 到 stderr 中。
+
+```test.sh >> filename```：把 test.sh 的输出追加到文件 filename 中。如果filename 不存在的话，将会被创建。
+
+
+
+**5. 竖线 |**
+
+管道: 分析前边命令的输出，并将输出作为后边命令的输入。这是一种产生命令链的好方法。
+
+```bash
+$ vim test26.sh
+```
+输入代码：
+```bash
+#!/bin/bash
+
+tr 'a-z' 'A-Z'
+exit 0
+```
+现在让我们输送l```s -l```的输出到一个脚本中：
+```bash
+$ chmod 755 test26.sh
+$ ls -l | ./test26.sh
+```
+输出的内容均变为了大写字母。
+
+![](/img/post/shell/vertical_line.png)
+
+
+
+**6.破折号-**
+
+1.选项，前缀: 在所有的命令内如果想使用选项参数的话,前边都要加上“-”。
+
+```bash
+$ vim test27.sh
+```
+
+输入代码：
+```bash
+#!/bin/bash
+
+a=5
+b=5
+if [ "$a" -eq "$b" ]
+then
+    echo "a is equal to b."
+fi
+```
+运行代码：
+```bash
+$ bash test27.sh
+a is equal to b.
+```
+
+2.用于重定向stdin或stdout
+
+下面脚本用于备份最后24小时当前目录下所有修改的文件.
+```bash
+$ vim test28.sh
+```
+输入代码：
+```bash
+#!/bin/bash
+
+BACKUPFILE=backup-$(date +%m-%d-%Y)
+# 在备份文件中嵌入时间.
+archive=${1:-$BACKUPFILE}
+#  如果在命令行中没有指定备份文件的文件名,
+#  那么将默认使用"backup-MM-DD-YYYY.tar.gz".
+
+tar cvf - `find . -mtime -1 -type f -print` > $archive.tar
+gzip $archive.tar
+echo "Directory $PWD backed up in archive file \"$archive.tar.gz\"."
+
+exit 0
+```
+运行代码：
+```
+$ bash test28.sh
+$ ls
+```
+
+
+
+
+
+
+
+
+
+
+
 
 
 
