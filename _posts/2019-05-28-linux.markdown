@@ -1092,7 +1092,7 @@ w3m https://www.shiyanlou.com/faq
 
 ![](/img/post/linux/apt-get.png)
 
-#### 重新安装, 
+#### 重新安装
 
 如不知道软件包完整名, 通常我们是使用```Tab```键补全软件包名
 ```shell
