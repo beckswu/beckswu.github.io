@@ -1155,7 +1155,7 @@ File exists
 
 **if 语句语法格式**：
 
-```bash
+```
 if condition
 then
     command1 
@@ -1167,7 +1167,7 @@ fi
 
 **2. if else 语法格式**：
 
-```bash
+```
 if condition
 then
     command1 
@@ -1182,7 +1182,7 @@ fi
 
 **3. if-elif-else 语法格式**：
 
-```bash
+```
 if condition1
 then
     command1
@@ -1200,9 +1200,9 @@ fi
 num1=$[2*3]
 num2=$[1+5]
 if test $[num1] -eq $[num2]
-then
+then #
     echo 'Two numbers are equal!'
-else
+else #
     echo 'The two numbers are not equal!'
 fi
 ```
@@ -1218,15 +1218,15 @@ Two numbers are equal!
 a=10
 b=20
 if [ $a == $b ]
-then
+then #
    echo "a == b"
 elif [ $a -gt $b ]
-then
+then #
    echo "a > b"
 elif [ $a -lt $b ]
-then
+then #
    echo "a < b"
-else
+else #
    echo "Ineligible"
 fi
 ```
@@ -1244,30 +1244,30 @@ a < b
 
 #syntax
 if [ condition ] 
-then 
+then  #
     statement
 fi #end of if statement 
 
 count = 10 
 if [$count -eq  10 ]
-then 
+then #
     echo "condition is true"
 fi 
 
 
 #or 
 if (($count >  9))
-then 
+then #
     echo "condition is true"
-else 
+else #
     echo "condition is false"
 fi 
 
 #or
 if (($count ==  10)) #注意不能写成 [ $count == 10 ]会报错
-then 
+then #
     echo "condition is true"
-else 
+else #
     echo "condition is false"
 fi 
 
@@ -1278,18 +1278,18 @@ fi
 word=abc
 #string 写成 word="abc" or word=abc 都可以
 if [ $word == "abc"]
-then 
+then #
     echo "condition is true"
 fi
 
 word="a"
 if [[ $word == "b" ]]
-then 
+then #
     echo "condition b is true"
 elif [[ $word == "a" ]]
-then
+then #
     echo "condition a is true"
-else 
+else #
     echo "condition is false"
 fi
 
@@ -1305,33 +1305,72 @@ fi
 
 #### For Loop
 
+for循环一般格式为：
+```
+for var in item1 item2 ... itemN
+do
+    command1
+    command2
+    ...
+    commandN
+done
+```
+例如，顺序输出当前列表中的数字：
+```
+for loop in 1 2 3 4 5
+do
+    echo "The value is: $loop"
+done
+```
+输出结果：
 
+```
+The value is: 1
+The value is: 2
+The value is: 3
+The value is: 4
+The value is: 5
+```
+顺序输出**字符串**中的字符：
+```
+for str in This is a string
+do
+    echo $str
+done
+```
+输出结果：
+```
+This
+is
+a
+string
+```
 
 ```bash
 #! /bin/bash
 
 for i in 1 2 3 4 5 #number separated by spaces 
-do 
+do #
     echo $i
 done 
 
 #
 
 for i in {1..10} #number from 1 to 10
-do 
+do  #
     echo $i
 done 
 
 #can only use for bash over 4.0
 for i in {1..10..2} #number from 1 to 10, increase by 2
-do 
+do  #
     echo $i
 done 
 
 #
 
 for (( i=0; i<10; i++ ))
-do 
+do #
     echo $i
 done 
 
