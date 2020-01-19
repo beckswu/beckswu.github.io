@@ -108,13 +108,7 @@ A: 因为```/dev/null``` ，里面是空的，重定向到 ```/var/log/wtmp``` �
 | ```;``` | 1. 使用分号（;）可以在同一行上写两个或两个以上的命令 <br/> 2. 终止case选项（双分号） |
 | ```.``` | 点号等价于 source 命令: 当前 bash 环境下读取并执行 FileName.sh 中的命令 |
 |```"``` | 双引号, "STRING" 将会阻止（解释）STRING中大部分特殊的字符。见下面例子 |
-| ```'``` | 单引号, STRING' 将会阻止STRING中<span style="color:red">**所有特殊字符**</span>的解释 | 
-| ```/``` | 1. 斜线（/） 文件名路径分隔符。分隔文件名不同的部分（如/```home/bozo/projects/Makefile```）注意在linux中表示路径的时候，许多个```/```跟一个```/```是一样的。```/home/shiyanlou```等同于```////home///shiyanlou```<br> 2. 也可用来作为除法算术操作符。| 
-| ```\``` |  一种对单字符的引用机制。```\X``` 将会“转义”字符```X```。这等价于```"X"```，也等价于```'X'```。```\``` 通常用来转义双引号（```"```）和单引号（```'```），这样双引号和单引号就不会被解释成特殊含义了。 <br/> - ```\n``` 表示新的一行<br/> - ```\r``` 表示回车<br/> -```\t``` 表示水平制表符<br/> -```\v``` 表示垂直制表符<br/> -```\b``` 表示后退符<br/> -```\a``` 表示"alert"(蜂鸣或者闪烁)<br/> -```\0xx``` 转换为八进制的ASCII码, 等价于0xx<br/> -```"``` 表示引号字面的意思 | 
-| ``` ` ``` |  反引号（`） 反引号中的命令会优先执行 |
-| ```:``` | 冒号 <br/> 1. 等价于```NOP```（no op，一个什么也不干的命令）。也可以被认为与shell的内建命令<span style="background-color:#FFFF00">true作用相同</span>, 也可以用作站位符 ```if [] then : ```。“:”命令是一个bash的内建命令，它的退出码（exit status）是（0）<br/> 2. 与 ```>``` 重定向操作符结合使用时，将会把一个文件清空，但是并不会修改这个文件的权限<br/> 3. ```$PATH``` 变量中做分隔符 |
-| ```?``` |  三元操作符 如 ```(( t=a<50?8:9 ))``` |
-| ```$``` | 变量替换: 引用变量 |
+
 
 
 **#**
@@ -652,6 +646,8 @@ echo "Hello world" #print Hello world
 
 ## variable
 
+变量赋值 都不加 ```$``` (即使前面出现也不加F), 引用加 ```$```
+
 #### 变量定义
 
 如果 ```variable``` 是一个变量的名字，那么 ```$variable``` 就是引用这个变量的值，即这变量所包含的数据。
@@ -681,7 +677,8 @@ echo ${myname}
 echo ${myname}Good
 echo $mynameGood #print nothing, because we dont have any mynameGood variable
 
-myname="miao"
+
+myname="miao" #跟上面myname 是一个变量
 echo ${myname}
 ```
 
@@ -918,7 +915,7 @@ echo "area=$area"
 | ```-gt``` | is greater than ```if[ $a -gt $b ]```|
 | ```>``` | is greater than ```(($a > $b))``` |
 | ```-ge``` | is greater than or equal to ```if[ $a -ge $b ]```|
-| ```>=``` | is greater than or equal to ```(($a >= $b))``` |
+| ```>=``` | is greater than or equal to ```(($a >= $b))```  or ``` [[ $a>=$b ]]``` (如果没有两个```[[]]```, always true )|
 | ```-lt``` | is less than  ```if[ $a -lt $b ]```|
 | ```<``` | is less than ```(($a < $b)``` |
 | ```-le``` | is less than to  ```if[ $a -le $b ]``` |
@@ -1374,6 +1371,11 @@ do #
     echo $i
 done 
 
+#
+for (( i=0; i<10; i+=2 ))
+do #
+    echo $i
+done 
 
 
 ```
