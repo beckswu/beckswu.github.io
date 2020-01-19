@@ -1721,6 +1721,221 @@ done
 
 
 
+## Function
+
+By default, every variable defined is global variable. It means it can accessed in anywhere in script. Local can be used inside function only 
+
+- ```$?```: 表示previous function return value, 函数返回值在调用该函数后通过 ```$?``` 来获得 
+- ```$1 $2```: 在function 内部表示传入function 的参数, 注意, <span style="color:red">10 不能获取第十个参数，获取第十个参数需要```{10}```。当n>=10时，需要使用```${n}```来获取参数</span>。
+- ```local```: local keyword 表示定义在function 的variable为局部变量，只能在function 内用, 如果不加local, <span style="background-color:#FFFF00">**外面的值可能被function 内部值 改变**</span>
+- 可以带```function fun()``` 定义，也可以直接```fun()``` 定义,不带任何参数。
+- 参数返回，可以显示加：return 返回，<span style="background-color:#FFFF00">**如果不加，将以最后一条命令运行结果，作为返回值**</span>。 return后跟数值n(0-255) 
+- <span style="color:red">**所有函数在使用前必须定义。**</span>
+
+
+
+shell中函数的定义格式如下：
+
+```basg
+[ function ] funname [()]
+{
+    action;
+    [return int;]
+
+}
+```
+
+
+```bash
+#!/bin/bash
+
+demoFun(){
+    echo "This is my first shell function!"
+}
+echo "-----Execution-----"
+demoFun
+echo "-----Finished-----"
+
+```
+
+Output the result：
+```bash
+-----Execution-----
+This is my first shell function!
+-----Finished-----
+```
+
+下面定义一个带有return语句的函数：
+
+```bash
+#!/bin/bash
+funWithReturn(){
+    echo "This function will add the two numbers of the input..."
+    echo "Enter the first number: "
+    read aNum
+    echo "Enter the second number: "
+    read anotherNum
+    echo "The two numbers are $aNum and $anotherNum !"
+    return $(($aNum+$anotherNum))
+}
+funWithReturn
+echo "The sum of the two numbers entered is $? !"
+```
+
+输出类似下面：
+
+```
+This function will add the two numbers of the input...
+Enter the first number: 
+1
+Enter the second number: 
+2
+The two numbers are 1 and  2 !
+The sum of the two numbers entered is 3 !
+```
+
+#### 函数参数
+
+在Shell中，调用函数时可以向其传递参数。在函数体内部，通过 n 的形式来获取参数的值，例如，n的形式来获取参数的值，例如，```$1```表示第一个参数，```$2```表示第二个参数... 带参数的函数示例：
+
+```bash
+#!/bin/bash
+funWithParam(){
+    echo "The first parameter is $1 !"
+    echo "The second parameter is $2 !"
+    echo "The tenth parameter is $10 !"
+    echo "The tenth parameter is ${10} !"
+    echo "The eleventh parameter is ${11} !"
+    echo "The total number of parameters is $# !"
+    echo "Outputs all parameters as a string $* !"
+}
+funWithParam 1 2 3 4 5 6 7 8 9 34 73
+```
+输出结果：
+
+```
+The first parameter is 1 !
+The second parameter is 2 !
+The tenth parameter is 10 !
+The tenth parameter is 34 !
+The eleventh parameter is 73 !
+The total number of parameters is 11 !
+Outputs all parameters as a string 1 2 3 4 5 6 7 8 9 34 73 !
+```
+
+猜数字游戏：
+
+首先让系统随机生成一个数字，给这个数字一个范围，让用户猜数字，对输入作出判断，并且给出提示。
+
+```bash
+#!/bin/bash
+
+function randNum(){
+  while :
+  do #
+    read aNum
+    if test $aNum -eq $1
+    then  #
+      echo "right"
+      break 1
+    else  #
+      if [ $aNum -gt $1 ]
+        then  #
+           echo "The answer is smaller than yours."
+         else #
+           echo "The answer is bigger than yours."
+         fi #
+      fi #
+  done
+}
+
+randNum $(($RANDOM%100+1))
+```
+
+
+```bash
+#! /bin/bash
+
+#syntax 1
+function name(){
+    command
+}
+
+#syntax 1
+name (){
+    command 
+}
+
+function Hello(){
+    echo "Hello"
+}
+
+quit(){
+    exit
+}
+
+quit #如果quit 在 Hello 前面，会quit 的script instead of print Hello
+Hello #run the function
+
+
+#Pass Argument into Function
+
+function print(){
+    local name=$1 #$1 first argument, 这个name is different from the global variable name (Tom)
+    echo "$name" 
+}
+
+name="Tom"
+
+echo "The name is $name : Before" #print Tom
+
+print Max #Hello passed into function 
+
+echo "The name is $name : After" #print Tom, 如果不在function 里面加上local, 会print Max, 因为function 里面改了name值
+
+```
+
+example
+
+```bash
+usage(){
+    echo "You need to provide an argument :"
+    echo "usage : $0 file_name"
+}
+
+is_file_exist(){
+    local file=$1 #$1 first argument provided by function
+    if [[ -f $file ]] 
+        then #
+            echo "found file"    
+    fi #
+    [[ -f $file ]] && return 1  || return 0 #如果file 存在return 1, 否则return 0 
+    
+}
+
+[[ $# -eq 0 ]] && usage #if 没有 passing argument print usage message
+
+is_file_exist $1 #$1 first argument provided by script
+if [ $? -ne 0 ]  # $? 表示previous function return value
+then #
+    echo "File found"
+else  #
+    echo "File not found"
+fi
+
+
+#可以override function, allow to create wrapper
+
+ls () {
+command ls -lh #必须加command keyword 
+}
+#if we didn't put the keyword command in front of ls, would end up in an endless loop. recursion  
+# Even though we are inside the function ls when we call ls it would have called another instance of the function 
+# ls which in turn would have done the same and so on.
+
+ls
+
+```
 
 
 
@@ -2245,97 +2460,6 @@ done
 
 
 
-## Function
-
-By default, every variable defined is global variable. It means it can accessed in anywhere in script. Local can be used inside function only 
-
-**$?**: 表示previous function return value <br/>
-**$1 $2**: 在function 内部表示传入function 的参数
-**local**: 定义在function 的variable为局部变量，只能在function 内用
-
-```bash
-#! /bin/bash
-
-#syntax 1
-function name(){
-    command
-}
-
-#syntax 1
-name (){
-    command 
-}
-
-function Hello(){
-    echo "Hello"
-}
-
-quit(){
-    exit
-}
-
-quit #如果quit 在 Hello 前面，会quit 的script instead of print Hello
-Hello #run the function
-
-
-#Pass Argument into Function
-
-function print(){
-    local name=$1 #$1 first argument, 这个name is different from the global variable name (Tom)
-    echo "$name" 
-}
-
-name="Tom"
-
-echo "The name is $name : Before" #print Tom
-
-print Max #Hello passed into function 
-
-echo "The name is $name : After" #print Tom, 如果不在function 里面加上local, 会print Max, 因为function 里面改了name值
-
-
-
-
-
-
-#example
-
-usage(){
-    echo "You need to provide an argument :"
-    echo "usage : $0 file_name"
-}
-
-is_file_exist(){
-    local file=$1 #$1 first argument provided by function
-    if [[ -f $file ]] 
-        then 
-            echo "found file"    
-    fi
-    [[ -f $file ]] && return 1  || return 0 #如果file 存在return 1, 否则return 0 
-    
-}
-
-[[ $# -eq 0 ]] && usage #if 没有 passing argument print usage message
-
-is_file_exist $1 #$1 first argument provided by script
-if [ $? -ne 0 ]  # $? 表示previous function return value
-then
-    echo "File found"
-else 
-    echo "File not found"
-fi
-
-
-#可以override function, allow to create wrapper
-
-ls () {
-command ls -lh #必须加command keyword 
-}
-#if we didn't put the keyword command in front of ls, would end up in an endless loop. Even though we are inside the function ls when we call ls it would have called another instance of the function ls which in turn would have done the same and so on.
-
-ls
-
-```
 
 
 
