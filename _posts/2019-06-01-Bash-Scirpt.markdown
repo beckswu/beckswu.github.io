@@ -333,7 +333,7 @@ $ bash test.sh
 | 符号 | 解释 |
 | :---: | :--- |
 | ```()``` | 1. 在括号中的命令列表，将会作为一个子 shell 来运行, 括号中的变量,对于脚本剩下的部分<span style="background-color:#FFFF00">**是不可用的**</span>. <br/> 2. 初始化数组   |
-| ```{}``` | 1. 文件名扩展 比如 ```touch {1..10}.txt <br/> 2. 创建了一个匿名函数, <span style="background-color:#FFFF00">**对于大括号外可见**</span> |
+| ```{}``` | 1. 文件名扩展 比如 ```touch {1..10}.txt``` <br/> 2. 创建了一个匿名函数, <span style="background-color:#FFFF00">**对于大括号外可见**</span> |
 | ```[]``` | 1. if condition<br/> 2. 数组index|
 | ```<  >``` | 重新定向 |
 | ```|``` | 管道 | 
