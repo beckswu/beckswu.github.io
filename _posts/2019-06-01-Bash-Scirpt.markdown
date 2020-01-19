@@ -1077,7 +1077,7 @@ fi
 
 | 符号 | 解释 |
 | :---: | :--- | 
-| ```=``` | is equal to ```if[ $a = $b]``` 跟```==``` 一样的 |
+| ```=``` | is equal to ```if[ $a = $b ]``` 跟```==``` 一样的，<span style="background-color:#FFFF00">一定留空格在 ```$a``` , ```$b``` 和 ```[]``` 之间</span> |
 | ```==``` | is equal to ```if[ $a == $b ]```|
 | ```!=``` | is not equal to ```if[ $a != $b ]```|
 | ```<``` | is less than, in ASCII alphabetical order ```if [[ $a < $b ]]```, <span style="background-color:#FFFF00">**注意对比string 大小用 两个bracket**</span>|
@@ -1406,6 +1406,304 @@ do #
         echo $item 
     fi 
 done 
+
+
+```
+
+## While
+
+
+```bash
+#! /bin/bash
+
+#sytax 
+while [condition] 
+do  #
+    command1
+    comand2
+    comand3
+done #
+
+
+n=1 
+while [ $n -le 10 ] #or (( $n <= 10 ))
+do  #
+    echo $n 
+    n=$(( $n + 1 )) # n= 不能有空格
+    # or  let n++ or (( n++ ))
+done  #
+
+
+```
+
+```bash
+#!/bin/bash
+int=1
+while(( $int<=5 ))
+do #
+    echo $int
+    let "int++"
+done #
+```
+运行脚本，输出：
+```
+1
+2
+3
+4
+5
+```
+如果int小于等于5，那么条件返回真。int从1开始，每次循环处理时，int加1。运行上述脚本，返回数字1到5，然后终止。
+使用了 Bash let 命令，它用于执行一个或多个表达式，变量计算中不需要加上 $ 来表示变量
+
+while循环可用于读取键盘信息。下面的例子中，输入信息被设置为变量MAN，按<Ctrl-D>结束循环。
+
+```bash
+echo 'press <CTRL-D> exit'
+echo -n 'Who do you think is the most handsome: '
+while read MAN
+do #
+    echo "Yes！$MAN is really handsome"
+done #
+```
+
+
+#### 无限循环
+
+无限循环语法格式：
+```bash
+while :
+do #
+    command
+done #
+
+# 或者
+while true
+do #
+    command
+done #
+
+# 或者
+
+for (( ; ; ))
+
+```
+
+
+
+
+## Until Loop
+
+until循环执行一系列命令直<span style="background-color:#FFFF00">**至条件为真时停止**</span>。 until循环与while循环在处理方式上刚好相反。 一般while循环优于until循环，但在某些时候—也只是极少数情况下，until循环更加有用。 until 语法格式:
+```bash
+until condition
+do #
+    command
+done #
+```
+
+条件可为任意测试条件，测试发生在循环末尾，因此循环至少执行一次—请注意这一点。
+
+```bash
+#! /bin/bash
+
+#syntax
+until [condition]
+do  #
+    command1
+    command2
+    command3
+done #
+
+n=1
+until [ $n -ge 10 ] #or use (( $n > 10 ))
+do 
+    echo $n
+    n=$(( n + 1 )) #or use (( n++ ))
+done 
+
+
+```
+
+
+## Case
+
+
+Shell case语句为多选择语句。可以用case语句匹配一个值与一个模式，如果匹配成功，执行相匹配的命令。case语句格式如下：
+```bash
+case 值 in
+模式1) #
+    command1
+    command2
+    ... #
+    commandN
+    ;;
+模式2） #
+    command1
+    command2
+    ... #
+    commandN
+    ;; #
+esac
+```
+
+
+- 取值后面必须为单词<span style="background-color:#FFFF00">**in**</span>，每一模式必须以<span style="background-color:#FFFF00">**右括号结束**</span>。取值可以为<span style="background-color:#FFFF00">**变量或常数**</span>。匹配发现取值符合某一模式后，其间所有命令开始执行直至 <span style="background-color:#FFFF00">**;;**</span>。
+- 取值将检测匹配的每一个模式。一旦模式匹配，<span style="color:red">则执行完匹配模式相应命令后不再继续其他模式</span>。如果无一匹配模式，使用星号 ```*``` 捕获该值，再执行后面的命令。
+- 它需要一个```esac```（就是case反过来）作为结束标记，每个case分支<span style="background-color:#FFFF00">**用右圆括号**</span>，用<span style="background-color:#FFFF00">**两个分号表示break**</span>。
+
+
+
+下面的脚本提示输入1到4，与每一种模式进行匹配：
+```bash
+echo 'Enter a number between 1 and 4:'
+echo 'The number you entered is:'
+read aNum
+case $aNum in #
+    1)  echo 'You have chosen 1'
+    ;;  #
+    1)  echo 'You have chosen 2'
+    ;; #
+    1)  echo 'You have chosen 3'
+    ;; #
+    1)  echo 'You have chosen 4'
+    ;; #
+    *)  echo 'You did not enter a number between 1 and 4'
+    ;;
+esac
+```
+输入不同的内容，会有不同的结果，例如：
+
+```
+Enter a number between 1 and 4:
+The number you entered is:
+3
+You have chosen 3
+```
+
+不光可以判断strict letters/character, 可以判断是不是符合一些pattern
+
+```bash
+#! /bin/bash
+
+vehicle=$1
+
+case $vehicle in
+    "car" )
+        echo "Rent of $vehicle is 100 dolar" ;;
+     "van" )
+        echo "Rent of $vehicle is 80 dolar" ;;
+     "bicycle" )
+        echo "Rent of $vehicle is 5 dolar" ;;
+     "truck" )
+        echo "Rent of $vehicle is 150 dolar" ;;
+    * ) #default case  
+        echo "Unknown vechicle" ;;
+esac
+
+
+echo -e "Enter some character : \c"
+read value 
+
+#pattern
+case $value in
+    [a-z] ) #enter smaller character 
+        echo "User entered $value a to z" ;;
+    [A-Z] )
+        echo "User entered $value A to Z" ;;
+    [0-9] ) #enter integer
+        echo "User entered $value 0 to 9" ;;
+    ? ) #? means every special character which is one letter character
+        echo "User entered $value special character" ;;
+    * ) #more than one character， 只有一位的character 被? capture了 
+        echo "Unknown input" ;;
+esac
+
+#如果运行上面的，发现输入K 跑到case a - z 里面了
+# 需要run command LANG=C 会fix 让 K 跑到 case A-Z
+#'LANG' enviroment variable indicates the language/locale and encoding where "C" is the language setting
+
+
+```
+
+
+
+
+## Break / Continue
+
+
+
+break命令允许跳出所有循环（终止执行后面的所有循环）。 下面的例子中，脚本进入死循环直至用户输入数字大于5。要跳出这个循环，返回到shell提示符下，需要使用break命令。
+
+```bash
+#!/bin/bash
+while :
+do #
+    echo -n "Enter a number between 1 and 5:"
+    read aNum
+    case $aNum in #
+        1|2|3|4|5) echo "The number you entered is $aNum!"
+        ;; #
+        *) echo "The number you entered is not between 1 and 5! game over!"
+            break
+        ;; #
+    esac #
+done
+```
+执行以上代码，输出结果为：
+
+```
+Enter a number between 1 and 5:3
+The number you entered is 3!
+Enter a number between 1 and 5:7
+The number you entered is not between 1 and 5! game over!
+```
+
+continue命令与break命令类似，只有一点差别，它不会跳出所有循环，仅仅跳出当前循环。 对上面的例子进行修改：
+
+```bash
+#!/bin/bash
+while :
+do #
+    echo -n "Enter a number between 1 and 5: "
+    read aNum
+    case $aNum in #
+        1|2|3|4|5) echo "The number you entered is $aNum!"
+        ;; #
+        *) echo "The number you entered is not between 1 and 5!"
+            continue
+            echo "game over"
+        ;; #
+    esac #
+done
+```
+运行代码发现，当输入大于5的数字时，该例中的循环不会结束，语句 echo "Game is over!" 永远不会被执行。
+
+
+
+
+```bash
+#! /bin/bash
+
+for (( i=1 ; i<=10 ; i++ ))
+do  #
+    if [ $i -gt 5 ]
+    then  #
+        break #break the loop 当 i > 5 
+    fi #
+    echo "$i"
+done
+
+#
+
+for (( i=1 ; i<=10 ; i++ )) 
+do  #
+    if [ $i -eq 3 -o $i -eq 6 ]
+    then  #
+        continue #continue if i = 3 or i = 6,  不print
+    fi #
+    echo "$i"
+done
 
 
 ```
@@ -1764,54 +2062,6 @@ echo "scale=2; 3^3" | bc -l #计算的3的立方
 ```
 
 
-## Case
-
-不光可以判断strict letters/character, 可以判断是不是符合一些pattern
-
-```bash
-#! /bin/bash
-
-vehicle=$1
-
-case $vehicle in
-    "car" )
-        echo "Rent of $vehicle is 100 dolar" ;;
-     "van" )
-        echo "Rent of $vehicle is 80 dolar" ;;
-     "bicycle" )
-        echo "Rent of $vehicle is 5 dolar" ;;
-     "truck" )
-        echo "Rent of $vehicle is 150 dolar" ;;
-    * ) #default case  
-        echo "Unknown vechicle" ;;
-esac
-
-
-echo -e "Enter some character : \c"
-read value 
-
-#pattern
-case $value in
-    [a-z] ) #enter smaller character 
-        echo "User entered $value a to z" ;;
-    [A-Z] )
-        echo "User entered $value A to Z" ;;
-    [0-9] ) #enter integer
-        echo "User entered $value 0 to 9" ;;
-    ? ) #? means every special character which is one letter character
-        echo "User entered $value special character" ;;
-    * ) #more than one character， 只有一位的character 被? capture了 
-        echo "Unknown input" ;;
-esac
-
-#如果运行上面的，发现输入K 跑到case a - z 里面了
-# 需要run command LANG=C 会fix 让 K 跑到 case A-Z
-#'LANG' enviroment variable indicates the language/locale and encoding where "C" is the language setting
-
-
-```
-
-
 
 ## Array 
 
@@ -1863,30 +2113,6 @@ echo "${#string[@]}" #print 1
 
 
 
-## While
-
-```bash
-#! /bin/bash
-
-#sytax 
-while [condition] 
-do 
-    command1
-    comand2
-    comand3
-done
-
-
-n=1 
-while [ $n -le 10 ] #or (( $n <= 10 ))
-do 
-    echo $n 
-    n=$(( $n + 1 )) # n= 不能有空格
-    # or  let n++ or (( n++ ))
-done 
-
-
-```
 
 
 ## Sleep, Open Terminal
@@ -1955,32 +2181,6 @@ while IFS=' ' read -r line #也可以用IFS=' '
 
 
 
-## Until Loop
-
-
-
-```bash
-#! /bin/bash
-
-#syntax
-until [condition]
-do 
-    command1
-    command2
-    command3
-done
-
-n=1
-until [ $n -ge 10 ] #or use (( $n > 10 ))
-do 
-    echo $n
-    n=$(( n + 1 )) #or use (( n++ ))
-done 
-
-
-```
-
-
 
 
 
@@ -2035,37 +2235,6 @@ done
 ```
 
 
-
-
-## Break / Continue
-
-
-
-```bash
-#! /bin/bash
-
-for (( i=1 ; i<=10 ; i++ ))
-do 
-    if [ $i -gt 5 ]
-    then 
-        break #break the loop 当 i > 5 
-    fi
-    echo "$i"
-done
-
-
-
-for (( i=1 ; i<=10 ; i++ ))
-do 
-    if [ $i -eq 3 -o $i -eq 6 ]
-    then 
-        continue #continue if i = 3 or i = 6,  不print
-    fi
-    echo "$i"
-done
-
-
-```
 
 
 ## Function
