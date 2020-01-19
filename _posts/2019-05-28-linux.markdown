@@ -2003,6 +2003,9 @@ free -b  #-b btye, -k KB, -m MB, -G GB, -T TB
 
 ## echo
 
+| 命令 | 解释 |
+| ```-n``` | 打印完后不换行 | 
+
 used for bash scripting to print 
 
 ```shell
