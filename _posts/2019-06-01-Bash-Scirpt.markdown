@@ -1418,7 +1418,7 @@ done
 
 ```
 
-## While
+#### While
 
 
 ```bash
@@ -1500,7 +1500,7 @@ for (( ; ; ))
 
 
 
-## Until Loop
+#### Until Loop
 
 until循环执行一系列命令直<span style="background-color:#FFFF00">**至条件为真时停止**</span>。 until循环与while循环在处理方式上刚好相反。 一般while循环优于until循环，但在某些时候—也只是极少数情况下，until循环更加有用。 until 语法格式:
 ```bash
@@ -1534,7 +1534,7 @@ done
 ```
 
 
-## Case
+#### Case
 
 
 Shell case语句为多选择语句。可以用case语句匹配一个值与一个模式，如果匹配成功，执行相匹配的命令。case语句格式如下：
@@ -1637,7 +1637,7 @@ esac
 
 
 
-## Break / Continue
+#### Break / Continue
 
 
 
@@ -2372,20 +2372,22 @@ done
 
 ## Read File from while loop
 
-
+- ```IFS=``` or ```IFS=''``` <span style="background-color:#FFFF00">**prevents leading/trailing whitespace from being trimmed**</span>
+- ```-r``` prevents backslacsh escapes from being interpreted. Consider each backslach to be part of the input line
+- ```while IFS= read -r line || [[ -n "$line" ]]```: If the file isn’t a standard POSIX text file (= not terminated by a newline character), 如果最后一行不是以 ```\n``` 结尾
 
 ```bash
 #! /bin/bash
 
 while read p 
-do 
+do  #
     echo $p
 done < hello.sh #< input read direction, read hello.sh line by line
 
 
 #Method 2
 cat hello.sh | while read p #whatever output from cat as the input for the while command
-do 
+do  #
     echo $p
 done 
 
@@ -2394,7 +2396,7 @@ done
 
 while IFS= read -r line # IFS= 和read 之间有空格，means we assign space to IFS not read
 #-r flag means prevent backslash escape from being interpreted 
-do 
+do #
     echo $line
 done < hello.sh 
 
