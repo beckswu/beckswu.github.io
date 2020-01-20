@@ -2373,8 +2373,10 @@ sudo gpasswd -d mark Java #remove user from Group
 
 ## head / tail
 
-Head: output the first part of the file 
-Tail: output the last part of the file, ```-f``` 不停的读取某个文件并显示
+- ```Head```: output the first part of the file 
+- ```tail```: output the last part of the file, ```-f``` 不停的读取某个文件并显示
+    - ```tail -n11```  or ```tail -11``` 从 倒数第11 行开始，比如有100行，从90行开始一直到100行
+    - ```tail -n+11``` 从第11行开始，知道结尾, 比如有100行，从11行开始一直到100行
 
 
 ```shell
@@ -3222,6 +3224,30 @@ $ echo 'hello shiyanlou' | tee hello
 ```
 
 ![](/img/post/linux/tee.png)
+
+
+## time
+
+显示command 运行时间, 格式:
+
+```bash
+time command ...
+```
+
+e.g. 
+
+```bash
+time head -1 file.txt 
+```
+
+会显示
+
+```
+real: 0.013s
+user: 0.001s
+sys:  0.005s
+```
+
 
 ## top
 
