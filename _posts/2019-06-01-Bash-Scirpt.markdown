@@ -1153,6 +1153,8 @@ File exists
 
 #### if
 
+注: <span style="background-color:#FFFF00">**```if []``` if 和 ```[]``` 之间必须有空格**</span>
+
 [if primary expressions](http://tldp.org/LDP/Bash-Beginners-Guide/html/sect_07_01.html#sect_07_01_01)
 
 
@@ -2372,7 +2374,7 @@ done
 
 ## Read File from while loop
 
-- ```IFS=``` or ```IFS=''``` <span style="background-color:#FFFF00">**prevents leading/trailing whitespace from being trimmed**</span>
+- ```IFS= ``` or ```IFS=''``` <span style="background-color:#FFFF00">**prevents leading/trailing whitespace from being trimmed**</span>, ```IFS= read``` 和read 中间要有空格
 - ```-r``` prevents backslacsh escapes from being interpreted. Consider each backslach to be part of the input line
 - ```while IFS= read -r line || [[ -n "$line" ]]```: If the file isn’t a standard POSIX text file (= not terminated by a newline character), 如果最后一行不是以 ```\n``` 结尾
 
