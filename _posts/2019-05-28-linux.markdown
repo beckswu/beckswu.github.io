@@ -2371,7 +2371,7 @@ sudo gpasswd -d mark Java #remove user from Group
 ```
 
 
-## head .tail
+## head / tail
 
 Head: output the first part of the file 
 Tail: output the last part of the file, ```-f``` 不停的读取某个文件并显示
