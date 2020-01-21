@@ -48,7 +48,7 @@ wc -l file.txt
 ```
 
 一个file 多少个column, 假定column 数一样
-``shell
+```shell
 col=`head -1 file.txt | wc -w`
 ```
 
