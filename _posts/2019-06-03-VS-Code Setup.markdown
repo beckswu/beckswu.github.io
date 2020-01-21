@@ -397,3 +397,25 @@ venv
 
 ![](/img/post/VSCode/python_unittest5.png)
 
+## Customized 
+
+#### Keyboard Binding 
+
+左下角setting -> Keyboard Shortcuts
+
+![](img/post/VSCode/keyboardjson.png)
+
+```js
+[{
+    "key": "Alt+R",
+    "command": "editor.action.insertSnippet",
+    "args": { "snippet": "<span style=\"color:red\"></span>" },
+    "when": "resourceLangId == markdown"
+},{
+    "key": "Alt+G",
+    "command": "editor.action.insertSnippet",
+    "args": { "snippet": "<span style=\"background-color:#FFFF00\"></span>" },
+    "when": "resourceLangId == markdown"
+}
+]
+```
