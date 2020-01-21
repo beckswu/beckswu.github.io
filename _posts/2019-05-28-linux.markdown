@@ -1168,6 +1168,7 @@ sudo apt-get autoremove  #auto remove the dependency which required for the pack
 ```awk``` 所有的操作都是基于 ```pattern(模式)—action(动作)```对来完成的，如下面的形式
 
 
+
 ```shell
 pattern {action}
 ```
@@ -1247,11 +1248,18 @@ awk '{
 | ```$N```| 	N表示字段号，最大值为NF变量的值 |
 | ```FS```| 	字段分隔符(当前行的分隔符)，由正则表达式表示，默认为" "空格 |
 | ```RS```| 	输入记录分隔符(行与行之间分隔符)，默认为"\n"，即一行为一个记录 |
-| ```NF```| 	当前记录字段数 |
-| ```NR```| 	已经读入的记录数 |
+| ```NF```| 	a variable indicating the number of fields (i.e. number of "columns") on an input line |
+| ```NR```| 	indicating the number of records (i.e. current line number) that's accumulated across multiple files read |
 | ```FNR```| 	当前输入文件的记录数，请注意它与NR的区别 |
 | ```OFS```| 	输出字段分隔符，默认为" "空格 | 
 | ```ORS```| 	输出记录分隔符，默认为```\n``` |
+| ```BEGIN``` | a code block with a "BEGIN" prefix will be executed before any line reads. 在读取所有输入前执行 |
+| ```END``` | The code block with an "END" prefix is only executed after the last line is read. 在读取所有输入后执行 |
+| ```$i``` | the i-th field of the input line |
+
+
+
+
 
 关于```awk```的内容本课程将只会包含这些内容，如果你想了解更多，请期待后续课程，或者参看一下链接内容：
 
@@ -2795,7 +2803,7 @@ nl -b a file # 是否空行都列出行号
 
 ## paste
 
-```paste```这个命令与```join``` 命令类似，<span style="background-color:#FFFF00">**它是在不对比数据的情况下，简单地将多个文件合并一起**</span>，以Tab隔开
+```paste```这个命令与```join``` 命令类似，<span style="background-color:#FFFF00">**它是在不对比数据的情况下，简单地将多个文件合并一起**</span>，以Tab隔开, if no file specified or put ```-``` instead of file name, paste reads from standard input and gives output as it is until a interrupt command ```[Ctrl-c]``` is given
 
 使用方式： ```paste [option] file...```
 
@@ -2804,7 +2812,7 @@ nl -b a file # 是否空行都列出行号
 
 | 选项 |	说明 |
 | ```-d or --delimiters=LIST``` |	 指定合并的分隔符，默认为Tab |
-| ```-s```|	不合并到一行，每个文件为一行 |
+| ```-s``` or ```--serial```|	不合并到一行，每个文件为一行, paste one file at a time instead of in parallel |
 
 ```shell
 $ echo hello > file1
@@ -2815,6 +2823,55 @@ $ paste -s file1 file2 file3
 ```
 
 ![](/img/post/linux/paste.png)
+
+比如有file  name, age, profession
+
+```
+Name:
+Sally
+Jim
+John
+
+Age:
+22
+18
+30
+
+Profession:
+Student 
+Worker
+Singer
+```
+
+下面将第一个file 用 ```|``` 隔开, 第二个File 用 ```,``` 隔开
+```shell
+paste -d'|,' name, age, profession
+#output 
+
+#Sally|22,Student
+#Jim|18,Worker
+#John|30,Singer
+```
+
+```-s``` 文件会横过来
+```shell
+paste -s name, age, profession
+#output 
+
+#Sally Jim John
+#22 18 30 
+#Student Worker Singer
+```
+
+Combination of ```-d``` and ```-s```: 
+```shell
+paste -d","-s name, age, profession
+#output 
+
+#Sally,Jim,John
+#22,18,30 
+#Student,Worker,Singer
+```
 
 
 ## PS / nice /renice
