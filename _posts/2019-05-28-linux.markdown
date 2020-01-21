@@ -2185,6 +2185,7 @@ PCRE（Perl Compatible Regular Expressions中文含义：perl语言兼容正则�
 | ```-E``` or ```--extended-regexp``` | Interpret Pattern as an extended regular expression |
 | ```-I``` | 忽略binary file , 等于```binary-files=without-match``` option|
 | ```-i``` | ignore case sensitive 忽略大小写 | 
+| ```-o``` or ```--only-matching``` | print only the matched(non-empty) parts of matching line, with each such parts on a separate matching line | 
 | ```-n``` | print the line number,显示匹配文本所在行的行号 | 
 | ```-v``` | Invert sense of matching, only select non-matching line 反选，输出不匹配行的内容 | 
 | ```-r``` | recursively find all files under each directory recursively 递归匹配查找 |
