@@ -52,6 +52,14 @@ wc -l file.txt
 col=`head -1 file.txt | wc -w`
 ```
 
+把文件每个单词 各自打在独立的一行
+
+```shell
+grep -o '[[:alpha:]]\{2,\}' file.txt 
+#or
+grep -o -E '[[:alpha:]]{2,}' file.txt 
+```
+
 
 ## Linux  基础
 
