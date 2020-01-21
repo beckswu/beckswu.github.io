@@ -30,41 +30,6 @@ Ctrl + d # open new terminal window tab
 
 ```
 
-**cp**: copy and paste  <br/>
-**mv**: move and rename <br/>
-**Less**:  View some part of the file (lookup, view line by line / page by page) <br/>
-**Touch**: create new file(cannot create directory), change file timestamp   <br/>
-**Nano(or gedit)**: txt/code editor   <br/>
-**sudo**: grant super user priviledge <br/>
-**Top**: provide you dynamic real time view of running system <br/>
-**Echo** print, can include variable in "" <br/>
-**chmod** add/remove access for user, group, others (u,g,o), 可以是给octal(数字的形式) <br/>
-**which**: where software/command located <br/>
-**whatis**: display short manual(man command) page description <br/>
-**useradd**: create new user  <br/>
-**passwd**: change password for user <br/>
-**userdel**: delete exisiting user <br/>
-**groups**: show which group is currently user connected to <br/>
-**groupadd**: add new group in system <br/>
-**groupdel**: delete existing group <br/>
-**gpasswd -a**: add user to exisiting group <br/>
-**gpasswd -d**: delete user from exisiting group <br/>
-**df**: the amount of disk space being used by your file system <br/>
-**du**: estimate and display the disk space used by files in details <br/>
-**free**: display the total amount free and used physical and swap memory in the system  <br/>
-**watch**: run command at a regular interval or repeatedly <br/>
-**head/tail**: print first / last part of the file <br/>
-**find**: Find the file (by name, by time) <br/>
-**wc**: print a count of lines, words and characters for each files <br/>
-**Cal**: 显示calendar <br/>
-**Date**: print  and change system date and time information <br/>
-**Multiple Command** ; &&  ||  <br/>
-**ifconfig**: interface configuration: used to view and change network interface configuration on your system <br/>
-**tar**: 压缩/解压 文件夹/文件 <br/>
-**grep**: search and print pattern / word in a text file or a number of text file <br/>
-**netstat**: display network connection, routing tables and a number of network interfaces, and view network protocal states 
-
-
 
 **Shell**: a program that take commands from keyboard and give them to operating system to perform;
 
@@ -73,6 +38,20 @@ Command Line or Shell: aslo called **CLI(Command Line Interface)**
 **Terminal**: a tool which you can use to pass your shell commands.  A program that opens a window and lets you interact with the shell
 
 File in Linux system are arranged in **hierarchical directory structure**: organized in a tree-like pattern
+
+
+## 实用code
+
+一个file 多少行
+```shell
+wc -l file.txt
+```
+
+一个file 多少个column, 假定column 数一样
+``shell
+col=`head -1 file.txt | wc -w`
+```
+
 
 ## Linux  基础
 
