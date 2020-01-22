@@ -3817,7 +3817,14 @@ Esc #进入普通模式
 | ```:set background=dark或light```	| ，设置背景风格 | 
 | ```:set backup(bk)```	|  设置自动备份，默认未打开 | 
 | ```:set cindent(cin)```	|  设置C语言风格缩进 |  
-
+| ```:syntax on``` |	语法加“靓”（亮）|
+| ```:syntax off```|	语法不加“靓”（亮）|
+| ```:set cindent``` |	C 语言自动缩进（可简写为set cin） |
+| ```:set sw=8``` |	自动缩进宽度（需要set cin才有用） |
+| ```:set ts=8``` |	设定 TAB 宽度 |
+| ```:set number``` |	显示行号 | 
+| ```:set nonumber``` |	不显示行号 |
+| ```:setsm``` |	括号自动匹配 |
 
 
 **普通模式下快速调整缩 find**
@@ -4072,6 +4079,7 @@ who 显示terminal 信息
 | ```-a``` | read arguments from file not standard inputs |
 | ```-E``` or ```-e``` | 如果遇到 EOF, ignore 接下来的input |
 | ```-n``` or ```--max-args=N``` | used as N max arguments per command line | 
+| ```-p``` or ```--interactive``` | prompt before running command, run command 之前会询问 |
 | ```－t``` or ```--verbose``` | print command before execute them |
 
 
@@ -4098,6 +4106,16 @@ echo 'one two three' | xargs -n1 mkdir
 mkdir one
 mkdir two
 mkdir three
+
+echo 'one two three' | xargs -t mkdir
+#显示
+mkdir one two three
+
+
+echo 'one two three' | xargs -t
+#显示
+echo 'one two three' 
+one two three
 ```
 
 找到这个folder 下所有文件是 14天前被修改的，然后删除
