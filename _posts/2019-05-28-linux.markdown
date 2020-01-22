@@ -1691,6 +1691,13 @@ cron 服务监测时间最小单位是分钟，所以 cron 会每分钟去读取
 - ```/etc/cron.weekly```，目录下的脚本会每周执行一次，在每周第七天的6点47分时运行；
 
 
+#### Email TO
+
+```bash
+MAILTO="email address"
+* * * * * echo blaah
+```
+
 
 ## cut 
 
