@@ -42,17 +42,17 @@ File in Linux system are arranged in **hierarchical directory structure**: organ
 
 ## 实用code
 
-一个file 多少行
+**一个file 多少行**
 ```shell
 wc -l file.txt
 ```
 
-一个file 多少个column, 假定column 数一样
+**一个file 多少个column, 假定column 数一样**
 ```shell
 col=`head -1 file.txt | wc -w`
 ```
 
-把文件每个单词 各自打在独立的一行
+**把文件每个单词 各自打在独立的一行**
 
 ```shell
 grep -o '[[:alpha:]]\{2,\}' file.txt 
@@ -60,6 +60,15 @@ grep -o '[[:alpha:]]\{2,\}' file.txt
 grep -o -E '[[:alpha:]]{2,}' file.txt 
 ```
 
+**Remove all prefix white space** 
+```
+sed "s/^[[:space::]]*//" file.txt
+```
+
+**Swap two columns** 
+```
+awk `{ t=$1; $1=$2; $2=t; print;}` file.txt
+```
 
 ## Linux  基础
 
