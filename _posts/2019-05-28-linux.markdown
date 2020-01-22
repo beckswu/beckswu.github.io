@@ -76,6 +76,15 @@ sed "s/^[[:space::]]*//" file.txt
 awk `{ t=$1; $1=$2; $2=t; print;}` file.txt
 ```
 
+**设置变量来自上个结果输出**
+
+``` "$()" ``` or ``` `` ```
+
+```bash
+col="$(head -1 file.txt | wc -w)"
+col=`head -1 file.txt|wc -w`
+```
+
 ## Linux  基础
 
 cat list1.txt #显示list1.txt 所有内容: ```group_name:password:GID:user_list```: 比如 ```sudo:x:27```, 密码一般不显示，用```x``` 代替. 如果用户的 GID 等于用户组的 GID，那么最后一个字段 user_list 就是空的
