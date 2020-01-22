@@ -61,6 +61,9 @@ grep -o -E '[[:alpha:]]{2,}' file.txt
 
 #or 
 cat file.txt | xargs -n1
+
+#or
+cat words.txt | tr -s ' ' '\n' 
 ```
 
 **Remove all prefix white space** 
