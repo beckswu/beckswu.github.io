@@ -58,6 +58,9 @@ col=`head -1 file.txt | wc -w`
 grep -o '[[:alpha:]]\{2,\}' file.txt 
 #or
 grep -o -E '[[:alpha:]]{2,}' file.txt 
+
+#or 
+cat file.txt | xargs -n1
 ```
 
 **Remove all prefix white space** 
@@ -4063,6 +4066,15 @@ who 显示terminal 信息
 
 ## xargs
 
+| 参数   |  Meaning |
+|:----------:|:-------------|
+| ```-0``` or ```--null``` | arguments are separated by null not white space. disable quote and backslash processing and logical EOF processing |
+| ```-a``` | read arguments from file not standard inputs |
+| ```-E``` or ```-e``` | 如果遇到 EOF, ignore 接下来的input |
+| ```-n``` or ```--max-args=N``` | used as N max arguments per command line | 
+| ```－t``` or ```--verbose``` | print command before execute them |
+
+
 ```xargs``` 是一条 UNIX 和类 UNIX 操作系统的常用命令。它的作用是将参数列表转换成小块分段传递给其他命令，以避免参数列表过长的问题。
 
 这个命令在有些时候十分有用，特别是当用来处理产生大量输出结果的命令如 find，locate 和 grep 的结果，详细用法请参看 man 文档。
@@ -4071,6 +4083,28 @@ who 显示terminal 信息
 $ cut -d: -f1 < /etc/passwd | sort | xargs echo
 ```
 上面这个命令用于将/etc/passwd文件按:分割取第一个字段排序后，使用echo命令生成一个列表。
+
+
+The xargs command in UNIX is a command line utility for <span style="color:red"> building an execution pipeline from standard input</span>. By default ```xargs``` reads items from standard input as separated by blanks and executes a command once for each argument 一次执行一个command 从 standard input 
+
+```bash
+echo 'one two three' | xargs mkdir
+ls #显示 one two three 3个文件夹
+```
+
+```bash
+echo 'one two three' | xargs -n1 mkdir
+#显示
+mkdir one
+mkdir two
+mkdir three
+```
+
+找到这个folder 下所有文件是 14天前被修改的，然后删除
+
+```
+find /tmp -mtime +14 | xargs rm
+```
 
 
 ## zip / unzip
