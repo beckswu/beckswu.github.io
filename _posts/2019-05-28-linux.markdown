@@ -3135,6 +3135,32 @@ $ sed -i '30d' passwd
 - [sed单行脚本快速参考](http://sed.sourceforge.net/sed1line_zh-CN.html)
 - [sed完全手册](https://www.gnu.org/software/sed/manual/sed.html)
 
+#### 替换
+
+
+比如file 是:
+```bash
+$ cat pets.txt
+This is my my cat
+  my cat's name
+```
+
+```/g``` <span style="background-color:#FFFF00">表示一行上的替换**所有**的匹配</span>：
+
+```bash
+sed "s/my/Becks/" pets.txt
+# 输出
+This is Becks my cat
+  Becks cat's name
+
+sed "s/my/Becks/g" pets.txt
+# 输出
+This is Becks Becks cat
+  Becks cat's name
+```
+
+
+
 
 ## ssh 
 
