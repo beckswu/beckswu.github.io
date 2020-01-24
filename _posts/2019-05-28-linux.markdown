@@ -3558,7 +3558,7 @@ my goat's name is adam
 
 When sed reads a file line by line, the line that has been currently read is inserted into the pattern buffer (<span style="background-color:#FFFF00">**pattern space**</span>). It is like temporary buffer, the scratchpad where the current information is stored. When you tell sed to print, it prints the pattern buffer.
 
-**Hold buffer** / hold space is like a long-term storage, such that you can catch something, store it and reuse it later when sed is processing another line.<span style="color:red">** You do not directly process the hold space**</span>, instead, you need to copy it or append to the pattern space if you want to do something with it. For example, the print command ```p``` prints the pattern space only. Likewise, s operates on the pattern space.
+**Hold buffer** / hold space is like a long-term storage, such that you can catch something, store it and reuse it later when sed is processing another line.<span style="color:red">** You do not directly process the hold space**</span>, instead, you need to copy it or append to the pattern space if you want to do something with it. For example, the print command ```p``` prints the pattern space only. Likewise, s operates on the pattern space. Hold Space 
 
 | 命令 | 解释 | 
 | ```g：```| 将hold space中的内容拷贝到pattern space中，原来pattern space里的内容清除 |
@@ -3576,6 +3576,47 @@ two
 three
 ```
 
+e.g. 1
+```bash
+sed 'x' t.txt
+#打印 
+#
+# one 
+# two
+```
+
+因为
+
+| pattern space  | hold space before |  pattern space after x | hold space after x |
+| :--- | :--- |:--- | :--- |
+| one |   |    | one |
+| two |  one |  one | two |
+| three | two  | two |  three |
+
+
+e.g. 2
+
+```bash
+sed 'G' t.txt
+#打印 
+#
+# one 
+
+# two
+
+# three
+```
+
+因为
+
+| pattern space before | hold space before |  pattern space after G |
+| :--- | :--- | :--- |
+| one | ``` ```  | one <br/> ``` ```  |
+| two |  ``` ```  | two <br/> ``` ```  |
+| three | ``` ```  | three <br/> ``` ```  |
+
+
+e.g. 3
 ```
 $ sed 'H;g' t.txt
 
@@ -3588,6 +3629,23 @@ one
 two
 three
 ```
+
+```H``` 操作:
+
+| pattern space  | hold space before |  hold space after ```H``` |
+| :--- | :--- | :--- |
+| one | ``` ```  | ``` ``` <br/> one  |
+| two |  ``` ``` <br/> one   | ``` ``` <br/> one  <br/> two  |
+| three |``` ``` <br/> one <br/> two  | ``` ``` <br/> one <br/> two <br/> three  |
+
+```g``` 操作:
+
+| pattern space before | hold space |  pattern space after ```g``` |
+| :--- | :--- | :--- |
+| one | ``` ``` <br/> one   | ``` ``` <br/> one  |
+| two |   ``` ``` <br/> one  <br/> two    | ``` ``` <br/> one  <br/> two  |
+| three | ``` ``` <br/> one <br/> two <br/> three | ``` ``` <br/> one <br/> two <br/> three  |
+
 
 ![](/img/post/linux/hold.png)
 
@@ -3611,15 +3669,7 @@ sed '1! G;h;\$!d' t.txt
 
 可以拆分上面命令
 
-```bash
-sed '1! G;' t.txt
-#print 
-#one 
-#two
-#
-#three
 
-```
 
 ## ssh 
 
