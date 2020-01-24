@@ -30,41 +30,6 @@ Ctrl + d # open new terminal window tab
 
 ```
 
-**cp**: copy and paste  <br/>
-**mv**: move and rename <br/>
-**Less**:  View some part of the file (lookup, view line by line / page by page) <br/>
-**Touch**: create new file(cannot create directory), change file timestamp   <br/>
-**Nano(or gedit)**: txt/code editor   <br/>
-**sudo**: grant super user priviledge <br/>
-**Top**: provide you dynamic real time view of running system <br/>
-**Echo** print, can include variable in "" <br/>
-**chmod** add/remove access for user, group, others (u,g,o), 可以是给octal(数字的形式) <br/>
-**which**: where software/command located <br/>
-**whatis**: display short manual(man command) page description <br/>
-**useradd**: create new user  <br/>
-**passwd**: change password for user <br/>
-**userdel**: delete exisiting user <br/>
-**groups**: show which group is currently user connected to <br/>
-**groupadd**: add new group in system <br/>
-**groupdel**: delete existing group <br/>
-**gpasswd -a**: add user to exisiting group <br/>
-**gpasswd -d**: delete user from exisiting group <br/>
-**df**: the amount of disk space being used by your file system <br/>
-**du**: estimate and display the disk space used by files in details <br/>
-**free**: display the total amount free and used physical and swap memory in the system  <br/>
-**watch**: run command at a regular interval or repeatedly <br/>
-**head/tail**: print first / last part of the file <br/>
-**find**: Find the file (by name, by time) <br/>
-**wc**: print a count of lines, words and characters for each files <br/>
-**Cal**: 显示calendar <br/>
-**Date**: print  and change system date and time information <br/>
-**Multiple Command** ; &&  ||  <br/>
-**ifconfig**: interface configuration: used to view and change network interface configuration on your system <br/>
-**tar**: 压缩/解压 文件夹/文件 <br/>
-**grep**: search and print pattern / word in a text file or a number of text file <br/>
-**netstat**: display network connection, routing tables and a number of network interfaces, and view network protocal states 
-
-
 
 **Shell**: a program that take commands from keyboard and give them to operating system to perform;
 
@@ -73,6 +38,63 @@ Command Line or Shell: aslo called **CLI(Command Line Interface)**
 **Terminal**: a tool which you can use to pass your shell commands.  A program that opens a window and lets you interact with the shell
 
 File in Linux system are arranged in **hierarchical directory structure**: organized in a tree-like pattern
+
+
+## 实用code
+
+**一个file 多少行**
+```shell
+wc -l file.txt
+```
+
+**一个file 多少个column, 假定column 数一样**
+```shell
+col=`head -1 file.txt | wc -w`
+```
+
+**把文件每个单词 各自打在独立的一行**
+
+```shell
+grep -o '[[:alpha:]]\{2,\}' file.txt 
+#or
+grep -o -E '[[:alpha:]]{2,}' file.txt 
+
+#or 
+cat file.txt | xargs -n1
+
+#or
+cat words.txt | tr -s ' ' '\n' 
+```
+
+**Remove all prefix white space** 
+```
+sed "s/^[[:space::]]*//" file.txt
+```
+
+**Swap two columns** 
+```
+awk `{ t=$1; $1=$2; $2=t; print;}` file.txt
+```
+
+**设置变量来自上个结果输出**
+
+``` "$()" ``` or ``` `` ```
+
+```bash
+col="$(head -1 file.txt | wc -w)"
+col=`head -1 file.txt|wc -w`
+```
+
+**Loop File**
+
+```bash
+while IFS= read -r line 
+do #
+    for word in $line
+    do#
+    done #
+done
+```
 
 ## Linux  基础
 
@@ -1168,6 +1190,7 @@ sudo apt-get autoremove  #auto remove the dependency which required for the pack
 ```awk``` 所有的操作都是基于 ```pattern(模式)—action(动作)```对来完成的，如下面的形式
 
 
+
 ```shell
 pattern {action}
 ```
@@ -1251,11 +1274,18 @@ awk '{
 | ```$N```| 	N表示字段号，最大值为NF变量的值 |
 | ```FS```| 	字段分隔符(当前行的分隔符)，由正则表达式表示，默认为" "空格 |
 | ```RS```| 	输入记录分隔符(行与行之间分隔符)，默认为"\n"，即一行为一个记录 |
-| ```NF```| 	当前记录字段数 |
-| ```NR```| 	已经读入的记录数 |
+| ```NF```| 	a variable indicating the number of fields (i.e. number of "columns") on an input line |
+| ```NR```| 	indicating the number of records (i.e. current line number) that's accumulated across multiple files read |
 | ```FNR```| 	当前输入文件的记录数，请注意它与NR的区别 |
 | ```OFS```| 	输出字段分隔符，默认为" "空格 | 
 | ```ORS```| 	输出记录分隔符，默认为```\n``` |
+| ```BEGIN``` | a code block with a "BEGIN" prefix will be executed before any line reads. 在读取所有输入前执行 |
+| ```END``` | The code block with an "END" prefix is only executed after the last line is read. 在读取所有输入后执行 |
+| ```$i``` | the i-th field of the input line |
+
+
+
+
 
 关于```awk```的内容本课程将只会包含这些内容，如果你想了解更多，请期待后续课程，或者参看一下链接内容：
 
@@ -1684,6 +1714,13 @@ cron 服务监测时间最小单位是分钟，所以 cron 会每分钟去读取
 - ```/etc/cron.monthly```，目录下的脚本会每月执行一次，在每月1号的6点52分时运行；
 - ```/etc/cron.weekly```，目录下的脚本会每周执行一次，在每周第七天的6点47分时运行；
 
+
+#### Email TO
+
+```bash
+MAILTO="email address"
+* * * * * echo blaah
+```
 
 
 ## cut 
@@ -2202,6 +2239,7 @@ PCRE（Perl Compatible Regular Expressions中文含义：perl语言兼容正则�
 | ```-E``` or ```--extended-regexp``` | Interpret Pattern as an extended regular expression |
 | ```-I``` | 忽略binary file , 等于```binary-files=without-match``` option|
 | ```-i``` | ignore case sensitive 忽略大小写 | 
+| ```-o``` or ```--only-matching``` | print only the matched(non-empty) parts of matching line, with each such parts on a separate matching line， 比如file 中有apple, ```grep -o 'p '```, 会把两个单独的```p``` 打印在两行 | 
 | ```-n``` | print the line number,显示匹配文本所在行的行号 | 
 | ```-v``` | Invert sense of matching, only select non-matching line 反选，输出不匹配行的内容 | 
 | ```-r``` | recursively find all files under each directory recursively 递归匹配查找 |
@@ -2799,7 +2837,7 @@ nl -b a file # 是否空行都列出行号
 
 ## paste
 
-```paste```这个命令与```join``` 命令类似，<span style="background-color:#FFFF00">**它是在不对比数据的情况下，简单地将多个文件合并一起**</span>，以Tab隔开
+```paste```这个命令与```join``` 命令类似，<span style="background-color:#FFFF00">**它是在不对比数据的情况下，简单地将多个文件合并一起**</span>，以Tab隔开, if no file specified or put ```-``` instead of file name, paste reads from standard input and gives output as it is until a interrupt command ```[Ctrl-c]``` is given
 
 使用方式： ```paste [option] file...```
 
@@ -2808,7 +2846,7 @@ nl -b a file # 是否空行都列出行号
 
 | 选项 |	说明 |
 | ```-d or --delimiters=LIST``` |	 指定合并的分隔符，默认为Tab |
-| ```-s```|	不合并到一行，每个文件为一行 |
+| ```-s``` or ```--serial```|	不合并到一行，每个文件为一行, paste one file at a time instead of in parallel |
 
 ```shell
 $ echo hello > file1
@@ -2819,6 +2857,55 @@ $ paste -s file1 file2 file3
 ```
 
 ![](/img/post/linux/paste.png)
+
+比如有file  name, age, profession
+
+```
+Name:
+Sally
+Jim
+John
+
+Age:
+22
+18
+30
+
+Profession:
+Student 
+Worker
+Singer
+```
+
+下面将第一个file 用 ```|``` 隔开, 第二个File 用 ```,``` 隔开
+```shell
+paste -d'|,' name, age, profession
+#output 
+
+#Sally|22,Student
+#Jim|18,Worker
+#John|30,Singer
+```
+
+```-s``` 文件会横过来
+```shell
+paste -s name, age, profession
+#output 
+
+#Sally Jim John
+#22 18 30 
+#Student Worker Singer
+```
+
+Combination of ```-d``` and ```-s```: 
+```shell
+paste -d","-s name, age, profession
+#output 
+
+#Sally,Jim,John
+#22,18,30 
+#Student,Worker,Singer
+```
 
 
 ## PS / nice /renice
@@ -3051,6 +3138,32 @@ $ sed -i '30d' passwd
 - [sed简明教程](https://coolshell.cn/articles/9104.html)
 - [sed单行脚本快速参考](http://sed.sourceforge.net/sed1line_zh-CN.html)
 - [sed完全手册](https://www.gnu.org/software/sed/manual/sed.html)
+
+#### 替换
+
+
+比如file 是:
+```bash
+$ cat pets.txt
+This is my my cat
+  my cat's name
+```
+
+```/g``` <span style="background-color:#FFFF00">表示一行上的替换**所有**的匹配</span>：
+
+```bash
+sed "s/my/Becks/" pets.txt
+# 输出
+This is Becks my cat
+  Becks cat's name
+
+sed "s/my/Becks/g" pets.txt
+# 输出
+This is Becks Becks cat
+  Becks cat's name
+```
+
+
 
 
 ## ssh 
@@ -3764,7 +3877,14 @@ Esc #进入普通模式
 | ```:set background=dark或light```	| ，设置背景风格 | 
 | ```:set backup(bk)```	|  设置自动备份，默认未打开 | 
 | ```:set cindent(cin)```	|  设置C语言风格缩进 |  
-
+| ```:syntax on``` |	语法加“靓”（亮）|
+| ```:syntax off```|	语法不加“靓”（亮）|
+| ```:set cindent``` |	C 语言自动缩进（可简写为set cin） |
+| ```:set sw=8``` |	自动缩进宽度（需要set cin才有用） |
+| ```:set ts=8``` |	设定 TAB 宽度 |
+| ```:set number``` |	显示行号 | 
+| ```:set nonumber``` |	不显示行号 |
+| ```:setsm``` |	括号自动匹配 |
 
 
 **普通模式下快速调整缩 find**
@@ -4013,6 +4133,16 @@ who 显示terminal 信息
 
 ## xargs
 
+| 参数   |  Meaning |
+|:----------:|:-------------|
+| ```-0``` or ```--null``` | arguments are separated by null not white space. disable quote and backslash processing and logical EOF processing |
+| ```-a``` | read arguments from file not standard inputs |
+| ```-E``` or ```-e``` | 如果遇到 EOF, ignore 接下来的input |
+| ```-n``` or ```--max-args=N``` | used as N max arguments per command line | 
+| ```-p``` or ```--interactive``` | prompt before running command, run command 之前会询问 |
+| ```－t``` or ```--verbose``` | print command before execute them |
+
+
 ```xargs``` 是一条 UNIX 和类 UNIX 操作系统的常用命令。它的作用是将参数列表转换成小块分段传递给其他命令，以避免参数列表过长的问题。
 
 这个命令在有些时候十分有用，特别是当用来处理产生大量输出结果的命令如 find，locate 和 grep 的结果，详细用法请参看 man 文档。
@@ -4021,6 +4151,38 @@ who 显示terminal 信息
 $ cut -d: -f1 < /etc/passwd | sort | xargs echo
 ```
 上面这个命令用于将/etc/passwd文件按:分割取第一个字段排序后，使用echo命令生成一个列表。
+
+
+The xargs command in UNIX is a command line utility for <span style="color:red"> building an execution pipeline from standard input</span>. By default ```xargs``` reads items from standard input as separated by blanks and executes a command once for each argument 一次执行一个command 从 standard input 
+
+```bash
+echo 'one two three' | xargs mkdir
+ls #显示 one two three 3个文件夹
+```
+
+```bash
+echo 'one two three' | xargs -n1 mkdir
+#显示
+mkdir one
+mkdir two
+mkdir three
+
+echo 'one two three' | xargs -t mkdir
+#显示
+mkdir one two three
+
+
+echo 'one two three' | xargs -t
+#显示
+echo 'one two three' 
+one two three
+```
+
+找到这个folder 下所有文件是 14天前被修改的，然后删除
+
+```
+find /tmp -mtime +14 | xargs rm
+```
 
 
 ## zip / unzip
