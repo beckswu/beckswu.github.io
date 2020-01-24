@@ -3103,6 +3103,7 @@ $ sed -i 's/sad/happy/4' test # 4表示指定行中的第四个匹配字符串
 | ```s/regexp/pattern``` | attempt to match regexp with the pattern space. If successful, replace that portion matched with replacement	行内替换 |
 | ```c \text``` |	 replace selected lines with text	整行替换 |
 | ```a``` |	 append text	插入到指定行的后面 |
+| ```-e``` | Append the editing commands specified by the command argument to the list of commands, 把几个command 拆开写(见下面例子) |
 | ```i``` |	 insert text	插入到指定行的前面 |
 | ```p``` |	 print current pattern	打印指定行，通常与-n参数配合使用 |
 | ```d``` |	delete pattern space	删除指定行 |
@@ -3141,6 +3142,22 @@ $ sed -i '30d' passwd
 
 #### 替换
 
+| 命令 |	说明 |
+| ```s``` | 替换 <br/> ```3s``` 只替换第三行  <br/> ```3,6s``` 替换3到6行  <br/> ```sed 's/s/S/1'``` 替换每一行第一个 <br/> ```sed 's/s/S/2' my.txt``` 只替换每行第二个match的 <br/> ```sed 's/s/S/3g' my.txt```只替换第一行的第3个以后的s： |
+| ```g``` | 替换所有行 | 
+| ```&``` | 做被匹配的变量, 在左右加东西, ```sed 's/my/[&]/g' my.txt``` 所有的```my``` 会变为 ```[`my]``` |
+| ```()``` | 括号内匹配的可以<span style="background-color:#FFFF00">当变量使用</span> <br/> ```sed 's/(my) is (good)/\1:\2/g‘``` 把```my``` 变成第一个变量, ```good``` 做为第二个变量 (```\1,\2...```), 结果是打印 ```my good``` |
+
+
+- ```^``` 表示一行的开头。如：```/^#/``` 以```#```开头的匹配。
+- ```$``` 表示一行的结尾。如：```/}$/``` 以```}```结尾的匹配。
+- <span style="background-color:#FFFF00">```\<``` 表示词首</span>。 如：```\<abc``` 表示以 abc 为首的詞。
+- ```\>``` 表示词尾。 如：```abc\>``` 表示以 ```abc``` 結尾的詞。
+- ```.``` 表示任何单个字符。
+- ```*``` 表示某个字符出现了0次或多次。
+- ```[ ]``` 字符集合。 如：```[abc]``` 表示匹配a或b或c，还有 ```[a-zA-Z]``` 表示匹配所有的26个字符。如果其中有^表示反，如 [^a] 表示非a的字符
+
+**E.g.1**
 
 比如file 是:
 ```bash
@@ -3154,14 +3171,321 @@ This is my my cat
 ```bash
 sed "s/my/Becks/" pets.txt
 # 输出
-This is Becks my cat
-  Becks cat's name
+#This is Becks my cat
+#  Becks cat's name
 
 sed "s/my/Becks/g" pets.txt
+
 # 输出
-This is Becks Becks cat
-  Becks cat's name
+#This is Becks Becks cat
+#  Becks cat's name
 ```
+
+
+<span style="background-color:#FFFF00">**上面的sed并没有对文件的内容改变**</span>，只是把处理过后的内容输出，如果你要写回文件，你可以使用重定向，如：
+
+
+```bash
+sed "s/my/Becks's/g" pets.txt > new_pets.txt
+
+#or
+sed -i "s/my/Becks's/g" pets.txt
+```
+
+**E.g 2  remove tag**
+
+```
+
+去掉所有的file，比如有file
+
+```
+<b>This</b> is what <span style="text-decoration: underline;">I</span> meant. Understand?
+```
+
+```bash
+$ sed 's/<.*>//g' html.txt
+# meant Understand? #会删除tag包含 内所有的内容
+ 
+# 其中的'[^>]' 指定了除了>的字符重复0次或多次。
+$ sed 's/<[^>]*>//g' html.txt
+This is what I meant. Understand?
+```
+
+比如有文本
+
+```
+This is my cat, my cat's name is betty
+This is my dog, my dog's name is frank
+This is my fish, my fish's name is george
+This is my goat, my goat's name is adam
+```
+
+**E.g 3. 替换指定行**
+
+```shell
+sed "3s/my/your/g" pets.txt #只替换第三行 把my 到 your 
+
+sed "3,6s/my/your/g" pets.txt #替换从第三行到第六行所有的my 变成your
+
+```
+
+
+**E.g 4 多个匹配**
+
+
+如果我们需要一次替换多个模式，可参看下面的示例：（第一个模式把第一行到第三行的my替换成your，第二个则把第3行以后的This替换成了That）
+
+```bash
+$ sed '1,3s/my/your/g; 3,$s/This/That/g' my.txt
+#This is your cat, your cat's name is betty
+#This is your dog, your dog's name is frank
+#That is your fish, your fish's name is george
+#That is my goat, my goat's name is adam
+
+上面的命令等价于：（注：下面使用的是sed的-e命令行参数）
+
+```bash
+sed -e '1,3s/my/your/g' -e '3,$s/This/That/g' my.txt
+```
+我们可以使用&来当做被匹配的变量，然后可以在基本左右加点东西。如下所示：
+
+
+```shell
+$ sed 's/my/[&]/g' my.txt
+#This is [my] cat, [my] cat's name is betty
+#This is [my] dog, [my] dog's name is frank
+#This is [my] fish, [my] fish's name is george
+#This is [my] goat, [my] goat's name is adam
+```
+
+
+**E.g 5 圆括号匹配**
+
+使用圆括号匹配的示例：（圆括号括起来的正则表达式所匹配的字符串会可以当成变量来使用，sed中使用的是\1,\2…）
+
+
+```shell
+
+$ sed 's/This is my \([^,&]*\),.*is \(.*\)/\1:\2/g' my.txt
+#cat:betty
+#dog:frank
+#fish:george
+#goat:adam
+```
+
+上面这个例子中的正则表达式有点复杂，解开如下（去掉转义字符）：
+
+正则为：```This is my ([^,]*),.*is (.*)```
+匹配为：```This is my (cat),……….is (betty)```
+
+然后：```\1```就是```cat```，```\2```就是```betty```
+
+
+
+
+#### N command 
+
+把下一行的内容纳入当成缓冲区做匹配，把偶数行纳入奇数行匹配, 
+
+file 还是下面形式
+
+```
+This is my cat
+    my cat's name is betty
+This is my dog
+     my dog's name is frank
+This is my fish
+     my fish's name is george
+This is my goat
+    my goat's name is adam
+```
+
+```shell
+sed 'N;s/my/your/' pets.txt
+#This is your cat
+#    my cat's name is betty
+#This is your dog
+#    my dog's name is frank
+#This is your fish
+#    my fish's name is george
+#This is your goat
+#    my goat's name is adam
+```
+
+偶数行纳入奇数行，原来file 变成
+
+```
+This is my cat\n  my cat's name is betty
+This is my dog\n  my dog's name is frank
+This is my fish\n  my fish's name is george
+This is my goat\n  my goat's name is adam
+```
+
+再比如下面的
+```shell
+$ sed 'N;s/\n/,/' pets.txt
+#This is my cat,  my cat's name is betty
+#This is my dog,  my dog's name is frank
+#This is my fish,  my fish's name is george
+#This is my goat,  my goat's name is adam
+```
+
+#### a/i command 
+
+- 比如 ```sed '1 i my pig'``` : 表示第一行<span style="background-color:#FFFF00">**前**</span>插入```my pig``` 
+- 比如 ```sed '$ a my pig'``` : 表示最后一行<span style="background-color:#FFFF00">**后**</span>面插入 ```my pig```
+
+现有file
+```
+This is my cat,  my cat's name is betty
+This is my dog,  my dog's name is frank
+This is my fish,  my fish's name is george
+This is my goat,  my goat's name is adam
+```
+
+```bash
+
+# 其中的1i表明，其要在第1行前插入一行（insert）
+$ sed "1 i This is my monkey, my monkey's name is wukong" my.txt
+#This is my monkey, my monkey's name is wukong
+#This is my cat, my cat's name is betty
+#This is my dog, my dog's name is frank
+#This is my fish, my fish's name is george
+#This is my goat, my goat's name is adam
+ 
+# 其中的$a表明，其要在最后一行后追加一行（append）
+$ sed "$ a This is my monkey, my monkey's name is wukong" my.txt
+#This is my cat, my cat's name is betty
+#This is my dog, my dog's name is frank
+#This is my fish, my fish's name is george
+#This is my goat, my goat's name is adam
+#This is my monkey, my monkey's name is wukong
+```
+
+在每个fish的下一行append 一行 This is my pig 
+
+```bash
+sed "/fish/a This is my pig" del.txt
+#This is my cat, my cat's name is betty
+#This is my dog, my dog's name is frank
+#This is my fish, my fish's name is george
+#This is my pig
+#This is my goat, my goat's name is adam
+```
+
+在每个my下一行 插入 ----
+
+```bash
+$ sed "/my/a ----" my.txt
+#This is my cat, my cat's name is betty
+#----
+#This is my dog, my dog's name is frank
+#----
+#This is my fish, my fish's name is george
+#----
+#This is my goat, my goat's name is adam
+#----
+```
+
+
+#### c Command
+
+- ```2 c This is my pig``` :  把第二行替换为 This is my pig 
+- ```/fish/c This is my pig```: 把有fish 的行 替换为 This is my pig 
+
+```
+This is my cat, my cat's name is betty
+This is my dog, my dog's name is frank
+This is my fish, my fish's name is george
+This is my goat, my goat's name is adam
+```
+
+```bash
+$ sed "2 c This is my monkey, my monkey's name is wukong" my.txt
+#This is my cat, my cat's name is betty
+#This is my monkey, my monkey's name is wukong
+#This is my fish, my fish's name is george
+#This is my goat, my goat's name is adam
+ 
+$ sed "/fish/c This is my monkey, my monkey's name is wukong" my.txt
+#This is my cat, my cat's name is betty
+#This is my dog, my dog's name is frank
+#This is my monkey, my monkey's name is wukong
+#This is my goat, my goat's name is adam
+```
+
+#### d Command 
+
+删除匹配行
+
+```
+This is my cat, my cat's name is betty
+This is my dog, my dog's name is frank
+This is my fish, my fish's name is george
+This is my goat, my goat's name is adam
+```
+
+
+```shell
+#删除含有fish的行
+$ sed '/fish/d' my.txt
+#This is my cat, my cat's name is betty
+#This is my dog, my dog's name is frank
+#This is my goat, my goat's name is adam
+
+#删除第二行 
+$ sed '2d' my.txt
+#This is my cat, my cat's name is betty
+#This is my fish, my fish's name is george
+#This is my goat, my goat's name is adam
+ 
+#从2行 到结尾 都删除
+$ sed '2,$d' my.txt
+#This is my cat, my cat's name is betty
+```
+
+
+
+
+#### p Command 
+
+- ```-n``` 只打印符合规定的line. Each line of input is echoed to the standard output 
+
+打印命令
+
+
+```bash
+# 匹配fish并输出，可以看到fish的那一行被打了两遍，
+# 这是因为sed处理时会把处理的信息输出
+$ sed '/fish/p' my.txt
+#This is my cat, my cat's name is betty
+#This is my dog, my dog's name is frank
+#This is my fish, my fish's name is george
+#This is my fish, my fish's name is george
+#This is my goat, my goat's name is adam
+ 
+# 使用n参数就好了
+$ sed -n '/fish/p' my.txt
+#This is my fish, my fish's name is george
+ 
+# 从一个模式到另一个模式
+$ sed -n '/dog/,/fish/p' my.txt
+#This is my dog, my dog's name is frank
+#This is my fish, my fish's name is george
+ 
+#从第一行打印到匹配fish成功的那一行
+$ sed -n '1,/fish/p' my.txt
+#This is my cat, my cat's name is betty
+#This is my dog, my dog's name is frank
+#This is my fish, my fish's name is george
+```
+
+
+
+
+
+
+
 
 
 
