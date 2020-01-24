@@ -3567,7 +3567,7 @@ When sed reads a file line by line, the line that has been currently read is ins
 | ```H：```| 将pattern space中的内容append到hold space\n后, 这前hold 后面 插入 |
 | ```x：```| 交换pattern space和hold space的内容, 先读到pattern,  然后同时进行 1. 读的pattern到hold.  2.原始的hold 到 pattern, |
 
-注: 如果上面都是第一个command，都是<span style="background-color:#FFFF00">先把内容读到pattern</span>, 然后再```g```, ```G``` or ```H```
+注: 读每行时，<span style="background-color:#FFFF00">先把内容读到pattern</span>, 然后再```g```, ```G``` or ```H```
 
 
 File
@@ -3709,23 +3709,13 @@ sed -n '1! G;h;$p' t.txt #-n 和 p 只打印最后一行
 可以拆分上面命令
 
 
-```1! G``` 操作:
+```1! G;h;``` 操作: 注意这个操作是每行都进行```1! G;h``` 操作 而不是先进行```1! G``` 再进行 ```h``` 操作
 
-| pattern space before | hold space |  pattern space after  |
-| :--- | :--- | :--- |
-| one | ```""```   |  one  |
-| two |   ```""```  | two <br/>```""```   |
-| three | ```""```  | three <br/> ```""``` |
-
-
-```h``` 操作:
-
-| pattern space before | hold space |  hold space after  |
-| :--- | :--- | :--- |
-| one | ```""```   |  one  |
-| two <br/>```""```  |   ```""```  | two <br/> one  |
-| three <br/> ```""``` | ```""```  | three <br/> two <br/> one |
-
+| pattern space load | pattern space after |  hold space before |  hold space after | 解释 |
+| :--- | :--- | :--- |:--- | :--- |
+| one | one  |  ```""```  | one | 没有 ```G```, 只有```h``` |
+| two |   two <br/> one   | one   |  two <br/> one |```G``` 先将hold space 带到pattern space, 再复制pattern 到 hold |
+| three | three <br/> two <br/> one  | two <br/> one  | three <br/> two <br/> one |  |
 
 
 
