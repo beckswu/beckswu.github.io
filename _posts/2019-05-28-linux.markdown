@@ -3558,14 +3558,16 @@ my goat's name is adam
 
 When sed reads a file line by line, the line that has been currently read is inserted into the pattern buffer (<span style="background-color:#FFFF00">**pattern space**</span>). It is like temporary buffer, the scratchpad where the current information is stored. When you tell sed to print, it prints the pattern buffer.
 
-**Hold buffer** / hold space is like a long-term storage, such that you can catch something, store it and reuse it later when sed is processing another line.<span style="color:red">** You do not directly process the hold space**</span>, instead, you need to copy it or append to the pattern space if you want to do something with it. For example, the print command ```p``` prints the pattern space only. Likewise, s operates on the pattern space. Hold Space 
+**Hold buffer** / hold space is like a long-term storage, such that you can catch something, store it and reuse it later when sed is processing another line.<span style="color:red">**You do not directly process the hold space**</span>, instead, you need to copy it or append to the pattern space if you want to do something with it. For example, the print command ```p``` prints the pattern space only. Likewise, s operates on the pattern space. Hold Space 
 
 | 命令 | 解释 | 
 | ```g：```| 将hold space中的内容拷贝到pattern space中，原来pattern space里的内容清除 |
-| ```G：```| 将hold space中的内容append到pattern space\n后 |
-| ```h：```| 将pattern space中的内容拷贝到hold space中，原来的hold space里的内容被清除 |
-| ```H：```| 将pattern space中的内容append到hold space\n后 |
-| ```x：```| 交换pattern space和hold space的内容  |
+| ```G：```| 将hold space中的内容append到pattern space\n后， | 
+| ```h：```| 将pattern space中的内容拷贝到hold space中，原来的hold space里的内容被清除, 在之前一行的hold 的前面 |  
+| ```H：```| 将pattern space中的内容append到hold space\n后, 这前hold 后面 插入 |
+| ```x：```| 交换pattern space和hold space的内容, 先读到pattern,  然后同时进行 1. 读的pattern到hold.  2.原始的hold 到 pattern, |
+
+注: 如果上面都是第一个command，都是<span style="background-color:#FFFF00">先把内容读到pattern</span>, 然后再```g```, ```G``` or ```H```
 
 
 File
@@ -3594,7 +3596,7 @@ sed 'x' t.txt
 | three | two  | two |  three |
 
 
-e.g. 2
+e.g. 2, ```G``` 不会把pattern 到 hold, 只会让hold 到pattern
 
 ```bash
 sed 'G' t.txt
@@ -3605,6 +3607,12 @@ sed 'G' t.txt
 # two
 
 # three
+
+sed 'G' t.txt
+#打印 三个空行
+#
+# 
+#
 ```
 
 因为
@@ -3615,8 +3623,43 @@ sed 'G' t.txt
 | two |  ``` ```  | two <br/> ``` ```  |
 | three | ``` ```  | three <br/> ``` ```  |
 
+E.g. 3
 
-e.g. 3
+```bash
+sed 'h' t.txt
+#打印 
+# one
+# two 
+# three
+
+sed 'H' t.txt
+#打印
+# one 
+# two 
+# three
+```
+
+```H``` 操作:
+
+| pattern space  | hold space before |  hold space after ```H``` |
+| :--- | :--- | :--- |
+| one | ``` ```  | ``` ``` <br/> one  |
+| two |  ``` ``` <br/> one   | ``` ``` <br/> one  <br/> two  |
+| three |``` ``` <br/> one <br/> two  | ``` ``` <br/> one <br/> two <br/> three  |
+
+
+```h``` 操作:
+
+| pattern space  | hold space before |  hold space after ```H``` |
+| :--- | :--- | :--- |
+| one | ```""```  | one|
+| two |  ```""```   | two |
+| three |```""```  | three  |
+
+
+
+
+e.g. 4
 ```
 $ sed 'H;g' t.txt
 
@@ -3630,13 +3673,7 @@ two
 three
 ```
 
-```H``` 操作:
-
-| pattern space  | hold space before |  hold space after ```H``` |
-| :--- | :--- | :--- |
-| one | ``` ```  | ``` ``` <br/> one  |
-| two |  ``` ``` <br/> one   | ``` ``` <br/> one  <br/> two  |
-| three |``` ``` <br/> one <br/> two  | ``` ``` <br/> one <br/> two <br/> three  |
+```H``` 具体见上面操作
 
 ```g``` 操作:
 
@@ -3649,13 +3686,15 @@ three
 
 ![](/img/post/linux/hold.png)
 
-E.g.2 
+E.g. 5 相当于 tac
 
 ```bash
 sed '1! G;h;\$!d' t.txt
 #three
 #two
 #one
+
+sed -n '1! G;h;$p' t.txt #-n 和 p 只打印最后一行
 ```
 其中的 ```‘1! G;h;\$!d’``` 可拆解为三个命令
 
@@ -3668,6 +3707,30 @@ sed '1! G;h;\$!d' t.txt
 
 
 可以拆分上面命令
+
+
+```1! G``` 操作:
+
+| pattern space before | hold space |  pattern space after  |
+| :--- | :--- | :--- |
+| one | ```""```   |  one  |
+| two |   ```""```  | two <br/>```""```   |
+| three | ```""```  | three <br/> ```""``` |
+
+
+```h``` 操作:
+
+| pattern space before | hold space |  hold space after  |
+| :--- | :--- | :--- |
+| one | ```""```   |  one  |
+| two <br/>```""```  |   ```""```  | two <br/> one  |
+| three <br/> ```""``` | ```""```  | three <br/> two <br/> one |
+
+
+
+
+
+
 
 
 
