@@ -3143,7 +3143,7 @@ $ sed -i '30d' passwd
 #### 替换
 
 | 命令 |	说明 |
-| ```s``` | 替换 <br/> ```3s``` 只替换第三行  <br/> ```3,6s``` 替换3到6行  <br/> ```sed 's/s/S/1'``` 替换每一行第一个 <br/> ```sed 's/s/S/2' my.txt``` 只替换每行第二个match的 <br/> ```sed 's/s/S/3g' my.txt```只替换第一行的第3个以后的s： |
+| ```s``` | 替换 <br/> ```3s``` 只替换第三行  <br/> ```3,6s``` 替换3到6行  <br/>```sed '/fish/, +3s/This/#/g```: 替换fish后(包括fish 行)的连续3行, 一共四行的This 变成 #，如果这四行没有不替换  <br/>,  ```sed 's/s/S/1'``` 替换每一行第一个 <br/> ```sed 's/s/S/2' my.txt``` 只替换每行第二个match的 <br/> ```sed 's/s/S/3g' my.txt```只替换第一行的第3个以后的s： |
 | ```g``` | 替换所有行 | 
 | ```&``` | 做被匹配的变量, 在左右加东西, ```sed 's/my/[&]/g' my.txt``` 所有的```my``` 会变为 ```[`my]``` |
 | ```()``` | 括号内匹配的可以<span style="background-color:#FFFF00">当变量使用</span> <br/> ```sed 's/(my) is (good)/\1:\2/g‘``` 把```my``` 变成第一个变量, ```good``` 做为第二个变量 (```\1,\2...```), 结果是打印 ```my good``` |
@@ -3481,14 +3481,145 @@ $ sed -n '1,/fish/p' my.txt
 ```
 
 
+可以使用相对位置, dog 行(包括dog 行) 后面连续三行的替换
+
+```
+# 其中的+3表示后面连续3行
+$ sed '/dog/,+3s/^/# /g' pets.txt
+#This is my cat
+#  my cat's name is betty
+## This is my dog
+##   my dog's name is frank
+## This is my fish
+##   my fish's name is george
+#This is my goat
+#  my goat's name is adam
+ 
+ $ sed '/dog/,+3s/This/His /g' pets.txt
+This is my cat
+#  my cat's name is betty
+# His is my dog
+#   my dog's name is frank
+# His is my fish
+#   my fish's name is george
+#This is my goat
+#  my goat's name is adam
+ 
+ ```
+
+
+#### 命令打包
+
+多个命令可以用分号分开，可以用大括号括起来作为嵌套命令。下面是几个例子：
+
+
+```
+$ cat pets.txt
+This is my cat
+  my cat's name is betty
+This is my dog
+  my dog's name is frank
+This is my fish
+  my fish's name is george
+This is my goat
+  my goat's name is adam
+ 
+# 对3行到第6行，执行命令/This/d
+$ sed '3,6 {/This/d}' pets.txt
+This is my cat
+  my cat's name is betty
+  my dog's name is frank
+  my fish's name is george
+This is my goat
+  my goat's name is adam
+ 
+# 对3行到第6行，匹配/This/成功后，再匹配/fish/，成功后执行d命令
+$ sed '3,6 {/This/{/fish/d}}' pets.txt
+This is my cat
+  my cat's name is betty
+This is my dog
+  my dog's name is frank
+  my fish's name is george
+This is my goat
+  my goat's name is adam
+ 
+# 从第一行到最后一行，如果匹配到This，则删除之；如果前面有空格，则去除空格
+$ sed '1,${/This/d;s/^ *//g}' pets.txt
+my cat's name is betty
+my dog's name is frank
+my fish's name is george
+my goat's name is adam
+```
+
+
+#### Hold/Pattern Space
 
 
 
+When sed reads a file line by line, the line that has been currently read is inserted into the pattern buffer (<span style="background-color:#FFFF00">**pattern space**</span>). It is like temporary buffer, the scratchpad where the current information is stored. When you tell sed to print, it prints the pattern buffer.
+
+**Hold buffer** / hold space is like a long-term storage, such that you can catch something, store it and reuse it later when sed is processing another line.<span style="color:red">** You do not directly process the hold space**</span>, instead, you need to copy it or append to the pattern space if you want to do something with it. For example, the print command ```p``` prints the pattern space only. Likewise, s operates on the pattern space.
+
+| 命令 | 解释 | 
+| ```g：```| 将hold space中的内容拷贝到pattern space中，原来pattern space里的内容清除 |
+| ```G：```| 将hold space中的内容append到pattern space\n后 |
+| ```h：```| 将pattern space中的内容拷贝到hold space中，原来的hold space里的内容被清除 |
+| ```H：```| 将pattern space中的内容append到hold space\n后 |
+| ```x：```| 交换pattern space和hold space的内容  |
 
 
+File
+```
+$ cat t.txt
+one
+two
+three
+```
+
+```
+$ sed 'H;g' t.txt
+
+one
+ 
+one
+two
+ 
+one
+two
+three
+```
+
+![](/img/post/linux/hold.png)
+
+E.g.2 
+
+```bash
+sed '1! G;h;\$!d' t.txt
+#three
+#two
+#one
+```
+其中的 ```‘1! G;h;\$!d’``` 可拆解为三个命令
+
+- ```1! G``` 只有第一行不执行```G```命令，将hold space中的内容append回到pattern space
+- ```h``` 第一行都执行```h```命令，将pattern space中的内容拷贝到hold space中
+- ```\$!d```  除了最后一行不执行```d```命令，其它行都执行```d```命令，删除当前行
 
 
+![](/img/post/linux/hold2.png)
 
+
+可以拆分上面命令
+
+```bash
+sed '1! G;' t.txt
+#print 
+#one 
+#two
+#
+#three
+
+```
 
 ## ssh 
 
