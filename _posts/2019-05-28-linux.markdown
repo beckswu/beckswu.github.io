@@ -1729,7 +1729,7 @@ MAILTO="email address"
 
 | Flag | 	说明| 
 | :---: | :--- |
-| ```c``` | character, select only these character | 
+| ```c``` | character, select only these character; <br/> ```cut -c3```: 选取第三个字母 | 
 | ```d``` | delimilter, use delimiter instead of TAB as delimiter | 
 | ```f``` | select only these field | 
 
@@ -2063,6 +2063,23 @@ echo "the value of x is $x" #print the value of x is 10
 echo -e 'some \text' #-e use escape,  \t -> tab,   print:  some     ext
 
 ```
+
+
+#### printf
+
+echo 与 printf 区别
+
+First sentence of entry for ```echo``` in the bash man page (emphasis mine):
+
+> Output the args, separated by spaces, followed by a newline.
+
+First sentence of the man page entry for ```printf```:
+
+> Write the formatted arguments to the standard output under the control of the format.
+
+printf only prints what appears in the format; <span style="color:red">**it does not append an implied newline**</span>.
+
+
 
 ## exec 
 
