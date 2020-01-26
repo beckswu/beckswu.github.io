@@ -1,0 +1,78 @@
+---
+layout:     post
+title:      "C++ in Linux"
+subtitle:   "linux learning note "
+date:       2020-01-26 20:00:00
+author:     "Becks"
+header-img: "img/post-bg2.jpg"
+catalog:    true
+tags:
+    - Linux
+    - C++
+    - 学习笔记
+---
+
+## GCC 
+
+| Option | 解释 | 
+| ```-c``` | 只compile, 不链接成为可执行文件, 通常用语编译不包含主程序的子程序文件 | 
+| ```-o output_filename``` | 如果不给这个选项, GCC 给出预设可执行文件 ```a.out``` | 
+| ```-g``` | 产生 GDB Debugger 必要的 | 
+| ```-O``` | 对程序进行优化的编译，链接, 执行速度变快, 但是compile，链接速度变慢 |
+| ```-O2``` | 比```-O``` 更好优化编译，链接, 但是整个编译，链接过程更慢 |
+| ```-pedantic``` | 产生警告信息 |
+| ```-Wall``` |  最有价值, 让GCC 产生更多的警告信息 |
+| ```-Werror``` | 要求GCC 将所有的警告 当成错误进行处理，对自动编译的make 非常有用, 如果有这个选项, GCC 会在所有产生警告地方停止编译, 迫使程序员修改 |
+
+
+## GDB Debugger
+
+有程序
+```c++
+1 #include <iostream>
+2 #include <vector> 
+3 using namespace std;
+4 
+5  void func(vector<int>b){
+6    for(auto i: b)
+7        cout << i <<endl;
+8  }
+9 int main(){
+10   vector<int>a={1,2,3,4,5};
+11    for(auto i: a)
+12        cout << i <<endl;
+13     func(a);
+14    return 0;
+15 }
+```
+```
+
+```shell
+g++ -g -Wall -Werror -o test hello.cpp
+
+gdb test #打开生成test 的调试工具
+
+(gdb) run #运行刚生成的out 文件
+
+(gdb) backtrace #具体哪里发生了错误
+
+(gbb) frame #将错误定位到原来cpp文件的行
+```
+
+![](/img/post/linuxC++/gdb1.png)
+
+```shell
+(gdb) break 7 #在第7行breakpoint 
+(gdb) break 13 #在第13行breakpoint 
+
+(gdb) print a[0]; #打印vector a[0]
+
+(gdb) step #单步执行每条语句
+(gdb) s #跟step 一样
+
+（gbd) next #到下个break point
+
+(gdb) quit # 退出调试
+```
+
+![](/img/post/linuxC++/gdb2.png)
