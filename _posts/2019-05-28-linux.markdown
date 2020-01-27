@@ -3802,7 +3802,7 @@ exit
 | ```-n``` | compare to string numerical value |
 | ```-R``` | random sort, shuffle | 
 | ```-r``` | sort on reversed order |
-| ```-t --field-separator=SEP``` | field separator, use SEP instead of nonblank |
+| ```-t --field-separator=SEP``` | field separator, use SEP instead of nonblank <br/> 注: 如果用escape character <span style="background-color:#FFFF00"> 加```$```, sort -t$'\t' -n -k2``` </span> |
 | ```-u```| unique | 
 
 ```shell
