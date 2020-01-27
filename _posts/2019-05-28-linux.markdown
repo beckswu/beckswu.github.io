@@ -2961,6 +2961,28 @@ paste -d","-s name, age, profession
 ```
 
 
+如果file.txt 为
+```
+Jim Student
+Sally worker
+John Student
+```
+
+默认分隔符为```\tab``` 
+
+```shell
+paste -s file.txt
+#Jim Student     Sally worker    John Student
+```
+
+```shell
+cat file.txt | paste -d ';' - -  #－－mean read from stdin, then read from stdin, you can stack as many of them
+#print 
+#Jim Student;Sally worker    
+#John Student
+```
+
+
 ## PS / nice /renice
 
 
@@ -4229,7 +4251,7 @@ uniq命令可以用于过滤或者输出重复行。
 | ```-f --skip-fields=N``` | avoid comparing first N fields |
 | ```-i``` | ignore cases when comparing 忽略大小写 |
 | ```-s --skip-chars=N``` | avoid comparing first N characters |
-| ```－u``` | print only unique line |
+| ```－u``` | print only <span style="background-color:#FFFF00">**unique** line </span> |
 | ```-w --check-chars=N``` | compare no more than N characters in lines |
 
 过滤重复行
