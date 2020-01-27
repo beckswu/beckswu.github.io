@@ -106,6 +106,24 @@ head -n22 | tail -n11
 sed -n '12,22p'
 ```
 
+**把file 的每三行变成一行**
+
+```shell
+paste -d';' - - -
+paste - - - | tr $'\t' ';'
+paste -s -d';;\n'
+```
+
+**精确寻找**
+
+```shell
+grep  ```\bthe\b```  file.txt #只需找the 这个词, there 不会匹配
+#or 
+grep -w 'the'
+
+grep -iw -E 'the|that|then|those' #只需找含有the, that, then, those 的句子, there 不会包括
+```
+
 
 ## Linux  基础
 
@@ -2256,6 +2274,7 @@ PCRE（Perl Compatible Regular Expressions中文含义：perl语言兼容正则�
 | ```[^xyz]```| 	排除型（negate）字符集合。匹配未列出的任意字符。例如，```[^abc]```可以匹配“plain”中的“plin”。 |
 | ```[a-z]```| 	字符范围。匹配指定范围内的任意字符。例如，```[a-z]```可以匹配“a”到“z”范围内的任意小写字母字符。 |
 | ```[^a-z]```| 	排除型的字符范围。匹配任何不在指定范围内的任意字符。例如，```[^a-z]```可以匹配任何不在“a”到“z”范围内的任意字符。 |
+| ```\1\2``` | 使用上一个pattern， 比如 ```grep '\([0-9]\)\1'``` 匹配 11, 22, 33, 44, 55, 66, 77, 88, 99 |
 
 优先级
 优先级为从上到下从左到右，依次降低：
@@ -2290,10 +2309,12 @@ PCRE（Perl Compatible Regular Expressions中文含义：perl语言兼容正则�
 | ```-n``` | print the line number,显示匹配文本所在行的行号 | 
 | ```-v``` | Invert sense of matching, only select non-matching line 反选，输出不匹配行的内容 | 
 | ```-r``` | recursively find all files under each directory recursively 递归匹配查找 |
+| ```-w``` or ```--word-regex```| Select only these lines containing matches that forms whole word <br/> ```grep -w 'the'``` 不会match there |
 
 
 | 特殊符号 |	说明 |
 | :---:  | :---: |
+| ```\b``` | word boundary, e.g. ```\bthe\b``` 只需找the 这个词,  there 匹配|
 | ```[:alnum:]``` |	代表英文大小写字母及数字，亦即```0-9, A-Z, a-z``` |
 | ```[:alpha:]``` |	代表任何英文大小写字母，亦即 ```A-Z, a-z``` | 
 | ```[:blank:]``` |	代表空白键与 ```[Tab]``` 按键两者 |
@@ -2437,6 +2458,9 @@ grep -nv "Some options" f1.txt #显示f1.txt 不包含Some options的行
 grep -help #显示有的flag, options 用grep command
 
 ```
+
+
+[15 example of Grep command](https://www.thegeekstuff.com/2009/03/15-practical-unix-grep-command-examples/)
 
 
 
@@ -2975,13 +2999,19 @@ paste -s file.txt
 #Jim Student     Sally worker    John Student
 ```
 
+```- -```  Merge a file by pasting the data into 2 columns
+
 ```shell
 cat file.txt | paste -d ';' - -  #－－mean read from stdin, then read from stdin, you can stack as many of them
+#or 
+paste -d ';' - -  < file.txt
+
 #print 
 #Jim Student;Sally worker    
 #John Student
 ```
 
+[10 Use of paste command](http://www.theunixschool.com/2012/07/10-examples-of-paste-command-usage-in.html): 不错的例子
 
 ## PS / nice /renice
 
