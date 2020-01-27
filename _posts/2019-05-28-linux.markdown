@@ -1559,6 +1559,25 @@ $ cat -A /etc/protocols
 $ cat /etc/protocols | col -x | cat -A
 ```
 
+## colrm
+
+
+colrm start 和stop 是inclusive 的
+```shell
+colrm [start] [stop]
+```
+
+e.g. 
+
+```
+cat file.txt
+abcdefgh
+
+colrm 4 6
+abcgh
+```
+
+
 ## cp
 
 CP: copy and paste
