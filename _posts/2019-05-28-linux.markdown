@@ -2432,6 +2432,12 @@ sudo gpasswd -d mark Java #remove user from Group
 
 ## head / tail
 
+| 命令 | 解释 |
+| :---: | :--- |
+| ```-cN``` | 打印前N 
+| ```-nN``` or ```-n+N``` | 从第N行或者倒数第N行开始打印 |
+
+
 - ```Head```: output the first part of the file 
 - ```tail```: output the last part of the file, ```-f``` 不停的读取某个文件并显示
     - ```tail -n11```  or ```tail -11``` 从 倒数第11 行开始，比如有100行，从90行开始一直到100行
