@@ -51,6 +51,9 @@ tags:
 g++ -g -Wall -Werror -o test hello.cpp
 
 gdb test #打开生成test 的调试工具
+#上面可以写成两步
+gdb
+(gdb) file text
 
 (gdb) run #运行刚生成的out 文件
 
@@ -61,18 +64,52 @@ gdb test #打开生成test 的调试工具
 
 ![](/img/post/linuxC++/gdb1.png)
 
+#### Breakpoint
+
+```shell
+# 运行到指定某行停止
+break 行号
+# 一次只能设置一个数不能设置两个数
+
+#运行到指定function 停止
+break function_name
+
+#符号if 语句条件是, 运行到指定位置停止运行
+break line_number/function_name if condition 
+
+```
+
+
 ```shell
 (gdb) break 7 #在第7行breakpoint 
-(gdb) break 13 #在第13行breakpoint 
+(gdb) break 12 #在第13行breakpoint 
 
 (gdb) print a[0]; #打印vector a[0]
+
 
 (gdb) step #单步执行每条语句
 (gdb) s #跟step 一样
 
+
 （gbd) next #到下个break point
+（gdb) continue #继续执行程序, 到下一个breakpoint 
+#or 用 c 也是continue
+
+
+（gdb) enable 1 #在第二个breakpoint 回到第一个 breakpoint，
+(gdb) run #回到breakpoint 1
 
 (gdb) quit # 退出调试
 ```
 
+next 
+
 ![](/img/post/linuxC++/gdb2.png)
+
+continue: 运行到下一个breakpoint 
+
+![](/img/post/linuxC++/gdb3.png)
+
+enable 
+
+![](/img/post/linuxC++/gdb4.png)
