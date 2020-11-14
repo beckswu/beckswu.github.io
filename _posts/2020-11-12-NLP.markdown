@@ -139,7 +139,9 @@ e.g. Happy sometimes as positive word sometimes as negative, A the number of pos
 ![](/img/post/Natural-Language-Processing/course1/week2pic1.png)
 
 $$ P\left(Positive \mid happy \right) = \frac{ P\left(Positive \cap happy \right)}{P\left(happy \right)} $$
+
 $$ P\left(happy \mid Positive \right) = \frac{ P\left(Positive \cap happy \right)}{P\left(Positive \right)} $$
+
 $$ P\left(Positive \mid happy \right) =  P\left(happy \mid Positive \right) \frac{ P\left(Positive \right)}{P\left(happy \right)} $$
 
 ![](/img/post/Natural-Language-Processing/course1/week2pic2.png)
@@ -197,7 +199,7 @@ log prior is important for unbalanced dataset. We further introduce λ as follow
 
 ![](/img/post/Natural-Language-Processing/course1/week2pic7.png)
 
-The positive value indicates tweet is positive. Negative value indicates tweet is negative
+<span style="color:red">The positive value indicates tweet is positive. Negative value indicates tweet is negative</span>
 
 ![](/img/post/Natural-Language-Processing/course1/week2pic8.png)
 
@@ -212,8 +214,8 @@ The positive value indicates tweet is positive. Negative value indicates tweet i
    - Tokenize sentences
 3. Compute freq(w, class), use below table to compute
 4. Get $$P\left(w \mid  pos \right), P\left(w \mid neg \right)$$ using Laplacian Smoothing formula
-5. Get $$\lambda\left( w \right) =  log \frac{P\left( w \mid pos \right)}{P\left( w \mid neg \right)}
-6. Compute $$logprior = log \frac{D_{pos}}{D_{neg}} $$ where $$ D_{pos} $$ and $$D_{neg}$$ coorespond to  the bumber of positive and negative documents respectively
+5. Get $$\lambda\left( w \right) =  log \frac{P\left( w \mid pos \right)}{P\left( w \mid neg \right)}$$
+6. Compute $$logprior = log \frac{D_{pos}}{D_{neg}} $$ where $$ D_{pos} $$ and $$D_{neg}$$ correspond to  the number of positive and negative documents respectively
 
 
 ![](/img/post/Natural-Language-Processing/course1/week2pic9.png)
