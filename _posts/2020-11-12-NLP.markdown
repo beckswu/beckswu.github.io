@@ -239,7 +239,7 @@ There are many applications of naive Bayes including:
 
 - Author identification: document written by which author, calculate $$\lambda$$ for each word for both author to build vocabulary
 - Spam filtering: $$\frac{P\left(spam \mid email \right)}{P\left(nnspam \mid email \right)}$$
-- Information retrieval: filter relevant and irrelevant documents in a database, calculate the likelihood of the documents given the query, retrieve document if $$P\left(document_k \mid query \right) \apprx \prod_{i=0}^{\mid query \mid} P\left(query_i \mid document_k  \right) > threshold$$
+- Information retrieval: filter relevant and irrelevant documents in a database, calculate the likelihood of the documents given the query, retrieve document if $$P\left(document_k \mid query \right) \approx \prod_{i=0}^{\mid query \mid} P\left(query_i \mid document_k  \right) > threshold$$
 - Word disambiguation: e.g. don't know bank in reading, refer to river or money? to calculate the score of the document, $$\frac{P\left(river \mid text\right)}{P\left(money \mid text\right)}$$. if refer to river not money, score is bigger than 1. 
 
 
