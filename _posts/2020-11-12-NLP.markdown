@@ -163,7 +163,7 @@ Once you have the probabilities, you can compute the likelihood score as follows
 
 We usually compute the probability of a word given a class as follows:
 
-$$ P\left(w_i \mid class \right) = \frac{freq\left(wi,class \right)}{N_{class}} \qquad \text{class}\in \text{{Positive, Negative}}$$
+$$ P\left(w_i \mid class \right) = \frac{freq\left(wi,class \right)}{N_{class}} \quad \text{class}\in \text{{Positive, Negative}}$$
 
 However, if a word does not appear in the training, then it automatically gets a probability of 0, to fix this we add smoothing as follows
 
@@ -171,7 +171,7 @@ $$ P\left(w_i \mid class \right) = \frac{freq\left(wi,class \right) + 1}{N_{clas
 
 Note that we added all in the numerator, and since there are V words to normalize, we add V in the denominator. where 
 
-$$N_{class}$$: frequency of all words in class$$<br/>
+$$N_{class}$$: frequency of all words in class<br/>
 $$V$$: number of unique words in vocabulary
 
 
