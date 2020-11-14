@@ -163,7 +163,7 @@ Once you have the probabilities, you can compute the likelihood score as follows
 
 We usually compute the probability of a word given a class as follows:
 
-$$ P\left(w_i \mid class \right) = \frac{freq\left(wi,class \right)}{N_{class}} \quad \text{class}\in \text{{Positive, Negative}}$$
+$$ P\left(w_i \mid class \right) = \frac{freq\left(wi,class \right)}{N_{class}} \quad \text{class} \in \text{\{Positive, Negative\}}$$
 
 However, if a word does not appear in the training, then it automatically gets a probability of 0, to fix this we add smoothing as follows
 
