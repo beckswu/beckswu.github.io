@@ -109,7 +109,7 @@ $$x^{\left( i \right)} $$ is i-th tweet
 
 $$P\left( y \mid x^{\left( i \right)}, \theta \right) = h \left(x^{\left( i \right)}, \theta \right)^{y^\left( i \right)} \left( 1-  h \left(x^{\left( i \right)}, \theta \right) \right)^{\left( 1- y^\left( i \right) \right)} $$
 
-when y = 1, you get $$h \left(x^{\left( i \right)}, \theta \right)$$, when y = 0, you get $$ \left( 1-  h \left(x^{\left( i \right)}, \theta \right) \right) $$. In either case, you want to maximize $$ h \left(x^{\left( i \right)}, \theta \right)$$ clsoe to 1. when y = 0, you want $$ \left( 1-  h \left(x^{\left( i \right)}, \theta \right) $$ to be 0  as $$ h \left(x^{\left( i \right)}, \theta \right)$$ close to 1, when y = 1, you want $$ h \left(x^{\left( i \right)}, \theta \right) = 1$$
+when y = 1, you get $$h \left(x^{\left( i \right)}, \theta \right)$$, when y = 0, you get $$ \left( 1-  h \left(x^{\left( i \right)}, \theta \right) \right) $$. In either case, you want to maximize $$ h \left(x^{\left( i \right)}, \theta \right)$$ clsoe to 1. when y = 0, you want $$ \left( 1-  h \left(x^{\left( i \right)}, \theta \right) \right)  $$ to be 0  as $$ h \left(x^{\left( i \right)}, \theta \right)$$ close to 1, when y = 1, you want $$ h \left(x^{\left( i \right)}, \theta \right) = 1$$
 
 Define the likelihood as 
 
@@ -126,3 +126,94 @@ $$L\left(  \theta \right) = \prod_{i=1}^{m}  h \left(\theta, x^{\left( i \right)
 ![](/img/post/Natural-Language-Processing/course1/week1pic16.png)
 
 ![](/img/post/Natural-Language-Processing/course1/week1pic17.png)
+
+
+#### Week2 Naive Bayes
+
+Tweet <span style="color:red">defined either positive or negative, cannot be both</span>. Bayes' rule is based on the mathmatical formulation of conditional probabilities. <span style="background-color: #FFFF00">Called **Naive** because make assumpton that the **features you're using for classification are all independent**, which in reality is rare</span>
+
+$$ P\left(X \mid Y \right) = \frac{ P\left(Y \mid X \right) P\left(X \right)}{P\left(Y \right)} $$
+
+e.g. Happy sometimes as positive word sometimes as negative, A the number of positive tweet, B the number tweet contain happy
+
+![](/img/post/Natural-Language-Processing/course1/week2pic1.png)
+
+$$ P\left(Positive \mid happy \right) = \frac{ P\left(Positive \cap happy \right)}{P\left(happy \right)} $$
+$$ P\left(happy \mid Positive \right) = \frac{ P\left(Positive \cap happy \right)}{P\left(Positive \right)} $$
+$$ P\left(Positive \mid happy \right) =  P\left(happy \mid Positive \right) \frac{ P\left(Positive \right)}{P\left(happy \right)} $$
+
+![](/img/post/Natural-Language-Processing/course1/week2pic2.png)
+
+- Word with equal probability for positive/negative don't add anything to the sentiment (e.g. I, am, learning, NLP) 
+- "sad, happy, not" have a significant difference between probabilities. 
+- "because" negative class is zero, no way of comparing between two corpora, a problem
+
+![](/img/post/Natural-Language-Processing/course1/week2pic3.png)
+
+
+Once you have the probabilities, you can compute the likelihood score as follows. A score greater than 1 indicates that the class is positive, otherwise it is negative.
+
+
+![](/img/post/Natural-Language-Processing/course1/week2pic4.png)
+
+
+**Laplacian Smoothing**
+
+We usually compute the probability of a word given a class as follows:
+
+$$ P\left(w_i \mid class \right) = \frac{freq\left(wi,class \right)}{N_{class}} \qquad \text{class}\in \text{{Positive, Negative}}$$
+
+However, if a word does not appear in the training, then it automatically gets a probability of 0, to fix this we add smoothing as follows
+
+$$ P\left(w_i \mid class \right) = \frac{freq\left(wi,class \right) + 1}{N_{class} + V}$$
+
+Note that we added all in the numerator, and since there are V words to normalize, we add V in the denominator. where 
+
+$$N_{class}$$: frequency of all words in class$$<br/>
+$$V$$: number of unique words in vocabulary
+
+
+![](/img/post/Natural-Language-Processing/course1/week2pic5.png)
+
+**Log Likelihood**
+
+![](/img/post/Natural-Language-Processing/course1/week2pic6.png)
+
+
+To compute the log likelihood, we need to get the ratios and use them to compute a score that will allow us to decide whether a tweet is positive or negative.  <span style="background-color: #FFFF00">The higher the ratio, the more positive the word is</span>. To do inference, you can compute the following:
+
+
+
+$$ \frac{P\left(pos\right)}{P\left(neg\right)} \prod_{i=1}^m \frac{P\left(w_i \mid pos\right)}{P\left(w_i \mid neg\right)} > 1 $$
+
+
+
+m gets larger, we can get numerical flow issues, hard to store on device , so we introduce the 
+
+$$ log\left( \frac{P\left(pos\right)}{P\left(neg\right)} \prod_{i=1}^m \frac{P\left(w_i \mid pos\right)}{P\left(w_i \mid neg\right)} \right) =>  \underbrace{log\frac{P\left(pos\right)}{P\left(neg\right)}}_{\text{log prior}} + \underbrace{\sum_{i=1}^m \frac{P\left(w_i \mid pos\right)}{P\left(w_i \mid neg\right)}}_{\text{log likelihood}}  $$
+ 
+ 
+log prior is important for unbalanced dataset. We further introduce λ as follows:
+
+![](/img/post/Natural-Language-Processing/course1/week2pic7.png)
+
+The positive value indicates tweet is positive. Negative value indicates tweet is negative
+
+![](/img/post/Natural-Language-Processing/course1/week2pic8.png)
+
+**Training Naive Bayes**
+
+1. collect and annotate corpus: divide tweets into two groups, positive/negative
+2. Preprocess the tweets: process_tweet(tweet) ➞ [w1, w2, w3, ...]:
+   - Lowercase
+   - Remove punctuation, urls, names
+   - Remove stop words
+   - Stemming
+   - Tokenize sentences
+3. Compute freq(w, class), use below table to compute
+4. Get $$P\left(w \mid  pos \right), P\left(w \mid neg \right)$$ using Laplacian Smoothing formula
+5. Get $$\lambda\left( w \right) =  log \frac{P\left( w \mid pos \right)}{P\left( w \mid neg \right)}
+6. Compute $$logprior = log \frac{D_{pos}}{D_{neg}} $$ where $$ D_{pos} $$ and $$D_{neg}$$ coorespond to  the bumber of positive and negative documents respectively
+
+
+![](/img/post/Natural-Language-Processing/course1/week2pic9.png)
