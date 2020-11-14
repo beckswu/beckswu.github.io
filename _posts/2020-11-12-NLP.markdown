@@ -117,3 +117,12 @@ $$L\left(  \theta \right) = \prod_{i=1}^{m}  h \left(\theta, x^{\left( i \right)
 
 
 ![](/img/post/Natural-Language-Processing/course1/week1pic14.png)
+
+
+**Gradient Descent Derivation**
+
+![](/img/post/Natural-Language-Processing/course1/week1pic15.png)
+
+![](/img/post/Natural-Language-Processing/course1/week1pic16.png)
+
+![](/img/post/Natural-Language-Processing/course1/week1pic17.png)
