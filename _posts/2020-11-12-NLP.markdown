@@ -144,6 +144,9 @@ $$ P\left(happy \mid Positive \right) = \frac{ P\left(Positive \cap happy \right
 
 $$ P\left(Positive \mid happy \right) =  P\left(happy \mid Positive \right) \frac{ P\left(Positive \right)}{P\left(happy \right)} $$
 
+Q: Suppose that in your dataset, 25% of the positive tweets contain the word ‘happy’. You also know that a total of 13% of the tweets in your dataset contain the word 'happy', and that 40% of the total number of tweets are positive. You observe the tweet: ''happy to learn NLP'. What is the probability that this tweet is positive? <br/>
+A: 0.77
+
 ![](/img/post/Natural-Language-Processing/course1/week2pic2.png)
 
 - Word with equal probability for positive/negative don't add anything to the sentiment (e.g. I, am, learning, NLP) 
@@ -192,10 +195,10 @@ $$ \frac{P\left(pos\right)}{P\left(neg\right)} \prod_{i=1}^m \frac{P\left(w_i \m
 
 m gets larger, we can get numerical flow issues, hard to store on device , so we introduce the 
 
-$$ log\left( \frac{P\left(pos\right)}{P\left(neg\right)} \prod_{i=1}^m \frac{P\left(w_i \mid pos\right)}{P\left(w_i \mid neg\right)} \right) =>  \underbrace{log\frac{P\left(pos\right)}{P\left(neg\right)}}_{\text{log prior}} + \underbrace{\sum_{i=1}^m \frac{P\left(w_i \mid pos\right)}{P\left(w_i \mid neg\right)}}_{\text{log likelihood}}  $$
+$$ log\left( \frac{P\left(pos\right)}{P\left(neg\right)} \prod_{i=1}^m \frac{P\left(w_i \mid pos\right)}{P\left(w_i \mid neg\right)} \right) =>  \underbrace{log\frac{P\left(pos\right)}{P\left(neg\right)}}_{\text{log prior}} + \underbrace{\sum_{i=1}^m log \frac{P\left(w_i \mid pos\right)}{P\left(w_i \mid neg\right)}}_{\text{log likelihood}}  $$
  
  
-log prior is important for unbalanced dataset. We further introduce λ as follows:
+<span style="background-color: #FFFF00">log prior is important for unbalanced dataset</span>. We further introduce λ as follows:
 
 ![](/img/post/Natural-Language-Processing/course1/week2pic7.png)
 
@@ -219,3 +222,48 @@ log prior is important for unbalanced dataset. We further introduce λ as follow
 
 
 ![](/img/post/Natural-Language-Processing/course1/week2pic9.png)
+
+
+**Testing Naive Bayes**
+
+if a word not in vocabulary, think as neutral, not contribute to score
+
+![](/img/post/Natural-Language-Processing/course1/week2pic10.png)
+
+$$\text{Accuracy} \rightarrow \frac{1}{m} \sum_{i=1}^{m} {pred_i == Y_{val}} $$
+
+
+**Naive Bayes Application**
+
+There are many applications of naive Bayes including:
+
+- Author identification: document written by which author, calculate $$\lambda$$ for each word for both author to build vocabulary
+- Spam filtering: $$\frac{P\left(spam \mid email \right)}{P\left(nnspam \mid email \right)}$$
+- Information retrieval: filter relevant and irrelevant documents in a database, calculate the likelihood of the documents given the query, retrieve document if $$P\left(document_k \mid query \right) \apprx \prod_{i=0}^{\mid query \mid} P\left(query_i \mid document_k  \right) > threshold$$
+- Word disambiguation: e.g. don't know bank in reading, refer to river or money? to calculate the score of the document, $$\frac{P\left(river \mid text\right)}{P\left(money \mid text\right)}$$. if refer to river not money, score is bigger than 1. 
+
+
+**Naive Bayes Assummtion**
+
+<span style="background-color: #FFFF00">Advantage: simple doesn't require setting any custom parameters</span>.
+
+Assumption:
+
+1. <span style="background-color: #FFFF00">Indepdence between predictors or features associated with each class</span>
+  - assume word in a piece of text are independent. e.g. "It is sunny and hot in the Sahara desert." But "sunny" and "hot" often appear together. And together often related to beach or desert. Not always independent 
+  - under or over estimate conditional probabilities of individual words
+  - e.g. "It's always cold and snowy in ___" naive model will assign equal weight to the words "spring, summer, fall, winter".
+2. Relative frequencies in corpus: <span style="background-color: #FFFF00">rely on distribution on training dataset</span>
+   - A good dataset contain the same proportion of positive and negative weets as a random sample. But in reality positive tweet is more common(because negative tweets maybe muted or banned by twitter). This would result a very optimistic or pessimistic model
+
+
+**Error Analysis**
+
+1. Semantic meaning lost in the pre-processing step by removing punctuation and stop words
+   - "My beloved grandmother :(", with punctuation indicating a sad face, after process, [belov, grandmoth], positive tweet
+   - "This is not good, because your attitude is not even close to being nice." if remove neutral word, [good, attitude, close, nice] positive
+2. Word order affect meaning
+   - "I am happy because I did not go." vs. "I am not happy because I did go."
+3. Adversarial attack: some quirks of languages come naturally to human but confuse Naive Bayes model
+   - some common language phenomenon, Sarcasm, Irony and Euphemisms.
+   - e.g. "This is a ridiculously powerful movie. The plot was gripping and I cried right through until the ending" positive. After process. [ridicul, power, movi, plot, grip, cry, end] negative
