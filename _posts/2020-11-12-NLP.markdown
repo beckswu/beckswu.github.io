@@ -12,6 +12,8 @@ tags:
     - 学习笔记
 ---
 
+<script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"> </script>
+
 ## Natural Language Processing with Classification and Vector Spaces
 
 #### Week1 Vocabulary & Feature Extraction
@@ -20,7 +22,7 @@ tags:
 
 - Represent Text as a vector. Check every word from vocabulary, if appear, note 1 else 0
 - Disadvantage: Large
-- Logistric regression learn **N+1** N is the size of vocabulary
+- Logistric regression learn **N+1** where N is the size of vocabulary
 - Build vocabulary: process one by one and get sets of lists of word
 
 
@@ -36,7 +38,7 @@ e.g. I am happy because I am learning NLP
 
 ![](/img/post/Natural-Language-Processing/course1/week1pic1.png)
 
-**Positive & Negative Frequencies**:
+**Positive & Negative Frequencies**: Build vocabulary, map word to frequencey
 
 ![](/img/post/Natural-Language-Processing/course1/week1pic2.png)
 
@@ -79,3 +81,39 @@ When preprocessing, you have to perform the following:
 matrix with m rows and three columns. Every row: the feature for each tweets
 
 ![](/img/post/Natural-Language-Processing/course1/week1pic11.png)
+
+
+**General Implementation**: 
+
+```python
+freqs = build_freqs(tweets,labels) #Build frequencies dictionary
+X = np.zeros((m,3)) #Initialize matrix X
+for i in range(m): #For every tweet
+    p_tweet = process_tweet(tweets[i]) #process tweet, include
+                                      # deleting stops, stemming, deleting URLS, and handles and lower cases
+    X[i, :] = extract_features(p_tweet, freqs) #Extract Features: 
+                                               #By summing up the positive and negative frequencies of the tweets
+                                               
+```
+
+**Logistic Regression**
+
+$$x^{\left( i \right)} $$ is i-th tweet
+
+![](/img/post/Natural-Language-Processing/course1/week1pic12.png)
+
+![](/img/post/Natural-Language-Processing/course1/week1pic13.png)
+
+
+**Logistic Cost Function Derivation**
+
+$$P\left( y \mid x^{\left( i \right)}, \theta \right) = h \left(x^{\left( i \right)}, \theta \right)^{y^\left( i \right)} \left( 1-  h \left(x^{\left( i \right)}, \theta \right) \right)^{\left( 1- y^\left( i \right) \right)} $$
+
+when y = 1, you get $$h \left(x^{\left( i \right)}, \theta \right)$$, when y = 0, you get $$ \left( 1-  h \left(x^{\left( i \right)}, \theta \right) \right) $$. In either case, you want to maximize $$ h \left(x^{\left( i \right)}, \theta \right)$$ clsoe to 1. when y = 0, you want $$ \left( 1-  h \left(x^{\left( i \right)}, \theta \right) $$ to be 0  as $$ h \left(x^{\left( i \right)}, \theta \right)$$ close to 1, when y = 1, you want $$ h \left(x^{\left( i \right)}, \theta \right) = 1$$
+
+Define the likelihood as 
+
+$$L\left(  \theta \right) = \prod_{i=1}^{m}  h \left(\theta, x^{\left( i \right)} \right)^{y^\left( i \right)} \left( 1-  h \left(\theta, x^{\left( i \right)} \right) \right)^{\left( 1- y^\left( i \right) \right)}   $$
+
+
+![](/img/post/Natural-Language-Processing/course1/week1pic14.png)
