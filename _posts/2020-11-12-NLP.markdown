@@ -168,7 +168,7 @@ We usually compute the probability of a word given a class as follows:
 
 $$ P\left(w_i \mid class \right) = \frac{freq\left(wi,class \right)}{N_{class}} \quad \text{class} \in \text{\{Positive, Negative\}}$$
 
-$$N_{positive}$$ is the number of positive labelled tweets, $$N_{negative}$$ is the number of negative labelled tweets,  $$N_{negative} + N_{positive} = N_{all} $$
+$$N_{positive}$$ is the total number of positive words, $$N_{negative}$$ is the number of negative words
 
 
 However, if a word does not appear in the training, then it automatically gets a probability of 0, to fix this we add smoothing as follows
