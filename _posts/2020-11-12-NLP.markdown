@@ -168,13 +168,18 @@ We usually compute the probability of a word given a class as follows:
 
 $$ P\left(w_i \mid class \right) = \frac{freq\left(wi,class \right)}{N_{class}} \quad \text{class} \in \text{\{Positive, Negative\}}$$
 
+$$N_{positive}$$ is the number of positive labelled tweets, $$N_{negative}$$ is the number of negative labelled tweets,  $$N_{negative} + N_{positive} = N_{all} $$
+
+
 However, if a word does not appear in the training, then it automatically gets a probability of 0, to fix this we add smoothing as follows
 
-$$ P\left(w_i \mid class \right) = \frac{freq\left(wi,class \right) + 1}{N_{class} + V}$$
+$$ P\left(w_i \mid positive \right) = \frac{freq\left(wi,positive \right) + 1}{N_{positive} + V}$$
+
+$$ P\left(w_i \mid negative \right) = \frac{freq\left(wi,negative \right) + 1}{N_{negative} + V}$$
 
 Note that we added all in the numerator, and since there are V words to normalize, we add V in the denominator. where 
 
-$$N_{class}$$: frequency of all words in class<br/>
+$$N_{class}$$: count of all words in class,  <span style="color:red">if appear more than once, count all</span><br/>
 $$V$$: number of unique words in vocabulary
 
 
@@ -193,10 +198,13 @@ $$ \frac{P\left(pos\right)}{P\left(neg\right)} \prod_{i=1}^m \frac{P\left(w_i \m
 
 
 
-m gets larger, we can get numerical flow issues, hard to store on device , so we introduce the 
+m gets larger, we can get numerical flow issues, hard to store on device , so we introduce the log, which gives you the following equation 
 
-$$ log\left( \frac{P\left(pos\right)}{P\left(neg\right)} \prod_{i=1}^m \frac{P\left(w_i \mid pos\right)}{P\left(w_i \mid neg\right)} \right) =>  \underbrace{log\frac{P\left(pos\right)}{P\left(neg\right)}}_{\text{log prior}} + \underbrace{\sum_{i=1}^m log \frac{P\left(w_i \mid pos\right)}{P\left(w_i \mid neg\right)}}_{\text{log likelihood}}  $$
+$$ log\left( \frac{P\left( D_{pos}\right)}{P\left(D_{neg}\right)} \prod_{i=1}^m \frac{P\left(w_i \mid pos\right)}{P\left(w_i \mid neg\right)} \right) =>  \underbrace{log\frac{P\left(D_{pos}\right)}{P\left(D_{neg}\right)}}_{\text{log prior}} + \underbrace{\sum_{i=1}^m log \frac{P\left(w_i \mid pos\right)}{P\left(w_i \mid neg\right)}}_{\text{log likelihood}} $$
+
+$$\text{where} \quad P\left(D_{pos}\right) = \frac{D_{pos}}{D},  P\left(D_{neg}\right) = \frac{D_{neg}}{D}$$
  
+ <span style="background-color: #FFFF00">where D is the total number of documents, $$D_{pos}$$ is the total number of positive tweets and $$D_{neg}$$ is the total number of negative tweets.</span> 注：与$$N_{pos}$$ 不同， $$N_{pos}$$ 是total number of all positive words
  
 <span style="background-color: #FFFF00">log prior is important for unbalanced dataset</span>. We further introduce λ as follows:
 
