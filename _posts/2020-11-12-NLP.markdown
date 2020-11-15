@@ -276,3 +276,80 @@ Assumption:
 3. Adversarial attack: some quirks of languages come naturally to human but confuse Naive Bayes model
    - some common language phenomenon, Sarcasm, Irony and Euphemisms.
    - e.g. "This is a ridiculously powerful movie. The plot was gripping and I cried right through until the ending" positive. After process. [ridicul, power, movi, plot, grip, cry, end] negative
+
+
+
+#### Week3 Vector Space
+
+e.g. "Where are you heading" vs "Where are you from" -> Different meaning 尽管前三个词一样<br/>
+e.g. "What is your age" vs "How old are you" -> Same meaning
+
+e.g. "You eat ceral from  a bowl" ceral and bowl are related <br/>
+e.g. "You can buy something and someone else sells it" second half sentence is dependent on the first half
+
+- Vector space: <span style="background-color: #FFFF00">identify the context around each word in the text to capture relative meaning, to represent words and documents as vector</span>
+- Vector space allow to identify sentence are similar even if they do not share the same words
+- Vector space allow to capture dependencies between words
+- application:
+  -  information extraction to answer questions in the style of who, what, where, how... 
+  -  machine translation
+  -  chatbots programming: 机器客服
+
+
+**Word by Word Design**
+
+number of times they <span style="background-color: #FFFF00">occur together within a certain **distance** k</span>
+
+
+ <span style="background-color: #FFFF00">Co-occurence matrix</span>: e.g. data =2, count how many appearance for  each word has distance smaller or euqal than 2
+
+
+![](/img/post/Natural-Language-Processing/course1/week3pic1.png)
+
+<span style="color:red">Word by word , get n entries, with n between 1 and size(vocabulary)</span>
+
+
+
+**Word by Document Design**
+
+number of times they <span style="background-color: #FFFF00">occur together within a certain **category** k</span>
+
+Divide corpus into different tops like Entertainment, Economy, Machine Learning. Below data appear 500 times in corpus related to Entertainment, 6620 times in documents related to Economy
+
+![](/img/post/Natural-Language-Processing/course1/week3pic2.png)
+
+![](/img/post/Natural-Language-Processing/course1/week3pic3.png)
+
+**Euclidean Distance**
+
+Euclidean Distance is the norm of the difference between vectors, straight line between points
+
+$$d\left( \vec{v}, \vec{w} \right) = \sqrt{\sum_{i=1}^n \left(v_i - w_i \right)^2 } \quad \rightarrow \quad \text{Norm of }  \left( \vec{v}, \vec{w} \right) $$
+
+![](/img/post/Natural-Language-Processing/course1/week3pic4.png)
+
+```python
+v = np.array([1,6,8])
+w = np.array([0,4,6])
+
+#Calculate the Eudlidean distance d 
+d = np.linalg.norm(v-w)
+```
+
+
+**Cosine Similarity**
+
+Problem with Euclidean distance:  Vector space where corpora are represented by occurrence of the words "disease" and "eggs". Argiculture and history corpus has a similar number of words. Suggests agriculture and history corpora are more similar than agriculture and food corpora
+
+- If the angle is small, cosine -> 1, if angle is big, cosine -> 0
+- <span style="background-color: #FFFF00">Advantage: Cosine similarity isn't biased by the size difference between the representations</span>
+
+![](/img/post/Natural-Language-Processing/course1/week3pic5.png)
+
+$$\begin{align} \hat{v} \cdot \hat{w} &= \Vert \hat{v} \Vert \Vert \hat{w} \Vert cos \left( \beta \right) \\  cos \left( \beta \right) &= \frac{\hat{v} \cdot \hat{w}}{\Vert \hat{v} \Vert \Vert \hat{w} \Vert}  \\ &= \frac{\left(20 \times 30\right) + \left(40 \times 20 \right)}{\sqrt{20^2 + 40^2} \times \sqrt{30^2 + 20^2}}\end{align}$$
+
+-  proportional to the similarity between the directions of the vectors that you are comparing. 
+-  the cosine similarity values between 0 and 1
+
+![](/img/post/Natural-Language-Processing/course1/week3pic6.png)
+
