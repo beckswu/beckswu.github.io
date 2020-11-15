@@ -168,7 +168,8 @@ We usually compute the probability of a word given a class as follows:
 
 $$ P\left(w_i \mid class \right) = \frac{freq\left(wi,class \right)}{N_{class}} \quad \text{class} \in \text{\{Positive, Negative\}}$$
 
-$$N_{positive}$$ is the total number of positive words, $$N_{negative}$$ is the number of negative words
+- $$freq_{positive}$$ and $$freq_{negative}$$  are the frequencies of that specific word in the positive or negative class. In other words, the positive frequency of a word is the number of times the word is counted with the label of 1.
+- $$N_{positive}$$ and $$N_{negative}$$  are the total number of positive and negative words for all documents (for all tweets), respectively.
 
 
 However, if a word does not appear in the training, then it automatically gets a probability of 0, to fix this we add smoothing as follows
@@ -179,8 +180,8 @@ $$ P\left(w_i \mid negative \right) = \frac{freq\left(wi,negative \right) + 1}{N
 
 Note that we added all in the numerator, and since there are V words to normalize, we add V in the denominator. where 
 
-$$N_{class}$$: count of all words in class,  <span style="color:red">if appear more than once, count all</span><br/>
-$$V$$: number of unique words in vocabulary
+
+<span style="color:red">$$V$$:  the number of unique words in the entire set of documents, for all classes, whether positive or negative.</span>
 
 
 ![](/img/post/Natural-Language-Processing/course1/week2pic5.png)
@@ -206,7 +207,7 @@ $$\text{where} \quad P\left(D_{pos}\right) = \frac{D_{pos}}{D},  P\left(D_{neg}\
  
  <span style="background-color: #FFFF00">where D is the total number of documents, $$D_{pos}$$ is the total number of positive tweets and $$D_{neg}$$ is the total number of negative tweets.</span> <span style="color:red">注：与$$N_{pos}$$ 不同， $$N_{pos}$$ 是total number of all positive words</span>
  
-<span style="background-color: #FFFF00">log prior is important for unbalanced dataset</span>. We further introduce λ as follows:
+<span style="background-color: #FFFF00">log prior represents the underlying probability in the target population that a tweet is positive versus negative.  important for unbalanced dataset</span>. We further introduce λ as follows:
 
 ![](/img/post/Natural-Language-Processing/course1/week2pic7.png)
 
