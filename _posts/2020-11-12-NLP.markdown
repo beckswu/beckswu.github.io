@@ -204,7 +204,7 @@ $$ log\left( \frac{P\left( D_{pos}\right)}{P\left(D_{neg}\right)} \prod_{i=1}^m 
 
 $$\text{where} \quad P\left(D_{pos}\right) = \frac{D_{pos}}{D},  P\left(D_{neg}\right) = \frac{D_{neg}}{D}$$
  
- <span style="background-color: #FFFF00">where D is the total number of documents, $$D_{pos}$$ is the total number of positive tweets and $$D_{neg}$$ is the total number of negative tweets.</span> 注：与$$N_{pos}$$ 不同， $$N_{pos}$$ 是total number of all positive words
+ <span style="background-color: #FFFF00">where D is the total number of documents, $$D_{pos}$$ is the total number of positive tweets and $$D_{neg}$$ is the total number of negative tweets.</span> <span style="color:red">注：与$$N_{pos}$$ 不同， $$N_{pos}$$ 是total number of all positive words</span>
  
 <span style="background-color: #FFFF00">log prior is important for unbalanced dataset</span>. We further introduce λ as follows:
 
@@ -259,7 +259,7 @@ Assumption:
 
 1. <span style="background-color: #FFFF00">Indepdence between predictors or features associated with each class</span>
   - assume word in a piece of text are independent. e.g. "It is sunny and hot in the Sahara desert." But "sunny" and "hot" often appear together. And together often related to beach or desert. Not always independent 
-  - under or over estimate conditional probabilities of individual words
+  - <span style="color:red">Under or over estimate conditional probabilities of individual words</span>
   - e.g. "It's always cold and snowy in ___" naive model will assign equal weight to the words "spring, summer, fall, winter".
 2. Relative frequencies in corpus: <span style="background-color: #FFFF00">rely on distribution on training dataset</span>
    - A good dataset contain the same proportion of positive and negative weets as a random sample. But in reality positive tweet is more common(because negative tweets maybe muted or banned by twitter). This would result a very optimistic or pessimistic model
