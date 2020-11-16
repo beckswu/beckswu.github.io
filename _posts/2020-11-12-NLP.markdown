@@ -287,7 +287,7 @@ e.g. "What is your age" vs "How old are you" -> Same meaning
 e.g. "You eat ceral from  a bowl" ceral and bowl are related <br/>
 e.g. "You can buy something and someone else sells it" second half sentence is dependent on the first half
 
-- Vector space: <span style="background-color: #FFFF00">identify the context around each word in the text to capture relative meaning, to represent words and documents as vector</span>
+- Vector space: <span style="background-color: #FFFF00">identify the context around each word  to capture relative meaning, to represent words and documents as vector</span>
 - Vector space allow to identify sentence are similar even if they do not share the same words
 - Vector space allow to capture dependencies between words
 - application:
@@ -340,10 +340,10 @@ d = np.linalg.norm(v-w)
 
 **Cosine Similarity**
 
-Problem with Euclidean distance:  Vector space where corpora are represented by occurrence of the words "disease" and "eggs". Agriculture and history corpus has a similar number of words. Suggests agriculture and history corpora are more similar than agriculture and food corpora
+Problem with Euclidean distance:  Vector space where corpora are represented by occurrence of the words "disease" and "eggs". Because Agriculture and history corpus has a similar number of words(出现单词数量一样), Suggests agriculture and history 比 agriculture and food 更想近义
 
-- if A and B are identical, you will get ```cos\left( \theta \right)=1```
-- If you get ```cos\left( \theta \right)=0```, that means that they are orthogonal (or perpendicular).
+- if A and B are identical, you will get $$cos\left( \theta \right)=1$$
+- If you get $$cos\left( \theta \right)=0$$, that means that they are orthogonal (or perpendicular).
 - Numbers between 0 and 1 indicate a similarity score.
 - Numbers between -1-0 indicate a dissimilarity score.
 - <span style="background-color: #FFFF00">Advantage: Cosine similarity isn't biased by the size difference between the representations</span>
@@ -361,10 +361,10 @@ $$\begin{align} \hat{v} \cdot \hat{w} &= \Vert \hat{v} \Vert \Vert \hat{w} \Vert
 
 - PCA: dimenison reduction from high dimension to fewer dimension. project data into a lower dimension while retaining as much information as possible
 - Original Space -> Uncorrelated features -> Dimension Reduction
-- Visualization to check if PCA capure relationship among words
-- <span style="color:red">**Eigenvector**</span>: directions of uncorrelated features for your data
-- <span style="color:red">**Eigenvalue**</span>: amount of information retained by each feature(variances of data in each of those new features)
-- <span style="color:red">**Dot Product**</span>: gives the projection on uncorrelated features
+- Can use visualization to check if PCA capure relationship among words
+- <span style="color:red">**Eigenvector**</span>: <span style="background-color: #FFFF00">directions</span> of uncorrelated features for your data
+- <span style="color:red">**Eigenvalue**</span>: amount of information retained by each feature(<span style="background-color: #FFFF00">variances</span> of data in each of those new features)
+- <span style="color:red">**Dot Product**</span>: gives the <span style="background-color: #FFFF00">projection</span> on uncorrelated features
 
 ![](/img/post/Natural-Language-Processing/course1/week3pic7.png)
 
