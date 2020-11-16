@@ -333,15 +333,19 @@ v = np.array([1,6,8])
 w = np.array([0,4,6])
 
 #Calculate the Eudlidean distance d 
+
 d = np.linalg.norm(v-w)
 ```
 
 
 **Cosine Similarity**
 
-Problem with Euclidean distance:  Vector space where corpora are represented by occurrence of the words "disease" and "eggs". Argiculture and history corpus has a similar number of words. Suggests agriculture and history corpora are more similar than agriculture and food corpora
+Problem with Euclidean distance:  Vector space where corpora are represented by occurrence of the words "disease" and "eggs". Agriculture and history corpus has a similar number of words. Suggests agriculture and history corpora are more similar than agriculture and food corpora
 
-- If the angle is small, cosine -> 1, if angle is big, cosine -> 0
+- if A and B are identical, you will get ```cos\left( \theta \right)=1```
+- If you get ```cos\left( \theta \right)=0```, that means that they are orthogonal (or perpendicular).
+- Numbers between 0 and 1 indicate a similarity score.
+- Numbers between -1-0 indicate a dissimilarity score.
 - <span style="background-color: #FFFF00">Advantage: Cosine similarity isn't biased by the size difference between the representations</span>
 
 ![](/img/post/Natural-Language-Processing/course1/week3pic5.png)
@@ -349,7 +353,7 @@ Problem with Euclidean distance:  Vector space where corpora are represented by 
 $$\begin{align} \hat{v} \cdot \hat{w} &= \Vert \hat{v} \Vert \Vert \hat{w} \Vert cos \left( \beta \right) \\  cos \left( \beta \right) &= \frac{\hat{v} \cdot \hat{w}}{\Vert \hat{v} \Vert \Vert \hat{w} \Vert}  \\ &= \frac{\left(20 \times 30\right) + \left(40 \times 20 \right)}{\sqrt{20^2 + 40^2} \times \sqrt{30^2 + 20^2}}\end{align}$$
 
 -  proportional to the similarity between the directions of the vectors that you are comparing. 
--  the cosine similarity values between 0 and 1
+-  the cosine similarity values between 0 and 1 for word by Word/Docs, cosine similarity values between -1 and 1 when using word embedding 
 
 ![](/img/post/Natural-Language-Processing/course1/week3pic6.png)
 
@@ -364,7 +368,7 @@ $$\begin{align} \hat{v} \cdot \hat{w} &= \Vert \hat{v} \Vert \Vert \hat{w} \Vert
 
 ![](/img/post/Natural-Language-Processing/course1/week3pic7.png)
 
-1. Mean Normalize Data  $$$$x_i = \frac{x_i - \mu_i}{\sigma_{x_{i}}}$$$$
+1. Mean Normalize Data  $$x_i = \frac{x_i - \mu_i}{\sigma_{x_{i}}}$$
 2. Get Covariance Matrix
 3. Perform Singular Value Decomposition to get set of three matrices(Eigenvectors on column wise, Eigenvalues on diagonal). <span style="background-color: #FFFF00"> Eigenvalues and eigenvectors should be organized according to the eigenvalues in descending order. Ensure to retain as much as information as possible </span>
 4. Project data to a new set of features, using the eigenvectors and eigenvalues in this steps
