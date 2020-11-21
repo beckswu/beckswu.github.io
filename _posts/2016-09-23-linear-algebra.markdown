@@ -28,7 +28,7 @@ Cosine: &nbsp;&nbsp;&nbsp; $$  \vec a \cdot \vec b  =  ||a|| ||b|| cos\theta  $$
 Sine: &nbsp;&nbsp;&nbsp; $$  \vec a \times \vec b  =  ||a|| ||b|| sin\theta  $$<br/>
 Cauchy Schwarz Inequality: &nbsp;&nbsp;&nbsp; $$  \mid \vec a \cdot \vec b \mid  <=  ||a||||b||  $$<br/>
 scaler projection: &nbsp;&nbsp;&nbsp; $$  \vec proj_{L} \left(\vec x\right) =   \frac{ \vec x \cdot \vec v  }{ ||\vec v|| } $$<br/>
-vector projection: &nbsp;&nbsp;&nbsp; $$  \vec proj_{L} \left(\vec x\right) =  c \vec v =  \frac{ \vec x \cdot \vec v  }{ \vec v \cdot \vec v } \vec v =  \frac{ \vec v \vec v^T  }{ \| \vec v \|^2 } \vec x =  $$<br/>
+vector projection: &nbsp;&nbsp;&nbsp; $$  \vec proj_{L} \left(\vec x\right) =  c \vec v =  \frac{ \vec x \cdot \vec v  }{ \vec v \cdot \vec v } \vec v =  \frac{ \vec v \vec v^T  }{ \| \vec v \|^2 } \vec x =  $$(project x on L, v is a vector on L)<br/>
 two vector $$  \vec  x $$ and $$  \vec y $$ are orthorgonal: &nbsp;&nbsp;&nbsp; $$  \vec  x \cdot \vec y  = 0 $$   <br/>
 (Optional) : $$  \vec a \times \left( \vec b \times \vec c \right)  =  \vec b \left(\vec a \cdot \vec c \right) - \vec c \left(\vec a \cdot \vec b \right)  $$
 
@@ -52,6 +52,30 @@ Basis is a set of n vectors that
 - span the space: <br/> 
    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; every (vector) $$\vec x$$ in V it is possible to choose $$ a_1, …, a_n \subseteq  F $$ such that $$ x = a_1 \vec v_1 + … + a_n \vec vn. $$
 - The space is then n-dimensional 
+
+
+Prove Dot Product:
+
+We know for a triangle, have $$c^2 = a^2 + b^2 - 2abcos\theta$$, so 
+
+$$\Vert \vec u - \vec x \Vert^2 = \Vert \vec u \Vert^2 + \Vert \vec v \Vert^2 - 2\Vert \vec u \Vert\Vert  \vec v\Vert cos\theta  $$
+
+$$\Vert \vec u \Vert^2 + \Vert \vec v \Vert^2 - 2 \vec u \cdot \vec v = \Vert \vec u \Vert^2 + \Vert \vec v \Vert^2 - 2\Vert \vec u \Vert\Vert \vec v\Vert cos\theta  $$
+
+$$\vec u \cdot \vec v =\Vert u \Vert\Vert v\Vert cos\theta  $$
+
+Projection Prove:
+
+$$\vec x$$ project on L is $$c\vec v$$, so triangle rule, 两个直角边垂直,
+
+$$ \left( \vec x - c \vec v \right) \cdot \vec v  = 0 $$
+
+$$ \vec x \cdot \vec v - c \vec v \cdot \vec v  = 0 $$
+
+$$ c = \frac{\vec x \cdot \vec v}{\vec v \cdot \vec v}  $$
+
+$$ \begin{align} proj_L \left( \vec x \right) = c \vec v &= \frac{\vec x \cdot \vec v}{\vec v \cdot \vec v}  \vec v =  \frac{\vec x \cdot \vec v}{\vert \vec v \vert^2}  \vec v \\ &=  \frac{ \vec v \left(\vec v \cdot \vec x \right)}{\vert \vec v \vert^2} =  \frac{ \vec v \vec v^T \vec x }{\vert \vec v \vert^2} \\ &=  \frac{ \vec v \vec v^T }{\vert \vec v \vert^2}  \vec x     \end{align}$$
+
 
 ## Inverse
 
