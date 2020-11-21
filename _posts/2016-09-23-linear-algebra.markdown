@@ -44,14 +44,7 @@ Cross product 还可以算平行四边形的面积
 
 求basis的coordinate的时，若basis vector orthogonal to each other, 可以用scaler projection, 看$$  \vec x$$到$$  \vec v_i$$的projection $$ \frac{ \vec x \cdot \vec v  }{ \|\vec v\|^2 } $$ 即是coordinate
 
-## Basis
 
-Basis is a set of n vectors that 
-- are not linear combinations of each other (linear independent): <br/>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; for all $$ a_1, …, a_n \subseteq F $$, if $$ a_1v_1 + … + a_nv_n = 0 $$, then necessarily  $$ a_1 = … = a_n = 0;  $$
-- span the space: <br/> 
-   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; every (vector) $$\vec x$$ in V it is possible to choose $$ a_1, …, a_n \subseteq  F $$ such that $$ x = a_1 \vec v_1 + … + a_n \vec vn. $$
-- The space is then n-dimensional 
 
 
 Prove Dot Product:
@@ -75,6 +68,16 @@ $$ \vec x \cdot \vec v - c \vec v \cdot \vec v  = 0 $$
 $$ c = \frac{\vec x \cdot \vec v}{\vec v \cdot \vec v}  $$
 
 $$ \begin{align} proj_L \left( \vec x \right) = c \vec v &= \frac{\vec x \cdot \vec v}{\vec v \cdot \vec v}  \vec v =  \frac{\vec x \cdot \vec v}{\vert \vec v \vert^2}  \vec v \\ &=  \frac{ \vec v \left(\vec v \cdot \vec x \right)}{\vert \vec v \vert^2} =  \frac{ \vec v \vec v^T \vec x }{\vert \vec v \vert^2} \\ &=  \frac{ \vec v \vec v^T }{\vert \vec v \vert^2}  \vec x     \end{align}$$
+
+
+## Basis
+
+Basis is a set of n vectors that 
+- are not linear combinations of each other (linear independent): <br/>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; for all $$ a_1, …, a_n \subseteq F $$, if $$ a_1v_1 + … + a_nv_n = 0 $$, then necessarily  $$ a_1 = … = a_n = 0;  $$
+- span the space: <br/> 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; every (vector) $$\vec x$$ in V it is possible to choose $$ a_1, …, a_n \subseteq  F $$ such that $$ x = a_1 \vec v_1 + … + a_n \vec vn. $$
+- The space is then n-dimensional 
 
 
 ## Inverse
@@ -310,12 +313,12 @@ properties:
     prove: $$ A^T A = \begin{bmatrix} -- \vec v_1^T -- \\  --\vec v_2^T-- \\ --\vdots-- \\ --\vec v_k^T-- \end{bmatrix}  \begin{bmatrix} \mid &\mid &\cdots &\mid \\  \vec v_1 & \vec v_2 & \cdots  &\vec v_k \\ \mid &\mid &\cdots &\mid \end{bmatrix} =  \begin{bmatrix} 1 & 0 &\cdots & 0 \\  0 & 1 & \cdots & 0  \\ \vdots &  \vdots & \ddots & \vdots \\ 0 & 0 & \cdots & 1 \end{bmatrix}  $$
 5. __Left Invertible__: A is n by n matrix whose columns form an orthonormal set, then $$A^{-1} = A^T $$ (因为是 n by n, 所以是invertible)
 6. If orthonormal basis 组成的matrix A,  then $$Proj_v \vec x = A \left( A^T A \right)^{-1} A \vec x = A A^T \vec x $$
-7. If orthonormal basis 组成的matrix A, then when do transformation, it will preserve length and angle for transformation. It aslo preserve inner product. prove: 
+7. If orthonormal basis 组成的matrix A, then when do transformation, it will preserve length and angle for transformation. It aslo preserve inner product. prove: (Diagonal matrix determinant is the product of all diagonal)
 
 
    $$ \| C \vec x \|^2 = C\vec x \cdot C \vec x = \left( C\vec x \right)^T C \vec x = \vec x^T C^T C \vec x =\vec x^T \vec x =  \| C \vec x \|   $$ 
 
-   $$cos\theta =  \frac{ C\vec w \cdot C \vec v }{ \| C\vec v \| \| C\vec v \| } =  \frac{ \left(C\vec w \right)^T C \vec v }{ \| \vec v \| \| \vec v \| } =  \frac{ \vec w^T C^T C \vec v }{ \| \vec v \| \| \vec v \| }  = \frac{ \vec w^T \vec v }{ \| \vec v \| \| \vec v \| } $$
+   $$cos\theta =  \frac{ C\vec w \cdot C \vec v }{ \| C\vec w \| \| C\vec v \| } =  \frac{ \left(C\vec w \right)^T C \vec v }{ \| \vec w \| \| \vec v \| } =  \frac{ \vec w^T C^T C \vec v }{ \| \vec w \| \| \vec v \| }  = \frac{ \vec w^T \vec v }{ \| \vec w \| \| \vec v \| } $$
 
   $$ \left( A x \right)^T \left(A y \right) = x^T A^T A y = x^T y  $$ 
 
@@ -450,7 +453,7 @@ Remark:
 properties: 
 - $$A^2$$has the same eigenvectors in X and squared eigenvalues in $$\Lambda^2$$, $$A^2 = X \Lambda X^{-1} \space X \Lambda X^{-1} = X \Lambda^2 X^{-1} $$
 - Power of A: $$A^k = X \Lambda X^{-1} \space X \Lambda X^{-1} \cdots X \Lambda X^{-1}  = X \Lambda^k X^{-1} $$
-- Matrix X has inverse, beacuse coumns were assumed to be linearly independent. <span style="color: red">Without n independent eigenvectors, we can't diagonalize</span>
+- Matrix X has inverse, beacuse columns were assumed to be linearly independent. <span style="color: red">Without n independent eigenvectors, we can't diagonalize</span>
 - <span style="background-color: #FFFF00">$$A$$ and $$\Lambda$$ have the same eigenvalues $$\lambda_1, \lambda_2, \cdots, \lambda_n$$</span>, The eigenvectors are different.
     - Suppose the eigenvalues $$\lambda_1, \cdots, \lambda_n$$ are all <span style="color: red">different</span>. Then it is automatic that the eigenvectors $$x_1,\cdots, x_n$$ are <span style="color: red">independent</span>. <span style="color: red">The eigenvector matrix X will be invertile</span>. 
     - All the matrices $$A = B^{-1}CB $$ are *similar*. <span style="background-color: #FFFF00">They all share the eigenvalues of C</span>
