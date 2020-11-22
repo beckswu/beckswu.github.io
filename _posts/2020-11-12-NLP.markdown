@@ -378,3 +378,69 @@ $$\begin{align} \hat{v} \cdot \hat{w} &= \Vert \hat{v} \Vert \Vert \hat{w} \Vert
 
 ![](/img/post/Natural-Language-Processing/course1/week3pic9.png)
 
+
+
+#### Week4 Transforming word vectors
+
+Translate word: caculate word embedding in English and French, transform word embedding in English to French and find the most similar one
+
+![](/img/post/Natural-Language-Processing/course1/week4pic1.png)
+
+R: transform matrix, X: English word, Y: French word.  First get subsets of English word and French equivalence
+
+![](/img/post/Natural-Language-Processing/course1/week4pic2.png)
+
+<span style="color:red">Why not store all vocabulary?</span>: just need a subset to collect to find transform matrix. If it works well, then model can translate words that are not in vocabulary
+
+**Solving for R**:
+
+$$ \begin{align} \color{olive}{\text{Initialize R}}\quad & \\
+ \color{blue}{\text{in a loop:}}\quad & \\ 
+ & Loss = \Vert XR - Y \Vert_F  \qquad   \color{fuchsia}{\text{Frobenium Norm}} \\
+ & g = \frac{d}{dR} Loss \qquad   \color{fuchsia}{\text{gradient R}}  \\
+ & R = R - \alpha g \qquad \quad   \color{fuchsia}{\text{update}} 
+\end{align} $$ 
+
+
+Can pick a fixed number of times to go through the loop or check the loss at each iteration and break out loop when loss falls between a certain threshold.
+
+
+**Frobenius norm**
+
+
+$$ \Vert A \Vert_F = \sqrt{\sum_{i=1}^m \sum_{j=1}^n \vert a_{ij}\vert^2 } $$ 
+
+e.g. has two word embedding and dimension is two, the matrix is 2x2
+
+$$ A = \begin{pmatrix}
+    2 & 2\\
+    2 & 2\\
+  \end{pmatrix}$$
+
+$$  \Vert A \Vert_F = \sqrt{2^2 + 2^2 + 2^2 + 2^2} = 4 $$
+
+```python
+A = np.array([[2,2,],
+              [2,2,]])
+A_squared = np.square(A)
+print(A_squared)  # array([[4,4,],
+                  #        [4,4,]])
+
+A_Frobenious = np.sqrt(np.sum(A_squared))
+```
+
+**Frobenius norm squared**
+
+can cancel the square root by taking the square
+
+$$\Vert XR - Y \Vert_F^2 $$
+
+so the gradient will be: 
+
+**Gradient**
+
+Easier to take derivative rather than dealing with the square root in Frobenius norm
+
+$$  Loss = \Vert XR - Y \Vert_F^2  $$
+
+$$  g = \frac{d}{dR}Loss = \frac{2}{m} X^T \left( XR - Y  \right) $$
