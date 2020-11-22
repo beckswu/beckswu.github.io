@@ -430,6 +430,7 @@ A = np.array([[2,2,],
               [2,2,]])
 A_squared = np.square(A)
 print(A_squared)  # array([[4,4,],
+
                   #        [4,4,]])
 
 A_Frobenious = np.sqrt(np.sum(A_squared))
@@ -533,6 +534,15 @@ v = np.array([[2,2,]])
 num_planes_matrix = side_of_plane_matrix(random_planes_matrix, v)
 ```
 
+
 Text can be embedded into vector space so that nearest neighbors refer to text with similar meaning
 
 ![](/img/post/Natural-Language-Processing/course1/week4pic8.png)
+
+
+
+## Natural Language Processing with Probabilistic Models
+
+#### Week1 Autocorrect and Minimum Edit Distance
+
+AutoCorrect: Change misspell word to correct one
