@@ -405,6 +405,12 @@ $$ \begin{align} \color{olive}{\text{Initialize R}}\quad & \\
 Can pick a fixed number of times to go through the loop or check the loss at each iteration and break out loop when loss falls between a certain threshold.
 
 
+<span style="background-color: #FFFF00">Explanation for fixed number of iterations iterating until the loss falls below a threshold.</span>
+
+- You cannot rely on training loss getting low -- what you really want is the validation loss to go down, or validation accuracy to go up. And indeed - in some cases people train until validation accuracy reaches a threshold, or -- commonly known as "early stopping" -- until the validation accuracy starts to go down, which is a sign of over-fitting.
+- Why not always do "early stopping"? Well, mostly because well-regularized models on larger data-sets never stop improving. Especially in NLP, you can often continue training for months and the model will continue getting slightly and slightly better. This is also the reason why it's hard to just stop at a threshold -- unless there's an external customer setting the threshold, why stop, where do you put the threshold?
+- Stopping after a certain number of steps has the advantage that you know how long your training will take - so you can keep some sanity and not train for months. You can then try to get the best performance within this time budget. Another advantage is that you can fix your learning rate schedule -- e.g., lower the learning rate at 10% before finish, and then again more at 1% before finishing. Such learning rate schedules help a lot, but are harder to do if you don't know how long you're training.
+
 **Frobenius norm**
 
 
@@ -431,9 +437,16 @@ A_Frobenious = np.sqrt(np.sum(A_squared))
 
 **Frobenius norm squared**
 
-can cancel the square root by taking the square
+$$\frac{1}{m} \Vert XR - Y \Vert_F^2 $$
 
-$$\Vert XR - Y \Vert_F^2 $$
+- The norm is always nonnegative (we're summing up absolute values), and so is the square.
+- When we take the square of all non-negative (positive or zero) numbers, the order of the data is preserved. For example, if 3 > 2, 3^2 > 2^2
+- Using the norm or squared norm in gradient descent <span style="color:red">results in the same location of the minimum</span>.
+- Squaring cancels the square root in the Frobenius norm formula. Because of the chain rule, we would have to do more calculations if we had a square root in our expression for summation.
+- Dividing the function value by the positive number doesn't change the optimum of the function, for the same reason as described above.
+- divide by m: We're interested in transforming English embedding into the French. Thus, it is more important to measure average loss per embedding than the loss for the entire dictionary (which increases as the number of words in the dictionary increases).
+
+
 
 so the gradient will be: 
 
@@ -444,3 +457,82 @@ Easier to take derivative rather than dealing with the square root in Frobenius 
 $$  Loss = \Vert XR - Y \Vert_F^2  $$
 
 $$  g = \frac{d}{dR}Loss = \frac{2}{m} X^T \left( XR - Y  \right) $$
+
+
+
+**Locality Sensitive Hashing**
+
+<span style="background-color: #FFFF00">Reduce computational cost(much faster) to find K-nearest neighbor </span>is to use locality sensitive hashing. For example, using word vectors with just two dimensions. **plan** can helps bucket vectors into subsets based on localtion(蓝色点在蓝色plane 上方，灰色点在灰色plane上方)
+
+![](/img/post/Natural-Language-Processing/course1/week4pic3.png)
+
+normal vector: perpendicular to any vectors on the plane.
+
+![](/img/post/Natural-Language-Processing/course1/week4pic4.png)
+
+If dot product positive, it's on one side of the plane. If dot product negative, it's on opposite side of the plane. If dot product is zero, it is on plane
+
+dot product of P and V1 is equal to the do length of P multiply V1 projection onto P
+
+![](/img/post/Natural-Language-Processing/course1/week4pic5.png)
+
+![](/img/post/Natural-Language-Processing/course1/week4pic6.png)
+
+```python
+def side_of_plane(P,v):
+  dotprodcut = np.dot(P,v.T)
+  sign_of_dot_product = np.sign(dotproduct)
+  sign_of_dot_prodcut_scalar = np.asscalar(sign_of_dot_product)
+  return sign_of_dot_prodcut_scalar
+```
+
+**Multiple Plane**
+
+To divide vector space into manageable regions, want to use more than one plane. Get multiple signal, one for each plane, but need a single hash value 
+
+
+![](/img/post/Natural-Language-Processing/course1/week4pic7.png)
+
+Rule: 
+
+$$  \color{maroon}{\text{sign_i} \geq 0, \rightarrow h_i = 1}  $$
+
+$$  \color{maroon}{\text{sign_i} < 0, \rightarrow h_i = 0 } $$
+
+$$  \mathbf{hash = \sum_i^H 2^i \times h_i} $$
+
+```python
+def hash_multiple_plane(P_l, v):
+    hash_value = 0
+    for i, P in enumerate(P_l):
+        sign = side_of_plane(P,v)
+        hash_i = 1 if sign >=0 else 0
+        hash_value += 2**i * hash_i
+    return hash_value
+```
+
+
+
+```python
+#Generate Random Plane
+
+num_dimensions = 2 
+num_planes = 3
+
+random_planes_matrix = np.random.normal(
+                       size = (num_planes,
+                               num_dimensions)) 
+#find out whether vector v is on positive or negative side of each planes
+
+def side_of_plane_matrix(P,v):
+  dotproduct = np.dot(P,v.T
+  sign_of_dot_product = np.sign(dotproduct)
+  return sign_of_dot_product
+
+v = np.array([[2,2,]])
+num_planes_matrix = side_of_plane_matrix(random_planes_matrix, v)
+```
+
+Text can be embedded into vector space so that nearest neighbors refer to text with similar meaning
+
+![](/img/post/Natural-Language-Processing/course1/week4pic8.png)
