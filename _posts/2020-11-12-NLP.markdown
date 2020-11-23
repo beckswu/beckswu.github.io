@@ -550,7 +550,7 @@ How it works?
 
 1. Identify a misspelled word(only spelling error, not contextual error(e.g. Happy birthday to deer friend))   - how ? if spelled correctly, it is in dictionary. if not, probably a misspelled word
 2. Find strings n edit distance way  e.g. deah vs dear
-   - Edit: an operation perfomed on a string to change it, insert, delete, switch (eta - > eat, eta -> tea, but not eta -> ate), replace
+   - Edit: an operation perfomed on a string to change it, including: insert, delete, switch (eta - > eat, eta -> tea, but not eta -> ate), replace
    - Autocorrect: n is usually 1 to 3 edits
 3. Filter candidates 
    - step 2 generate word if not in vocabulary, remove it. e.g. deah -> d_ar, if d_ar not in vocabulary remove it
@@ -563,3 +563,23 @@ Minimum distance application: spelling correction, document similarity, machine 
 Minimum edit distance(**Levenshtein distance**): insert(cost 1), delete(cost 1), <span style="background-color: #FFFF00">replace(cost 2, can think of delete then insert)</span>
 
 ![](/img/post/Natural-Language-Processing/course2/week1pic2.png)
+
+
+#### Week2 Part of Speech Tagging and Hidden Markov Models
+
+![](/img/post/Natural-Language-Processing/course2/week2pic1.png)
+
+[Meaning of Tag](https://www.ling.upenn.edu/courses/Fall_2003/ling001/penn_treebank_pos.html)
+
+Application: 
+
+- indentify entity: "Effel Tower is in Paris"  Effel Tower & Paris are entities
+- Co-reference resolution: "Effel Tower is in Paris, it is 324 meters high", speech tagging indentify it refer to Eiffel Tower
+- Speech Recognition: check if a sequence of word has a high probability or not
+
+
+**Markov chain**: type of stochastic model that describes a sequence of possible events. To get probability of each event, it needs only the states of the previous events. Stochastic means random or randomness. Markov chain can be depicted as <span style="background-color: #FFFF00">directed graph</span>. A state refers to a certain condition of the present moment.
+
+e.g. Why not learn ... (next is verb? or norm?) depends on previous word
+
+![](/img/post/Natural-Language-Processing/course2/week2pic2.png)
