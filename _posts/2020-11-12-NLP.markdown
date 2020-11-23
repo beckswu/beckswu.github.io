@@ -545,4 +545,21 @@ Text can be embedded into vector space so that nearest neighbors refer to text w
 
 #### Week1 Autocorrect and Minimum Edit Distance
 
-AutoCorrect: Change misspell word to correct one
+
+How it works?
+
+1. Identify a misspelled word(only spelling error, not contextual error(e.g. Happy birthday to deer friend))   - how ? if spelled correctly, it is in dictionary. if not, probably a misspelled word
+2. Find strings n edit distance way  e.g. deah vs dear
+   - Edit: an operation perfomed on a string to change it, insert, delete, switch (eta - > eat, eta -> tea, but not eta -> ate), replace
+   - Autocorrect: n is usually 1 to 3 edits
+3. Filter candidates 
+   - step 2 generate word if not in vocabulary, remove it. e.g. deah -> d_ar, if d_ar not in vocabulary remove it
+4. Calculate word probabilities
+
+![](/img/post/Natural-Language-Processing/course2/week1pic1.png)
+
+Minimum distance application: spelling correction, document similarity, machine translation, DNA sequencing etc
+
+Minimum edit distance(**Levenshtein distance**): insert(cost 1), delete(cost 1), <span style="background-color: #FFFF00">replace(cost 2, can think of delete then insert)</span>
+
+![](/img/post/Natural-Language-Processing/course2/week1pic2.png)
