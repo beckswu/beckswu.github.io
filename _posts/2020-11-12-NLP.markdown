@@ -758,7 +758,7 @@ $$C\left(w_1^2 w_3\right) = C\left(w_1 w_2 w_3 \right) \quad \text{a bigram foll
 
 $$ \text{Probabiity of N-gram} \quad P\left( w_N \mid w_1^{N-1} \right) = \frac{ C\left(w_1^{N-1} w_N\right)}{C\left(w_1^{N-1}\right)}$$
 
-![](/img/post/Natural-Language-Processing/course2/week2pic2.gif)
+![](/img/post/Natural-Language-Processing/course2/week3pic2.gif)
 
 $$ \text{Chain Rule} \quad P\left(A,B,C,D\right) = P\left(A \right)P\left(B \mid A \right)P\left( C \mid\ A,B \right)P\left(D\mid A, B, C \right)$$
 
@@ -781,3 +781,16 @@ $$P\left(the \ teacher \ drinks \ tea\right) \approx P\left(the \right)P\left(te
   - $$P\left( w_1^n \right) \approx P\left(w_1 \right)P\left(w_2 \mid w_1 \right)P ... P\left(w_n\mid w_{n-1} \right) $$: The first term of Bigram reiles on unigram probability of first word n sentence
 
 ![](/img/post/Natural-Language-Processing/course2/week3pic3.gif)
+
+
+**Start & End of Sentences**:
+
+Start: 
+
+- Problem: first word, you don't previous word, can't calculate bigram probability
+- Solution: add a special term ```<s>``` so can calculate the probabilities
+- For n-grams, first N words, don't have enough context, <span style="background-color: #FFFF00">add n-1 special term</span>
+
+
+End: 
+
