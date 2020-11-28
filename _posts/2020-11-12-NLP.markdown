@@ -700,3 +700,34 @@ e.g. 下面的例子,
 3. Algorithm stops as arrived at the start token
 
 ![](/img/post/Natural-Language-Processing/course2/week2pic18.gif)
+
+
+#### Week3 Autocomplete and Language Models
+
+Language model: calculate the probability of sentences
+
+- Estimate probability of word sequences. 
+- Estimate probability of a word following a sequence of words with most likely suggestions(**Autocomplete a sentence**) e.g. if you type, how are, e-mail application guess you
+
+Application:
+
+- Speech recognition:  P(I saw a van) > P(eyes awe of an)
+- Spelling correction
+- Augmentatitve communication: predict most likely word from menu for people unable to physically talk or sign
+  - Augmentative communication system: take a series of hand gestures from a user to help them form words and sentences
+
+
+**N-gram**: 
+
+- An N-gram: sequence of N words. Order matters
+- punctuation is treated as words. But all other special characters such as codes will be removed
+
+
+E.g. bigrams are all sets of two words that appear side by side in corpus. <span style="color:red">Notes: 下面例子, I am appear twice, 但是only include 一次在 bigram set</span>
+
+
+$$ \text{Corpus: I am happy because I am learning} $$
+
+$$ \text{Unigrams: \{I, am, happy, because,learning\}} $$
+
+$$ \text{Bigrams: \{I am, am happy, happy because,...\}},note: \color{red}{ \cancel{I happy} } $$
