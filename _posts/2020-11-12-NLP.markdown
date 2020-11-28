@@ -650,3 +650,53 @@ $$ C\left(t_i, w_i \right) $$ word_i 属于tag_i 出现的次数
 from 0 -> NN / VB has the same probability. But the emission probability of love is higher for VB. From love(VB) -> to(O), 没有其他的tag有emission probability of to
 
 ![](/img/post/Natural-Language-Processing/course2/week2pic15.gif)
+
+- Matrix C: hold ther intermediate optimal probabilities 
+  - first column C: the probability from start state $$\pi$$ to the first tag $$t_i$$ and  word $$W_1$$. $$  c_{i,1} = a_{1,i} \times b_{i,cindex\left(w_1\right)}$$: product of transition probability(from 1 to tag i) and emission probability(from tag i to word1)
+- Matrix D: The most likely indices of visited state
+  - The column is all 0, no proceeding tags traversed
+- Both matrix <span style="color:red">n rows: the number of speech tags/hidden states. K columns: the number of words</span>
+
+![](/img/post/Natural-Language-Processing/course2/week2pic16.gif)
+
+
+**Forward Pass**
+
+*Matrix C*
+
+$$  c_{i,j} = \underset{k}{max} \ c_{k,j-1} \times a_{k,i} \times  b_{i,cindex\left(w_j\right)} \text{}$$
+
+
+- <span style="background-color: #FFFF00">$$b_{i,cindex\left(w_j\right)}$$: emission proability from $$tag_i$$ to $$word_j$$</span>
+- <span style="background-color: #FFFF00">$$a_{k,i}$$ the transition probability from previous $$tag_k$$ to current $$tag_i$$</span>
+- <span style="background-color: #FFFF00">$$c_{k,j-1} $$: the probability of proceeding path traversed</span>
+- Then choose k to maximize the entire formula
+
+In real word use <span style="color:red">**log probability**: to avoid multiply very small number, may lead to numeric issue for multiplication </span>
+
+$$  c_{i,j} = \underset{k}{max} log\left(\ c_{k,j-1}\right) + log\left(a_{k,i}\right) +  log\left(b_{i,cindex\left(w_j\right)}\right) \text{}$$
+
+*Matrix D*
+
+$$  d_{i,j} = \underset{k}{argmax} \ c_{k,j-1} \times a_{k,i} \times  b_{i,cindex\left(w_j\right)} \text{}$$
+
+- in each $$  d_{i,j}$$  save the k which maximize the entry in $$ c_{i,j}$$
+- argmax returns k which maximize the function arguments instead of maximum value
+
+In the below example, three states are not initial state, state can be 1,2,3. k can be 1,2,3
+
+
+![](/img/post/Natural-Language-Processing/course2/week2pic17.gif)
+
+
+**Backward Pass**
+
+Extract the graph from matrix D, which represents most likely sequence of hidden states:  Get the index of entry of $$C_{i,k}$$ which is the highest probability in the last column C. Use that index s ($$\underset{i}{argmax} \ c_{i,k}$$) to traverse backwards through the matrix D to reconstruct the sequence 
+
+e.g. 下面的例子,
+
+1. 最后一列的最大的概率是 0.01 $$C_{1,5}$$, $$s = \underset{i}{argmax} \ c_{i,k} = 1$$. The most likely tag for word5 is tag1
+2. $$D_{1,5} = 3$$, so previous index is 3 ( tag 3 is the pervious state with the highest proabability for $$C_{1,5}$$)
+3. Algorithm stops as arrived at the start token
+
+![](/img/post/Natural-Language-Processing/course2/week2pic18.gif)
