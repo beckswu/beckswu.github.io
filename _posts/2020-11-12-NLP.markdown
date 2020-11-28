@@ -583,3 +583,70 @@ Application:
 e.g. Why not learn ... (next is verb? or norm?) depends on previous word
 
 ![](/img/post/Natural-Language-Processing/course2/week2pic2.png)
+
+To predict the first word, because state depend on previous state, introduce initial state. Transition Matrix A (n+1) x n where n is the number of hidden states.
+
+![](/img/post/Natural-Language-Processing/course2/week2pic3.png)
+
+
+**Hidden Markov Model**:
+
+For human, can recognize fly = verb, but machine cannot. Observable: can only seen by the machine
+
+![](/img/post/Natural-Language-Processing/course2/week2pic5.png)
+
+
+<span style="color:red">**Emission probability**</span>: describe the transition from hidden states of hidden Markov model(Norn, verb...) to the words of corpus
+
+![](/img/post/Natural-Language-Processing/course2/week2pic6.png)
+
+e.g. VB -> eat 0.5 means:  when model is currently at hidden state for a verb, 0.5 chance that observable the model will emit the word eats.  可以注意到每个word 的tag的概率都大于0，因为context 不同，tag不同, 例如 He lay on his *back* V.S. I'll be *back*
+
+
+![](/img/post/Natural-Language-Processing/course2/week2pic7.png)
+
+
+
+![](/img/post/Natural-Language-Processing/course2/week2pic8.png)
+
+**Calculate Probability**:
+
+
+![](/img/post/Natural-Language-Processing/course2/week2pic9.png)
+
+
+Process Corpus:
+
+1. At start token in each line of sentence as to calculate initial probability
+2. transform all wors in lowercase and keep punctuation 
+
+
+![](/img/post/Natural-Language-Processing/course2/week2pic10.png)
+
+为了避免probability as 0, add a small value eplison(e.g. 0.001)
+
+![](/img/post/Natural-Language-Processing/course2/week2pic11.png)
+
+Since vb is 1/3 for all outgoing transitions. Reasonable because don't have any data to estimate these probabilities
+
+In reall world, don't apply smoothing for initial probability. Because: if add, allow a sentence to start with any parts of speech tag, including punctuation
+
+![](/img/post/Natural-Language-Processing/course2/week2pic12.png)
+
+
+**Populating the Emission Matrix**
+
+![](/img/post/Natural-Language-Processing/course2/week2pic13.png)
+
+
+$$ C\left(t_i \right) $$: tag i 总共出现的次数，<br/>
+$$ C\left(t_i, w_i \right) $$ word_i 属于tag_i 出现的次数
+
+![](/img/post/Natural-Language-Processing/course2/week2pic14.png)
+
+
+**Viterbi Algorithm**: a graph algorithm
+
+from 0 -> NN / VB has the same probability. But the emission probability of love is higher for VB. From love(VB) -> to(O), 没有其他的tag有emission probability of to
+
+![](/img/post/Natural-Language-Processing/course2/week2pic15.gif)
