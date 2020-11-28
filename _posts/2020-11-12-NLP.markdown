@@ -723,11 +723,61 @@ Application:
 - punctuation is treated as words. But all other special characters such as codes will be removed
 
 
-E.g. bigrams are all sets of two words that appear side by side in corpus. <span style="color:red">Notes: 下面例子, I am appear twice, 但是only include 一次在 bigram set</span>
+E.g. 
+- Bigrams are all sets of two words that appear side by side in corpus. <span style="color:red">Notes: 下面例子, I am appear twice, 但是only include 一次在 bigram set</span>, I happy 因为不相邻，所以不是
+- Tigram: represent unique triplets of words that appear together in the sequence together in the corpus
 
 
 $$ \text{Corpus: I am happy because I am learning} $$
 
 $$ \text{Unigrams: \{I, am, happy, because,learning\}} $$
 
-$$ \text{Bigrams: \{I am, am happy, happy because,...\}},note: \color{red}{ \cancel{I happy} } $$
+$$ \text{Bigrams: \{I am, am happy, happy because,...\}},note: \color{red}{\text{"I happy" not in bigram}  } $$
+
+$$ \text{Bigrams: \{I am happy, am happy because, ...\}} $$
+
+Sequence Notation:
+
+$$W_1^3: \text{sequence of wrods from word 1 to word 3}$$
+
+$$W_{m-2}^m: \text{sequence of wrods from word m-2 to word m}$$
+
+![](/img/post/Natural-Language-Processing/course2/week3pic1.png)
+
+**Probability** 
+
+Note: in bigram: $$ P\left( happy \mid I \right) = 0$$ 因为 I happy never appear in the corpus
+
+$$ \text{Probabiity of bigram} \quad P\left( y \mid x \right) = \frac{ C\left(x, y \right)}{\sum_w{C\left(x, w \right)}} = \frac{ C\left(x y \right)}{C\left(x \right)}$$
+
+$$C_\left(x \right) \quad \text{the count of all unigram x}$$
+
+$$ \text{Probabiity of trigram} \quad P\left( w_3 \mid w_1^2 \right) = \frac{ C\left(w_1^2 w_3\right)}{C\left(w_1^2\right)}$$
+
+$$C\left(w_1^2 w_3\right) = C\left(w_1 w_2 w_3 \right) \quad \text{a bigram followed by a unigram}$$
+
+$$ \text{Probabiity of N-gram} \quad P\left( w_N \mid w_1^{N-1} \right) = \frac{ C\left(w_1^{N-1} w_N\right)}{C\left(w_1^{N-1}\right)}$$
+
+![](/img/post/Natural-Language-Processing/course2/week2pic2.gif)
+
+$$ \text{Chain Rule} \quad P\left(A,B,C,D\right) = P\left(A \right)P\left(B \mid A \right)P\left( C \mid\ A,B \right)P\left(D\mid A, B, C \right)$$
+
+$$P\left(the \ teacher \ drinks \ tea\right) = P\left(the \right)P\left(teacher \mid the \right)P\left( drinks \mid\ the, teacher \right)P\left(tea\mid the, teacher, drinks \right)$$
+
+**Problem with above calculation**: <span style="background-color: #FFFF00">Corpus almost never contains the exact sentences we're interested in or even its longer subsequences</span>, 比如$$C\left( the \ teacher \ drinks \ tea \right)$$ and $$C\left( the \ teacher \ drinks  \right)$$ neither of them are likely in training corpus, the count are 0. <span style="color:red">当sentences get longer and longer, the likelihood that more and more words will occur next to each other in the exact order gets smaller and smaller</span>
+
+
+
+<span style="background-color: #FFFF00">Solution: use approximation: **product of probabilities of bigrams**</span>
+
+$$P\left(the \ teacher \ drinks \ tea\right) \approx P\left(the \right)P\left(teacher \mid the \right)P\left( drinks \mid teacher \right)P\left(tea\mid drinks \right)$$
+
+
+- Markove assumption: only last N words matter
+- Bigram: $$P\left( w_n \mid w_1^{n-1} \right) \approx P\left( w_n \mid w_{n-1} \right) $$
+- N-gram: $$P\left( w_n \mid w_1^{n-1} \right) \approx P\left( w_n \mid w_{n-N+1}^{n-1} \right) $$
+- Entire sentence modeled with bigram: $$P\left( w_1^n \right) \approx \prod_{i=1}^{n} P\left( w_i \mid w_i-1 \right) $$
+  - contrast with Naive Bayes, approximate sentence probability without cnsidering any word history
+  - $$P\left( w_1^n \right) \approx P\left(w_1 \right)P\left(w_2 \mid w_1 \right)P ... P\left(w_n\mid w_{n-1} \right) $$: The first term of Bigram reiles on unigram probability of first word n sentence
+
+![](/img/post/Natural-Language-Processing/course2/week3pic3.gif)
