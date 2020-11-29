@@ -753,7 +753,7 @@ $$ \text{Probabiity of bigram} \quad P\left( y \mid x \right) = \frac{ C\left(x,
 
 $$\text{where }C_\left(x \right): \text{the count of all unigram x.} \quad \sum_w{C\left(x, w \right)}: \text{the count of all bigram starting with x}$$
 
-$$\sum_w{C\left(x, w \right)}$$ can be simpilied to $$C_\left(x \right)$$: <span style="color:red">only works if x is followed by another word</span>
+$$\sum_w{C\left(x, w \right)}$$ bigram can be simpilied to $$C_\left(x \right)$$ unigram: <span style="color:red">only works if x is followed by another word</span>
 
 $$ \text{Probabiity of trigram} \quad P\left( w_3 \mid w_1^2 \right) = \frac{ C\left(w_1^2 w_3\right)}{C\left(w_1^2\right)}$$
 
@@ -797,4 +797,43 @@ Start:
 ![](/img/post/Natural-Language-Processing/course2/week3pic4.gif)
 
 End: 
+
+Problem 1:   $$ \text{Probabiity of bigram} \quad P\left( y \mid x \right) = \frac{ C\left(x, y \right)}{\sum_w{C\left(x, w \right)}} = \frac{ C\left(x y \right)}{C\left(x \right)}$$ $${\sum_w{C\left(x, w \right)}$$ the count of all bigram starting with X. <span style="color:red">When x is last word of sentences, doesn't work</span>
+
+e.g. Corpus:
+
+- ```<s> Lyn drinks chocolate```
+- ```<s> John drinks```
+
+$${\sum_w{C\left(drinks \ w \right)} = 1$$, C(drinks) = 2
+
+Solution: add end of sentence token
+
+
+Problem 2: 
+
+e.g. Corpus:
+
+- ```<s> yes no```
+- ```<s> yes yes```
+- ```<s> no no```
+
+all possible sentences of lengths 2:  add all probability will equal to 1  👌 
+
+- ```<s> yes yes```,  $$P\left( <{s}> yes \ yes \right) = \frac{1}{3}$$
+- ```<s> yes no```, $$P\left( <{s}> yes \ no \right) = \frac{1}{3}$$
+- ```<s> no no```   $$P\left( <{s}> no \ no \right) = \frac{1}{3}$$
+- ```<s> no yes``` $$P\left( <{s}> no \ yes \right) = 0$$
+
+all possible sentences of lengths 3: add all probability will equal to 1 👌 
+
+- ```<s> yes yes yes```,  $$P\left( <{s}> yes \ yes \right) = ...$$
+- ```<s> yes no no```, $$P\left( <{s}> yes \ no \right) = ...$$
+- ```<s> no no no``` $$P\left( <{s}> no \ yes \right) = ...$$
+
+However, What you want is the sum of all sentences of all length to 1: $$\sum_{2 word}P\left( ...\right) + \sum_{3 word}P\left( ...\right) ...  = 1$$
+
+**Solution**: add end of sentence token ```</s>```  
+
+e.g. 
 
