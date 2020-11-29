@@ -985,6 +985,10 @@ $$P\left( w_n \mid w_{n-1} \right) = \frac{ C\left(w_{n-1}, w_n\right) + k}{\sum
 
 some other advanced smoothing: Kneser-Ney smoothing, Good-Turing smoothing
 
+e.g. Corpus "I am happy I am learning"  and k = 3, vocabulary size is 4 ```(I, am), (am, happy), (happy, I), (am, learning)```, ```(I, am)``` count is 2
+
+$$P\left(can \mid I\right) = \frac{3}{2 + 3*4}$$
+
 
 **Backoff**
 
