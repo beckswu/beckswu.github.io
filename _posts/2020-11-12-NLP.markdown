@@ -701,6 +701,7 @@ e.g. 下面的例子,
 
 ![](/img/post/Natural-Language-Processing/course2/week2pic18.gif)
 
+[Forward & Backward Example](https://github.com/beckswu/Natural-Language-Processing/blob/master/Coursera/Course2-Natural%20Language%20Processing%20with%20Probabilistic%20Models/week2-Assignment-%20Part%20of%20Speech%20Tagging.ipynb)
 
 #### Week3 Autocomplete and Language Models
 
