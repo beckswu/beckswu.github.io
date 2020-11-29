@@ -798,7 +798,7 @@ Start:
 
 End: 
 
-Problem 1:   $$ \text{Probabiity of bigram} \quad P\left( y \mid x \right) = \frac{ C\left(x, y \right)}{\sum_w{C\left(x, w \right)}} = \frac{ C\left(x y \right)}{C\left(x \right)}$$ $${\sum_w{C\left(x, w \right)}$$ the count of all bigram starting with X. <span style="color:red">When x is last word of sentences, doesn't work</span>
+Problem 1:   $$ \text{Probabiity of bigram} \quad P\left( y \mid x \right) = \frac{ C\left(x, y \right)}{\sum_w{C\left(x, w \right)}} = \frac{ C\left(x y \right)}{C\left(x \right)}, {\sum_w{C\left(x, w \right)}$$ the count of all bigram starting with X. <span style="color:red">When x is last word of sentences, doesn't work</span>
 
 e.g. Corpus:
 
@@ -851,9 +851,9 @@ $$P\left(the | <{s}> \right)P\left(teacher \mid the \right)P\left( drinks \mid t
 
 e.g. Bigram:
 
-- ```<s> Lyn drinks chocolate </s>``` $$P\left( sentence \right) = \frac{2}{3} * \frac{1}{2} * \frac{1}{2} * \frac{2}{2} = \frac{1}{6}
-- ```<s> John drinks tea </s>```  $$P\left( sentence \right) = \frac{1}{3} * \frac{1}{1} * \frac{1}{2}* \frac{1}{1}  = \frac{1}{6}
-- ```<s> Lyn eats chocolate </s>``` $$P\left( sentence \right) = \frac{2}{3} * \frac{1}{2} * \frac{1}{1} *  \frac{2}{2} = \frac{1}{3}
+- ```<s> Lyn drinks chocolate </s>``` $$P\left( sentence \right) = \frac{2}{3} * \frac{1}{2} * \frac{1}{2} * \frac{2}{2} = \frac{1}{6}$$
+- ```<s> John drinks tea </s>```  $$P\left( sentence \right) = \frac{1}{3} * \frac{1}{1} * \frac{1}{2}* \frac{1}{1}  = \frac{1}{6}$$
+- ```<s> Lyn eats chocolate </s>``` $$P\left( sentence \right) = \frac{2}{3} * \frac{1}{2} * \frac{1}{1} *  \frac{2}{2} = \frac{1}{3}$$
 
 $$P\left( John \mid <{s}> \right) = \frac{1}{3},P\left( <{/s}> \mid tea  \right) = 1 $$
 
@@ -976,7 +976,8 @@ Problem: N-gram made of known words still migh be missing in training corpus. �
 
 $$P\left( w_n \mid w_{n-1} \right) = \frac{ C\left(w_{n-1}, w_n\right) + 1}{\sum_{w \in V} C\left( w_{n-1}, W\right) + 1} = \frac{C\left(w_{n-1}, w_n\right) + 1}{C\left(w_{n-1}\right) + V}$$
 
-Plus V only works if real counts are large enough to outweigh the plus one. Otherwise the probability of missing word will be too high 
+Plus V only works if real counts are large enough to outweigh the plus one. Otherwise the probability of missing word will be too high，比如就vocubary size = 2, $$ P\left(UNK \mid known word \right) =  \frac{C\left(w_{n-1}, w_n\right) + 1}{C\left(w_{n-1}\right) + V} = \frac{1}{1 + 2} = \frac{1}{3}$$
+
 
 
 **Add-k smooething**: make probability even smoother. can be applied to high order n-gram probabilities like trigram, four grams and beyond
@@ -1008,6 +1009,20 @@ linear interpolation of all orders of n-gram: combined weighted probabilities of
 
 $$\hat P\left( w_n \mid w_{n-2}w_{n-1} \right) = \lambda_1 \times P\left( w_n \mid w_{n-2}w_{n-1} \right) +\lambda_2 \times P\left( w_n \mid w_{n-2} \right) + \lambda_3 \times P\left( w_n \right), given \sum_i \lambda_i = 1 $$
 
-e.g. 
+e.g. John drink chocolate
 
 $$\hat P\left( chocolate \mid John \, drink \right) = 0.7 \times P\left( chocolate \mid John \, drink  \right) +0.2 \times P\left( chocolate \mid drink \right) + 0.1 \times P\left( chocolate \right) $$
+
+
+#### Week4 Word Embeddings with Neural Networks
+
+Build a vocabulary: assign integer to word, <span style="color:red"> Problem: order doesn't make sense from a semantic perspective. e.g. no reason that happy number > zebra</span> 
+
+![](/img/post/Natural-Language-Processing/course2/week4pic1.png)
+
+
+**one-hot vectors**: put 1 in the row that has the same label and 0 everywhere else 
+
+e.g. each vector has 1000 elements,
+
+![](/img/post/Natural-Language-Processing/course2/week4pic2.png)
