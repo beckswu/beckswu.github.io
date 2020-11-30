@@ -1021,8 +1021,120 @@ Build a vocabulary: assign integer to word, <span style="color:red"> Problem: or
 ![](/img/post/Natural-Language-Processing/course2/week4pic1.png)
 
 
-**one-hot vectors**: put 1 in the row that has the same label and 0 everywhere else 
+**one-hot vectors**: 
+
+- put 1 in the row that has the same label and 0 everywhere else,
+-  <span style="color:red"> Advantage: not imply any relationship between any two words</span>. e.g. Each vector says the word either happy or not , either zebra or not
+-  Huge vectors: require a lot of space and processing time. If created with English word, may have 1 million rows, one row for each English word
+-  No embedding meaning: if calculate the distance btween one-hot vectors, always get the same distance btween any two pairs of words. ```d(paper, excited) = d(paper, happy) = d(excited, happy)```, (inner product of any 2 one-hot vector is zero). 但是intuitively, happy is more similar to excited than paper
+
 
 e.g. each vector has 1000 elements,
 
-![](/img/post/Natural-Language-Processing/course2/week4pic2.png)
+![](/img/post/Natural-Language-Processing/course2/week4pic2.gif)
+
+**Word Embedding**
+
+比如横坐标，word are positive right, word are negative left; 纵坐标 word are concrete, higher. word are abstract lower. <span style="background-color: #FFFF00">Less precise than one hot vector</span>, 可能有两个点重合，比如snake & spider
+
+
+![](/img/post/Natural-Language-Processing/course2/week4pic3.png)
+
+上面例子是一个word embedding. 
+
+- Low dimension: Word embedding represent words in  a vector form that has a relative low dimension
+- Carry embed meaning:  
+  - e.g. semantic distance:  $$\text{forst} \approx \text{tree, forest} \not\approx \text{ticket}$$$
+  - e.g. analgies :  Paris -> France similar as Rome -> Italy
+
+![](/img/post/Natural-Language-Processing/course2/week4pic4.png)
+
+
+**Create Word Embedding**
+
+- If you want to generate word embedding based on Shakespeare, corpus should be full and original text of Shakespeare, not stude notes, slide presentation or keywords from Shakespeare. 
+- <span style="background-color:#FFFF00">Context(combination of words to occur around that particular word) is important, give meaning to each word embedding</span>. a simple vocabulary list of Shakespeare's most common words not enough to create mebedding. 
+- Objective of word embedding is to predict missing word
+- Embedding method, machine learning models which are set to learn word embeddings. <span style="color:red">The meaning of words, as carred by word embeddings depends on the embedding approach</span>
+  - <span style="background-color:#FFFF00">**Self-supervised learning**: Both unsupervised (input data are unlabeled) and supervised(text provide necessary context which would ordinarily make up the label)</span>
+- Word embedding can be tuned by a number of hyperparameters. One hyperparameter is dimension of word embedding vectors. In practice, could from a few hundred to low thousand
+  - <span style="color:red">Use high dimension captures more nuanced meanings but computatitional expensive</span>, may leading to diminishing return
+- Corpus must first be transformed into a suitable mathematical representation. e.g. Integer word Indices or one-hot vector
+
+![](/img/post/Natural-Language-Processing/course2/week4pic5.png)
+
+
+- **word2vec**: (Google, 2013). use a shallowed neural network to learn word embedding. propose two model architectures: 
+  - Continuous bag-of-words(CBOW): predict a missing word given the surrounding words
+  - Continuous skip-gram also know as  Skip-gram with negative sampling (SGNS): did the reverse of Continuous bag-of-words:  model predict surrounding given a input word
+- **Global Vectors(GloVe)** (Standford 2014): Involves factorizing the logarithm of the corpuses word co-occurrence matrix.(Similar to Count Matrix as above)
+- **fastText** (Facebook 2016): based on skip-gram model and take into account the structure of words by representing words an n-gram of character
+  - support out-of-vocabulary(OOV) words: infer embedding from the sequence of chracters they are made of and corresponding sequence that it was intially trained on. E.g. create similar embedding for kitty and kitten even kitty never seen before(因为 kitty and kitten has similar sequences of characters)
+  - another benefit: embedding vectors can be averaged together to make vector representations of phrases and sentences
+- Advanced work embedding methods: use advanced deep neural network to refine word meanings according  to their contexts. 一词多义(polysemy or words with similar meanings), 之前model  always has the same embedding e.g. plants. 可以是 organism like a flower, a factory or adverb. below are Tunable pre-trained model available
+  - BERT (Google, 2018): Bidirectional representations from transformers by Google
+  - ELMo (Allen Institute for AI, 2018)P embeddings from language models
+  - GPT-2 (OpenAI,2018): generative pre-training 2
+
+
+**Continuous bag-of-words**
+
+- <span style="background-color:#FFFF00">the objective: predict a missing word based on the surrounding words</span>
+- rationale: if two unique words are both frequently surrounded by a similar set of words in various sentences, then 这两个词 tend to related in their meaning(related semantically)
+
+![](/img/post/Natural-Language-Processing/course2/week4pic6.png)
+
+- define <span style="background-color:#FFFF00">**context words**</span> as four words. C= 2 <span style="color:red">Two words before center word and two words after it</span>. <span style="background-color:#FFFF00">C is the hyperparameter of the model</span>
+- Window: center word + context words
+- Architecture: context words as input and center words as output
+
+![](/img/post/Natural-Language-Processing/course2/week4pic7.gif)
+
+
+**Tokenization**
+
+- Case insensitive: The==the==THE  -> conver to either all lowercase or all uppercase
+- Punctuation  
+  - interruption punctuation marks ```,!.?``` as single special word of the vocabulary.  
+  - ignore non interrupting punctuation marks ```'<< >>"```
+  - collapse multi-sign marks into single marks ```!!!``` -> ```.``` , ```...``` -> ```.```
+- Number: 
+  - If numbers do not carry important meaning -> drop
+  - number may have meaning. e.g. 3,1415926 -> pi, 90210 is name of television show and zip code => keep as ```/<NUMBER>```
+- Special characters: such as mathematical symbols, currency symbols, section and paragraph signs and line markup signs => drop
+- Special words: emojis, hastags (like twitter) => depend on if and how handle 
+  - can consider each emoji or hashtag considered as individual word. 😄  -> ```:happy```
+
+
+```python
+# pip install nltk
+
+#pip install moji
+
+import nltk
+from nltk.tokenize import word_tokenize
+import emoji
+
+nltk.download('punkt') #download pre-trained Punkt tokenizer for English
+
+# handle common special uses of punctuation
+
+```
+下面例子, question marks and exclamation convert to a single full stop, last step get rid of number but keep alphabetical, full stops(previously an interrupting punctuation mark), emoji
+
+![](/img/post/Natural-Language-Processing/course2/week4pic8.gif)
+
+
+![](/img/post/Natural-Language-Processing/course2/week4pic9.gif)
+
+
+**Transforming Words Into Vectors**
+
+Corpus: I am happy because I am learning</br>
+Vocabulary: am, because, happy, I, learning  (vocabulary is the set of unique set)
+
+
+- Center word:  One-hot vector: 下面例子order by alphabetic order，实际中可以是arbitrary 
+- Context word: take the average of one-hot vectors of each context word
+
+![](/img/post/Natural-Language-Processing/course2/week4pic10.gif)
