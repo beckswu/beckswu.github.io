@@ -1233,9 +1233,9 @@ $$ \begin{align} \frac{\partial Cross-entropy \, Loss}{\partial z_j} &= \frac{\p
 &= -y_j + \hat y_j \left( \sum_{i}^V y_i \right) =  \hat y_j-y_j
 \end{align} $$
 
-Therefore:
-
-$$\frac{\partial Cross-entropy \, Loss}{\partial w_j} = \frac{\partial Cross-entropy \, Loss}{\partial z_j} \frac{\partial z_j }{\partial w_j} = \left(\hat y_j-y_j \right) x_j  $$
+Therefore: Note $$H_j$$ is the hidden layer output
+ 
+$$\frac{\partial Cross-entropy \, Loss}{\partial w_j} = \frac{\partial Cross-entropy \, Loss}{\partial z_j} \frac{\partial z_j }{\partial w_j} = \left(\hat y_j-y_j \right) H_j  $$
 
 
 
