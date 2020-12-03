@@ -563,7 +563,7 @@ Text can be embedded into vector space so that nearest neighbors refer to text w
 
 
 
-## Autocorrect and Minimum Edit Distance
+## 2.1 Autocorrect and Minimum Edit Distance
 
 
 How it works?
@@ -574,7 +574,7 @@ How it works?
    - Autocorrect: n is usually 1 to 3 edits
 3. Filter candidates 
    - step 2 generate word if not in vocabulary, remove it. e.g. deah -> d_ar, if d_ar not in vocabulary remove it
-4. Calculate word probabilities
+4. Calculate word probabilities: $$ P\left( w \right) = \frac{C\left( w \right) }{V}$$, $$C\left( w \right)$$在文本中出现次数, V: total size of the corpus
 
 ![](/img/post/Natural-Language-Processing/course2/week1pic1.png)
 
