@@ -252,7 +252,7 @@ if a word not in vocabulary, think as neutral, not contribute to score
 $$\text{Accuracy} \rightarrow \frac{1}{m} \sum_{i=1}^{m} {pred_i == Y_{val}} $$
 
 
-**Naive Bayes Application**
+#### Naive Bayes Application
 
 There are many applications of naive Bayes including:
 
@@ -585,11 +585,11 @@ Minimum edit distance(**Levenshtein distance**): insert(cost 1), delete(cost 1),
 ![](/img/post/Natural-Language-Processing/course2/week1pic2.png)
 
 
-#### Week2 Part of Speech Tagging and Hidden Markov Models
+## Part of Speech Tagging and Hidden Markov Models
 
 ![](/img/post/Natural-Language-Processing/course2/week2pic1.png)
 
-[Meaning of Tag](https://www.ling.upenn.edu/courses/Fall_2003/ling001/penn_treebank_pos.html)
+[Tag Meanings](https://www.ling.upenn.edu/courses/Fall_2003/ling001/penn_treebank_pos.html)
 
 Application: 
 
@@ -598,25 +598,27 @@ Application:
 - Speech Recognition: check if a sequence of word has a high probability or not
 
 
+#### Markov chain
+
 **Markov chain**: type of stochastic model that describes a sequence of possible events. To get probability of each event, it needs only the states of the previous events. Stochastic means random or randomness. Markov chain can be depicted as <span style="background-color: #FFFF00">directed graph</span>. A state refers to a certain condition of the present moment.
 
 e.g. Why not learn ... (next is verb? or norm?) depends on previous word
 
 ![](/img/post/Natural-Language-Processing/course2/week2pic2.png)
 
-To predict the first word, because state depend on previous state, introduce initial state. Transition Matrix A (n+1) x n where n is the number of hidden states.
+To predict the first word, because state depend on previous state, <span style="background-color:#FFFF00">introduce initial state</span>. Transition Matrix A (n+1) x n where n is the number of hidden states.
 
 ![](/img/post/Natural-Language-Processing/course2/week2pic3.png)
 
 
-**Hidden Markov Model**:
+#### Hidden Markov Model
 
 For human, can recognize fly = verb, but machine cannot. Observable: can only seen by the machine
 
 ![](/img/post/Natural-Language-Processing/course2/week2pic5.png)
 
 
-<span style="color:red">**Emission probability**</span>: describe the transition from hidden states of hidden Markov model(Norn, verb...) to the words of corpus
+<span style="color:red">**Emission probability**</span>: describe the transition from hidden states of hidden Markov model(Norn, verb...) to the words of corpus(从单词的词性 到 具体的单词)
 
 ![](/img/post/Natural-Language-Processing/course2/week2pic6.png)
 
@@ -629,29 +631,33 @@ e.g. VB -> eat 0.5 means:  when model is currently at hidden state for a verb, 0
 
 ![](/img/post/Natural-Language-Processing/course2/week2pic8.png)
 
-**Calculate Probability**:
+#### Calculate Probability
 
+Process Corpus:
+
+1. <span style="background-color:#FFFF00">Add start token in each line of sentence as to calculate initial probability</span>
+2. transform all words in lowercase and keep punctuation 
+
+**Transition Matrix:
+**
 
 ![](/img/post/Natural-Language-Processing/course2/week2pic9.png)
 
 
-Process Corpus:
 
-1. At start token in each line of sentence as to calculate initial probability
-2. transform all words in lowercase and keep punctuation 
 
 
 ![](/img/post/Natural-Language-Processing/course2/week2pic10.png)
 
-为了避免probability as 0, add a small value eplison(e.g. 0.001)
+#### Soothing 
 
-![](/img/post/Natural-Language-Processing/course2/week2pic11.png)
+- 为了避免probability as 0, add a small value eplison(e.g. 0.001)
+-  vb is 1/3 for all outgoing transitions. 是Reasonable的 because don't have any data to estimate these probabilities
+- In reall world, <span style="background-color:#FFFF00">don't apply smoothing for initial probability. Because: if add, allow a sentence to start with any parts of speech tag, including punctuation</span>
 
-Since vb is 1/3 for all outgoing transitions. 是Reasonable的 because don't have any data to estimate these probabilities
 
-In reall world, don't apply smoothing for initial probability. Because: if add, allow a sentence to start with any parts of speech tag, including punctuation
+![](/img/post/Natural-Language-Processing/course2/week2pic11.gif)
 
-![](/img/post/Natural-Language-Processing/course2/week2pic12.png)
 
 
 **Populating the Emission Matrix**
