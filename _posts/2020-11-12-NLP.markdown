@@ -16,7 +16,7 @@ tags:
 
 ## Natural Language Processing with Classification and Vector Spaces
 
-#### Week1 Vocabulary & Feature Extraction
+#### Vocabulary & Feature Extraction
 
 **Sparse Representation**: 
 
@@ -40,26 +40,20 @@ e.g. I am happy because I am learning NLP
 
 **Positive & Negative Frequencies**: Build vocabulary, map word to frequencey
 
-![](/img/post/Natural-Language-Processing/course1/week1pic2.png)
+![](/img/post/Natural-Language-Processing/course1/week1pic2.gif)
 
-![](/img/post/Natural-Language-Processing/course1/week1pic3.png)
-
-![](/img/post/Natural-Language-Processing/course1/week1pic4.png)
-
-![](/img/post/Natural-Language-Processing/course1/week1pic5.png)
 
 
 <span style="background-color: #FFFF00">Faster speed for logistic regression, Instead learning V feature(size of vocabulary), only learn 3 features</span>
 
 
-![](/img/post/Natural-Language-Processing/course1/week1pic6.png)
+$$X_m = \left[ 1, \sum_{w_{pos}} freqs\left( w_{pos}, 1 \right),  \sum_{w_{neg}} freqs\left( w_{neg}, 1 \right) \right]$$
 
-![](/img/post/Natural-Language-Processing/course1/week1pic7.png)
-
-![](/img/post/Natural-Language-Processing/course1/week1pic8.png)
+![](/img/post/Natural-Language-Processing/course1/week1pic6.gif)
 
 
-Hence you end up getting the following feature vector ```[1,8,11][1,8,11]```. 11 corresponds to the bias, 88 the positive feature, and 1111 the negative feature.
+
+Hence you end up getting the following feature vector ```[1,8,11]```. 11 corresponds to the bias, 88 the positive feature, and 11 the negative feature.
 
 
 **Preprocessing**: 
@@ -73,10 +67,8 @@ When preprocessing, you have to perform the following:
 5. Convert all your words to lower case.
 
 
-![](/img/post/Natural-Language-Processing/course1/week1pic9.png)
+![](/img/post/Natural-Language-Processing/course1/week1pic9.gif)
 
-
-![](/img/post/Natural-Language-Processing/course1/week1pic10.png)
 
 matrix with m rows and three columns. Every row: the feature for each tweets
 
@@ -87,11 +79,16 @@ matrix with m rows and three columns. Every row: the feature for each tweets
 
 ```python
 freqs = build_freqs(tweets,labels) #Build frequencies dictionary
+
 X = np.zeros((m,3)) #Initialize matrix X
+
 for i in range(m): #For every tweet
+
     p_tweet = process_tweet(tweets[i]) #process tweet, include
                                       # deleting stops, stemming, deleting URLS, and handles and lower cases
+
     X[i, :] = extract_features(p_tweet, freqs) #Extract Features: 
+    
                                                #By summing up the positive and negative frequencies of the tweets
                                                
 ```
@@ -1206,15 +1203,16 @@ Mathematical Prove:
 
 
 As we know:
+
 $$ d\frac{f\left(x\right)}{g\left(x\right)} = \frac{f'\left(x\right) g\left(x\right) - g'\left(x\right)f\left(x\right)}{g\left(x\right)^2}$$
 
-We use simplified notation
+We define simplified notation
 
 $$\text{Denote} \sum_i^V e^{z_i}  \, \text{ as} \sum, \hat y \text{ is the output for softmax function} $$
 
 
 $$\begin{align} \frac{\partial \frac{e^{z_j}}{\sum} }{\partial z_j} &= \frac{\frac{\partial e^{z_j}}{\partial z_j} \sum - \frac{ \partial \sum }{\partial z_j} e^{z_j} }{ \sum ^2} \\ &=  \frac{ e^{z_j} \sum - e^{z_j}  e^{z_j} }{ \sum ^2} \\ &= \frac{e^{z_j}}{\sum} \frac{\sum - e^{z_j}}{\sum}  = \hat y_j \left( 1-\hat y_j \right) \\
- \frac{\partial \frac{e^{z_j}}{\sum} }{\partial z_k} &= \frac{\frac{\partial e^{z_j}}{\partial z_k} \sum -\frac{ \partial \sum }{\partial z_k} e^{z_j} }{ \sum ^2} \\ &=  \frac{ 0 \sum - e^{z_j}  e^{z_k} }{ \sum ^2}  = -\hat y_k \hat y_j  \end{align}  $$
+ \frac{\partial \frac{e^{z_j}}{\sum} }{\partial z_k} &= \frac{\frac{\partial e^{z_j}}{\partial z_k} \sum -\frac{ \partial \sum }{\partial z_k} e^{z_j} }{ \sum ^2} \\ &=  \frac{ 0 \sum - e^{z_j}  e^{z_k} }{ \sum ^2}  = -\hat y_k \, \hat y_j  \end{align}  $$
 
 So the derivative of softmax:
 
