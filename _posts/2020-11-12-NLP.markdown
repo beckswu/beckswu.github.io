@@ -15,7 +15,7 @@ tags:
 <script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"> </script>
 
 
-## Vocabulary & Feature Extraction
+## 1.1 Vocabulary & Feature Extraction
 
 #### Sparse Representation
 
@@ -138,7 +138,7 @@ $$ d\theta = \frac{1}{m} X^T \left( h\left(X, \theta \right) - y \right)$$
 ------------
 
 
-##  Naive Bayes
+##  1.2 Naive Bayes
 
 Tweet <span style="color:red">defined either positive or negative, cannot be both</span>. Bayes' rule is based on the mathmatical formulation of conditional probabilities. <span style="background-color: #FFFF00">Called **Naive** because make assumpton that the **features you're using for classification are all independent**, which in reality is rare</span>
 
@@ -288,7 +288,7 @@ Assumption:
 
 
 
-## Vector Space
+## 1.3 Vector Space
 
 e.g. "Where are you heading" vs "Where are you from" -> Different meaning 尽管前三个词一样<br/>
 e.g. "What is your age" vs "How old are you" -> Same meaning
@@ -390,7 +390,8 @@ $$\begin{align} \hat{v} \cdot \hat{w} &= \Vert \hat{v} \Vert \Vert \hat{w} \Vert
 [Sample Code for PCA](https://github.com/beckswu/Natural-Language-Processing/tree/master/Coursera/Course1-Natural%20Language%20Processing%20with%20Classification%20and%20Vector%20Spaces)
 
 
-### Transforming word vectors
+
+## 1.4 Transforming word vectors
 
 Translate word: calculate word embedding in English and French, transform word embedding in English to French and find the most similar one
 
