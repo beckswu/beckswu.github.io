@@ -288,7 +288,7 @@ Assumption:
 
 
 
-#### Week3 Vector Space
+## Vector Space
 
 e.g. "Where are you heading" vs "Where are you from" -> Different meaning 尽管前三个词一样<br/>
 e.g. "What is your age" vs "How old are you" -> Same meaning
@@ -305,7 +305,7 @@ e.g. "You can buy something and someone else sells it" second half sentence is d
   -  chatbots programming: 机器客服
 
 
-**Word by Word Design**
+#### Word by Word Design
 
 number of times they <span style="background-color: #FFFF00">occur together within a certain **distance** k</span>
 
@@ -319,7 +319,7 @@ number of times they <span style="background-color: #FFFF00">occur together with
 
 
 
-**Word by Document Design**
+#### Word by Document Design
 
 number of times they <span style="background-color: #FFFF00">occur together within a certain **category** k</span>
 
@@ -329,7 +329,7 @@ Divide corpus into different tops like Entertainment, Economy, Machine Learning.
 
 ![](/img/post/Natural-Language-Processing/course1/week3pic3.png)
 
-**Euclidean Distance**
+#### Euclidean Distance
 
 Euclidean Distance is the norm of the difference between vectors, straight line between points
 
@@ -347,15 +347,15 @@ d = np.linalg.norm(v-w)
 ```
 
 
-**Cosine Similarity**
+#### Cosine Similarity
 
-Problem with Euclidean distance:  Vector space where corpora are represented by occurrence of the words "disease" and "eggs". Because Agriculture and history corpus has a similar number of words(出现单词数量一样), Suggests agriculture and history 比 agriculture and food 更想近义
+<span style="color:red">Problem with Euclidean distance</span>:  Vector space where corpora are represented by occurrence of the words "disease" and "eggs". Because Agriculture and history corpus has a similar number of words(出现单词数量一样), Suggests agriculture and history 比 agriculture and food 更想近义
 
 - if A and B are identical, you will get $$cos\left( \theta \right)=1$$
 - If you get $$cos\left( \theta \right)=0$$, that means that they are orthogonal (or perpendicular).
 - Numbers between 0 and 1 indicate a similarity score.
-- Numbers between -1-0 indicate a dissimilarity score.
-- <span style="background-color: #FFFF00">Advantage: Cosine similarity isn't biased by the size difference between the representations</span>
+- Numbers between -1 and 0 indicate a dissimilarity score.
+- <span style="background-color: #FFFF00">Advantage: Cosine similarity **isn't biased by the size** difference between the representations</span>
 
 ![](/img/post/Natural-Language-Processing/course1/week3pic5.png)
 
@@ -387,11 +387,12 @@ $$\begin{align} \hat{v} \cdot \hat{w} &= \Vert \hat{v} \Vert \Vert \hat{w} \Vert
 
 ![](/img/post/Natural-Language-Processing/course1/week3pic9.png)
 
+[Sample Code for PCA](https://github.com/beckswu/Natural-Language-Processing/tree/master/Coursera/Course1-Natural%20Language%20Processing%20with%20Classification%20and%20Vector%20Spaces)
 
 
 #### Week4 Transforming word vectors
 
-Translate word: caculate word embedding in English and French, transform word embedding in English to French and find the most similar one
+Translate word: calculate word embedding in English and French, transform word embedding in English to French and find the most similar one
 
 ![](/img/post/Natural-Language-Processing/course1/week4pic1.png)
 
@@ -414,13 +415,13 @@ $$ \begin{align} \color{olive}{\text{Initialize R}}\quad & \\
 Can pick a fixed number of times to go through the loop or check the loss at each iteration and break out loop when loss falls between a certain threshold.
 
 
-<span style="background-color: #FFFF00">Explanation for fixed number of iterations iterating until the loss falls below a threshold.</span>
+<span style="background-color: #FFFF00">Explanation for fixed number of iterations iterating until the loss falls below a threshold instead checking loss at each iteration.</span>
 
-- You cannot rely on training loss getting low -- what you really want is the validation loss to go down, or validation accuracy to go up. And indeed - in some cases people train until validation accuracy reaches a threshold, or -- commonly known as "early stopping" -- until the validation accuracy starts to go down, which is a sign of over-fitting.
-- Why not always do "early stopping"? Well, mostly because well-regularized models on larger data-sets never stop improving. Especially in NLP, you can often continue training for months and the model will continue getting slightly and slightly better. This is also the reason why it's hard to just stop at a threshold -- unless there's an external customer setting the threshold, why stop, where do you put the threshold?
-- Stopping after a certain number of steps has the advantage that you know how long your training will take - so you can keep some sanity and not train for months. You can then try to get the best performance within this time budget. Another advantage is that you can fix your learning rate schedule -- e.g., lower the learning rate at 10% before finish, and then again more at 1% before finishing. Such learning rate schedules help a lot, but are harder to do if you don't know how long you're training.
+- You <span style="color:red">cannot rely on training loss getting low</span> -- what you really want is the validation loss to go down, or validation accuracy to go up. And indeed - in some cases people train until validation accuracy reaches a threshold, or -- commonly known as "early stopping" -- until the validation accuracy starts to go down, which is a sign of over-fitting.
+- Why not always do "early stopping"? Well, mostly because <span style="color:red">well-regularized models on larger data-sets never stop improving</span>. Especially in NLP, you can often continue training for months and the model will continue getting slightly and slightly better. This is also the reason why it's hard to just stop at a threshold -- unless there's an external customer setting the threshold, why stop, where do you put the threshold?
+- Stopping after a certain number of steps has the advantage that you know <span style="color:red">how long your training will take</span> - so you can keep some sanity and not train for months. You can then try to get the best performance within this time budget. <span style="color:red">Another advantage is that you can fix your learning rate schedule</span> -- e.g., lower the learning rate at 10% before finish, and then again more at 1% before finishing. Such learning rate schedules help a lot, but are harder to do if you don't know how long you're training.
 
-**Frobenius norm**
+#### Frobenius norm
 
 
 $$ \Vert A \Vert_F = \sqrt{\sum_{i=1}^m \sum_{j=1}^n \vert a_{ij}\vert^2 } $$ 
@@ -452,9 +453,9 @@ $$\frac{1}{m} \Vert XR - Y \Vert_F^2 $$
 - The norm is always nonnegative (we're summing up absolute values), and so is the square.
 - When we take the square of all non-negative (positive or zero) numbers, the order of the data is preserved. For example, if 3 > 2, 3^2 > 2^2
 - Using the norm or squared norm in gradient descent <span style="color:red">results in the same location of the minimum</span>.
-- Squaring cancels the square root in the Frobenius norm formula. Because of the chain rule, we would have to do more calculations if we had a square root in our expression for summation.
+- Squaring cancels the square root in the Frobenius norm formula. Because of the chain rule for derivative, we would have to do more calculations if we had a square root in our expression for summation.
 - Dividing the function value by the positive number doesn't change the optimum of the function, for the same reason as described above.
-- divide by m: We're interested in transforming English embedding into the French. Thus, it is more important to measure average loss per embedding than the loss for the entire dictionary (which increases as the number of words in the dictionary increases).
+- divide by m: We're interested in transforming English embedding into the French. Thus, it is more important to <span style="background-color:#FFFF00">measure average loss per embedding</span> than the loss for the entire dictionary (which increases as the number of words in the dictionary increases).
 
 
 
@@ -532,15 +533,27 @@ num_planes = 3
 random_planes_matrix = np.random.normal(
                        size = (num_planes,
                                num_dimensions)) 
+#[[ 1.76405235  0.40015721]
+
+# [ 0.97873798  2.2408932 ]
+
+# [ 1.86755799 -0.97727788]]
+
 #find out whether vector v is on positive or negative side of each planes
 
 def side_of_plane_matrix(P,v):
-  dotproduct = np.dot(P,v.T
+  dotproduct = np.dot(P,v.T)
   sign_of_dot_product = np.sign(dotproduct)
   return sign_of_dot_product
 
-v = np.array([[2,2,]])
+v = np.array([[2,2]])
 num_planes_matrix = side_of_plane_matrix(random_planes_matrix, v)
+#array([[1.],
+
+#       [1.],
+
+#       [1.]])
+
 ```
 
 
@@ -550,9 +563,7 @@ Text can be embedded into vector space so that nearest neighbors refer to text w
 
 
 
-## Natural Language Processing with Probabilistic Models
-
-#### Week1 Autocorrect and Minimum Edit Distance
+## Autocorrect and Minimum Edit Distance
 
 
 How it works?
