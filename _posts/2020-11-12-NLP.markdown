@@ -14,11 +14,10 @@ tags:
 
 <script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"> </script>
 
-## Natural Language Processing with Classification and Vector Spaces
 
-#### Vocabulary & Feature Extraction
+## Vocabulary & Feature Extraction
 
-**Sparse Representation**: 
+#### Sparse Representation
 
 - Represent Text as a vector. Check every word from vocabulary, if appear, note 1 else 0
 - Disadvantage: Large
@@ -56,15 +55,17 @@ $$X_m = \left[ 1, \sum_{w_{pos}} freqs\left( w_{pos}, 1 \right),  \sum_{w_{neg}}
 Hence you end up getting the following feature vector ```[1,8,11]```. 11 corresponds to the bias, 88 the positive feature, and 11 the negative feature.
 
 
-**Preprocessing**: 
+#### Preprocessing 
 
 When preprocessing, you have to perform the following:
 
 1. Eliminate handles(@...) and URLs
 2. Tokenize the string into words.
-3. Remove stop words like  “and, is, are, at, has, for ,a”
+3. Remove stop words like  “and, is, are, at, has, for ,a”: Stop words are words that don't add significant meaning to the text.
 4. Stemming- or convert every word to its stem. Like dancer, dancing, danced, becomes 'danc'. You can use porter stemmer to take care of this.
 5. Convert all your words to lower case.
+  
+[example](https://github.com/beckswu/Natural-Language-Processing/tree/master/Coursera/Course1-Natural%20Language%20Processing%20with%20Classification%20and%20Vector%20Spaces)
 
 
 ![](/img/post/Natural-Language-Processing/course1/week1pic9.gif)
@@ -85,15 +86,16 @@ X = np.zeros((m,3)) #Initialize matrix X
 for i in range(m): #For every tweet
 
     p_tweet = process_tweet(tweets[i]) #process tweet, include
+
                                       # deleting stops, stemming, deleting URLS, and handles and lower cases
 
     X[i, :] = extract_features(p_tweet, freqs) #Extract Features: 
-    
+
                                                #By summing up the positive and negative frequencies of the tweets
                                                
 ```
 
-**Logistic Regression**
+#### Logistic Regression
 
 $$x^{\left( i \right)} $$ is i-th tweet
 
@@ -125,7 +127,18 @@ $$L\left(  \theta \right) = \prod_{i=1}^{m}  h \left(\theta, x^{\left( i \right)
 ![](/img/post/Natural-Language-Processing/course1/week1pic17.png)
 
 
-#### Week2 Naive Bayes
+
+------------
+
+if X is M x N matrix, N is the number of features 
+
+
+$$ d\theta = \frac{1}{m} X^T \left( h\left(X, \theta \right) - y \right)$$
+
+------------
+
+
+####  Naive Bayes
 
 Tweet <span style="color:red">defined either positive or negative, cannot be both</span>. Bayes' rule is based on the mathmatical formulation of conditional probabilities. <span style="background-color: #FFFF00">Called **Naive** because make assumpton that the **features you're using for classification are all independent**, which in reality is rare</span>
 
@@ -141,25 +154,25 @@ $$ P\left(happy \mid Positive \right) = \frac{ P\left(Positive \cap happy \right
 
 $$ P\left(Positive \mid happy \right) =  P\left(happy \mid Positive \right) \frac{ P\left(Positive \right)}{P\left(happy \right)} $$
 
-Q: Suppose that in your dataset, 25% of the positive tweets contain the word ‘happy’. You also know that a total of 13% of the tweets in your dataset contain the word 'happy', and that 40% of the total number of tweets are positive. You observe the tweet: ''happy to learn NLP'. What is the probability that this tweet is positive? <br/>
+e.g. Q: Suppose that in your dataset, 25% of the positive tweets contain the word ‘happy’. You also know that a total of 13% of the tweets in your dataset contain the word 'happy', and that 40% of the total number of tweets are positive. You observe the tweet: ''happy to learn NLP'. What is the probability that this tweet is positive? <br/>
 A: 0.77
 
 ![](/img/post/Natural-Language-Processing/course1/week2pic2.png)
 
 - Word with equal probability for positive/negative don't add anything to the sentiment (e.g. I, am, learning, NLP) 
 - "sad, happy, not" have a significant difference between probabilities. 
-- "because" negative class is zero, no way of comparing between two corpora, a problem
+- <span style="color:red">Problem: "because" negative class is zero, no way of comparing between two corpora</span>
 
 ![](/img/post/Natural-Language-Processing/course1/week2pic3.png)
 
 
-Once you have the probabilities, you can compute the likelihood score as follows. A score greater than 1 indicates that the class is positive, otherwise it is negative.
+Once you have the probabilities, you can compute the likelihood score as follows.<span style="background-color:#FFFF00"> A score greater than 1 indicates that the class is positive, otherwise it is negative.</span>
 
 
 ![](/img/post/Natural-Language-Processing/course1/week2pic4.png)
 
 
-**Laplacian Smoothing**
+#### Laplacian Smoothing
 
 We usually compute the probability of a word given a class as follows:
 
@@ -175,10 +188,7 @@ $$ P\left(w_i \mid positive \right) = \frac{freq\left(wi,positive \right) + 1}{N
 
 $$ P\left(w_i \mid negative \right) = \frac{freq\left(wi,negative \right) + 1}{N_{negative} + V}$$
 
-Note that we added all in the numerator, and since there are V words to normalize, we add V in the denominator. where 
-
-
-<span style="color:red">$$V$$:  the number of unique words in the entire set of documents, for all classes, whether positive or negative.</span>
+where  <span style="color:red">$$V$$:  the number of unique words in the entire set of documents, for all classes, whether positive or negative.</span>
 
 
 ![](/img/post/Natural-Language-Processing/course1/week2pic5.png)
@@ -196,13 +206,16 @@ $$ \frac{P\left(pos\right)}{P\left(neg\right)} \prod_{i=1}^m \frac{P\left(w_i \m
 
 
 
-m gets larger, we can get numerical flow issues, hard to store on device , so we introduce the log, which gives you the following equation 
+<span style="color:red">m gets larger, we can get numerical flow issues,</span> hard to store on device , so we introduce the <span style="background-color:#FFFF00">**log**</span>, which gives you the following equation 
 
 $$ log\left( \frac{P\left( D_{pos}\right)}{P\left(D_{neg}\right)} \prod_{i=1}^m \frac{P\left(w_i \mid pos\right)}{P\left(w_i \mid neg\right)} \right) =>  \underbrace{log\frac{P\left(D_{pos}\right)}{P\left(D_{neg}\right)}}_{\text{log prior}} + \underbrace{\sum_{i=1}^m log \frac{P\left(w_i \mid pos\right)}{P\left(w_i \mid neg\right)}}_{\text{log likelihood}} $$
 
 $$\text{where} \quad P\left(D_{pos}\right) = \frac{D_{pos}}{D},  P\left(D_{neg}\right) = \frac{D_{neg}}{D}$$
  
- <span style="background-color: #FFFF00">where D is the total number of documents, $$D_{pos}$$ is the total number of positive tweets and $$D_{neg}$$ is the total number of negative tweets.</span> <span style="color:red">注：与$$N_{pos}$$ 不同， $$N_{pos}$$ 是total number of all positive words</span>
+ - Reason to use log prior ratio: in real world, number of positive tweets may not equal to the number of negative tweets in your training data 
+ - <span style="background-color: #FFFF00">D is the total number of tweets </span> 
+ - <span style="background-color: #FFFF00">$$D_{pos}$$ is the total number of positive tweets and $$D_{neg}$$ is the total number of negative tweets.</span> 
+ - <span style="color:red">**注：与$$N_{pos}$$ 不同， $$N_{pos}$$ 是total number of all positive words**</span>
  
 <span style="background-color: #FFFF00">log prior represents the underlying probability in the target population that a tweet is positive versus negative.  important for unbalanced dataset</span>. We further introduce λ as follows:
 
@@ -212,13 +225,13 @@ $$\text{where} \quad P\left(D_{pos}\right) = \frac{D_{pos}}{D},  P\left(D_{neg}\
 
 ![](/img/post/Natural-Language-Processing/course1/week2pic8.png)
 
-**Training Naive Bayes**
+#### Training Naive Bayes
 
 1. collect and annotate corpus: divide tweets into two groups, positive/negative
 2. Preprocess the tweets: process_tweet(tweet) ➞ [w1, w2, w3, ...]:
    - Lowercase
    - Remove punctuation, urls, names
-   - Remove stop words
+   - Remove stop words: Stop words are words that don't add significant meaning to the text. 
    - Stemming
    - Tokenize sentences
 3. Compute freq(w, class), use below table to compute
@@ -249,7 +262,7 @@ There are many applications of naive Bayes including:
 - Word disambiguation: e.g. don't know bank in reading, refer to river or money? to calculate the score of the document, $$\frac{P\left(river \mid text\right)}{P\left(money \mid text\right)}$$. if refer to river not money, score is bigger than 1. 
 
 
-**Naive Bayes Assummtion**
+#### Naive Bayes Assumption
 
 <span style="background-color: #FFFF00">Advantage: simple doesn't require setting any custom parameters</span>.
 
@@ -257,8 +270,7 @@ Assumption:
 
 1. <span style="background-color: #FFFF00">Indepdence between predictors or features associated with each class</span>
   - assume word in a piece of text are independent. e.g. "It is sunny and hot in the Sahara desert." But "sunny" and "hot" often appear together. And together often related to beach or desert. Not always independent 
-  - <span style="color:red">Under or over estimate conditional probabilities of individual words</span>
-  - e.g. "It's always cold and snowy in ___" naive model will assign equal weight to the words "spring, summer, fall, winter".
+  - <span style="color:red">Under or over estimate conditional probabilities of individual words</span> e.g. "It's always cold and snowy in ___" naive model will assign equal weight to the words "spring, summer, fall, winter".
 2. Relative frequencies in corpus: <span style="background-color: #FFFF00">rely on distribution on training dataset</span>
    - A good dataset contain the same proportion of positive and negative weets as a random sample. But in reality positive tweet is more common(because negative tweets maybe muted or banned by twitter). This would result a very optimistic or pessimistic model
 
