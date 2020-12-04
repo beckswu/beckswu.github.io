@@ -137,6 +137,8 @@ $$ d\theta = \frac{1}{m} X^T \left( h\left(X, \theta \right) - y \right)$$
 
 ------------
 
+<br/><br/><br/>
+
 
 ##  1.2 Naive Bayes
 
@@ -188,7 +190,7 @@ $$ P\left(w_i \mid positive \right) = \frac{freq\left(wi,positive \right) + 1}{N
 
 $$ P\left(w_i \mid negative \right) = \frac{freq\left(wi,negative \right) + 1}{N_{negative} + V}$$
 
-where  <span style="color:red">$$V$$:  the number of unique words in the entire set of documents, for all classes, whether positive or negative.</span>
+where  <span style="color:red">$$V$$:  the number of unique words in the entire set of documents(而不是total count of word), for all classes, whether positive or negative.</span>
 
 
 ![](/img/post/Natural-Language-Processing/course1/week2pic5.png)
@@ -286,6 +288,8 @@ Assumption:
    - some common language phenomenon, Sarcasm, Irony and Euphemisms.
    - e.g. "This is a ridiculously powerful movie. The plot was gripping and I cried right through until the ending" positive. After process. [ridicul, power, movi, plot, grip, cry, end] negative
 
+
+<br/><br/><br/>
 
 
 ## 1.3 Vector Space
@@ -389,7 +393,7 @@ $$\begin{align} \hat{v} \cdot \hat{w} &= \Vert \hat{v} \Vert \Vert \hat{w} \Vert
 
 [Sample Code for PCA](https://github.com/beckswu/Natural-Language-Processing/tree/master/Coursera/Course1-Natural%20Language%20Processing%20with%20Classification%20and%20Vector%20Spaces)
 
-
+<br/><br/><br/>
 
 ## 1.4 Transforming word vectors
 
@@ -561,7 +565,7 @@ Text can be embedded into vector space so that nearest neighbors refer to text w
 
 ![](/img/post/Natural-Language-Processing/course1/week4pic8.png)
 
-
+<br/><br/><br/>
 
 ## 2.1 Autocorrect and Minimum Edit Distance
 
@@ -584,8 +588,9 @@ Minimum edit distance(**Levenshtein distance**): insert(cost 1), delete(cost 1),
 
 ![](/img/post/Natural-Language-Processing/course2/week1pic2.png)
 
+<br/><br/><br/>
 
-## Part of Speech Tagging and Hidden Markov Models
+## 2.2 Part of Speech Tagging and Hidden Markov Models
 
 ![](/img/post/Natural-Language-Processing/course2/week2pic1.png)
 
@@ -742,12 +747,16 @@ e.g. 下面的例子,
 
 [Forward & Backward Example](https://github.com/beckswu/Natural-Language-Processing/blob/master/Coursera/Course2-Natural%20Language%20Processing%20with%20Probabilistic%20Models/week2-Assignment-%20Part%20of%20Speech%20Tagging.ipynb)
 
-#### Week3 Autocomplete and Language Models
+<br/><br/><br/>
 
-Language model: calculate the probability of sentences
+#### 2.3 Autocomplete and Language Models
+
+**Language model**: calculate the probability of a given sentence
 
 - Estimate probability of word sequences. 
 - Estimate probability of a word following a sequence of words with most likely suggestions(**Autocomplete a sentence**) e.g. if you type, how are, e-mail application guess you
+  - It estimate the probability by splitting sentence into series of n-grams then find their probability in the probability matrix. Then language model predict next elements of sequence by return the word with <span style="color:red">highest probability</span>
+
 
 Application:
 
@@ -757,14 +766,14 @@ Application:
   - Augmentative communication system: take a series of hand gestures from a user to help them form words and sentences
 
 
-**N-gram**: 
+#### N-gram 
 
-- An N-gram: sequence of N words. Order matters
+- An N-gram: sequence of N words. <span style="background-color:#FFFF00">Order matters</span>
 - punctuation is treated as words. But all other special characters such as codes will be removed
 
 
 E.g. 
-- Bigrams are all sets of two words that appear side by side in corpus. <span style="color:red">Notes: 下面例子, I am appear twice, 但是only include 一次在 bigram set</span>, I happy 因为不相邻，所以不是
+- Bigrams are all sets of two words that appear side by side in corpus. <span style="color:red">Notes: 下面例子, ```I am``` appear twice, 但是only include 一次在 bigram set</span>, I happy 因为不相邻，所以不是
 - Tigram: represent unique triplets of words that appear together in the sequence together in the corpus
 
 
@@ -778,13 +787,13 @@ $$ \text{Bigrams: \{I am happy, am happy because, ...\}} $$
 
 Sequence Notation:
 
-$$W_1^3: \text{sequence of wrods from word 1 to word 3}$$
+$$W_1^3: \text{sequence of words from word 1 to word 3}$$
 
 $$W_{m-2}^m: \text{sequence of wrods from word m-2 to word m}$$
 
 ![](/img/post/Natural-Language-Processing/course2/week3pic1.png)
 
-**Probability** 
+#### Probability
 
 Note: in bigram: $$ P\left( happy \mid I \right) = 0$$ 因为 I happy never appear in the corpus
 
@@ -792,7 +801,7 @@ $$ \text{Probabiity of bigram} \quad P\left( y \mid x \right) = \frac{ C\left(x,
 
 $$\text{where }C_\left(x \right): \text{the count of all unigram x.} \quad \sum_w{C\left(x, w \right)}: \text{the count of all bigram starting with x}$$
 
-$$\sum_w{C\left(x, w \right)}$$ bigram can be simpilied to $$C_\left(x \right)$$ unigram: <span style="color:red">only works if x is followed by another word</span>
+$$\sum_w{C\left(x, w \right)}$$ bigram can be simpilied to $$C_\left(x \right)$$ unigram: <span style="color:red">**only works if x is followed by another word**</span>
 
 $$ \text{Probabiity of trigram} \quad P\left( w_3 \mid w_1^2 \right) = \frac{ C\left(w_1^2 w_3\right)}{C\left(w_1^2\right)}$$
 
@@ -806,7 +815,7 @@ $$ \text{Chain Rule} \quad P\left(A,B,C,D\right) = P\left(A \right)P\left(B \mid
 
 $$P\left(the \ teacher \ drinks \ tea\right) = P\left(the \right)P\left(teacher \mid the \right)P\left( drinks \mid\ the, teacher \right)P\left(tea\mid the, teacher, drinks \right)$$
 
-**Problem with above calculation**: <span style="background-color: #FFFF00">Corpus almost never contains the exact sentences we're interested in or even its longer subsequences</span>, 比如$$C\left( the \ teacher \ drinks \ tea \right)$$ and $$C\left( the \ teacher \ drinks  \right)$$ neither of them are likely in training corpus, the count are 0. <span style="color:red">当sentences get longer and longer, the likelihood that more and more words will occur next to each other in the exact order gets smaller and smaller</span>
+**Problem with above calculation**: <span style="background-color: #FFFF00">Corpus almost never contains the exact sentences we're interested in or even its longer subsequences</span>, 比如$$C\left( the \ teacher \ drinks \ tea \right)$$ and $$C\left( the \ teacher \ drinks  \right)$$ 可能都不会出现在 training corpus, the count are 0. <span style="color:red">当sentences get longer and longer, the likelihood that more and more words will occur next to each other in the exact order gets smaller and smaller</span>
 
 
 
@@ -819,13 +828,13 @@ $$P\left(the \ teacher \ drinks \ tea\right) \approx P\left(the \right)P\left(te
 - Bigram: $$P\left( w_n \mid w_1^{n-1} \right) \approx P\left( w_n \mid w_{n-1} \right) $$
 - N-gram: $$P\left( w_n \mid w_1^{n-1} \right) \approx P\left( w_n \mid w_{n-N+1}^{n-1} \right) $$
 - Entire sentence modeled with bigram: $$P\left( w_1^n \right) \approx \prod_{i=1}^{n} P\left( w_i \mid w_i-1 \right) $$
-  - contrast with Naive Bayes, approximate sentence probability without cnsidering any word history
+  - contrast with Naive Bayes where approximate sentence probability without cnsidering any word history
   - $$P\left( w_1^n \right) \approx P\left(w_1 \right)P\left(w_2 \mid w_1 \right)P ... P\left(w_n\mid w_{n-1} \right) $$: The first term of Bigram reiles on unigram probability of first word n sentence
 
 ![](/img/post/Natural-Language-Processing/course2/week3pic3.gif)
 
 
-**Start & End of Sentences**:
+#### Start & End of Sentences
 
 Start: 
 
@@ -837,7 +846,7 @@ Start:
 
 End: 
 
-Problem 1:   $$ \text{Probabiity of bigram} \quad P\left( y \mid x \right) = \frac{ C\left(x, y \right)}{\sum_w{C\left(x, w \right)}} = \frac{ C\left(x y \right)}{C\left(x \right)}, {\sum_w{C\left(x, w \right)}$$ the count of all bigram starting with X. <span style="color:red">When x is last word of sentences, doesn't work</span>
+Problem 1:  $$ \text{Probabiity of bigram} \quad P\left( y \mid x \right) = \frac{ C\left(x, y \right)}{\sum_w{C\left(x, w \right)}} = \frac{ C\left(x y \right)}{C\left(x \right)}$$, $$\sum_w C\left(x, w \right)$$ the count of all bigram starting with X. <span style="color:red">When x is last word of sentences, doesn't work</span>
 
 e.g. Corpus:
 
@@ -915,15 +924,13 @@ $$\text{Note: } P\left( w_n \mid w_{n-N+1}^{n-1} \right) = \frac{ C\left(w_{n-N+
 - Probability Matrix: divde each cell from Count Matrix by Count Matrix row sum 
     - Count Matrix row sum equivalent to your counts of n-1 gram:  $$sum\left( row \right) = \sum_{w \in V} C\left(w_{n-N+1}^{n-1}, w\right) = C\left(w_{n-N+1}^{n-1}\right)$$
 
-**Language Model**: to esitmate the probability of a given sentence
 
-It estimate the probability by splitting sentence into series of n-grams then find their probability in the probability matrix. Then language model predict next elements of sequence by return the word with highest probability
 
 **Log probability**:  all probability in calculation <= 1 and mutiplying them brings risk of underflow
 
 ![](/img/post/Natural-Language-Processing/course2/week3pic5.gif)
 
-Algorithm：
+#### Algorithm
 
 1. Choose sentence start:  <span style="background-color: #FFFF00">**randomly choose** among all bigrams starting with ```<s>``` based on bigram probability. Bigrams with higher probabilities are more likely to be chosen.</span>
 2. Choose next bigram starting with previous word from step 1 **randomly**, 概率更高，被抽到概率更大
@@ -935,6 +942,8 @@ e.g. :  choose 是绿色
 ![](/img/post/Natural-Language-Processing/course2/week3pic6.png)
 
 
+#### Perplexity
+
 **Language Model Evaluation**
 
  - For smaller corpora: 80% Train, 10% Validation(used for tuning hyper-parameters), 10% Test
@@ -942,7 +951,7 @@ e.g. :  choose 是绿色
 
 ![](/img/post/Natural-Language-Processing/course2/week3pic7.png)
 
-**Perplexity** 
+
 
 $$PP\left(W \right) = P\left(s_1,s_2,...,s_m \right)^{\frac{1}{m}}$$
 
@@ -954,8 +963,8 @@ $$PP\left(W \right) = P\left(s_1,s_2,...,s_m \right)^{\frac{1}{m}}$$
 - Perplexity is the inverse probability of test sets normalized by <span style="color:red">the number of words</span> in the test set => higher the language model probability esitmates lower perplexity will be
 - <span style="color:red">Perplexity is closely related to **entropy** which measures uncertainty</span>
 - <span style="background-color: #FFFF00">Good language model have perplexity score between 60 to 20. Log perplexity is between 4.3 and 5.9 </span>
-- perplexity for character level language lower perplxity for than word-based model
-- The same probability for different test sets, the bigger m the lower final perplexity will be
+- perplexity for character level language lower perplexity for than word-based model
+- The same probability for different test sets, <span style="background-color:#FFFF00">**the bigger m the lower final perplexity will be**</span>
 
 e.g. 100 word in the text sets, m = 100, probability 0.9 which is high => means predict test sets very well
 
@@ -976,10 +985,10 @@ Use log perplexity insetad of perplexity
 $$logPP\left(W \right) = -\frac{1}{m}\sum_{i=1}^{m}  log_2\left(P\left( w_i \mid  w_{i-1} \right)  \right), \,\, \color{red}{w_i \text{: i-th word in test set}}$$
 
 
-**Out of vocabulary**
+#### Out of vocabulary
 
 - closed vocabulary: a fixed last of word.   a set of unique word supported by a language model. e.g. chatbot only answer limited questions
-- open vocabulary: deal with words not seen before (out of vocabulary)
+- open vocabulary: can deal with words not seen before (out of vocabulary)
 - unknown word also **called out of vocabuarly word (OOV)**
 - replace unknown word with special tag ```<UNK>``` in corpus and in input
 
@@ -987,7 +996,7 @@ Using ```<UNK>``` in corpus
 
 1. create vocabulary V
    - Criteria 1: min word frequency f: 至少在corpus 中出现f回
-   - Criteria 2: max size of vocabulary, only include words by frequency to the maximum vocabulary size
+   - Criteria 2: max size of vocabulary, only include words sort by frequency to the maximum vocabulary size
 2. Replace any word in corpus and not in V by ```<UNK>```
 3. Count the probabilities with ```<UNK>``` as with any other word, 
     - ```<UNK>``` usually lower perplexity
@@ -997,13 +1006,13 @@ Note:
 - You might have lot of ```<UNK>```, then model generate a sequence of ```<UNK>``` quotes with high probability instead of meaningful sentences. Due to this limitation, using ```<UNK>``` sparingly
 - <span style="background-color: #FFFF00">Only compare Language model perplexity with the same vocabulary</span>
 
-比如下面例子，vocabulary 的词必须要在corpus中至少出现两回
+比如下面例子，vocabulary 的词必须要在corpus中至少出现两回, 如果没有出现两回用 ```<UNK>``` 代替
 
 ![](/img/post/Natural-Language-Processing/course2/week3pic8.png)
 
 
 
-**Smoothing**
+#### Smoothing
 
 Problem: N-gram made of known words still migh be missing in training corpus. 比如 ```eat chocolate. John drinks```, bigram ```John eat``` are missing in bigram
 
@@ -1014,6 +1023,8 @@ Problem: N-gram made of known words still migh be missing in training corpus. �
 
 
 $$P\left( w_n \mid w_{n-1} \right) = \frac{ C\left(w_{n-1}, w_n\right) + 1}{\sum_{w \in V} C\left( w_{n-1}, W\right) + 1} = \frac{C\left(w_{n-1}, w_n\right) + 1}{C\left(w_{n-1}\right) + V}$$
+
+Note: <span style="background-color:#FFFF00">V is the size of vocabulary (而不是total count of word)</span>
 
 Plus V only works if real counts are large enough to outweigh the plus one. Otherwise the probability of missing word will be too high，比如就vocubary size = 2, $$ P\left(UNK \mid known word \right) =  \frac{C\left(w_{n-1}, w_n\right) + 1}{C\left(w_{n-1}\right) + V} = \frac{1}{1 + 2} = \frac{1}{3}$$
 
@@ -1030,7 +1041,7 @@ e.g. Corpus "I am happy I am learning"  and k = 3, vocabulary size is 4 ```(I, a
 $$P\left(can \mid I\right) = \frac{3}{2 + 3*4}$$
 
 
-**Backoff**
+#### Backoff
 
 - <span style="color:red">if N-gram missing => using (N-1) gram. if (N-1) gram missing, using (N-2) gram... so on until find nonzero probabilities</span>
 - using lower level N-gram, distort probabilities especially for smaller corpora
@@ -1041,7 +1052,7 @@ $$P\left(can \mid I\right) = \frac{3}{2 + 3*4}$$
 ![](/img/post/Natural-Language-Processing/course2/week3pic10.png)
 
 
-**Linear Interpolation**: 
+#### Linear Interpolation
 
 linear interpolation of all orders of n-gram: combined weighted probabilities of n-gram, (n-1) gram down to unigrams. <span style="background-color: #FFFF00">Lambda are learned from validation parts of the corpus. Can get them by maximizing the probability of sentences from the validation set</span>. The interpolation can be used for general n-gram by using more Lambdas
 
@@ -1052,15 +1063,16 @@ e.g. John drink chocolate
 
 $$\hat P\left( chocolate \mid John \, drink \right) = 0.7 \times P\left( chocolate \mid John \, drink  \right) +0.2 \times P\left( chocolate \mid drink \right) + 0.1 \times P\left( chocolate \right) $$
 
+<br/><br/><br/>
 
-#### Week4 Word Embeddings with Neural Networks
+## 2.4 Word Embeddings with Neural Networks
 
 Build a vocabulary: assign integer to word, <span style="color:red"> Problem: order doesn't make sense from a semantic perspective. e.g. no reason that happy number > zebra</span> 
 
 ![](/img/post/Natural-Language-Processing/course2/week4pic1.png)
 
 
-**one-hot vectors**: 
+#### one-hot vectors
 
 - put 1 in the row that has the same label and 0 everywhere else,
 -  <span style="color:red"> Advantage: not imply any relationship between any two words</span>. e.g. Each vector says the word either happy or not , either zebra or not
