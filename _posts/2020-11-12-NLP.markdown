@@ -676,6 +676,8 @@ $$ C\left(t_i, w_i \right) $$ word_i 属于tag_i 出现的次数
 
 #### Viterbi Algorithm: a graph algorithm
 
+Given a sequence of words, predict 每个词属于什么tag, e.g. given corpus ```['see', 'them', 'here', 'with', 'us', '.']```,predict ```['VB', 'PRP', 'RB', 'IN', 'PRP', '.']```
+
 下面例子:
 
 - from O -> NN / VB has the same probability. But the emission probability of love is higher for VB.
