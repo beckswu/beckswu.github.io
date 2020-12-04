@@ -749,7 +749,7 @@ e.g. 下面的例子,
 
 <br/><br/><br/>
 
-#### 2.3 Autocomplete and Language Models
+## 2.3 Autocomplete and Language Models
 
 **Language model**: calculate the probability of a given sentence
 
@@ -1136,7 +1136,7 @@ e.g. each vector has 1000 elements,
 
 ![](/img/post/Natural-Language-Processing/course2/week4pic6.png)
 
-- define <span style="background-color:#FFFF00">**context words**</span> as four words. C= 2 <span style="color:red">Two words before center word and two words after it</span>. <span style="background-color:#FFFF00">C is the hyperparameter of the model</span>
+- define <span style="background-color:#FFFF00">**context words**</span> as four words. C= 2 <span style="color:red">Two words before center word and two words after it</span>. C is half size of the context. <span style="background-color:#FFFF00">C is the hyperparameter of the model</span>
 - Window: center word + context words
 - Architecture: context words as input and center words as output
 
@@ -1182,26 +1182,26 @@ nltk.download('punkt') #download pre-trained Punkt tokenizer for English
 
 **Transforming Words Into Vectors**
 
-Corpus: I am happy because I am learning </br>
+Corpus: I am happy because I am learning <br/>
 Vocabulary: am, because, happy, I, learning  (vocabulary is the set of unique set)
 
 
 - Center word:  One-hot vector: 下面例子order by alphabetic order，实际中可以是arbitrary 
-- Context word: take the average of one-hot vectors of each context word
+- Context word: take the average of one-hot vectors of each context word (average 除以的是 2C, C is half size of context words )
 
 ![](/img/post/Natural-Language-Processing/course2/week4pic10.gif)
 
 [Python- Create One hot vector for center /context word ](https://github.com/beckswu/Natural-Language-Processing/blob/master/Coursera/Course2-Natural%20Language%20Processing%20with%20Probabilistic%20Models/week4-data_prep.ipynb)
 
 
-**Architecture of Continuous bag-of-words**
+#### Architecture of Continuous bag-of-words
 
 - based on shallow dense neural network with an input layer, a single hidden layer, and an output layer
 - input is vector of context words, size(vector) = size(vocabulary) V
 - output is predict of center word, size(vector) = size(vocabulary) V
 - Hyparameter: word embedding size N = size (Hidden layer), typical from hundred to thousands
 - Need activation function for hidden layer and output layer, result of activation layer is sent to next layer. The outcome of activation of output layer is model prediction
-  - <span style="color:red">Activation function: Hidden layer use ReLu, output layer use softmax</span>
+  - <span style="color:red">**Activation function: Hidden layer use ReLu, output layer use softmax**</span>
 
 
 ![](/img/post/Natural-Language-Processing/course2/week4pic11.png)
@@ -1218,12 +1218,11 @@ note: $$B_1$$ size is Nx1 broadcasting to NxM
 
 ![](/img/post/Natural-Language-Processing/course2/week4pic13.gif)
 
-
 **Activation Function**
 
 ![](/img/post/Natural-Language-Processing/course2/week4pic14.gif)
 
-Softmax: input is a vector of real numbers, 不像ReLu original form is single number. Output is a vector of real number in the interval 0 to 1 which <span style="background-color:#FFFF00">sum up to 1</span>, 可以被解释为 probabilities of exclusive events. <span style="background-color:#FFFF00">Each row correspond to a word of the vocabulary: probability of being center word</span>
+<span style="background-color:#FFFF00">**Softmax**</span>: input is a vector of real numbers. Output is a vector of real number in the interval 0 to 1 which <span style="background-color:#FFFF00">sum up to 1</span>, 可以被解释为 probabilities of exclusive events. <span style="background-color:#FFFF00">Each row correspond to a word of the vocabulary: probability of being center word</span>
 
 $$$$$$\hat y_i = \frac{e^{z_i}}{\sum_{j=1}^{V}e^{z_j}}, \text{exponential form transform inputs to all positive }$$
 
@@ -1296,30 +1295,30 @@ $$\frac{\partial Cross-entropy \, Loss}{\partial w_j} = \frac{\partial Cross-ent
 ------------
 
 
-**Extract Word Embedding Vectors**
+#### Extract Word Embedding Vectors
 
 After iterate training data serval times,
 
-Option 1:  can consider <span style="color:red">each column of $$W_1$$ as embedding vector of a word of the vocabulary</span>, $$W_1$$ size is VxN, it has one column for each word in the vocabulary, 比如下面例子，总共5列，第一列 is the word embedding column vector for *am*, 第二列for *because*
+**Option 1**:  can consider <span style="color:red">each column of $$W_1$$ as embedding vector of a word of the vocabulary</span>, $$W_1$$ size is VxN, it has one column for each word in the vocabulary, 比如下面例子，总共5列，第一列 is the word embedding column vector for *am*, 第二列for *because*
 
 ![](/img/post/Natural-Language-Processing/course2/week4pic19.png)
 
 
-Option 2: Use <span style="color:red">each row in $$W_2$$ as the embedding row vector for corresponding word</span>. $$W_1$$ size is NxV,  order is the same as input vector or matrix 比如 第一行表示 embedding row vector for *am*, 第二行for *because*
+**Option 2**: Use <span style="color:red">each row in $$W_2$$ as the embedding row vector for corresponding word</span>. $$W_1$$ size is NxV,  order is the same as input vector or matrix 比如 第一行表示 embedding row vector for *am*, 第二行for *because*
 
 ![](/img/post/Natural-Language-Processing/course2/week4pic20.png)
 
 
-Option 3: average of Option 1 and Option 2, average $$W_1$$ and the transpose of $$W_2$$  , $$W_3$$ size is NxV, <span style="color:red">each column of $$W_3$$ as embedding vector of a word of the vocabulary</span>, e.g. 第一列 is the word embedding column vector for *am*, 第二列for *because*
+**Option 3**: average of Option 1 and Option 2, average $$W_1$$ and the transpose of $$W_2$$  , $$W_3$$ size is NxV, <span style="color:red">each column of $$W_3$$ as embedding vector of a word of the vocabulary</span>, e.g. 第一列 is the word embedding column vector for *am*, 第二列for *because*
 
 ![](/img/post/Natural-Language-Processing/course2/week4pic21.png)
 
 
 
-**Evaluation**
+#### Evaluation
 
 
-- Intrinsic evaluation: assess how eell word embedding inherently capture the semantic(meaning of words) or syntactic(grammar) relationship between words
+- Intrinsic evaluation: assess how well word embedding inherently capture the semantic(meaning of words) or syntactic(grammar) relationship between words
   - could testing word embeddings on analogies:  
       - Semantic analogies: e.g. France -> pairs as Italy -> ?
       - syntactic analogies: e.g. plural, tenses(时态), and comparatives(比较级) e.g. seen -> saw as been -> ?
@@ -1339,6 +1338,7 @@ Option 3: average of Option 1 and Option 2, average $$W_1$$ and the transpose of
 
 ![](/img/post/Natural-Language-Processing/course2/week4pic22.gif)
 
+#### Python Lib
 
 Keras and Pytorch add embedding layer in neural network model using a sinle line of code. Other library like Trax also allow you do so.
 
