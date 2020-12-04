@@ -638,9 +638,11 @@ Process Corpus:
 1. <span style="background-color:#FFFF00">Add start token in each line of sentence as to calculate initial probability</span>
 2. transform all words in lowercase and keep punctuation 
 
+<span style="background-color:#FFFF00">**Transition Matrix**:</span>
+
 ![](/img/post/Natural-Language-Processing/course2/week2pic9.gif)
 
-**Transition Matrix**:
+
 
 ![](/img/post/Natural-Language-Processing/course2/week2pic9.png)
 
@@ -654,14 +656,14 @@ Process Corpus:
 
 - 为了避免probability as 0, add a small value eplison(e.g. 0.001)
 -  vb is 1/3 for all outgoing transitions. 是Reasonable的 because don't have any data to estimate these probabilities
-- In reall world, <span style="background-color:#FFFF00">don't apply smoothing for initial probability. Because: if add, allow a sentence to start with any parts of speech tag, including punctuation</span>
+- In reall world, <span style="background-color:#FFFF00">**don't apply smoothing for initial probability**. Because: if add, allow a sentence to start with any parts of speech tag, including punctuation</span>
 
 
 ![](/img/post/Natural-Language-Processing/course2/week2pic11.gif)
 
 
 
-**Populating the Emission Matrix**
+<span style="background-color:#FFFF00">**Populating the Emission Matrix**</span>
 
 ![](/img/post/Natural-Language-Processing/course2/week2pic12.gif)
 
@@ -684,17 +686,17 @@ $$ C\left(t_i, w_i \right) $$ word_i 属于tag_i 出现的次数
 Viterbi Algorithm 通过两个matrix (C&D) 实现
 
 - Matrix C: hold ther intermediate optimal probabilities 
-  - first column C: the probability <span style="color:red">from start state $$\pi$$ to the first tag $$t_i$$</span> and  word $$W_1$$. $$  c_{i,1} = a_{1,i} \times b_{i,cindex\left(w_1\right)}$$: product of transition probability(from 1 to tag i) and emission probability(from tag i to word1)
-- Matrix D: The most likely indices of visited state
+  - first column C: the probability <span style="color:red">from start state $$\pi$$ to the first tag $$t_i$$</span> and  word $$W_1$$. $$  c_{i,1} = \pi_i \times b_{i,cindex\left(w_1\right)} $$: product of transition probability of initial state (from initial state to tag i) and emission probability b(from tag i to word1)
+- Matrix D: The most likely indices of previous visited state given word $$w_i$$
   - The column is all 0, no proceeding tags traversed
-- Both matrix <span style="color:red">n rows: the number of speech tags/hidden states. K columns: the number of words</span>
+- Both matrix <span style="color:red">n rows: the number of speech tags/hidden states. K columns: the number of words in given sequences</span>
 
 ![](/img/post/Natural-Language-Processing/course2/week2pic16.gif)
 
 
 **Forward Pass**
 
-*Matrix C*
+*Matrix C*: $$  c_{i,j} $$: 第i个tag, 第j个单词
 
 $$  c_{i,j} = \underset{k}{max} \ c_{k,j-1} \times a_{k,i} \times  b_{i,cindex\left(w_j\right)} \text{}$$
 
@@ -723,7 +725,10 @@ In the below example, three states are not initial state, state can be 1,2,3. k 
 
 **Backward Pass**
 
-Extract the graph from matrix D, which represents most likely sequence of hidden states:  Get the index of entry of $$C_{i,k}$$ which is the highest probability in the last column C. Use that index s ($$\underset{i}{argmax} \ c_{i,k}$$) to traverse backwards through the matrix D to reconstruct the sequence. 从后往前推
+Extract the graph from matrix D, which represents most likely sequence of hidden states:  
+
+1. Get the index of entry of $$C_{i,k}$$ which is the highest probability in the last column C. 
+2. Use that index s ($$\underset{i}{argmax} \ c_{i,k}$$) to traverse backwards through the matrix D to reconstruct the sequence. 从后往前推
 
 e.g. 下面的例子,
 
