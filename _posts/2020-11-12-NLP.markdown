@@ -1076,15 +1076,16 @@ Build a vocabulary: assign integer to word, <span style="color:red"> Problem: or
 
 - put 1 in the row that has the same label and 0 everywhere else,
 -  <span style="color:red"> Advantage: not imply any relationship between any two words</span>. e.g. Each vector says the word either happy or not , either zebra or not
--  Huge vectors: require a lot of space and processing time. If created with English word, may have 1 million rows, one row for each English word
--  No embedding meaning: if calculate the distance btween one-hot vectors, always get the same distance btween any two pairs of words. ```d(paper, excited) = d(paper, happy) = d(excited, happy)```, (inner product of any 2 one-hot vector is zero). 但是intuitively, happy is more similar to excited than paper
+- <span style="color:red"> Disadvantage:</span>
+   -  Huge vectors: <span style="color:red">require a lot of space and processing time</span>. If created with English word, may have 1 million rows, one row for each English word
+   -  No embedding meaning: if calculate the distance btween one-hot vectors, always get the same distance btween any two pairs of words. ```d(paper, excited) = d(paper, happy) = d(excited, happy)```, (inner product of any 2 one-hot vector is zero). 但是intuitively, happy is more similar to excited than paper
 
 
 e.g. each vector has 1000 elements,
 
 ![](/img/post/Natural-Language-Processing/course2/week4pic2.gif)
 
-**Word Embedding**
+#### Word Embedding
 
 比如横坐标，word are positive right, word are negative left; 纵坐标 word are concrete, higher. word are abstract lower. <span style="background-color: #FFFF00">Less precise than one hot vector</span>, 可能有两个点重合，比如snake & spider
 
@@ -1103,12 +1104,12 @@ e.g. each vector has 1000 elements,
 
 **Create Word Embedding**
 
-- If you want to generate word embedding based on Shakespeare, corpus should be full and original text of Shakespeare, not stude notes, slide presentation or keywords from Shakespeare. 
+- If you want to generate word embedding based on Shakespeare, corpus should be full and original text of Shakespeare, not study notes, slide presentation or keywords from Shakespeare. 
 - <span style="background-color:#FFFF00">Context(combination of words to occur around that particular word) is important, give meaning to each word embedding</span>. a simple vocabulary list of Shakespeare's most common words not enough to create mebedding. 
-- Objective of word embedding is to predict missing word
+- Objective of word embedding is to predict missing word given context words
 - Embedding method, machine learning models which are set to learn word embeddings. <span style="color:red">The meaning of words, as carred by word embeddings depends on the embedding approach</span>
   - <span style="background-color:#FFFF00">**Self-supervised learning**: Both unsupervised (input data are unlabeled) and supervised(text provide necessary context which would ordinarily make up the label)</span>
-- Word embedding can be tuned by a number of hyperparameters. One hyperparameter is dimension of word embedding vectors. In practice, could from a few hundred to low thousand
+- Word embedding can be tuned by a number of hyperparameters. 其中一个是 dimension of word embedding vectors. In practice, could from a few hundred to low thousand
   - <span style="color:red">Use high dimension captures more nuanced meanings but computatitional expensive</span>, may leading to diminishing return
 - Corpus must first be transformed into a suitable mathematical representation. e.g. Integer word Indices or one-hot vector
 
@@ -1128,7 +1129,7 @@ e.g. each vector has 1000 elements,
   - GPT-2 (OpenAI,2018): generative pre-training 2
 
 
-**Continuous bag-of-words**
+#### Continuous bag-of-words
 
 - <span style="background-color:#FFFF00">the objective: predict a missing word based on the surrounding words</span>
 - rationale: if two unique words are both frequently surrounded by a similar set of words in various sentences, then 这两个词 tend to related in their meaning(related semantically)
@@ -1142,9 +1143,9 @@ e.g. each vector has 1000 elements,
 ![](/img/post/Natural-Language-Processing/course2/week4pic7.gif)
 
 
-**Tokenization**
+#### Tokenization
 
-- Case insensitive: The==the==THE  -> conver to either all lowercase or all uppercase
+- Case insensitive: The==the==THE  -> convert to either all lowercase or all uppercase
 - Punctuation  
   - interruption punctuation marks ```,!.?``` as single special word of the vocabulary.  
   - ignore non interrupting punctuation marks ```'<< >>"```
@@ -1181,7 +1182,7 @@ nltk.download('punkt') #download pre-trained Punkt tokenizer for English
 
 **Transforming Words Into Vectors**
 
-Corpus: I am happy because I am learning</br>
+Corpus: I am happy because I am learning </br>
 Vocabulary: am, because, happy, I, learning  (vocabulary is the set of unique set)
 
 
