@@ -1078,7 +1078,7 @@ Build a vocabulary: assign integer to word, <span style="color:red"> Problem: or
 -  <span style="color:red"> Advantage: not imply any relationship between any two words</span>. e.g. Each vector says the word either happy or not , either zebra or not
 - <span style="color:red"> Disadvantage:</span>
    -  Huge vectors: <span style="color:red">require a lot of space and processing time</span>. If created with English word, may have 1 million rows, one row for each English word
-   -  No embedding meaning: if calculate the distance btween one-hot vectors, always get the same distance btween any two pairs of words. ```d(paper, excited) = d(paper, happy) = d(excited, happy)```, (inner product of any 2 one-hot vector is zero). 但是intuitively, happy is more similar to excited than paper
+   -  <span style="color:red">No embedding meaning</span>: if calculate the distance btween one-hot vectors, always get the same distance btween any two pairs of words. ```d(paper, excited) = d(paper, happy) = d(excited, happy)```, (inner product of any 2 one-hot vector is zero). 但是intuitively, happy is more similar to excited than paper
 
 
 e.g. each vector has 1000 elements,
@@ -1351,3 +1351,87 @@ embed_layer = Embedding(10000,400)
 
 embed_layer = nn.Embedding(10000,400)
 ```
+
+
+## Trax: Neural Networks
+
+
+Neural Network predict positive/negative tweets:
+
+- has a embedding layer that transform the representation 
+- has another hidden layer with a ReLU activation function 
+- output layer with softmax function that give probabilities for whether a tweet is positive or negative sentiment
+- This structure allow to predict complex tweets: 比如 "This moive was almost good". 不能 classify correctly using simpler method 比如 Naive Bayes
+- Initial Representation for neural network is a vector of Integers, <span style="background-color:#FFFF00">List all word from vocabulary then assign integer index to each of word. Then need to 知道 maximum vector size tnd fill zeros to match that size (called **padding**: ensures that all vector have the same size even if your tweets don't)</span>
+
+![](/img/post/Natural-Language-Processing/course3/week1pic1.png)
+
+![](/img/post/Natural-Language-Processing/course3/week1pic2.png)
+
+#### Trax
+
+List the layer from left to right
+
+![](/img/post/Natural-Language-Processing/course3/week1pic3.png)
+
+
+
+Advantage: (Trax is based on Tensorflow, use Tensorflow as a backend, also use **JAX** library to speed up computation)
+
+- Run fast on CPUs, GPUs and TPUs(perform computations efficiently), don't need to change a single line of code for running on CPU, GPU, TPU
+- allow parallel computing: allow model running on multiple machines or courses simultaneously
+- Record algebraic computations for gradient evaluation, so they compute gradient automatically. 
+
+
+Trax Development History: TensorFlow (2014-2015) -> Translate(2016, long time to train, not practical for anyone else other than Google) -> Tensor2Tensor(2017, userd by many large companies in the word. Complicated but not nice to learn, hard for new researchers) -> Trax
+
+Trax： Deep Learning library with Clear Code and Speed
+
+What do you want from a deep learning library? 
+
+- Makes programmers efficient: Easy to Debug and understand 
+- Run code fast: Trax can run on-demand or preemptible Cloud without changing a single line of code 
+
+
+Some Resource
+
+- [Official Trax documentation maintained by the Google Brain team](https://trax-ml.readthedocs.io/en/latest/)
+- [Trax source code on GitHub](https://github.com/google/trax)
+- [JAX library](https://jax.readthedocs.io/en/latest/index.html)
+
+Python Class & Subclass(subclass can override method in super class )
+
+![](/img/post/Natural-Language-Processing/course3/week1pic4.gif)
+
+#### Trax Layers
+
+**Dense Layer**: The single computation( compute inner product between trainable wights and input vector) is called Dense layer
+
+![](/img/post/Natural-Language-Processing/course3/week1pic5.png)
+
+**ReLU Layer**: activation layer that follows a dense fully connected layer, and transforms any negative values to zero.
+
+![](/img/post/Natural-Language-Processing/course3/week1pic6.png)
+
+**Serial Layer**: a composition of sublayers layers that operates sequentially to perform the forward computation of entire model. Can think of serial layer as whole neural network model in one layer
+
+![](/img/post/Natural-Language-Processing/course3/week1pic7.gif)
+
+**Embedding Layer**: map words from vocabulary to representation of that word with determined dimension, 下面例子 embedding size = 2,
+
+![](/img/post/Natural-Language-Processing/course3/week1pic8.png)
+
+**Mean Layer**: Take means of each features from embedding. After mean leary, will have the same number of featurres as embedding size. Note: <span style="color:red">这个layer 没有任何trainable parameters because it's only computing the mean of word embeddings</span>
+
+![](/img/post/Natural-Language-Processing/course3/week1pic9.png)
+
+#### Gradient in Trax
+
+- function ```grad``` return a function that computes the gradients of f
+  - allows much easier training
+- forward and backward in a single line 
+  - Notice the double parentheses, 第一个是 passes the arguments for the grad function, 第二个是arguments for function returned by grad
+
+![](/img/post/Natural-Language-Processing/course3/week1pic10.png)
+
+![](/img/post/Natural-Language-Processing/course3/week1pic11.png)
