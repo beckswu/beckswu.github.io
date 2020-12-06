@@ -1422,6 +1422,24 @@ Python Class & Subclass(subclass can override method in super class )
 ![](/img/post/Natural-Language-Processing/course3/week1pic8.png)
 
 **Mean Layer**: Take means of each features from embedding. After mean leary, will have the same number of featurres as embedding size. Note: <span style="color:red">这个layer 没有任何trainable parameters because it's only computing the mean of word embeddings</span>
+    - ```trax.layers.tl.Mean```: Calculates means across an axis. In this case, please choose axis = 1 to get an average embedding vector (an embedding vector that is an average of all words in the vocabulary).
+    - For example, if the embedding matrix is 300 elements and vocab size is 10,000 words, taking the mean of the embedding matrix along axis=1 will yield a vector of 300 elements.
+
+```python
+# Pretend the embedding matrix uses  2 elements for embedding the meaning of a word
+
+# and has a vocabulary size of 3, So it has shape (2,3)
+
+tmp_embed = np.array([[1,2,3,],
+                    [4,5,6]
+                   ])
+print("The mean along axis 0 creates a vector whose length equals the vocabulary size")
+display(np.mean(tmp_embed,axis=0)) # DeviceArray([2.5, 3.5, 4.5], dtype=float32)
+
+print("The mean along axis 1 creates a vector whose length equals the number of elements in a word embedding")
+display(np.mean(tmp_embed,axis=1)) # DeviceArray([2., 5.], dtype=float32)
+
+```
 
 ![](/img/post/Natural-Language-Processing/course3/week1pic9.png)
 
