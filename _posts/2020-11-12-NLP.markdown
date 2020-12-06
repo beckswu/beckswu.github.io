@@ -1453,3 +1453,149 @@ display(np.mean(tmp_embed,axis=1)) # DeviceArray([2., 5.], dtype=float32)
 ![](/img/post/Natural-Language-Processing/course3/week1pic10.png)
 
 ![](/img/post/Natural-Language-Processing/course3/week1pic11.png)
+
+
+#### 4.2 RNN for Language Modeling
+
+**Problem with N-grams**: for N grams, model have to account for conditional probabilites for long sequences, difficult to estimate for long corpora: Need a lot of space and RAM. e.g. if user download app, may not have enough space. 
+
+![](/img/post/Natural-Language-Processing/course3/week2pic1.gif)
+
+#### RNN 
+
+**RNN**: Looks at previous N words, propagate the information from the beginning to the end
+
+e.g. 下面例子，trigram probabable choose "have": because highly probable to see that sequence of three words in text corpus. 但是如果用 have, sentence not make sense. 如果want to have a n-gram, have to account 6-grams, impractical
+
+![](/img/post/Natural-Language-Processing/course3/week2pic2.gif)
+
+Each box represent the computation made at each steps and colors represent the information used for every computation/ Every word in the sequence is multiplied by the same weight, $$W_x$$, the informatin propagate from the beginning to the end is multiplied by $$W_h$$. The block is repeated for every word in the sequence. The only learning parameters are $$W_x, W_h$$. They compute values that are fed over and over again until the prediction is made.
+
+Note:An RNN would have the same number of parameters for word sequences of different lengths. (Computations share parameters)
+
+![](/img/post/Natural-Language-Processing/course3/week2pic3.gif)
+
+
+Many to Many architecture, at each time step, <span style="background-color:#FFFF00">two inputs, x, hidden state h</span>. Make a prediction $$\hat y$$. Additionally, it propagate a new hidden state to the next time-step. The hidden state at every time t is computed with an activation function g
+
+ $$ h^{<{t}>} = g\left(W_h \left[  h^{<{t-1}>},  x^{<{t}>} \right] + b_h \right)$$
+
+ $$ h^{<{t}>} = g\left(W_{hh} h^{<{t-1}>} \oplus  W_{hx} x^{<{t}>} + b_h \right) \quad  \oplus \text{sum up element-wise}$$
+
+$$ W_h = \left[W_{hh} \mid W_{hx} \right] \quad \color{red}{\text{Horiztonal Stack}}$$
+
+$$\left[  h^{<{t-1}>},  x^{<{t}>} \right]= \left[ \frac{h^{<{t-1}>}}{x^{<{t}>}} \right] $$
+
+
+
+- 𝑊ℎ  in the first formula is denotes the horizontal concatenation of 𝑊ℎℎ and 𝑊ℎ𝑥 from the second formula.
+
+- 𝑊ℎ in the first formula is then multiplied by  $$\left[  h^{<{t-1}>},  x^{<{t}>} \right] $$, another concatenation of parameters from the second formula but this time in a different direction, i.e vertical!
+
+![](/img/post/Natural-Language-Processing/course3/week2pic5.png)
+
+First cell for RNN, take inputs the previous hidden state and current variable x, to get the current hidden state, get the product of x and $$h^{<{0}>$$ with their respective parameters, then sum the vectors element-wise. Then pass to activation function. With resulting value, compute current $$\hat h$$ by going through another activation function
+
+![](/img/post/Natural-Language-Processing/course3/week2pic6.gif)
+
+e.g. if $$ h^{<{t}>}$$ size is 4 x 1, $$ x^{<{t}>}$$ size is 10 x 1, what is the size of $$W_h$$, given  $$ h^{<{t}>} = g\left(W_h \left[  h^{<{t-1}>},  x^{<{t}>} \right] + b_h \right)$$
+
+Q: 14 x 4
+
+
+
+#### Application
+
+- One to One:  比如给出lists of score from favorite team to predict the position of your team on the leaderboard
+- One to Many: 给图片 predict caption
+- Many to One: Sentiment Analysis: RNN take every word from the sequence as inputs, propagate information from the beginning to the end, and output the sentiment
+- Many to Many: machine translation: encode and decoder architecture is popular for machine translation. First half doesn't return output is called encode, because it encodes the sequences of words in a single representation that caputres the overall meaning of the sentence. Decoder generate a sequence of words in other language.
+
+
+![](/img/post/Natural-Language-Processing/course3/week2pic4.gif)
+
+
+#### Cost Function
+
+
+k: the number of category/class, $$y_j = 0 or 1$$ 对于每个class, 比如下图output 是3个class
+
+![](/img/post/Natural-Language-Processing/course3/week2pic7.png)
+
+For RNN: 
+
+$$ J = -\frac{1}{T} \sum_{t=1}^T \sum_{j=1}^K y_j^{<{t}>} log \hat y_j^{<{t}>} $$, 与上面普通neural network cost function difference is summation over time T and division by the total number of steps T: is the <span style="background-color:#FFFF00">average of the cross entropy loss function over time</span>
+
+![](/img/post/Natural-Language-Processing/course3/week2pic8.png)
+
+#### Scan Function
+
+- Scan function is to take a function fn( equivalent to 下图中的 $$f_w$$), and apply to all the elements from beginning to end in the list ```elems``` ($$x{<{t_1}>}, x{<{t_2}>} ... x{<{T}>}$$))
+- Initializer (the hidden state $$h^{<{t_0}>}$$) is an optimal variable that could be used in the first computation of fn
+- Function first initialize hidden states $$h^{<{t_0}>}$$, set ys as an empty list  
+- For every x in the lis of elements, fn is called with x and the last hidden state as arguments, 
+- For loop computes every time step for RNN, stores prediction value and hidden states
+- Finally, function <span style="color:red">returns a list of predictions, and last hidden state</span>
+- <span style="color:red">Framework like Tensorflow need this type of abstraction in order to perform parallel computions and run on GPUs.</span>
+
+![](/img/post/Natural-Language-Processing/course3/week2pic9.gif)
+
+## Gated Recurrent Units
+
+- control how much information forget from the past and how much information to extract from current input. 
+- allow relevant information to be kept in the hidden states, even over long sequences. 比如下面例子，Ants learn Plural. GRU complete it by computing irrelevance and update gates. Can GRUS as Vanilla RNN with additional computations
+
+$$\Gamma_r = \sigma \left(W_r \left[  h^{<{t-1}>},  x^{<{t}>} \right] + b_r \right)  $$
+
+$$\Gamma_u = \sigma \left(W_u \left[  h^{<{t-1}>},  x^{<{t}>} \right] + b_u \right)  $$
+
+$$h^{'<{t-1}>} = tanh\left(W_h \left[ \Gamma_r *  h^{<{t-1}>},  x^{<{t}>} \right] + b_h \right)  $$
+
+$$h^{'<{t}>} = \Gamma_u *  h^{<{t-1}>} + \left( 1- \Gamma_u\right) * h^{'<{t-1}>} $$
+
+$$y^{<{t}>} = g\left(W_y  h^{<{t}>} + b_y \right)$$
+
+
+1. The first two computation in GRU are <span style="background-color:#FFFF00">**relevance gates**</span>. $$\Gamma_r, \Gamma_u $$ computed from sigmoid function. <span style="color:red">The output help determine which information from the previous hidden state is relevant and which values should be updated with current informations</span>
+2. After relevante gates is computed, the candidate h' for the hidden state is found: the value store all the candiates for information that overwrites in previous hidden states.  
+3. A new value for the current hidden state is calculated using the information from the previous hidden state, candidate hidden state and update gate and update some information from the last hidden states. <span style="background-color:#FFFF00">Updte date determnnes how much of information from the previous hidden state will be overwrited</span>. 
+4. a prediction $$\hat y$$ is computed using current hidden state
+
+![](/img/post/Natural-Language-Processing/course3/week2pic10.png)
+
+Vanilla RNN vs GRUS: 
+
+- **Problem with Vanilla**: update the hidden state at every time step, for a long sequences, information tends to vanish. So called <span style="background-color:#FFFF00">**vanishing gradients problem**</span>(开始的信息可能丢失了)
+- GRUs compute significantly more operations, can cuase lnger processing times and memory usage. GRUS help preserve important information for longer sequences. 
+
+![](/img/post/Natural-Language-Processing/course3/week2pic11.gif)
+
+
+
+#### Deep Bidiretion RNN
+
+e.g. 比如下面例子blank 来自于后下文
+
+![](/img/post/Natural-Language-Processing/course3/week2pic12.png)
+
+Could have another architecture where the information flow from end to beginning. 
+
+- <span style="background-color:#FFFF00">Information flows from the past(from left to right) and from the future(from right to left) independently</span>
+- Get prediction $$\hat y$$, <span style="color:red">have to start propagate information from both directions</span>
+- After compution all the hidden states for both directions, can get all of remaining predictions. 
+
+$$y^{<{t}>} = g\left(W_y  \left[ \vec h^{<{t}>}, \overleftarrow h^{<{t}>} \right]  + b_y \right)$$
+
+![](/img/post/Natural-Language-Processing/course3/week2pic13.gif)
+
+Deep RNNs are similar to deep neural networks. Deep RNN have a layer which takes input sequence x and multiple additional hidden layers. Like RNN stack together
+
+$$h^{\left[l \right]<{t}>} = f^{\left[l \right]} \left(W_h^{\left[l \right]}  \left[ h^{\left[l \right]<{t-1}>} , a^{\left[l-1 \right]<{t}>}  \right]  + b_h^{\left[l \right]}  \right)$$
+
+$$a^{\left[l \right]<{t}>} = f^{\left[l \right]} \left(W_a^{\left[l \right]} h^{\left[l \right]<{t}>}   + b_a^{\left[l \right]}  \right)$$
+
+1. Get hidden states for current layer: Af first progragate information through time. 
+2. pass the activations to next layer. Go deeper in the network and repeat the process for each layer until get prediction
+  
+
+![](/img/post/Natural-Language-Processing/course3/week2pic14.gif)
