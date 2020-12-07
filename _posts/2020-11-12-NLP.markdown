@@ -953,7 +953,8 @@ e.g. :  choose 是绿色
 
 
 
-$$PP\left(W \right) = P\left(s_1,s_2,...,s_m \right)^{\frac{1}{m}}$$
+$$\begin{align} PP\left(W \right) &= P\left(s_1,s_2,...,s_m \right)^{\frac{1}{m}} \\ &= \sqrt[m]{\prod_{i=1}^{m}  \frac{1}{ P\left( w_i \mid  w_{i-1}...w_{i-N+1} \right)   }} \\ &= \sqrt[m]{\prod_{i=1}^{m}  \frac{C\left(w_{i-1},... w_{i-N+1}, w_i \right)}{ C \left(w_{i-1},... w_{i-N+1}\right)   }} \end{align}$$left(W \right) =  \,\, =\color{red}{w_i \text{: i-th word in test set}}$$
+
 
 - W : test set containing m sentence
 - $$S_i$$ i-th sentence in the test set, each ending with ```</s>```
@@ -978,7 +979,8 @@ $$PP\left(W \right) = \sqrt[m]{\prod_{i=1}^{m} \prod_{j=1}^{ \mid s_i \mid} \fra
 
 **If all sentences in the test cases are concatenated:**
 
-$$PP\left(W \right) = \sqrt[m]{\prod_{i=1}^{m}  \frac{1}{ P\left( w_i \mid  w_{i-1} \right)   }}, \,\, \color{red}{w_i \text{: i-th word in test set}}$$
+$$PP\left(W \right) = \sqrt[m]{\prod_{i=1}^{m}  \frac{1}{ P\left( w_i \mid  w_{i-1} \right)   }} = \sqrt[m]{\prod_{i=1}^{m}  \frac{C\left( w_{i-1}, w_i \right)}{ C \left( w_{i-1}\right)   }} \,\, =\color{red}{w_i \text{: i-th word in test set}}$$
+
 
 Use log perplexity insetad of perplexity
 
@@ -1599,3 +1601,144 @@ $$a^{\left[l \right]<{t}>} = f^{\left[l \right]} \left(W_a^{\left[l \right]} h^{
   
 
 ![](/img/post/Natural-Language-Processing/course3/week2pic14.gif)
+
+
+## 3.3 LSTMs and Named Entity Recognition
+
+**RNN Advantages**:
+
+- Capture dependecies within a short range
+- Takes up less RAM and space(lightweight) than other n-gram models
+
+**RNN Disadvantages**:
+
+- Struggles with longer sequence
+- Prone to vanishing or exploding gradients: 
+  - This can arise due to the fact that RNN progagates information from the beginning of the sequence to the end. Starting with first words, the first values are computed(下图橙色框). Then it propagates some computed information takes the second word in the sequence, an gets new value(下图绿色框). Final steps, computattions contain information from all the words in the sequence, then RNN predict next word. <span style="color:red">Notice: the information from first step doesn't have much influence on the output.</span>. Can see Orange portion from the first step decrease with each new step. 因为computation at the first steps don't have much influence on the cost function. 
+
+![](/img/post/Natural-Language-Processing/course3/week3pic1.png)
+
+#### Vanishing/Exploding Gradient 
+
+Backprop:  The derivatives from each layer are multiplied from back to front in order to compute the derivative of initial layer.  The weights receive an update is proportional to the gradients with respect to the current weights of that time step. But in the network with<span style="color:red"> many time steps or layers, gradient arrived back at early layers as the product of all the terms from the later layer -> make unstable situation. Especially if the values become so small -> no longer updates properly</span>. For exploding gradients, work in opposite direction <span style="color:red">as updated weights become so large causing network to become unstable.</span>(numerical overflow)
+
+![](/img/post/Natural-Language-Processing/course3/week3pic2.png)
+
+Solution: 
+
+- **Identity RNN with ReLU activation**: Initialize weights as indentity matrix: what it does, copy previous hidden state, add information from current inputs and replace any negative values with 0. Has effects of your network to stay close to the values in the indentity matrix which act like 1s during matrix multiplication
+  - <span style="background-color:#FFFF00">**only works for vanishing gradients**</span>, as derivates of ReLu = 1 for all values greater than 0
+- **Gradient clippings**: simply choose a relevant value that clip the gradients e.g. 25. Using this technique, any value grater than 25 will be clipped to 25
+  - <span style="background-color:#FFFF00">**works for exploding gradients**</span>. serves to limit the magnitute of gradients. 
+- **Skip connections**: provide a direct connection to earlier layers, effectively skips over activation functions, add values from initial inputs x to outputs, e.g. F(x) + x. so <span style="background-color:#FFFF00">activations from eariler layers have more influence over the cost function</span>
+
+
+![](/img/post/Natural-Language-Processing/course3/week3pic3.png)
+
+下图可能有vanishing gradient problem, because for a good model, performance should improve accuracy through time
+
+![](/img/post/Natural-Language-Processing/course3/week3pic4.png)
+
+
+
+#### LSTM
+
+**Application for LSTM**
+
+- Next-character prediction for email
+- chatbots capable of remembering longer conversations
+- musice composition: consider music is built using long sequences of notes, much like text uses long sequences of words
+- image caption
+- speech recognition
+
+LSTM: special variety of RNN handle entire sequences of data by learning when to remember and when to forget, similar to GRU
+
+- A cell state: can think of as memory
+- A hidden state with three gates(<span style="color:red">flow 顺序是forget gate, input gate, output gate</span>): computation perform during training to decide what changes to make. has three gates to pass though before the entire operation is performed again. Any loop would update the weights. These cell state travels through these three gates that track inputs as it arrives,.Each one plays a part deciding how much information to pass and how much to leave behind. The series of gates allows gradients to flow unchanged. -> so vanishing/exploding gradient is mitigated
+  - Forget gate decides what to keep
+  - Input gate decides what ot add
+  - Output gate decides what the next hidden state will be
+- Loop back again at the end of each time step. 
+
+Structure:
+
+
+
+1. cell state $$c^{<{t_0}>}$$: can think of cell as memory of your network, carrying all the relevant information down the sequence. 
+  - As cell travels, each gate adds or removes information from cell state
+2. 最左边是forget gate, typically sigmoid layer, looks at all the information from previous cell state and decides what to throw away. Sequeeze each value from the cell states between zero and one
+  - <span style="background-color:#FFFF00">If value close to zero -> indicates it should be thrown away. Value close to one -> indicates should be kept</span>
+  - take the value from the forget states and multiply them element-wise by cell states
+3. Input gate: decide what new information to store/update in the cell, has two parts: 
+  1. sigmoid layer take the previous hidden state  $$h^{<{t_0}>}$$ and current input  to choose which values to update by assigning zero or one to each value. The closer to one, the higher the importance
+  2. tanh layer to slect candidates for new values to be added. take the previous hidden state  $$h^{<{t_0}>}$$ and current input to sequeezes the values between -1 and 1
+  3. Then the output of sigmoid and tanh are multiplied, model has what to need to calculate new cell state
+4. Then calculate new cell state.  $$c^{<{t_1}>}$$
+5. Finally output gate ($$y^{<{t}>}$$) takes the previus hidden state along with the current inputs and process them through another sigmoid and tanh layer. The outputs from sigmoid layer are multiplied by te tanh layer's output. The product decides how much write to next hidden state. 
+
+![](/img/post/Natural-Language-Processing/course3/week3pic5.gif)
+
+
+Note: The tanh layer’s output (between -1 and 1) is multiplied element-wise by the sigmoid layer’s output in both the input and output gates, ensuring an even flow through the LSTM unit.  This prevents any of the values from the current inputs from becoming so large that they make the other values insignificant. Ensures the values in your network stay numerically stable,
+
+
+#### NER
+
+NER: Named Entity Recognition: fast and efficient way to scan text for certain kinds of information. NERs sytems locate and extract named entities from text. Name entities can be a place, an organization or a person's name, can even be tiems and dates.  
+
+
+![](/img/post/Natural-Language-Processing/course3/week3pic6.gif)
+
+
+- B dashes denotes entity 
+- All other words are classified O
+
+![](/img/post/Natural-Language-Processing/course3/week3pic7.png)
+
+Application:
+
+- Search engine efficiency: NER models scan millions of websites once and stores the entities as indentified in the process. Then tag from your search query simply match against website tags. 
+- recommendation engines: tags extracted from your history and compared to similar user hitories then recommend things you might want to check out
+- Customer service: match customer to an appropriate customer service agents. works similarly to a phone tree where prompted to provide some information about your request. e.g. use an app to communicate with your car insurance company, 需要provide some spoken information. then match to appropriate agents
+- Automatic trading: build a web scraper to get the articles of the names of certain CEOs, Ssocks, or cryptocurrencies. Then feed those article into a sentiment classification system and make your trade accordingly
+
+**Training NERS: Data Processing**
+
+1. Assign each entity class to a unique number. e.g. person name = 1, geographical location = 2, time indicator = 3
+2. Assign each word a number that corresponds to its assigned entity class. O 表示 a failure or unrecognized word. <span style="color:red">Numbers are random and assigned when you process your data</span>. Each sequence is transformed into an array of numbers where each number 表示 index of the labeled word
+3. apdding: LSTM require all sequences are the same length. Can set length of sequnces to a certain number and add generic ```<PAD>``` token to fill all empty spaces.
+
+
+![](/img/post/Natural-Language-Processing/course3/week3pic8.png)
+
+**Traing the NER**:
+
+1. Create a tensor for each input and corresponding number 
+2. Put them in a batch, batch size normally power of 2, <span style="color:red">speed up processing time considerably</span> -> 64, 128, 256, 512...
+3. Feed it into an LSTM unit
+4. Run the output through a dense layer (Linear operation on the input vectors) or fully connected layer
+5. Predict using a <span style="background-color:#FFFF00">**log softmax**</span> over K classes (K: the number of possible output), <span style="color:red">log softmax gets better numerical performance and gradients optimization than softmax</span>
+
+![](/img/post/Natural-Language-Processing/course3/week3pic9.png)
+
+
+**Evaluateig the model**
+
+1. Pass test set through the model
+2. Get arg max across the prediction array, 下面```np.argmax``` takes an axis parameter. need to consider the dimension of array
+3. make sure arrays are padded using ```<PAD>``` token, which makes arrays the same length
+4. Compare outputs against test labels to see how accurate model is
+
+
+下面code, mask variable is where you identify any token IDs you need to skip over during evaluation. One token need to skip is ```<PAD>``` token
+
+![](/img/post/Natural-Language-Processing/course3/week3pic10.png)
+
+**Some Useful Link**
+
+
+
+[**Intro to optimization in deep learning: Gradient Descent**](https://blog.paperspace.com/intro-to-optimization-in-deep-learning-gradient-descent/)
+
+[**Understanding LSTMs**](https://colah.github.io/posts/2015-08-Understanding-LSTMs/)
+
