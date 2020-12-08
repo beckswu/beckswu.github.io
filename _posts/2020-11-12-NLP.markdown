@@ -1742,3 +1742,96 @@ Application:
 
 [**Understanding LSTMs**](https://colah.github.io/posts/2015-08-Understanding-LSTMs/)
 
+## 3.4 Siamese Network
+
+It's made up two identical neural networks which are merged at the end.  <span style="background-color:#FFFF00">Used as Indenify similarity between things</span>
+
+e.g. Comparing meaning not the same as compare words
+
+- How old are you = what is your age
+- Where are you from $$/neq$$ where are you going 尽管前三个字一样，但是不等
+
+Application:
+
+- Question duplicates: Stackoverflow, Quera check your questions if exist before post
+- Handwritten checks: determine if two signatures are the same or not
+- Search engine queries: to predict whether a new query is similar to the one that was already executed
+
+#### Architecture
+
+- <span style="background-color:#FFFF00">Both network have a identical sub network.</span>  <span style="color:red">并且sub networks share identical parameters</span>. Learned parameters of each sub-network are exactly the same. 
+- Each network output a vector, one for each questions.
+- Cosine similarity tells how similar they are, $$\hat y$$ a value between -1 and 1
+  - <span style="background-color:#FFFF00">if $$\hat y \leq \tau $$ -> input questions are different. if $$\hat y > \tau $$ -> input questions are the same</span>. $$\tau$$ is a parameter that chose how often want to interpret cosine similarity to indicate two questions are similar. Higher threshold means only very similar sentences is considered similar
+
+
+下面是一个example, not all Siamese network contain LSTM. 
+
+![](/img/post/Natural-Language-Processing/course3/week4pic1.png)
+
+
+#### Cost Function
+
+- Anchor: the first question e.g. "How old are you"
+- positive questions: have the same meaning as anchor, cosine similarity close to 1
+- negative questions: not have the same meaning as anchor, cosine similarity close to -1
+
+![](/img/post/Natural-Language-Processing/course3/week4pic2.png)
+
+$$ diff = s\left(A,N \right) - \left(A, P \right) = \frac{A \cdot N}{\Vert A \Vert \Vert N \Vert}- \frac{A \cdot P}{\Vert A \Vert \Vert P \Vert}$$
+
+<span style="color:red">s(v1, v2) is similarity metric(cosine similarity), could be distance metrics d(v1, v2) such as ecludian distance </span>
+
+loss function allow whether model do well. 当difference igger or smaller along x-axis, loss bigger or smaller along the y-axis. Minimizing loss in training-> minimize this difference
+
+
+![](/img/post/Natural-Language-Processing/course3/week4pic3.png)
+
+Notice, when difference less than zero, want loss < 0? give model positive value, model update and improve. give model negative value, like telling: Good job. Please update weight to the worst next time. When loss = 0, not asking model to update weights, because performing as expected for that training example. Need to update loss function as below. 
+
+如果difference is just less than zero, want model to still learn and <span style="background-color:#FFFF00">ask to predict a wider difference, can shift the loss function a little to the left. margin refer as *Alpha*.</span> Loss function shift to right by $$\alpha$$. So if difference less than 0 but small in magnitute, loss greater than 0.
+
+![](/img/post/Natural-Language-Processing/course3/week4pic4.png)
+
+
+**Triplet Loss**
+
+$$L = \begin{cases}0; \quad \text{if diff } + \alpha \leq 0 \\[2ex] diff; \, \text{if diff } + \alpha > 0 \\ \end{cases} $$
+
+$$L\left(A, P, N \right) = max\left(diff + \alpha, 0 \right) $$
+
+
+
+
+#### Triplet Selection
+
+  
+- Firstly, select pair of duplicate questions as anchor and positive 
+- Secondly, select a question is difference meaning from the anchor, to form anchor and negative pair
+- 错误的方式是: select triplet random: <span style="color:red">很可能select non-duplicative pair A and N, where loss 0. Loss is zero whenever model correctly predict A and P more similar to A and N. When loss is zero, network little to learn from triplet.</span>
+- **Hard Triplet**: <span style="background-color:#FFFF00">are more difficult to train. Hard triplets 是similarity between anchor and negative very close to, but still smaller than similarity between anchor and positive.</span> When model encounter hard triplet, algorithm need to adjust its weight so that yield similairty line up with labels
+  - By selecting hard triplets, trainning focus are doing better on difficult caes which 也许会predict incorrectly
+
+![](/img/post/Natural-Language-Processing/course3/week4pic5.png)
+
+
+Use ```b``` as batch size, 如下图<span style="color:red">每一行，是duplicate, 每一个column 没有duplicate</span>
+
+![](/img/post/Natural-Language-Processing/course3/week4pic6.png)
+
+vector v1, #row = batch sizes,  #columns is the number of embedding layer(```d_model```). Note dimension of embedding ```d_model``` is a parameter that determins the dimensions of weights through each layer in the model, determine the size of output layer. $$v_{1,1}$$ is a duplicateo of $$v_{2,1}$$, but $$v_{1,1,}$$ is not a duplicates of any other row in $$v_{1}$$
+
+![](/img/post/Natural-Language-Processing/course3/week4pic7.png)
+
+may get similarity as 下图左侧的matrix
+
+- Digonal is the key features, <span style="background-color:#FFFF00">These values are the similarities for positive examples, question duplicates. 通常diagonal 数比不是在diagonal的数要大, because expect duplicates have higher similarity than non-duplicates. </span>
+- upper right, lower left -> similarity for all negative examples. most number are lower than similarities along the diagonal
+- 注意 negative example question pairs still have similarity 大于0, 虽然similarity range 从-1 到1，但不意味着大于0 表示duplicates 或小于表示non-duplicated. <span style="background-color:#FFFF00">Really mater 是find duplicates have a higher similarity relative to non-duplicated.</span>
+- <span style="color:red">Creating pairs like this remove the need for additional  non-duplicate example and input data</span>. Insteading of sets up specific bathchs with negative examples, model can learn from existing questions duplicates batches.
+
+Overall Cost Function 
+
+$$\begin{align}J &= \sum_{i=1}^{m} L\left(A^{\left(i\right)}, P^{\left(i\right)}, N^{\left(i\right)} \right) =\sum_{i=1}^{m}  max\left(diff + \alpha, 0 \right) \\ &= \sum_{i=1}^{m}  max\left(s\left(A^{\left(i\right)}, N^{\left(i\right)} \right) - s\left(A^{\left(i\right)}, P^{\left(i\right)}\right) + \alpha, 0 \right) \\&  \color{blue}{\text{i refer to a specific training example and there are m observations}}\end{align}$$
+
+![](/img/post/Natural-Language-Processing/course3/week4pic8.png)
