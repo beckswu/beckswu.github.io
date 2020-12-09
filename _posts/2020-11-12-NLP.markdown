@@ -1355,16 +1355,16 @@ embed_layer = nn.Embedding(10000,400)
 ```
 
 
-## Trax: Neural Networks
+## 3.1 Trax: Neural Networks
 
 
-Neural Network predict positive/negative tweets:
+Neural Network predict positive/negative tweets, structure:
 
 - has a embedding layer that transform the representation 
 - has another hidden layer with a ReLU activation function 
 - output layer with softmax function that give probabilities for whether a tweet is positive or negative sentiment
 - This structure allow to predict complex tweets: 比如 "This moive was almost good". 不能 classify correctly using simpler method 比如 Naive Bayes
-- Initial Representation for neural network is a vector of Integers, <span style="background-color:#FFFF00">List all word from vocabulary then assign integer index to each of word. Then need to 知道 maximum vector size tnd fill zeros to match that size (called **padding**: ensures that all vector have the same size even if your tweets don't)</span>
+- Initial Representation for neural network is a vector of Integers, <span style="background-color:#FFFF00">List all word from vocabulary then assign integer index to each of word. Then need to 知道 maximum vector size then fill zeros to match that size (called **padding**: ensures that all vector have the same size even if your tweets don't)</span>
 
 ![](/img/post/Natural-Language-Processing/course3/week1pic1.png)
 
@@ -1372,7 +1372,7 @@ Neural Network predict positive/negative tweets:
 
 #### Trax
 
-List the layer from left to right
+List the layer from left to right. Note Dense layer(fully-connected layer): A maps collections of R^m vectors to R^n, where n (= n_units) is fixed at layer creation time,. Fully computation is ```y = Wx + b```. Generally followed by a non-linear activation function. 
 
 ![](/img/post/Natural-Language-Processing/course3/week1pic3.png)
 
@@ -1457,7 +1457,7 @@ display(np.mean(tmp_embed,axis=1)) # DeviceArray([2., 5.], dtype=float32)
 ![](/img/post/Natural-Language-Processing/course3/week1pic11.png)
 
 
-#### 4.2 RNN for Language Modeling
+## 4.2 RNN for Language Modeling
 
 **Problem with N-grams**: for N grams, model have to account for conditional probabilites for long sequences, difficult to estimate for long corpora: Need a lot of space and RAM. e.g. if user download app, may not have enough space. 
 
@@ -1835,3 +1835,48 @@ Overall Cost Function
 $$\begin{align}J &= \sum_{i=1}^{m} L\left(A^{\left(i\right)}, P^{\left(i\right)}, N^{\left(i\right)} \right) =\sum_{i=1}^{m}  max\left(diff + \alpha, 0 \right) \\ &= \sum_{i=1}^{m}  max\left(s\left(A^{\left(i\right)}, N^{\left(i\right)} \right) - s\left(A^{\left(i\right)}, P^{\left(i\right)}\right) + \alpha, 0 \right) \\&  \color{blue}{\text{i refer to a specific training example and there are m observations}}\end{align}$$
 
 ![](/img/post/Natural-Language-Processing/course3/week4pic8.png)
+
+- **Mean negative**: mean of off-diagonal values in each row(<span style="color:red">mean of the similarity of negative examples, not mean of negative number in a row</span>). 比如第一行 (-0.8 + 0.3 - 0.5)/3
+  **Closest negative**: off diagonal value cloest to(but less than) the value on diagonal in each row. By choosing this, force model to learn what diffferentiates these examples and drive those similarity values further apart through training. 比如第一行选取0.3: meaning a similarity of 0.3 has the most to offer model in terms of learning opportunity
+
+$$L_{Original} = max \left(\underbrace{s\left(A,N \right)-s\left(A,P \right)}_{diff} + \alpha, 0 \right)$$
+
+$$L_{1} = max \left(mean\_neg+ \alpha, 0 \right)$$
+
+$$L_{2} = max \left(closest\_neg+ \alpha, 0 \right)$$
+
+$$L_{Full}\left(A, P, N \right) = L_{1} + L_{2} $$
+
+$$J = \sum_{i=1}^m L_{Full}\left(A^{\left( i \right)}, P^{\left( i \right)}, N^{\left( i \right)} \right) $$
+
+
+In order to minimize the loss, you want $$diff + \alpha \leq 0$$, 
+
+- **Loss 1**: <span style="background-color:#FFFF00">using mean negative replace similarity of A and N, help model converge faster during training by reducing noice</span>. Reduce noice by trainning on average of several observations rather than training model on each of these off-diagonal examples. 
+  - Why Reduce noise? We define noise to be a small value that from a distribution that is centered arund 0. So the average of several noise is centered around 0.(Cancel oout individual noise from those observations)
+- **Loss 2**: create a slightly large penalty by diminishing the effects of more negative similarity of A and N. <span style="color:red">can think of closest negative as finding negative example that results in smallest difference between two similarity</span>. Then add small difference to alpha, able to generate the largest loss among all of other examples in that row -> make the model update weights more
+
+
+#### One Shot Learning
+
+Classification vs One Shot Learning
+
+- Classification: classify as 1 of K classes, probably use softmax function at the end to find maximum prabability. 比如k=10, 如果k增加一个, expensive to retrain the model. Besides unless you have many examples for the class. model training won't work well
+- One Shot Learning: one shot learning is to be able to classify new classes without retraining any models. You only need to learn the similarity function once. Then can test similarity score against some threshold to see if they are the same. Problem changes to determine which class to measure similarity between classes
+  - 比如下面的例子，比如银行签字，每次有新的签名, can't retrain entire system. Instead, just learn a similarity  -> identify whether two signature are the same or not
+
+![](/img/post/Natural-Language-Processing/course3/week4pic9.gif)
+
+
+#### Training / Testing
+
+1. prepare batches with batch size = b. Corresponding questions from each batch are duplicate(batch 1 和 batch 2第一行是duplicate). No duplicates within an indiivual batch(比如batch 1  第一行和第二行不是duplicate).
+2. Use these inputs t get outputs vectors for each batch (Embedding -> LSTM -> Vectors -> Cosine Similarity). <span style="color:red">Note two subnetworks have identical parameters so only train one set, then shared by both</span>
+   - Note: <span style="background-color:#FFFF00">$$\tau$$ and margin $$\alpha$$ from loss function are tunable hyperparameter</span>
+3. When testing model, perform one-shot learning. 
+  1. Convert each input an an array of numbers 
+  2. Feed arrays into model 
+  3. Compare $$v_1, v_2$$ using cosine similarity
+  4. Test against a threshold $$\tau$$. If similarity greater than $$\tau$$, questions are classified as duplicates
+
+![](/img/post/Natural-Language-Processing/course3/week4pic10.gif)
