@@ -1409,6 +1409,10 @@ Python Class & Subclass(subclass can override method in super class )
 
 **Dense Layer**: The single computation( compute inner product between trainable wights and input vector) is called Dense layer
 
+shape is a tuple with the desired shape of the weight matrix. ```y = np.dot(x, w)```
+- The number of rows in the weight matrix should equal the number of columns in the variable x. Since x may have 2 dimensions if it reprsents a single training example (row, col), or three dimensions (batch_size, row, col), get the last dimension from the tuple that holds the dimensions of x. (X的feature)
+- The number of columns in the weight matrix is the number of units chosen for that dense layer. (output 的unit)
+
 ![](/img/post/Natural-Language-Processing/course3/week1pic5.png)
 
 **ReLU Layer**: activation layer that follows a dense fully connected layer, and transforms any negative values to zero.
@@ -1445,6 +1449,29 @@ display(np.mean(tmp_embed,axis=1)) # DeviceArray([2., 5.], dtype=float32)
 
 ![](/img/post/Natural-Language-Processing/course3/week1pic9.png)
 
+
+- TrainTask: ```trax.supervised.training.TrainTask(labeled_data, loss_layer, optimizer, lr_schedule=None, n_steps_per_checkpoint=100)```:  A supervised task (labeled data + feedback mechanism) for training. ```init``` parameter 有
+  - labeled_data: Iterator of batches of labeled data tuples. Each tuple has 1+ data (input value) tensors followed by 1 label (target value) tensor.  All tensors are NumPy ndarrays or their JAX counterparts.
+  - loss_layer: Layer that computes a scalar value (the "loss") by comparing model output :math:`\hat{y}=f(x)` to the target :math:`y`. e.g. ```tl.CrossEntropyLoss```
+  - optimizer: Optimizer object that computes model weight updates from loss-function gradients. e.g.```trax.optimizers.Adam(0.01)```
+  - lr_schedule: Learning rate schedule, a function step -> learning_rate.
+  - n_steps_per_checkpoint: How many steps to run between checkpoints. <span style="color:red">每run n_steps_per_checkpoint 会print出loss_layer，如果有eval_task, 同样也会run eval_task，然后print eval task metrics</span>
+   
+- EvalTask, ```EvalTask(labeled_data, metrics, metric_names=None, n_eval_batches=1)``` Labeled data plus scalar functions for (periodically) measuring a model. An eval task specifies how (`labeled_data` + `metrics`) and with what precision (`n_eval_batches`) to measure a model as it is training. The variance of each scalar output is reduced by measuring over multiple (`n_eval_batches`) batches and reporting the average from those measurements.
+  - labeled_data: Iterator of batches of labeled data tuples. Each tuple has 1+ data tensors (NumPy ndarrays) followed by 1 label (target value) tensor. ```[tl.CrossEntropyLoss]```
+  - metrics: List of layers; each computes a scalar value per batch by comparing model output :math:`\hat{y}=f(x)` to the target :math:`y`.
+  - metric_names: List of names, one for each item in `metrics`, in matching order, to be used when recording/reporting eval output. If None, generate default names using layer names from metrics.
+  - n_eval_batches: Integer N that specifies how many eval batches to run; the output is then the average of the outputs from the N batches.
+
+- Training.Loop: ``Loop(model, task, eval_model=None, eval_task=None, output_dir=None, checkpoint_at=None, eval_at=None)`` Loop that can run for a given number of steps to train a supervised model. The typical supervised training process randomly initializes a model and updates its weights via feedback (loss-derived gradients) from a training task, by looping through batches of labeled data. A training loop can also be configured to run periodic evals and save intermediate checkpoints. For speed, the implementation takes advantage of JAX's composable function transformations (specifically, `jit` and `grad`).
+  - model: Trax layer, representing the core model to be trained. Loss functions and eval functions (a.k.a. metrics) are considered to be outside the core model, taking core model output and data labels as their two inputs.
+  - task: TrainTask instance, which defines the training data, loss function, and optimizer to be used in this training loop.
+  - eval_model: Optional Trax layer, representing model used for evaluation, e.g., with dropout turned off. If None, the training model (model) will be used.
+  - eval_task: EvalTask instance or None. If None, don't do any evals.
+  - output_dir: Path telling where to save outputs (evals and checkpoints). Can be None if both `eval_task` and `checkpoint_at` are None.
+  - checkpoint_at: Function (integer --> boolean) telling, for step n, whether that step should have its checkpoint saved. If None, the default is periodic checkpointing at `task.n_steps_per_checkpoint`.
+  - eval_at: Function (integer --> boolean) that says, for training step n, whether that step should run evals. If None, run when checkpointing.
+
 #### Gradient in Trax
 
 - function ```grad``` return a function that computes the gradients of f
@@ -1457,7 +1484,7 @@ display(np.mean(tmp_embed,axis=1)) # DeviceArray([2., 5.], dtype=float32)
 ![](/img/post/Natural-Language-Processing/course3/week1pic11.png)
 
 
-## 4.2 RNN for Language Modeling
+## 3.2 RNN for Language Modeling
 
 **Problem with N-grams**: for N grams, model have to account for conditional probabilites for long sequences, difficult to estimate for long corpora: Need a lot of space and RAM. e.g. if user download app, may not have enough space. 
 
@@ -1880,3 +1907,259 @@ Classification vs One Shot Learning
   4. Test against a threshold $$\tau$$. If similarity greater than $$\tau$$, questions are classified as duplicates
 
 ![](/img/post/Natural-Language-Processing/course3/week4pic10.gif)
+
+<br/><br/><br/>
+
+## 4.1 Neural Machine Translation
+
+#### Seq2Seq
+
+- take one sequence of items such as words, and output another sequence. 
+- Map variable-length of sequence to a fixed-length memory. The inputs and outputs don't have the matching lengths
+- LSTMs and GRUs are typically used to overcome the vanishing gradient problem
+- **Encode-Decoder**: takes in a hidden states and a string of words 比如single sentence. (如下图)
+  - Encoder takes the input one step at a time, collects information for inputs then move it fowward
+  - 橘色框biaoshi encoders final hidden states, which try to capture all the information collected from each input step before feeding into the decoder. The final hidden states provide initial sates for decoder to begin predicting the sequence. 
+- <span style="background-color:#FFFF00">**Shortcomings**</span>: 
+  - 因为是<span style="color:red">encoder hidden states is fixed length memory</span> -> lower performance
+  - <span style="color:red">Later input steps in the sequence are given more importance</span>. 比如下图中的today
+-  longer sequence become problematic. As ndividual inputs begin stacking up inside the encoders final hidden sates, 因为Seq2seq uses a fixed length memory  
+
+![](/img/post/Natural-Language-Processing/course4/week1pic1.png)
+
+![](/img/post/Natural-Language-Processing/course4/week1pic2.png)
+
+**One Vector per word**L give each word a vector for individual information instead of smash it all into one big vector. Also has flaw: How build a time/memory efficient model that predicts accurately from a long sequence. 
+
+![](/img/post/Natural-Language-Processing/course4/week1pic3.png)
+
+Solution: Focus attention in the right place:  Prevent sequence overload by giving the model a way to focus on the <span style="color:red">likeliest</span> words at each step. can think of a new layer to process this information. Do this by providing the information specific to each input word
+
+![](/img/post/Natural-Language-Processing/course4/week1pic4.png)
+
+Recurrent models typically take in a sequence in the order it is written and use that to output a sequence. Each element in the sequence is associated with its step in computation time t. (i.e. if a word is in the third element, it will be computed at $$t_3$$). These models generate a sequence of hidden states $$h_t$$, as a function of the previous hidden state $$h_{t−1}$$ and the input for position t. 
+
+The sequential nature of models <span style="color:red">(RNNs, LSTMs, GRUs) does not allow for parallelization within training examples</span>, which becomes critical at longer sequence lengths, as memory constraints limit batching across examples. In other words, if you rely on sequences and you need to know the beginning of a text before being able to compute something about the ending of it, then you can not use parallel computing. You would have to wait until the initial computations are complete. This is not good, because if your text is too long, then 1) it will take a long time for you to process it and 2) you will lose a good amount of information mentioned earlier in the text as you approach the end.  
+
+#### Alignment
+
+Motivation for alignment(used to be critical important for statistical translation)
+
+- Translating from one language to another 
+- Word sense discovery and disambiguation e.g.  Bank 可以指代 financial instituion 或者 riverbank
+
+Word Alignment: 比如德语 Berliner 可以指柏林人，也可以值一种donut 甜甜圈. 比如下面English word 多于German word. When performing alignment, model needs to identify relationships among the words in order to make accurate predictions in case the words are out of order or not exact translation.
+
+![](/img/post/Natural-Language-Processing/course4/week1pic5.png)
+
+[The Real Meaning of Ich Bin ein Berliner](https://www.theatlantic.com/magazine/archive/2013/08/the-real-meaning-of-ich-bin-ein-berliner/309500/)
+
+
+To align words correctly, need to add a attention layer to help the decoder understand  which inputs are more important. <span style="background-color:#FFFF00">The attention mechanism solves for longer input sequences by giving more weight to more important words.</span>.  比如下图hidden state in orange given higher attention score -> <span style="background-color:#FFFF00">next word in the decoder output will be strongly influenced by this encoder hidden state.</span>
+
+
+![](/img/post/Natural-Language-Processing/course4/week1pic6.png)
+
+1. Get available hidden states ready for encoder and first hidden states for decoder. 比如下面例子，encoder 两个hidden states, decoder一个
+2. **Calculate Alignment Score**: score  each of encoder hidden sattes by 计算 dot product between encoder state and decoder hidden state. <span style="color:red">higher score->more influence.</span>
+3. Run scores through <span style="background-color:#FFFF00">softmax</span>, each score is between 0 and 1, then <span style="color:red">give attention distribution</span>.
+4. Take each encoder hidden state, <span style="color:red">multiply by its softmax score,</span> -> <span style="background-color:#FFFF00">**alignment vector**</span>
+5. adding up everything alignment vector to <span style="background-color:#FFFF00">**context vector**</span> -> <span style="background-color:#FFFF00">context vector is feeded into decoder</span>
+
+![](/img/post/Natural-Language-Processing/course4/week1pic7.gif)
+
+
+#### Attention
+
+- Attention is an added layer that lets a model focus on what's important
+- **Queries**, **Values**, and **keys** are used for information retrieval inside the Attention layer
+  - **Key** and **Value** pair: both dimension <span style="color:red">N(input sequence of length from encoder hidden states)</span>. Keys and values have their own respective matrices, but the matrices have the same shape and are often the same. 
+  - **Query**: <span style="color:red">from encoder hidden state</span>
+  - Both key-value pair and query <span style="background-color:#FFFF00">enter attention layer on the opposite ends of the model</span>
+
+
+**Scale dot product attention**
+
+1. <span style="color:red">**Dot product**</span> between query and key is calculated, <span style="background-color:#FFFF00">measure similarity. Similar vectors of dot product -> higher value.</span>
+2. **Weighted sum** given to each value is determined by the probability that key matches the query. Probabilities calculated by running attention weights through softmax. Value between 0 and 1
+3. the query is mapped to next key-value pair, so on so forth
+
+
+![](/img/post/Natural-Language-Processing/course4/week1pic8.png)
+
+- Query(Q) is as column and words of keys as row
+- value socre(V) assigned based on closeness of the match
+
+One way you can think of it is as follows. Imagine that you are translating English into German. You can represent the word embeddings in the English language as keys and values. The queries will then be the German equivalent. You can then calculate the dot product between the query and the key. Note that similar vectors have higher dot products and non-similar vectors will have lower dot products. The intuition here is that you want to identify the corresponding words in the queries that are similar to the keys. This would allow your model to "look" or focus on the right place when translating each word. We then run a softmax:
+
+$$softmax\left(QK^T\right)$$
+
+That allows us to get a distribution of numbers between 0 and 1.  One more step is required. We then would multiply the output by VV. Remember VV in this example was the same as our keys, corresponding to the English word embeddings. Hence the equation becomes
+
+$$softmax\left(QK^T\right)V$$
+
+This tells us how much of each word, or which combination of words we will be feeding into our decoder to predict the next German word. This is called scale dot product attention. Note we add a normalization constant to it later, but you do not have to worry about that right now
+
+
+
+- <span style="background-color:#FFFF00">Model should flexible enough to connect each English word with its relevant German word, even they do not appear in the same position in respective sentences</span>. In another word, It should flexible to handle differences in grammearand word ordering in different language. 
+- <span style="color:red">For languages with different grammar structures, attention still looks at the correct token between them</span> 
+  - 比如下面例子，法语到英语, 第五个法语词Zone -> attention knows to look further down at 第八个token
+
+In the matrix, the lighter square shows where the model is actually looking when making the translation of that word. This mapping should not necessarily be one to one. The lighting just tells you to what extent is each word contributing to the input that will be fed into the decoder. As you can see several words can contribute to translating another word, depending on the weights (output) of the softmax that will be used to create the new input. 
+
+![](/img/post/Natural-Language-Processing/course4/week1pic9.png)
+
+
+下面例子padded zero at the end of sentence, ```<EOS>``` is 1 then pad 0
+
+![](/img/post/Natural-Language-Processing/course4/week1pic10.gif)
+
+#### Teacher Forcing
+
+- Teacher forcing allow your allow to use the ground truth or the actual outputs from decoder to compare its predictions during training
+- <span style="background-color:#FFFF00">Teacher forcing yields faster, more accurate training</span>
+
+e.g. 比如下面例子 as the motivation why teacher forcing is necessary for Seq2Seq model. Model predict correctly at the start of sequence. 但是第二个prediction is wrong, 第三个even further off. 第四个都没有logical sense. <span style="color:red">In a sequence model, each wrong prediction make the following predictions even less likely to be correct.</span>. 需要make a way to check at each step. 
+
+
+![](/img/post/Natural-Language-Processing/course4/week1pic11.png)
+
+- t1 (Wie) is processed through attention in order to predict geht. During training, <span style="background-color:#FFFF00">predicted output is not usede for prediciting next predicted word(green rectangle). Instead, the actual outputs/ground truths is the input to the decoder for each time step until the end of sequence is reached(不用预测的，用right answers feed into next time step)</span>. 
+- Without teacher forcing, models can be slow to reach convergence.
+- teacher forcing is still in active research
+
+![](/img/post/Natural-Language-Processing/course4/week1pic12.gif)
+
+[Link: What is Teacher Forcing ](https://towardsdatascience.com/what-is-teacher-forcing-3da6217fed1c?gi=fe02fa9e9d0)
+
+
+#### NMT with Attension
+
+1. Initial select: two copies. Input tokens(English) represented by zero and the target tokens(German) represented by one.
+2. <span style="color:red">One copy of the input tokens</span> fed into -> the inputs encoder to be transformed into the <span style="color:red">key and value vectors</span>. <span style="color:red">A copy of the target</span> tokens goes into the <span style="color:red">pre-attention decoder</span>. 
+  - The pre-attention decoder is not the decoder which produces the decoded outputs. <span style="background-color:#FFFF00">The pre-attention decoder transform the prediction targets into a different vector space called the **query vector** Q vector</span>, so can calculate the relative weights to give each input word. 
+  - The pre-attention decoder <span style="color:red">shifts the target tokens one place to the right, assign the start of sentence ```<SOS>``` to beginning of each sequence </span>, where the teacher forcing takes place, That way when we predict, we can just feed in the correct target word (i.e. teacher forcing). 
+3. Inputs and targets are converted to embeddings(or initial representations of the words)
+4. Now have query key and value vectors, you can prepare them for the attention layer:
+   1.  Compute $$ QK^T$$
+   2.  apply a padding mask before computing the softmax. (在Assignment中,zero-padding tokens to negative one billion, which will become approximately zero when computing the softmax )
+5. Once, have queries, keys, and values, compute attention. 
+6. Residual block adds the queries generated in the pre-attention decoder to the results of the attention layer. Then activations go to the second phase, with the mask that was previously created.  
+7. Drop the mask(图中标注的mask(1)) before running everything through the decoder, which is what the second Select is doing. It takes the activations from the attention layer（图中标注的attention(0)), and the second copy of the target tokens(图中标注的target tokens(2). <span style="background-color:#FFFF00">They are true targets which the decoder needs to compare against the predictions.</span>
+8.  Run everything through a dense layer or a simple linear layer with targets vocab size -> gives output. 
+9.  Take the outputs and run it through LogSoftmax, which is what transforms the attention weights to a distribution between zero and one.
+10. Match the log probabilites against true target tokens
+
+Note: <span style="color:red">图中的 Select([0,2]) -> LSTM -> Dense -> LogSoftmax : 是decoder</span>
+
+![](/img/post/Natural-Language-Processing/course4/week1pic13.png)
+
+![](/img/post/Natural-Language-Processing/course4/week1pic19.png)
+
+#### BLEU Score
+
+BLEU: Bilingual Evaluation Understudy. 
+
+- evaluate the quality of machine-translated text by compaing a candidate texts translation to one or more reference translation.
+- <span style="color:red">Usually The closer the BLEU score to one, the better the model. The closer to zero, the worse it is.</span>
+-  To get the BLEU score, the candidates and the references are usually based on an *average* of uni, bi, tri or even four-gram precision.  Unigrams account for adequacy while longer n-grams account for fluency of the translation. 
+- Problem
+   -  <span style="color:red">BLEU doesn't consider semantic meaning, so does not take into account the order of n-gram</span>
+   -  <span style="color:red">BLEU doesn't consider sentence structure</span> .e.g "Ate I was hungry beacause!" 如果reference is "I ate because I was hungry", will get a perfect BLEU score
+
+To calculate the blue score, count how many unique words(n-grams) appear in the reference. 比如下面unigram例子, I, am 都appear in referene 
+
+
+Bervity Penalty: The brevity penalty penalizes generated translations that are too short compared to the closest reference length with an exponential decay. The brevity penalty compensates for the fact that the BLEU score has no recall term.(recall: 是不是reference 中的正确都predict了，referenece length > candidate length, no penalty )
+
+$$BP = min \left(1, e^{1- \frac{\text{ref length}}{\text{candidate length}}} \right)$$
+
+![](/img/post/Natural-Language-Processing/course4/week1pic16.png)
+
+
+BLEU Score:
+
+
+$$BLUE = BP \left(\prod_{i=1}^4 precision_i \right)^{\frac{1}{4}}$$
+
+$$precision_i = \frac{\sum_{snt \in cand} \sum_{i \in snt} min\left(m_{cand}^i, m_{ref}^i \right)}{w_t^i}$$
+
+Where: 
+
+- $$m_{cand}^i$$ , is the count of i-gram in candidate matching the reference translation.
+- $$m_{ref}^i$$  , is the count of i-gram in the reference translation.
+- $$w_{t}^i$$  , is the total number of i-grams in candidate translation.
+- $$min\left(m_{cand}^i, m_{ref}^i \right)$$ 表示比如 bigram, (I,am) 在candidate中出现5次，但在reference中只出现3次，就取3次
+
+
+下面图中的score 是乘以100后的结果
+
+![](/img/post/Natural-Language-Processing/course4/week1pic17.png)
+
+
+#### ROUGE
+
+- Recall-Oriented Understudy for Gisting Evaluation:  
+- ROUGE was originally developed to evaluate the quality of machine summarized texts, but is useful for evaluating machine translation as well. 
+- Calculates precision and recall for machine texts by counting the n-gram overlap between the machine texts and a reference text.
+- Measures precision and recall between generated text and human-created text <span style="background-color:#FFFF00">where order matters</span>
+  - precision: How much of model text was relevant
+  - Recall: How much of the reference text is the system text captures?
+- Problem:
+  - <span style="background-color:#FFFF00">Doesn't take similar themes or concepts into consideration( low ROUGE score doesn't necessarily mean the the translation is bad)</span> 比如 model predict "I am a fruit-filled pastry" 跟 reference" I am a jelly donut" 意思一样但是score低
+
+The, cat, had, orange, fur 都appear。 如果model wants a high recall score, can guess hundred of words and have the chance the words in the true reference sentence. Then precision come in.
+![](/img/post/Natural-Language-Processing/course4/week1pic14.png)
+
+![](/img/post/Natural-Language-Processing/course4/week1pic15.png)
+
+
+#### Greedy Decoding
+
+- Select the <span style="color:red">most probable</span> word at each step(每步选取最大概率的)
+- For short sequence, it is fine
+- Limitiation: Best word at each time != best for long sequence, 比如model predict 出 I am, am, am, am...  
+
+
+#### Random Sampling
+
+- Often a little too random for accurate translation 
+- Solution: <span style="background-color:#FFFF00">assign more weight to more probable words, and less weight to less probable words</span>
+- <span style="color:red">**Temperature**</span>: <span style="background-color:#FFFF00">a parameter allowing for more or less randomness in predictions. measured on scale from 0 to 1, indicating low to high randomness</span>
+  - Lower temperatue setting = More confident, conservative network. More careful/safe decision for output
+  - Higher temperatue setting = More excited, random network(and more mistakes)
+
+#### Beam Search
+
+Greedy Decoding only select one best candidate as input sequence for each time step. Model encoded the input sequence and use previous time steps translation to calculate how much attention to give each of the input words. Now it's using the decoder to predict the next translated word. Now choosing just one best candidate may not be suitable for constructing a sentence.
+
+
+- A broader, more exploratory decoding alternative that use breath first search to build a search stream.
+  - Doesn't look only at next output, but instead apply a beam width parameter to select possible options
+- Istead of offering a best output like greedy decoding, beam seach select multiple options for the best input based on conditional probability
+- Beam width B: limit the number of branching paths. Select B number of best alternatives at each time step with the highest probabilities
+  - Once have B probability, can choose the one with highest probability
+  - <span style="background-color:#FFFF00">A larger beam width -> better model performance  ut slower decoding speed.</span> 
+- Problem: 
+  - Since the model learns a distribution, that tends to carry more weight than single tokens
+  - Can cause translation problems, 比如 in a speech corpus that hasn't been cleaned. 比如if have filler word "Uhm" which appear as translation with lower probability . That single element can throw off entire translation. 比如 at time step, most probable word 是 "Uhm"
+
+下面例子: assign conditional probability to each of several options for the next word in the sequence. The highest probability is the one will be chosen for each time step. 比如 "am" 是most likely next token with probability 40%. Next step, find "hungry" as the most likely token
+
+![](/img/post/Natural-Language-Processing/course4/week1pic18.png)
+
+#### Minimum Bayes Risk (MBR)
+
+1. Generate several random samples 
+2. Compare each sample against all the others and assign a similarity score (such as ROUGE!)
+3. Select the sample with the highest similarity.
+
+
+Examples: MBR Sampling, generate the scores for 4 samples:
+
+1. Calculate similarity score between sample 1 and sample 2
+2. Calculate similarity score between sample 1 and sample 3
+3. Calculate similarity score between sample 1 and sample 4
+4. Calculate weighted average of first 3 steps 
+5. Repeat until all samples (2,3,4) have overall scores
