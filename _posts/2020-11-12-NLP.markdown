@@ -1969,7 +1969,7 @@ To align words correctly, need to add a attention layer to help the decoder unde
 ![](/img/post/Natural-Language-Processing/course4/week1pic7.gif)
 
 
-#### Attention
+#### Attention Model
 
 - Attention is an added layer that lets a model focus on what's important
 - **Queries**, **Values**, and **keys** are used for information retrieval inside the Attention layer
@@ -2056,6 +2056,12 @@ Note: <span style="color:red">图中的 Select([0,2]) -> LSTM -> Dense -> LogSof
 ![](/img/post/Natural-Language-Processing/course4/week1pic13.png)
 
 ![](/img/post/Natural-Language-Processing/course4/week1pic19.png)
+
+![](/img/post/Natural-Language-Processing/course4/week1pic20.png)
+
+
+![](/img/post/Natural-Language-Processing/course4/NMTModel.png)
+
 
 #### BLEU Score
 
@@ -2163,3 +2169,208 @@ Examples: MBR Sampling, generate the scores for 4 samples:
 3. Calculate similarity score between sample 1 and sample 4
 4. Calculate weighted average of first 3 steps 
 5. Repeat until all samples (2,3,4) have overall scores
+
+
+<br/><br/><br/>
+
+## 4.2 Transformer
+
+**Neural machine translation** use neural network artchitecture: take sequential steps to encode input, start fom beginning of input make computation at every until until reach the end. At that point, decode the information following a similar sequential precedure. <span style="color:red">No parallel computing</span>. The more for input, the more time process that sentence
+
+![](/img/post/Natural-Language-Processing/course4/week2pic1.png)
+
+**Seq2Seq Architecture**: 
+
+- go through T sequential steps(<span style="background-color:#FFFF00">T is number of time-steps that model go through to process one sentence</span> ): e.g. sentence 有5个词, model will take five time stpes to encode the sentence. 
+- For large sequences: information loss, <span style="color:red">vanishing gradients problem</span>. LSTM and GRUS help a little.
+
+![](/img/post/Natural-Language-Processing/course4/week2pic2.png)
+
+**Transformer**
+
+- specially designed for 
+- transformer are based on attention, not require sequential computation per layer, only one step is needed
+- gradient from last output to the first input in a transformer is 1
+- transformer don't suffer from vanishing gradient problem which related to the length of sequence
+- transformer use Multi-headed attention layer instead of recurrent layer
+
+![](/img/post/Natural-Language-Processing/course4/week2pic3.gif)
+
+
+**Self Attention -> Multiheaded attention**
+
+- Self Attention use query, key, value obtained from every sequential inputs, 
+- Self Attention  output a same length sequential output for each input
+- Self Attention  can be think of attention model that incorporates a dense layer for every queries, keys, and values
+-  Multiheaded attention: can think of a set of parallel self-attention layers which are called heads. These heads are further concatenated to produce a single output, which emulates the recurrence sequence effect with attention
+- <span style="background-color:#FFFF00">Unlike recurrent layer, multi-headed attention computes the inputs in the sequence independently then allows us to paralleize the computation. But fail to model the sequential information for a given sequence, that's why need positional encoding stage into the transformer model</span>
+
+![](/img/post/Natural-Language-Processing/course4/week2pic4.png)
+
+![](/img/post/Natural-Language-Processing/course4/week2pic5.png)
+
+**Positional Encoding**
+
+encodes each input position in the sequence(since word order and position is important for language) to retain the positional information. The positional encoding output values to be added to the embeddings. So every word given to the model, have some of information about its order and position. 下面例子中 a positional encoding vector for each word ich, bin which will tell respective position. 
+
+
+#### Tranformer Application
+
+- Text summarization
+- Auto-complete(比如打字，comple, 输出complete)
+- Named entity recognition(NER)
+- Question answering 
+- Translation
+- Chat-bots
+- Other NLP tasks e.g. Sentiment Analysis, Market Intelligence, Text Classification, Character Recognition, Spell Checking. 
+
+
+#### Dot-Product Application
+
+- For a good embedding, vectors for English and German words that mean the same are similar. 
+- Query(German) looks for similar keys(English)
+- <span style="color:red">Each key has a probability of being a query a match for the query</span>
+- The queries by keys matrix is called **attention weights**, 表示how much each key similar to each query。 比如下面例子, I simialr to Ich, get 0.8 probability. 而 am 和 Ich不像，get 0.1 probability 
+- Return sum of the keys weighted by their probabilitys。 比如下面例子, query(Ich) get ```0.8 x vec("I") + 0.1 x vec("am") + 0.1 x vec("happy")```
+  
+比如input I am happy 和 translate "Ich bin gluklich", so want to look at English sentence to find similar words, that what attention does. In attention, <span style="color:red">German word vectors are called queries</span>, because it initiate the look up, a query is matched against all keys. 每个key 得到一个match for query的概率. 
+
+![](/img/post/Natural-Language-Processing/course4/week2pic6.png)
+
+feed embedding into three Linear Layer to get 3 different vectors for queries, keys and values.
+
+![](/img/post/Natural-Language-Processing/course4/week2pic7.gif)
+
+
+For matrix Q, K, attention model calculates <span style="background-color:#FFFF00">weights or scores 表示relative importance of keys for specific query from dot product</span>. Attention weights 可以被理解为alignments score. To <span style="background-color:#FFFF00">turn these weights to probability softmax matrix is needed</span>. Finally, <span style="color:red">multiply these probabilites with values, get weighted sequence</span>(attention result)
+
+![](/img/post/Natural-Language-Processing/course4/week2pic8.png)
+
+**Math**
+
+- Query: Shape: $$L_Q$$  by D
+  - think of queries as embedding of German words, D is the embedding of word embedding, $$L_K$$: the length of German sentence
+- Keys: Shape: $$L_K$$  by D
+  -  think of keys as embedding of English words), D is the embedding of word embedding, $$L_K$$: the length of English sentence
+- Query Q assign each key a probability,<span style="background-color:#FFFF00"> measure the similarity by taking those products of vectors</span>. if dot product large -> Q and K are similar. 
+  - However, <span style="color:red">similarity number not add up to 1, cannot be used as probabilities</span>. To make attention more focused on best matching keys, use softmax
+- <span style="background-color:#FFFF00">Attenion weights: $$W_A = softmax\left(QK^T\right)$$, shape is $$L_Q x L_K$$. 每个key-query pair gets a probability</span>
+- <span style="background-color:#FFFF00">To get weighted sum, multiply by value ( often same as keys ): weight each value $$v_i$$ by the probability that key $$k_i$$ matches the query.</span>
+- Attention mechansim calculates dynamic or alignments weights 表示 relative importance of the inputs in sequence which are keys for that particular ouputs which is query. A single contect vector can be calculated using the sum of weighted vectors.
+- GPUs and TPUs is used for speed-up matrix multiplications
+
+![](/img/post/Natural-Language-Processing/course4/week2pic9.png)
+
+![](/img/post/Natural-Language-Processing/course4/week2pic10.png)
+
+
+#### Causal Attention
+
+- **Encoder/decoder Attention**: One sentence(decoder) looks at another one(encoder)
+- **Causal (self) attention**: In one sentence, words look at previous words(used for generation text/summary). 比如 “I am happy" happy look at "I" 和 "am"
+- **Bi-directional self attention**: In one sentence, words look at both previous and future words
+
+**Causal attention**: 
+
+- <span style="color:red">Queries/Keys are words from the same sentence</span>. It is used in language models where try to generate sentences.
+  - <span style="background-color:#FFFF00">Query seach among past words only</span>
+- Causal attention allow words to attend to other words that are related in various ways <span style="color:red">but not words in future </span>. 因为future word还没有generated yet can attend any words to past
+
+
+![](/img/post/Natural-Language-Processing/course4/week2pic11.png)
+
+**Math**: 
+
+- <span style="background-color:#FFFF00">add mask(a constant triangular matrix, has 0 on diagonal and 下半区, minus inifinity on in upper right ) to weights $$QK^T$$</span>
+- $$ softmax\left( QK^T + M \right)$$ shape is $$L_Q$$ by $$L_K$$, 但是这个<span style="color:red">matrix allow model attend to words in future</span>. add M  $$L_Q$$ by $$L_K$$. 因为下半部分M 为0, 所以queries attending words in the past are untouched. 其他的值都是 minus inifinity. After softmax, all minus infinity become to 0(exponential of negative infinity equal 0) -> <span style="background-color:#FFFF00">prevent words from attending to future</span>
+
+![](/img/post/Natural-Language-Processing/course4/week2pic12.png)
+
+![](/img/post/Natural-Language-Processing/course4/week2pic13.png)
+
+
+#### Multi-headed Attention
+
+- Each head uses individually different linear transformations to represent word
+- Different heads can learn different relationships between words 比如下图 have N different heads and heads are being concatenated. Each one linear transformation results in one head
+
+
+![](/img/post/Natural-Language-Processing/course4/week2pic14.png)
+
+比如下图input of multi-headed attention is triple,
+
+1. Use fully connected layer dense layer on each query, key and value to create parallel attention heads, (3个合成一个head)
+2. Split these vectors into number of heads and perform attention on them as each head was different.
+3. Then result of attention will be concatenated back together.
+4. Put through a final fully connected layer to make different heads into a joint representation(Linear绿色框). The scale dot-product is used in dot-product attention model except scale factor $$\frac{1}{\sqrt{dk}}$$
+   - $$d_k$$ is the key and query dimenion. It is a normalization prevents the gradients from the function to be extremly small when large values of $$D_k$$ is used
+
+
+![](/img/post/Natural-Language-Processing/course4/week2pic15.png)
+
+
+d_head is dimensionality for each head, linear layer create n_heads vecotr each with each size d_head, separate head don't interact with each other
+
+
+![](/img/post/Natural-Language-Processing/course4/week2pic16.gif)
+
+1. create embedding for input words
+2. calculate keys and values matrices, packing all embedding into matrix for every head
+3. Then train weight matrices one per head to obtain new weighted queries, $$W_i^Q$$: ith head weighted matrix for Query
+4. with weighted query, key and value matrices, calculate result matrix $$Z_i$$: ith head by multiply ouput weight $$W^0$$
+
+
+![](/img/post/Natural-Language-Processing/course4/week2pic17.png)
+
+A multi-headed model jointly attends to information from different representation at different positions over the projected versions of queries, keys adn values. <span style="background-color:#FFFF00">Have to apply attention model parallel</span> reach different output values. Then these output values are then concatenated and weighted.
+
+
+![](/img/post/Natural-Language-Processing/course4/week2pic18.png)
+
+#### Transformer Decoder
+
+1. Input is tokenized sentence, a vector of integer, with shift right layer to add start token
+2. Sentence get embedded with word embeddings
+   - If input shape is batch by lengths, after embedding, shape is batch by lengths by d_models(size of embedding, usually 512,1024, nowadays up to 10k or more)
+3. position decoding: add embedding the information about position. The information is to learn vector representing 1,2,3 up to max lengths that put into the model
+   - The embedded first word will get added with vector representing one, The embedded second word will get added wit vector representing two, produce so called positional input embedding 
+4. multi-headed attention layer
+   - This model process each word, each position in the input sequence from positional input embedding . The attention itself searches other positions in the sequence to help identify relationships. Each word in the sequence is weighted
+   - Each layer of attention, there is a resuidual connection around it, followed by a layer normalization step to speed up training and significantly reduce overall processing time
+   - Then Each word is passed through a feed-forward layer, that's embeddings are fed into a neural network. Then add drop out at the end as regularization
+   - A layer normalization step is repeated N times.(下图2 N表示的位置)
+   - Finally the encoder layer output is obtained
+5. Feed-forward layer with ReLU:
+  - Some non-linear transformation are introducted by fully connected feed-forward layers with ReLu activation function for each input have shared parameters for efficiency 
+  - The feed forward neural network output vectors will replace the hidden states of original RNN encoder.
+6. After each attention and feed-forward layer, put a residual or skip connection. Add inputs of that layer to its output and perform layer normalization
+7. Step 4,5,6 重复 N times
+8. Final a dense(fully-connected) layer for outputs and a softmax layer, output batch by length by vocabulary size
+9.  calculate 记录 softmax for corss entropy loss
+
+![](/img/post/Natural-Language-Processing/course4/week2pic19.png)
+
+![](/img/post/Natural-Language-Processing/course4/week2pic20.png)
+
+![](/img/post/Natural-Language-Processing/course4/week2pic21.png)
+
+
+#### Transformer Summarizer
+
+Use Transformer model to produce the summary for article. Transformer predict next work and your inputs in news article. At test or inference time, input the ```article <EOS>``` token(first word of the summary) to the model ask for next word. Then ask for next work and next by random sampling until get ```<EOS>``` When run transformed model, generates a probability distrbution over all possible words. Will sample from this distribution. So each time get a different summary. 
+
+![](/img/post/Natural-Language-Processing/course4/week2pic23.png)
+
+- Input: tokenized as a sequence of integers. 0 表示 padding, 1 表示 EOS
+- Loss weights: 0s until the first ```<EOS>``` and then 1 on the start of the summary
+  - Don't want a huge loss because its not able to predict the correct one
+  - Instead of averaging the loss for every word in the whole sequence, weight the loss for the words within the article with 0s and ones within the sumarry with 1s. So model only focus on summary
+  - However, little data for summaries, actually helps to weight the article loss with nonzero number 比如 0.2, 0.5, or even 1. model able to learn word relationship that are common in the news
+
+![](/img/post/Natural-Language-Processing/course4/week2pic22.png)
+
+Cost function: cross entropy function that ignores the words from the article to be summarized
+
+$$J = -\frac{1}{m} \sum_j^m \sum_i^K y_j^i log \hat y_j^i $$
+
+where j: over summary. i: batch elements
