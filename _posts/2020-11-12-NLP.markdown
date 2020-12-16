@@ -2556,3 +2556,74 @@ Evaluation / Application
 - researchers use GLUE as a benchmark
 - Model agnostic, doesn't matter which model you used 
 - allow use of transfer learning because have access to several datasets
+
+
+<br/><br/><br/>
+
+## 4.4 Chatbot
+
+Long Text Sequence: Chanllenges due to size in training.
+
+- Writing Books: 变得困难辨认 book written by human or AI
+- Chatbots: 变得困难辨认 conversation you have real or computer
+
+[AI Storytelling](https://play.aidungeon.io/main/landing): Dragon model for Dungeon is based on GPT-3. It generates an interactive story based on all previous turns as inputs. That makes for a task that uses very long sequences.
+
+Process long text sequence is core of chatbot. Chatbot use all previous pieces of converversation as inputs for next reply -> big context windows
+
+- Context-based question: need both a question and relevant text from where to retrieve answer
+- Close loop question. no need extra text with a question or prompt from human. All knowledge is stored in weights of model during training 
+  
+#### Transformer Issues
+
+- Attention on sequence of Length L takes $$L^2$$ time and memory. 比如attention on two sentences of length L, need to compare each word in first sentence to each word in second sentence. 比如 L = 10000, $$L^2$$ = 100 M, 如果每秒process 10M, take 10 sec to compute
+- N layers take N times as much memory. e.g. GPT-3 has 96 layers and new models will have more. Even modern GPU can struggle this dimensionality
+- **Attention Complexity**: Attention is $$softmax\left( QK^T \right)V$$, Q,K,V are all size L by $$d_model$$, Then $$QK^T$$ size is L by L. For long sequence, usually don't need consider all L positions, instead focus on area of interest. 比如translate a long text from English to German, don't need to consider every word at once. Instead focus on single word being translated and those immediately around it by using attention. 
+- <span style="background-color:#FFFF00">The more layer model has, the more memory need.</span> 这是因为需要store forward pass, acivation for backprop. Can overcome this memory requirements by recomputing activations, 但是需要done efficiently to minimize taking too much extra time. 比如GPT-3 has 96 layers 会take a very long time to recompute activations, and model will continue to get bigger.
+  - Compute vs memory tradeoff
+
+
+**Solve Dot product Attention Complexity**
+
+e.g. 比如下图，can see what attention is doing, 比如word it, attention focus on certain words to determine if it refers to the streets or to be animal. it 只能refer to noun not other words 可以ignore other word. A pronoun(it) is a word that substitutes for a noun. That's why only want to look up nearest neighbor to speed up attention
+
+
+![](/img/post/Natural-Language-Processing/course4/week4pic1.png)
+
+**Nearest Neighbors**: Compute the nearest neighbors to q among vectors {$$k_1, ...k_n$$}
+
+- Attention computes $$d\left(q,k_i \right)$$ for i from 1 to n which can be slow 
+- Faster approximate uses locality sensitive hashing(LSH)
+  - Locality sensitive: if q is close to $$k_i$$ -> hash(q) == hash($$k_i$$)
+  - <span style="background-color:#FFFF00">When choose hash, want to make buckets roughly the same size</span>
+  - only run attention on keys that are in the same hash buckets as the query (就像上边 noun 和 pronoun的例子)
+  - Achieve by randomly cutting space: hash(x) = sign(xR) where R: [d,n_hash_bins]. R is random, size 是 d(dimension) 乘以 number of hash bins. Sign tell which side of the plane hash will be on. The process is repeated depending on the number of hashes you have
+
+#### LSH Attention
+
+**Standard Attenion**:
+
+$$A\left(Q,K,V\right) = softmax\left(Qk^T\right)V$$
+
+**LSH Attention**: <span style="background-color:#FFFF00">Note LSH is a probabilistic, not deterministic model 因为inherent randomness within LSH algorithm. Meaning hash can change along with buckets that vector map to</span>
+
+1. First hash Q and K 
+2. perform standard attention but within same-hash bins. This reduces the search space for each K to the same LSH bucket as Q. Can repeat this process multiple time to increase the probability of finding Q and K in the same bin. 可以done efficiently by parallel computing
+
+Integrate LSH to attention layer:
+
+1. modify model so outputs a single vector at each position which serves both as a query and a key. Called QK attention and performs just as regular attention
+2. map each vector to a bucket with LSH. 
+3. Sort vectors by LSH bucket
+4. Do attention only in each bucket. Use batch(parallel) computation
+  1. split sorted sequence into fixed size chunks which allow parallel computation
+  2. Let each chunk attend within itself and adjacent chunks(比如图中 blue 相互计算, 黄色相互计算, 红色相互计算) 因为一个hash bucket may split more than one chunk
+
+
+### Reversible Layers:
+
+<span style="color:red">Memory grow linearly with the number of layers</span>
+
+比如 want to run transformer on entire text of book, 也许有 1 million token to process. each token has associated feature size 512 (比如embedding) -> model input就有 2 GB, 在16GB的GPU, 相当于1/8 not touch layer yet. 而layer 有transformer layer and feedforward layer. 比如model 有 12个attention, 12个feedforward. 每个layer input 和 output 也是2GB, do backprop, forward path需要store intermediate quantities in meomory. 比如只save activation from boundaries between each layers 不保存individual layer就已经50GB (任何device 都不能fit) 而modern transformer much deeper than 12 layers
+
+![](/img/post/Natural-Language-Processing/course4/week4pic3.gif)
