@@ -2364,8 +2364,16 @@ Use Transformer model to produce the summary for article. Transformer predict ne
 - Input: tokenized as a sequence of integers. 0 表示 padding, 1 表示 EOS
 - Loss weights: 0s until the first ```<EOS>``` and then 1 on the start of the summary
   - Don't want a huge loss because its not able to predict the correct one
-  - Instead of averaging the loss for every word in the whole sequence, weight the loss for the words within the article with 0s and ones within the sumarry with 1s. So model only focus on summary
+  - Instead of averaging the loss for every word in the whole sequence, weight the loss for the words within the article with 0s and ones within the summary with 1s. So model only focus on summary
   - However, little data for summaries, actually helps to weight the article loss with nonzero number 比如 0.2, 0.5, or even 1. model able to learn word relationship that are common in the news
+
+```python
+#article, summary integer vector
+
+joint = np.array(list(article) + [EOS, SEP] + list(summary) + [EOS])
+mask = [0] * (len(list(article)) + 2) + [1] * (len(list(summary)) + 1) # Accounting for EOS and SEP
+
+```
 
 ![](/img/post/Natural-Language-Processing/course4/week2pic22.png)
 
@@ -2374,3 +2382,177 @@ Cost function: cross entropy function that ignores the words from the article to
 $$J = -\frac{1}{m} \sum_j^m \sum_i^K y_j^i log \hat y_j^i $$
 
 where j: over summary. i: batch elements
+
+<br/><br/><br/>
+
+
+
+## 4.3 Question Answering
+
+![](/img/post/Natural-Language-Processing/course4/week3pic2.png)
+
+
+#### Transfer Learning
+
+
+![](/img/post/Natural-Language-Processing/course4/week3pic1.gif)
+
+Transfer Learning:  e.g. use pretrain model (movie review) on course review. 
+
+- Reduce training time, faster convergence
+- Improve predictions
+- require a small datasets, because model learn a lot from other tasks
+
+
+![](/img/post/Natural-Language-Processing/course4/week3pic3.png)
+
+Two methods in Transfer learning
+
+- feature based method, word vectors(use pretrain CBOW(embedding) weights as word vectors)
+- fune tuning method , 
+  - take a exisitng weights as initialized weights and fine tune them on new task
+  - <span style="background-color:#FFFF00">Add a new layer and only fine tune new layer keep other layer frozen</span> 比如 movie review predict 3 ratings, course review provide 5 ratings, add a new layer to match new dimension(5)
+
+![](/img/post/Natural-Language-Processing/course4/week3pic4.png)
+
+![](/img/post/Natural-Language-Processing/course4/week3pic5.png)
+
+Generaly, a bigger data, a larger model -> better performance. 比如 unlabeled data 大于 label data.  
+
+- 对于unlabeled data 用于 pre-training. 比如CBOW, learn the word from the context(self-supervised learning)
+- labelled data 用于 downstream task using the model weights, 比如 what day is today, model predict March 14th
+
+![](/img/post/Natural-Language-Processing/course4/week3pic6.png)
+
+
+The model that is trained bidirectionally may have a deeper sense of context and language flow than unidirectional models.
+
+#### ELMo, GPT, BERT, T5
+
+**ELMo**: CBOW using C as windows size, ELMo use full context using RNN (<span style="color:red">Bi-directional</span> LSTM), suffer from long-term dependency 
+
+![](/img/post/Natural-Language-Processing/course4/week3pic7.png)
+
+**GPT**(Decoder): uni-directional. In transformer, using self-attention(Each word can peek at itself), but in GPT, only look at previous attention(No peeking)
+
+
+
+**BERT**: decoder, bi-drectional
+
+BERT Pre-training Tasks:
+
+-  Multi-Mask Langauage modelling. 比如 mask 两个词在sentence中，让model 学会predict 这两个词
+-  Next sentence Prediction. Given Sentence A, 然后给几个选项, predict which onesentence B
+
+**T5** using Encoder & Decoder
+
+![](/img/post/Natural-Language-Processing/course4/week3pic8.png)
+
+![](/img/post/Natural-Language-Processing/course4/week3pic9.png)
+
+
+#### BERT
+
+- A multi layer bidrectional transformer
+- Use positional embeddings
+- Famous model is BERT_base, has: (New model come out now has more parameters)
+    - 12 layers(12 transformer blocks)
+    - 12 attentions heads
+    - 110 million parameters
+
+1. Start with Embedding $$E_1, E_2 ... E_N$$
+2. Go to Transformer block(图中的蓝色圈)
+3. Get $$T_1, T_2 ... T_N$$
+
+![](/img/post/Natural-Language-Processing/course4/week3pic10.png)
+
+- Pretraining: use unlabelled data over different pretraining tasks
+  - Mask language modelling(MLM) : (mask 15% percent of words) , train data generator choose 15% of these positions at random for prediction. Mask them 80% of the time, replace them with a random token 10% of the time, then keep as is 10% of the time.  Note: could be multiple masked spans in a sentence. 
+    - Add a Dense layer after encoder outputs, multiply output vector by the embedding matrix then transform them into vocabulary dimension and add softmax at the end
+  - Next sentence prediction is also used when pre-training: Given two sentences, if true means two sentence follow one another.
+- Fine-tuning: initialized with pre-trained parameters and all of pararmeters are fine-tuned using labeled data from downstream tasks
+
+**Objective**
+
+1. start with positional embedding which indicate the position in the sentence of the word
+2. Then have segment embeddings: 表示if it is sentence A or setnence B
+3. Then have token embedding, have CLS token 表示beginning of sentence 和 SEP token 表示 end of sentence. 
+4. Take the sum of those embedding to get a new input
+
+![](/img/post/Natural-Language-Processing/course4/week3pic11.png)
+
+$$T_i$$ embedding are used to predict masked word using softmax. 绿色的C embedding are used for next sentence prediction
+
+![](/img/post/Natural-Language-Processing/course4/week3pic12.gif)
+
+![](/img/post/Natural-Language-Processing/course4/week3pic13.png)
+
+
+**Fine Tuning**
+
+![](/img/post/Natural-Language-Processing/course4/week3pic14.gif)
+
+
+#### T5
+
+T5 transformer known as Text to Text transformer. Can used for 
+
+- Classification
+- Question Answering
+- Machine Translation
+- Summarization
+- Sentiment
+
+Model Architecture: Use Encoder/decoder, 12 transformer blocks each, 220 million parameters
+
+- Sbasic encoder-encoder representation. Fully visible attention in encoder and causal attention in decoder
+- Language model with single transformer layer stack which are fed the concatenation of inputs and target, use causal attention
+- Prefix Language model allow fully visible masking over inputs and causal masking
+
+![](/img/post/Natural-Language-Processing/course4/week3pic15.png)
+
+
+- Examples-proportional mixing, 每个dataset 不管多大多小，都take 10%
+- Example mixing, regardless size of data, take equal sample
+- Temperature scaled mixing: play the parratmeters to get something between Examples-proportional mixing and Example mixing
+
+![](/img/post/Natural-Language-Processing/course4/week3pic16.png)
+
+**Graudal Unfreezing**: freeze one layer at a time.  比如下图 freeze last layer, fine-tuned using that keep other fixed. Then freeze 倒数第二个... gradual freezing each layer
+
+![](/img/post/Natural-Language-Processing/course4/week3pic17.gif)
+
+**Adapter layers**: add existing neural network or a neural network to each feed forward and each block of the transformer. Then these new feed forward networks designed that output dimension match input, allows them to be inserted without having ay structural change。 <span style="background-color:#FFFF00">When fine-tuning, only new adapter layers and layer normalization are updated</span>
+
+![](/img/post/Natural-Language-Processing/course4/week3pic18.png)
+
+A single model can simultaneously perform many tasks at once. Model most of parameters are shared across all of the tasks. Might train a single model on many tasks, but when reporting performance, can select different checkpoints for each task. Do the train at 2^18 steps
+
+![](/img/post/Natural-Language-Processing/course4/week3pic19.png)
+
+#### GLUE Benchmark
+
+GLUE: General Language Understanding Evaluation
+
+- A collection used to train, evaluate, analyze natural language understanding systems
+- has a lot of datasets. Each Dataset with different genres, and of different size and difficulties. 比如some are for coreference resolution, other used for simple sentiment analysis
+- Used with a **leaderboard**: people can use dataset, see how well models perform compared to others
+
+
+Tasks Evaluated on
+
+- Sentence grammatical or not? Sentence make sense or not?
+- Sentiment
+- Paraphrase
+- Similarity
+- Questions duplicates
+- Answerable: whether question can be answered or not?
+- Contradiction
+- Entailment
+- Winograd: try to identify whether a pronoun refer to a certain noun or another noun. 
+
+Evaluation / Application
+
+- researchers use GLUE as a benchmark
+- Model agnostic, doesn't matter which model you used 
+- allow use of transfer learning because have access to several datasets
