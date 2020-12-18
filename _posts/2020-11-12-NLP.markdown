@@ -2627,3 +2627,50 @@ Integrate LSH to attention layer:
 比如 want to run transformer on entire text of book, 也许有 1 million token to process. each token has associated feature size 512 (比如embedding) -> model input就有 2 GB, 在16GB的GPU, 相当于1/8 not touch layer yet. 而layer 有transformer layer and feedforward layer. 比如model 有 12个attention, 12个feedforward. 每个layer input 和 output 也是2GB, do backprop, forward path需要store intermediate quantities in meomory. 比如只save activation from boundaries between each layers 不保存individual layer就已经50GB (任何device 都不能fit) 而modern transformer much deeper than 12 layers
 
 ![](/img/post/Natural-Language-Processing/course4/week4pic3.gif)
+
+Transformer network precedes by adding residuals to hidden state. To run reverse, can substract residuals in oppsite order, start with outputs of model. Instead of store residuals, able to recompute quickly instead where residual connection come in.<span style="color:red"> Key idea is start with two copies of model inputs, then each layer only update one</span>. The activation don't update is the one to compute residuals. 
+
+Compute using one side of network plus feed foward from other side to compute $$y_2$$, similarly one side of network plus attention to computer other side to compute $$y_1$$
+
+![](/img/post/Natural-Language-Processing/course4/week4pic4.png)
+
+Foward layer for residual block: combine standard attention and feed forward residual layers from regular transformer to a single reversible residual block and nothing save in the memory except for $$y_1, y_2$$ for output layer instead of activiation for every individual layer  
+
+
+
+![](/img/post/Natural-Language-Processing/course4/week4pic5.png)
+
+#### Reformer
+
+Reformer is a transformer model designed to be memory efficient so it can handle very large context windows of upto 1 million words.
+
+- use LSH Attention: reduce complexity of attending over long sequences
+- use Reversible Residual Layers:  more efficienctly use memory available
+
+下面图from Reformer paper, highlight standard attention takes longer as sequence length increases. However, LSH attention takes roughly the same amount of time as sequence increase. The only difference is number of hashes. More hashes take slightly longer than fewer hashes, regardless of seqeunce sequence, 
+
+![](/img/post/Natural-Language-Processing/course4/week4pic6.png)
+
+
+## Resource
+
+[Jukebox - A neural network that generates music!](https://openai.com/blog/jukebox/)
+
+[GPT-3 Can also help with auto-programming!](https://beta.openai.com/?app=productivity&example=4_2_0)
+
+
+[Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer (Raffel et al, 2019)](https://arxiv.org/abs/1910.10683)
+
+[Reformer: The Efficient Transformer (Kitaev et al, 2020)](https://arxiv.org/abs/2001.04451)
+
+[Attention Is All You Need (Vaswani et al, 2017)](https://arxiv.org/abs/1706.03762)
+
+[Deep contextualized word representations (Peters et al, 2018)](https://arxiv.org/pdf/1802.05365.pdf)
+
+[The Illustrated Transformer (Alammar, 2018)](http://jalammar.github.io/illustrated-transformer/)
+
+[The Illustrated GPT-2 (Visualizing Transformer Language Models) (Alammar, 2019)](http://jalammar.github.io/illustrated-gpt2/)
+
+[BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding (Devlin et al, 2018)](https://arxiv.org/abs/1810.04805)
+
+[How GPT3 Works - Visualizations and Animations (Alammar, 2020)](http://jalammar.github.io/how-gpt3-works-visualizations-animations/)
