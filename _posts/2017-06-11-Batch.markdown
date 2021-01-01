@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      "Batch - 笔记"
+title:      "Batch - Note"
 subtitle:   "Batch Script learning note "
 date:       2017-06-11 20:00:00
 author:     "Becks"

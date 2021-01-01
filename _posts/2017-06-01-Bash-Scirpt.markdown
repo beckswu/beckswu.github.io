@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      "Bash Script - 笔记"
+title:      "Bash Script - Note"
 subtitle:   "Bash Script learning note "
 date:       2017-06-01 22:00:00
 author:     "Becks"
