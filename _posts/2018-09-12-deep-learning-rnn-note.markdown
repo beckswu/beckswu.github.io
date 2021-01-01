@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      "Deep Learning —— Sequence Model 笔记"
+title:      "Deep Learning —— Sequence Model Summary"
 subtitle:   "深度学习 Deep Learning —— Sequence Model note"
 date:       2018-09-12 19:00:00
 author:     "Becks"
