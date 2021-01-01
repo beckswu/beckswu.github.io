@@ -2,7 +2,7 @@
 layout:     post
 title:      "Vcpkg Installation"
 subtitle:   "vcpkg installation on Windows"
-date:       2018-09-28 10:00:00
+date:       2017-09-28 10:00:00
 author:     "Becks"
 header-img: "img/post/math.jpg"
 catalog:    false
