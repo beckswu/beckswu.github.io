@@ -1,8 +1,8 @@
 ---
 layout:     post
-title:      "QuickFIX —— C++ 配置"
+title:      "QuickFIX —— C++ Config"
 subtitle:   "FIX Engine C++ library —— QuickFix"
-date:       2018-10-03 19:00:00
+date:       2017-10-03 19:00:00
 author:     "Becks"
 header-img: "img/post-bg1.jpg"
 catalog:    true
