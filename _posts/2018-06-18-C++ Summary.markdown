@@ -1,13 +1,13 @@
 ---
 layout:     post
-title:      "C++ Primer - 笔记"
+title:      "C++ Primer - Summary"
 subtitle:   "C++ Primer Summary "
 date:       2018-06-18 20:00:00
 author:     "Becks"
 header-img: "img/post-bg2.jpg"
 catalog:    true
 tags:
-    - Batch
+    - C++
     - 学习笔记
 ---
 
