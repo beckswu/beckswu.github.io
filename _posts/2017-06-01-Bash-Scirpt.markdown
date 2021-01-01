@@ -2,7 +2,7 @@
 layout:     post
 title:      "Bash Script - 笔记"
 subtitle:   "Bash Script learning note "
-date:       2019-06-01 22:00:00
+date:       2017-06-01 22:00:00
 author:     "Becks"
 header-img: "img/post-bg2.jpg"
 catalog:    true

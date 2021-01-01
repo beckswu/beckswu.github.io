@@ -2,7 +2,7 @@
 layout:     post
 title:      "Git - 笔记"
 subtitle:   "版本管理库 Git learning note "
-date:       2018-09-18 20:00:00
+date:       2016-09-18 20:00:00
 author:     "Becks"
 header-img: "img/post-bg2.jpg"
 catalog:    true

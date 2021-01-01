@@ -2,7 +2,7 @@
 layout:     post
 title:      "Batch - 笔记"
 subtitle:   "Batch Script learning note "
-date:       2019-06-11 20:00:00
+date:       2017-06-11 20:00:00
 author:     "Becks"
 header-img: "img/post-bg2.jpg"
 catalog:    true

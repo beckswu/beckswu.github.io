@@ -2,7 +2,7 @@
 layout:     post
 title:      "cmake - 笔记"
 subtitle:   "Cmake learning note "
-date:       2019-05-30 20:00:00
+date:       2017-05-30 20:00:00
 author:     "Becks"
 header-img: "img/post-bg2.jpg"
 catalog:    true

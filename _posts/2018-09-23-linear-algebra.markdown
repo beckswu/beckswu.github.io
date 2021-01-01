@@ -2,7 +2,7 @@
 layout:     post
 title:      "Linear Algebra + PCA - Summary "
 subtitle:   "Linear Algebra 线性代数 总结"
-date:       2016-09-23 20:00:00
+date:       2018-09-23 20:00:00
 author:     "Becks"
 header-img: "img/post/math.jpg"
 catalog:    true

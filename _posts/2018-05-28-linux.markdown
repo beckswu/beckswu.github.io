@@ -2,7 +2,7 @@
 layout:     post
 title:      "Linux - 笔记"
 subtitle:   "linux learning note "
-date:       2019-05-28 20:00:00
+date:       2018-05-28 20:00:00
 author:     "Becks"
 header-img: "img/post-bg2.jpg"
 catalog:    true

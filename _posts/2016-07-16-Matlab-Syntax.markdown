@@ -2,7 +2,7 @@
 layout:     post
 title:      "Matlab Syntax"
 subtitle:   "Matlab Syntax Lookup Guide"
-date:       2019-07-16 20:00:00
+date:       2016-07-16 20:00:00
 author:     "Becks"
 header-img: "img/post-bg3.jpg"
 catalog:    true
