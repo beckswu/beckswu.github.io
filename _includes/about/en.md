@@ -2,6 +2,4 @@
 > Here I am
 
 
-Hi, I am *Jichen* (Becks), a Finacial Engineer. I grow up in Beijing, China. Currently I live in Florida, US.  
-
-In my spare time, I love learning new technologies, running and watching sports. 
+Hi, I am @*Jichen* (Becks), live in New York. I am a developer, dreamer and Practioner. I am interested in Quant Development, Machine learning, Artificial Intelligence.
