@@ -83,6 +83,16 @@ bundle install
 ```
 bundle exec jekyll serve
 ```
+If run above with error, add two lines at the bottom of Gemfile
+```
+gem 'jekyll-sitemap'
+gem 'jekyll-paginate' 
+```
+
+Then run below in the terminal
+```
+gem install jekyll-sitemap
+```
 
 Open browser with [http://127.0.0.1:4000](http://127.0.0.1:4000)
 
@@ -102,3 +112,6 @@ _site/
 .bundle/
 vendor/
 ```
+
+(Reference)[https://jekyllrb.com/tutorials/using-jekyll-with-bundler/]
+
