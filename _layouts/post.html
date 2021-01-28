@@ -26,7 +26,7 @@ layout: default
     <div class="header-mask"></div>
     <div class="container">
         <div class="row">
-            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+            <div class="col-lg-11 col-md-11">
                 <div class="post-heading">
                     <div class="tags">
                         {% for tag in page.tags %}
@@ -54,8 +54,8 @@ layout: default
 
     <!-- Post Container -->
             <div class="
-                col-lg-8 col-lg-offset-2
-                col-md-10 col-md-offset-1
+                col-lg-11
+                col-md-11
                 post-container">
 
                 <!-- Multi-Lingual -->
@@ -109,7 +109,7 @@ layout: default
     <!-- Side Catalog Container -->
         {% if page.catalog %}
             <div class="
-                col-lg-2 col-lg-offset-0
+                col-lg-1 col-lg-offset-0
                 visible-lg-block
                 sidebar-container
                 catalog-container">
@@ -125,8 +125,8 @@ layout: default
 
     <!-- Sidebar Container -->
             <div class="
-                col-lg-8 col-lg-offset-2
-                col-md-10 col-md-offset-1
+                col-lg-11 
+                col-md-11
                 sidebar-container">
 
                 <!-- Featured Tags -->
@@ -147,15 +147,15 @@ layout: default
                 {% endif %}
 
                 <!-- Friends Blog -->
-                {% if site.friends %}
+                <!-- {% if site.friends %} -->
                 <hr>
-                <h5>FRIENDS</h5>
-                <ul class="list-inline">
-                    {% for friend in site.friends %}
-                        <li><a href="{{friend.href}}">{{friend.title}}</a></li>
-                    {% endfor %}
-                </ul>
-                {% endif %}
+                <!--<h5>FRIENDS</h5> -->
+                <!-- <ul class="list-inline"> -->
+                <!--    {% for friend in site.friends %} --> 
+                <!--        <li><a href="{{friend.href}}">{{friend.title}}</a></li> -->
+                <!--    {% endfor %} -->
+                <!-- </ul>  -->
+                <!-- {% endif %} -->
             </div>
         </div>
     </div>

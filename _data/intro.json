@@ -1,0 +1,12 @@
+{
+    "introduction":
+       {
+         "img": "home-background.png",
+         "avatar":"avatar-becks-profile.jpg"
+      },
+      "FunAspectsHobbies":
+         {
+           "img": "home-background2.png",
+           "avatar":"about-me.jpg"
+        }
+ }

@@ -91,7 +91,7 @@
                 </ul>
                 <p class="copyright text-muted">
                     Copyright &copy; {{ site.title }} {{ site.time | date: '%Y' }}<br>. Powered by Jekyll&GitHub.</span> 
-您是本站第<span id="busuanzi_value_site_uv"></span>位访问者</p> 
+Your're the <span id="busuanzi_value_site_uv"></span>th visitor</p> 
              <p class="copyright text-muted" id="count"> </p>
 <!--                 <p class="copyright text-muted">
                     Copyright &copy; {{ site.title }} {{ site.time | date: '%Y' }}
@@ -107,7 +107,7 @@
         </div>
     </div>
 </footer>
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 <script>
   
@@ -120,7 +120,7 @@
     var hour=Math.floor(time%(24*60*60)/(60*60));
     var minute=Math.floor(time%(24*60*60)%(60*60)/60);
     var second=Math.floor(time%(24*60*60)%(60*60)%60);
-    var str="我的博客已默默运行了" + day + "天" + hour +"时" + minute + "分" + second + "秒";
+    var str="My website has been running for " + day + " days " + hour +" hrs " + minute + " mins " + second + " secs";
     document.getElementById('count').innerHTML=str;
   }
 </script>

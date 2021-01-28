@@ -20,9 +20,15 @@
                         <a href="{{ site.baseurl }}/">Home</a>
                     </li>
                     {% for page in site.pages %}{% if page.title %}
-                    <li>
-                        <a href="{{ page.url | prepend: site.baseurl }}">{{ page.title }}</a>
-                    </li>
+                        
+                        {% assign my_variable = page.url | slice: 0, 11 }} %}
+                        {% if site.exclude_pages contains my_variable %}
+                            <!-- Do Nothing -->
+                        {% else %}
+                            <li>
+                                <a href="{{ page.url | prepend: site.baseurl }}">{{ page.title }}</a>
+                            </li>
+                        {% endif %}
                     {% endif %}{% endfor %}
                 </ul>
             </div>
@@ -78,8 +84,31 @@
      * Also, we use 'click' instead of 'touchstart' as compromise
      */
     document.addEventListener('click', function(e){
+
         if(e.target == $toggle) return;
         if(e.target.className == 'icon-bar') return;
+
+        /*Add by Becks to uncheckRadioButton Start*/
+        if( (e.target.className == 'timeline-li-item' || e.target.className == 'radio'
+            || $(e.target).parents(".timeline-li-item").length) && 
+            e.target.className != 'date' && e.target.className != 'circle' //if circle or date, close radio
+            &&  ($(e.target).closest(".timeline-li-item").prev('.radio').is(':checked') || e.target.className == 'radio' ) ) 
+            /*
+                if click is radio button(e.target.className == 'radio' ), avoid second click at the same time to close a open which should be open
+             or click some other section belong to timeline-li-item, which is not open($(e.target).closest(".timeline-li-item").prev('.radio').is(':checked') is false),
+                 then close all radio button
+            */
+            return;
+
+         
+        $('input:radio').each(function() {
+            if($(this).is(':checked')) {
+                    // You have a checked radio button here...
+                    $(this).removeAttr("checked");
+                } 
+        });
+         /*Add by Becks to uncheckRadioButton End*/
+
         __HuxNav__.close();
     })
 </script>

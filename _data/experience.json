@@ -1,0 +1,88 @@
+{
+    "education":[
+       {
+         "img": "UIUC.png",
+         "university": "University of Illinois at Urbana-Champaign",
+         "major":"M.S. in Financial Engineering",
+         "date":"Aug 2015 - Dec 2016",
+         "highlight":[
+            {
+               "point":"Program Website: https://msfe.illinois.edu/"
+            }
+         ]
+      },
+      {
+         "img": "UC Denver.png",
+         "university": "University of Colorado Denver",
+         "major":"B.A. in Economics/Minor in Mathematics",
+         "date":"Sep 2011 - May 2015",
+         "highlight":[
+            {
+              
+            }
+         ]
+      },
+      {
+         "img": "CAU.png",
+         "university": "China Agricultural University",
+         "major":"B.A. in Economics/Minor in Mathematics",
+         "date":"Sep 2011 - May 2015",
+         "highlight":[
+            {
+               
+            }
+         ]
+      }
+    ],
+    "experiences":[
+      {
+         "img": "S&P.png",
+         "company": "S&P Global",
+         "position":"C++ Quantitative Developer",
+         "date":"May 2019 - Now",
+         "responsibility":[
+            {
+               "point":"Implement production algorithms for S&P credit analytics statistical machine learning extensively served as Capital IQ back-end programs on both Windows and Linux platforms used by worldwide S&P clients"
+            }
+         ]
+      },
+      {
+         "img": "Equiti.png",
+         "company": "Equiti Capital",
+         "position":"Financial Engineer/Developer",
+         "date":"March 2017 - May 2019",
+         "responsibility":[
+            {
+               "point":"Develop FX trading infrastructure using Python, C++, C#"
+            },{
+               "point":"FIX (Pricing/Dropcopy), API (Rest, SOUP, RabbitMQ), trading platforms connection in C++, C#"
+            },{
+               "point":"Develop tools for Traders, Supports, and Trading Operations"
+            },{
+               "point":"Build online alert systems and web dashboard to display key data and configure trading settings using HTML,Javascript/JQuery, PHP, CSS/Bootstrap"
+            }
+         ]
+      },
+      {
+         "img": "CME.png",
+         "company": "CME Group",
+         "position":"Machine Learning Practicum Student",
+         "date":"Jan 2016 - May 2016",
+         "responsibility":[
+            {
+               "point":"Lead the team to perform algorithm model training on limit order books and trade records of high frequency crude oil futures and Emini futures"
+            },{
+               "point":"Merged data in Python to generate attributes including average bid and ask price, volume imbalance, weighed book price, time lag trade volume, etc. to prepare model training"
+            },{
+               "point":"Modeled high frequency market via various machine learning models (logistic regression, Neural Network, SVM, Decision tree) in C++, Python & R to understand market pattern and make predictions market trends"
+            },{
+               "point":"Backtested all training models in the test set with real high frequency data and achieving 86% accurancy"
+            },{
+               "point":"Reimplement and improved iceberg order detection algorithms to identify iceberg orders"
+            },{
+               "point":"Summarized the weekly progress of the team and wrote weekly technical reports to CME supervisors to discuss the further optimization method and ascertain insignificant attributes"
+            }
+         ]
+      }
+   ]
+ }

@@ -7,8 +7,9 @@ author:     "Becks"
 header-img: "img/post-bg-city-night.jpg"
 catalog:    true
 tags:
-    - Jerkyll
+    - Jekyll
     - Github.io
+
 ---
 
 ## Install ruby, jekyll bundler
@@ -115,3 +116,244 @@ vendor/
 
 (Reference)[https://jekyllrb.com/tutorials/using-jekyll-with-bundler/]
 
+
+{% raw %}
+
+## Run with Draft
+
+create `_drafts` folder inside Jekyll folder, then run below code. When write draft, don't need to add a date for your draft, it will publish based on today's date
+
+```
+Jekyll serve --draft
+```
+
+when ready for publish, move to `_post` folder and add date
+
+## Permalink
+
+Without using default link, using `permalink` in 
+
+```
+permalink: /:year/:month:/:day/:title 
+```
+
+`/:` to refer the variable from front matter.
+
+
+
+## Default Front Matter
+
+in `_config.yml`, add
+
+```
+defaults:
+   - 
+      scope:
+        path: ""
+        type: "post"
+      values:
+        layout: "post"
+```
+
+All post file inside `_post` folder <span style="color:red;">even without front matter, write publish as post</span>
+
+
+## Install Theme
+
+go to [ruby them](https://rubygems.org/) search for `jekyll-theme`, then add it Gemfile and then run
+
+```
+bundle install
+```
+
+
+## Access Varaible
+
+[Access Variable](https://jekyllrb.com/docs/variables/)
+
+
+```html
+{{page.tile}}   #access current page(md file)'s tile, 
+{{layout.author} } # get front matter's author
+```
+e.g. `post.md`
+
+```html
+---
+layout:     post
+title:      "Test Github Site locally with Jekyll"
+date:       2017-01-06 12:00:00
+author:     "Becks"
+---
+
+... ...
+```
+
+`post.html`
+
+```html
+---
+layout: "wrapper"
+author: "Mike"
+---
+
+<h1> This is a post {{ page.title }} </h1>
+<h1> This is a post {{ site.title }} </h1> #give the data from yml file
+<h3> {{ layout.author}}</h3>  #Mike
+<h3> {{ page.author}}</h3>  #Becks
+<hr>
+
+<content>  #to display the content from md
+```
+
+
+## Include 
+
+Create a `_includes` folder, create html inside. Then in your layout html to include, can also  add variables inside layout html, then include html can access those variable
+
+
+header.html inside `_includes`
+```html
+<h1 style = "color: {{ include.color }}">{{ site.url }}</h1>
+<hr> <hr>
+```
+
+
+post.html  inside `_layout`
+
+```html
+<html>
+<head>
+    <meta charset = "UTF-8">
+    <title>{{ site.title }}</title>
+</head>
+<body>
+    {% include header.html color = "blue" %}  #include from _includes folder
+    {{ content }}
+</body>
+```
+
+## Looping Posts
+
+
+List all posts from `_post directory`,
+
+```html
+{% for post in site.posts %}
+    <li> <a href = "{{ post.url }} "{{ post.title }} </a> </li> <br/>
+    {{ post.url }} <br>
+{% endfor %}
+
+```
+
+List all pages local in `.github.io` folder
+
+```html
+{% for post in site.pages %}
+    <li> <a href = "{{ post.url }} "{{ post.title }} </a> </li> <br/>
+    {{ post.url }} <br>
+{% endfor %}
+
+```
+
+## If
+
+
+```html
+
+{% if page.title == "My First Post" or some_condition %}
+    This is the first post
+{% elsif page.title = "My Second post" and some_condition %}
+    This is the second post
+{% else %}
+    This is another post
+{% endif %}
+
+<h2>{{ page.title }} </h2>
+<hr>
+
+{% for post in site.pages %}
+    <li> <a style = "{% if page.url ==post.url %}color:red;{% endif %}" #if this page url equal to post url, make it red
+        href = "{{ post.url }} "{{ post.title }} </a> </li> <br/>
+    {{ post.url }} <br>
+{% endfor %}
+
+```
+
+
+## Data Files
+
+create `_data` inside root directory, can put three format, yml, json, or csv
+
+for example, create a `people.yml`
+
+```html
+- name: "Mike"
+    occupation: "Professor"
+
+- name: "Steve"
+    occupation: "Developer"
+
+- name: "James"
+    occupation: "Realtor"
+```
+
+Then in `home.html`
+
+```html
+{% for person in site.data.people %}
+    {{ person.name }}, {{ person.occupation }} <br/>
+
+{% endfor %}
+```
+
+## Static File
+
+Create `asset`(Can change the name for the file) in root directory
+
+
+Home.html
+```html
+{% for file in site.static_files %}
+    {{ file.path }}, {file.name}, {file.extname} <br> #extname: extension name
+{% endfor %}
+```
+
+
+
+Home.html
+```html
+{% for file in site.static_files %}
+    {{ file.path }}  <br>
+{% endfor %}
+```
+will print 
+```
+/assets/img/dog.jpeg
+/assets/img/logo.png
+/my.pdf
+```
+can create default for those static files, in `_config.yml`, add
+
+```
+defaults:
+   - 
+      scope:
+        path: "assets/img"
+      values:
+        image: true
+```
+
+in Home.html
+```html
+{% for file in site.static_files %}
+    {% if file.image %}
+    <img src = "{{ file.path }}" alt ="{ file.name }">   <br>
+    {% endif %}
+{% endfor %}
+```
+
+ 
+
+
+{% endraw %}

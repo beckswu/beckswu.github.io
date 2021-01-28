@@ -1,0 +1,221 @@
+/* -------------------------------------
+ * For horizontal version, set the
+ * $vertical variable to false
+ * ------------------------------------- */
+/* -------------------------------------
+ * General Style
+ * ------------------------------------- */
+ @import url(https://fonts.googleapis.com/css?family=Noto+Sans);
+
+ :root {
+  --timelinecolor: #cfe7ff;
+  --circlecolor: #cfe7ff;
+  --circlecolorchecked: #27e369;
+  --dashlinecolor: #deedfc;
+}
+ 
+ .experience-title {
+   margin: 2em 0 0 0;
+   font-size: 1.5em;
+   letter-spacing: 1.5px;
+   text-transform: uppercase;
+   font-family:  'Trocchi', serif; 
+ }
+
+ /* -------------------------------------
+  * timeline
+  * ------------------------------------- */
+ .timeline {
+   list-style: none;
+   margin: 50px 0 30px 120px;
+   padding: 20px 0 20px 30px;
+   border-left: 2px solid var(--timelinecolor);
+ }
+
+ .timeline:before {
+  content: '';
+  position: absolute;
+  width:16px;
+  height:1px;
+  left:128px;
+  top:123px;
+  background-color: var(--timelinecolor);
+}
+
+ .timeline > .row {
+   margin: 40px 0;
+   position: relative;
+ }
+
+ 
+
+ .timeline p {
+   margin: 0 0 15px;
+ }
+
+ .timeline-li-item{
+  max-height: 60px;
+  /*padding: 50px 20px 0;*/
+  border-color: transparent;
+  border-width: 2px;
+  border-style: solid;
+  border-radius: 0.5em;
+ }
+
+ .radio:checked ~ .timeline-li-item  {
+  max-height: 380px;
+  border-color: #eee9dc;
+  margin-right: 15px;
+  /*transform: translateX(20px);*/
+  transition: max-height 0.4s linear, border-color 0.5s linear, transform 0.2s linear;
+}
+
+
+.timeline-li-item:before { /*line link text and timeline*/
+  content: '';
+  width: 23px;
+  height: 1px;
+  position: absolute;
+  pointer-events: none;
+  left:-25px;
+  background-color: var(--dashlinecolor);
+  top: 60%;
+}
+
+.radio:checked ~ .timeline-li-item:before {
+ pointer-events: none;
+ top: 49%;
+}
+ 
+ .separateline{
+    content: '';
+    width:inherit;
+    height: 1px;
+    background-color:transparent;
+    top: 45%;
+ }
+
+ .radio:checked + .timeline-li-item > .separateline { /*when checked, show separate*/
+  background-color: black;
+}
+
+
+ .date {
+   margin-top: -10px;
+   top: 55%;
+   left: -113px;
+   font-size: 0.78em;
+   line-height: 20px;
+   position: absolute;
+   max-width: 70px;
+ }
+ 
+ .radio:checked + .timeline-li-item > .date { /*when checked, show separate*/
+  top: 49%;
+}
+
+ .circle {
+   margin-top: -10px;
+   top: 65%;
+   left: -39px;
+   width: 15px;
+   height: 15px;
+   background: var(--circlecolor);
+   border: 3px solid var(--circlecolor);
+   border-radius: 50%;
+   display: block;
+   position: absolute;
+ }
+
+.radio:checked + .timeline-li-item .circle {
+  background: var(--circlecolorchecked);
+  top: 50%;
+}
+ 
+
+
+
+
+ .timeline-li-description p {
+   max-height: 0;
+   color: transparent;
+   text-align: justify;
+   word-break: break-word;
+   hyphens: auto;
+   overflow: scroll;
+   padding: 20px 20px 0;
+ }
+
+
+ .radio:checked ~ .timeline-li-item > .timeline-li-description p {
+  max-height: 200px;
+  color: #666259;
+  transition: color 0.3s linear 0.3s;
+}
+ 
+ .exp {
+   z-index: 100;
+   cursor: pointer;
+   padding-top:10px;
+   transition: transform 0.2s linear;
+ }
+
+.radio:checked + .timeline-li-item .exp {
+  cursor: auto;
+}
+
+ .company-name{
+   font-size:16px;
+   color:rgb(71, 66, 66);
+ }
+
+ .company-position{
+    font-size:12px;
+    color:#66676b;
+    font-weight: 500;
+ }
+ 
+
+ .radio {
+   display: none;
+ }
+ 
+
+
+
+
+
+
+
+ 
+ 
+
+ 
+ /* Header carousel*/
+ 
+ .carousel-container{
+   padding-top: 65px;
+   padding-bottom: 55px;
+   width: 70%;
+   margin: auto;
+ }
+
+ .avatar{
+   border-radius:50%;
+ }
+
+ .self-introduction {
+   color:white;
+   font-weight:700;
+ }
+
+  /* -------------------------------------
+  * mobile phones (vertical version only)
+  * ------------------------------------- */
+  @media screen and (max-width: 767px) {
+    .avatar{
+      max-width: 300px;
+      margin-left: auto;
+      margin-right:auto;
+    }
+  }
