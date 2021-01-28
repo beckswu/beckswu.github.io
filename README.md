@@ -3,8 +3,8 @@ The blog is build based on [Huxpro/huxpro.github.io](https://github.com/Huxpro/h
 A couples of upgrades from [Huxpro](https://github.com/Huxpro/huxpro.github.io)'s version: 
 
 * [Add Email in the SNS group](https://github.com/beckswu/beckswu.github.io#SNS-Group)
-* [Change Homepage into a resume theme](https://github.com/beckswu/beckswu.github.io#Homepage)
-* [Move the homepage blog posts into Blogs page](https://github.com/beckswu/beckswu.github.io#Blogs)
+* [Change Homepage into a resume-theme page](https://github.com/beckswu/beckswu.github.io#Homepage)
+* [Move the blog posts into BLOGS page](https://github.com/beckswu/beckswu.github.io#Blogs)
 
 ## SNS-Group:
 
@@ -75,4 +75,4 @@ To add user specific background, modify  `_data\experience.json` like below to f
 
 ## Blogs
 
-Move the previous homepage blog posts into Blogs page by adding `/blogs/index.html`. The display fashion and style is the same as Hux origional one
+Move the previous homepage blog posts into Blogs page by adding `/blogs/index.html`. The display fashion and style is the same as [Huxpro](https://github.com/Huxpro/huxpro.github.io)'s one
