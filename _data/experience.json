@@ -1,7 +1,7 @@
 {
     "education":[
        {
-         "img": "UIUC.png",
+         "img": "resume/UIUC.png",
          "university": "University of Illinois at Urbana-Champaign",
          "major":"M.S. in Financial Engineering",
          "date":"Aug 2015 - Dec 2016",
@@ -12,7 +12,7 @@
          ]
       },
       {
-         "img": "UC Denver.png",
+         "img": "resume/UC Denver.png",
          "university": "University of Colorado Denver",
          "major":"B.A. in Economics/Minor in Mathematics",
          "date":"Sep 2011 - May 2015",
@@ -23,7 +23,7 @@
          ]
       },
       {
-         "img": "CAU.png",
+         "img": "resume/CAU.png",
          "university": "China Agricultural University",
          "major":"B.A. in Economics/Minor in Mathematics",
          "date":"Sep 2011 - May 2015",
@@ -36,7 +36,7 @@
     ],
     "experiences":[
       {
-         "img": "S&P.png",
+         "img": "resume/S&P.png",
          "company": "S&P Global",
          "position":"C++ Quantitative Developer",
          "date":"May 2019 - Now",
@@ -47,7 +47,7 @@
          ]
       },
       {
-         "img": "Equiti.png",
+         "img": "resume/Equiti.png",
          "company": "Equiti Capital",
          "position":"Financial Engineer/Developer",
          "date":"March 2017 - May 2019",
@@ -64,7 +64,7 @@
          ]
       },
       {
-         "img": "CME.png",
+         "img": "resume/CME.png",
          "company": "CME Group",
          "position":"Machine Learning Practicum Student",
          "date":"Jan 2016 - May 2016",
