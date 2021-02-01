@@ -361,9 +361,9 @@ Two main advantage of using Conv layer instead of fully connected layer
 e.g. 
 
 $$
-$\require{AMScd}$
+\require{AMScd}
 \begin{CD}
-    \underbrace{\text{Image 32 x 32 x 3}}_{3072} @>{f = 5}>> \underbrace{\text{28 x 28 x 6} }_{4074} 
+    \underbrace{\text{Image 32 x 32 x 3}}_{3072} @>{f = 5}> \text{6 filters}> \underbrace{\text{28 x 28 x 6} }_{4074} 
 \end{CD}
 $$
 
