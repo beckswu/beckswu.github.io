@@ -271,7 +271,7 @@ An example of ConvNet
 Input : `39 x 39 x 3` image 
 
 $$
-\require{AMScd}
+$\require{AMScd}$
 \begin{CD}
     \text{Image 39 x 39 x 3} @>{f^{\left[ 1 \right]} = 3, s^{\left[ 1 \right]} = 1 }> {p^{\left[ l \right]} = 0}, \text{10 filters}> \text{37 x 37 x 10}  \\
     @. @V{f^{\left[ 2 \right]} = 5, s^{\left[ 2 \right]} = 2 }V {p^{\left[ 2 \right]} = 0}, \text{20 filters}V \\
