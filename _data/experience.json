@@ -59,7 +59,7 @@
             },{
                "point":"Develop tools for Traders, Supports, and Trading Operations"
             },{
-               "point":"Build online alert systems and web dashboard to display key data and configure trading settings using HTML,Javascript/JQuery, PHP, CSS/Bootstrap"
+               "point":"Build online alert systems and web dashboards to display key data and configure trading settings using HTML,Javascript/JQuery, PHP, CSS/Bootstrap"
             }
          ]
       },
@@ -70,17 +70,17 @@
          "date":"Jan 2016 - May 2016",
          "responsibility":[
             {
-               "point":"Lead the team to perform algorithm model training on limit order books and trade records of high frequency crude oil futures and Emini futures"
+               "point":"Lead the team to perform algorithm model training on limit order books and trade records of high frequency Crude Oil futures and E-Mini futures"
             },{
-               "point":"Merged data in Python to generate attributes including average bid and ask price, volume imbalance, weighed book price, time lag trade volume, etc. to prepare model training"
+               "point":"Merged data in Python to generate 76 attributes including mid price, volume imbalance, weighed book price, time lag trade volume, etc. to prepare model training"
             },{
-               "point":"Modeled high frequency market via various machine learning models (logistic regression, Neural Network, SVM, Decision tree) in C++, Python & R to understand market pattern and make predictions market trends"
+               "point":"Modeled high frequency market via various machine learning models (Logistic Regression, Neural Network,SVM, Decision tree) in C++, Python & R to understand market pattern and make predictions market trends"
             },{
-               "point":"Backtested all training models in the test set with real high frequency data and achieving 86% accurancy"
+               "point":"Backtested all training models in the test set with real high frequency data and achieved 86% accuracy"
             },{
-               "point":"Reimplement and improved iceberg order detection algorithms to identify iceberg orders"
+               "point":"Reimplemented and improved iceberg order detection algorithms to identify iceberg orders"
             },{
-               "point":"Summarized the weekly progress of the team and wrote weekly technical reports to CME supervisors to discuss the further optimization method and ascertain insignificant attributes"
+               "point":"Summarized the weekly progress of the team and wrote weekly technical reports to CME supervisors"
             }
          ]
       }
