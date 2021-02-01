@@ -272,10 +272,12 @@ Input : `39 x 39 x 3` image
 
 $$
 $\require{AMScd}$
-    \begin{CD}
-    A @>>> B @>{\text{very long label}}>> C \\
-    @. @AAA @| \\
-    D @= E @<<< F
+\begin{CD}
+    \text{Image 39 x 39 x 3} @>{f^{\left[ 1 \right]} = 3, s^{\left[ 1 \right]} = 1 }> {p^{\left[ l \right]} = 0}, \text{10 filters}> \text{37 x 37 x 10}  \\
+    @. @V{f^{\left[ 2 \right]} = 5, s^{\left[ 2 \right]} = 2 }V {p^{\left[ 2 \right]} = 0}, \text{20 filters}V \\
+    \text{7 x 7 x 40}@<{f^{\left[ 3 \right]} = 5, s^{\left[ 3 \right]} = 2 }< {p^{\left[ 3 \right]} = 0}, \text{40 filters}< \text{17 x 17 x 20}  \\
+@VV{\text{unroll it}}V  @. \\
+\text{1960 vectors} @>{\text{logistic regression}}>{\text{or softmax unit}}> output 
 \end{CD}
 $$
 
@@ -341,5 +343,29 @@ When report number of layer, people usually report the number of layers that hav
 Notice:
 
 1. pooling layer has no parameters
-2. Conv layer tend to have a few parameters and lots of parameters tend to be in the fully connected layer
-3. Activation size tend of go down gradually as go deeper in the neural network. If drop too quickly, not great for performance as well
+2. <span style="color:red">Conv layer tend to have a few parameters and lots of parameters tend to be in the fully connected layer</span>
+3. <span style="color:red">Activation size tend of go down gradually as go deeper in the neural network. If drop too quickly, not great for performance as well
+</span>
+
+#### Why Convolutions
+
+
+Two main advantage of using Conv layer instead of fully connected layer
+
+- **parameter sharing**: A feature detector (such as vertical edge detector) that’s useful in one part of the image is probably useful in another part of the image (因为parameter 少了，可以在某种程度上解决overfitting). 
+  - e.g. apply 3 by 3 filter on the top-left of the image and apply the same filter on top-right of the image. 
+  - True for low-level features like edges as well as high-level features like detecting the eye that indicates a face or a cat
+- **sparsity of connections** 
+
+
+e.g. 
+
+$$
+$\require{AMScd}$
+\begin{CD}
+    \underbrace{\text{Image 32 x 32 x 3}}_{3072} @>{f = 5}> \text{6 filters}> \underbrace{\text{28 x 28 x 6} }_{4074} 
+\end{CD}
+$$
+
+- A fully-connected layer: the number of parameters is `3072 x 4074 = 14 million`
+- Convolutional layer: `(5 x 5 + 1 ) x 6  = 156 ` parameters
