@@ -276,7 +276,7 @@ $$
     \text{Image 39 x 39 x 3} @>{f^{\left[ 1 \right]} = 3, s^{\left[ 1 \right]} = 1 }> {p^{\left[ l \right]} = 0}, \text{10 filters}> \text{37 x 37 x 10}  \\
     @. @V{f^{\left[ 2 \right]} = 5, s^{\left[ 2 \right]} = 2 }V {p^{\left[ 2 \right]} = 0}, \text{20 filters}V \\
     \text{7 x 7 x 40}@<{f^{\left[ 3 \right]} = 5, s^{\left[ 3 \right]} = 2 }< {p^{\left[ 3 \right]} = 0}, \text{40 filters}< \text{17 x 17 x 20}  \\
-@VV{\text{unroll it}}V \\
+@VV{\text{unroll it}}V  @. \\
 \text{1960 vectors} @>{\text{logistic regression}}>{\text{or softmax unit}}> output 
 \end{CD}
 $$
@@ -313,5 +313,9 @@ Common choice of f = 2, s = 2, has the effect of shrinking the height and with o
 The formula still works. Since pooling applies each of channel independently, the number of input channel match the number of output channel
 
 $$n_H \times n_W \times n_c  =   \lfloor \frac{n + 2p -f}{s} + 1 \rfloor  \times \lfloor  \frac{n + 2p -f }{s} + 1\rfloor \times n_c  $$  
+
+#### CNN Example
+
+example inspired by LeNet-5
 
 
