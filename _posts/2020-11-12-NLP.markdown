@@ -9,6 +9,7 @@ catalog:    true
 tags:
     - Deep Learning
     - Machine Learning
+    - NLP
     - 学习笔记
 ---
 
