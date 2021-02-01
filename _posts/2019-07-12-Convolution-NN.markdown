@@ -352,11 +352,11 @@ Notice:
 
 Two main advantage of using Conv layer instead of fully connected layer
 
-- **parameter sharing**: A feature detector (such as vertical edge detector) that’s useful in one part of the image is probably useful in another part of the image (因为parameter 少了，可以在某种程度上解决overfitting). 
+- **parameter sharing**: A feature detector (such as vertical edge detector) that’s useful in one part of the image is probably useful in another part of the image (因为parameter 少了，<span style="color:red">allowed to train a smaller training set and less proned to overfitting)</span>. 
   - e.g. apply 3 by 3 filter on the top-left of the image and apply the same filter on top-right of the image. 
   - True for low-level features like edges as well as high-level features like detecting the eye that indicates a face or a cat
-- **sparsity of connections** 
-
+- **sparsity of connections** : In each layer, each output value depends only on a small number of inputs.  比如filter 是 3*3， output 第1行1个只取决于 input 的top left 3*3 parameter，不取决于 第一行第四个或者第五个值
+- Convolution neural network aslo very good at capturing **translation invariance**（即使原来图片发生一点点位移，还是原来feature) e.g 比如一只猫shift couple of pixels to right 仍是猫. And convolutional structure helps that shifted a few pixels should result pretty similar feature. Apply the same filter on the image helps to be more robust to caputre the desirable property of translation invariance
 
 e.g. 
 
@@ -369,3 +369,8 @@ $$
 
 - A fully-connected layer: the number of parameters is `3072 x 4074 = 14 million`
 - Convolutional layer: `(5 x 5 + 1 ) x 6  = 156 ` parameters
+
+
+Cost function: Use gradient descent or gradient descent momentum, RMSProp or Adams to optimize parameters to reduce J
+
+$$J = \frac{1}{m} \sum_{i=1}^m L\left(\hat y^{\left(i \right)},  y^{\left(i \right)}\right),\text{where }, \hat y \text{ is the predicted label and y is true label} $$
