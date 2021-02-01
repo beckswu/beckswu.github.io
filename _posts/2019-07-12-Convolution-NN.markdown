@@ -125,7 +125,7 @@ nu convention in computer vision</span>. If `f` is even, you will come up asymme
 ![](/img/post/cnn/week1pic5.gif)
 
 
-$$\text{n x n  *   f x f}   =   \lfloor \frac{n + 2p -f}{s} + 1 \rfloor  \text{ x } \lfloor  \frac{n + 2p -f }{s} + 1 \rfloor $$  
+$$\text{n x n } \times  \text{ f x f}   =   \lfloor \frac{n + 2p -f}{s} + 1 \rfloor  \times  \lfloor  \frac{n + 2p -f }{s} + 1 \rfloor $$  
 
 round down to the nearest integer if fraction is not integer (Floor). For above example, `(7 + 0 - 3)/2 + 1  = 3`
 
@@ -232,22 +232,31 @@ A: each filter has `3x3x3 = 27` filter plus one bias, so 10 filter has `28x10 = 
 
 if layer l is a convolution layer:
 
-$$ f^{\left[ l \right]} = \text{filter size} $$  <br/>
-$$ p^{\left[ l \right]} = \text{padding} $$ <br/>
-$$ s^{\left[ l \right]} = \text{stride} $$  <br/>
+$$ f^{\left[ l \right]} = \text{filter size} $$  
+
+$$ p^{\left[ l \right]} = \text{padding} $$ 
+
+$$ s^{\left[ l \right]} = \text{stride} $$  
+
 $$ n_c^{\left[ l \right]} = \text{number of filters} $$  
 
 
 Input: $$n_c$$ is the number of, use superscript l-1 because that's the activation from previous layer, H and W denotes height and width
 
-$$ n_H^{\left[ l-1 \right]} \times  n_W^{\left[ l-1 \right]} \times  n_c^{\left[ l - 1 \right]}$$  <br/>
-$$ n_H^{\left[ l \right]} \times  n_W^{\left[ l \right]} \times  n_c^{\left[ l  \right]}$$  <br/>
+$$ n_H^{\left[ l-1 \right]} \times  n_W^{\left[ l-1 \right]} \times  n_c^{\left[ l - 1 \right]}$$  
+
+$$ n_H^{\left[ l \right]} \times  n_W^{\left[ l \right]} \times  n_c^{\left[ l  \right]}$$
+
 $$ \text{where the height and width: } n^{\left[ l \right]}=   \lfloor \frac{n^{\left[ l-1 \right]} + 2p^{\left[ l \right]} -f^{\left[ l \right]}}{s^{\left[ l \right]}} + 1 \rfloor $$  
 
-$$ \text{Each filter is } f^{\left[ l \right]} \times  f^{\left[ l \right]} \times  n_c^{\left[ l-1  \right]}$$  <br/>
-$$\text{where }n_c^{\left[ l-1  \right]} \text{ last layer's number of channel}$$ <br/>
-$$\text{Activations: } a^{\left[ l \right]} -> n_H^{\left[ l \right]} \times  n_W^{\left[ l \right]} \times  n_c^{\left[ l  \right]} \text{or some write} a^{\left[ l \right]} -> n_c^{\left[ l \right]} \times  n_H^{\left[ l \right]} \times  n_W^{\left[ l  \right]}   $$  <br/>
-$$\text{Weights}: f^{\left[ l \right]} \times  f^{\left[ l \right]} \times  n_c^{\left[ l-1  \right]} \times  n_c^{\left[ l  \right]}  $$ <br/>
+$$ \text{Each filter is } f^{\left[ l \right]} \times  f^{\left[ l \right]} \times  n_c^{\left[ l-1  \right]}$$  
+
+$$\text{where }n_c^{\left[ l-1  \right]} \text{ last layer's number of channel}$$ 
+
+$$\text{Activations: } a^{\left[ l \right]} -> n_H^{\left[ l \right]} \times  n_W^{\left[ l \right]} \times  n_c^{\left[ l  \right]} \text{or some write} a^{\left[ l \right]} -> n_c^{\left[ l \right]} \times  n_H^{\left[ l \right]} \times  n_W^{\left[ l  \right]}   $$ 
+
+$$\text{Weights}: f^{\left[ l \right]} \times  f^{\left[ l \right]} \times  n_c^{\left[ l-1  \right]} \times  n_c^{\left[ l  \right]}  $$ 
+
 $$\text{bias: }  n_c^{\left[ l-1  \right]}, \text{in program, deminsion write: } \left(1,1,1,n_c^{\left[ l  \right]} \right) $$
 
 If using batch gradient descent or mini batch gradient descent:
@@ -264,8 +273,45 @@ Input : `39 x 39 x 3` image
 $$
 \require{AMScd}
 \begin{CD}
-    A @>>> B @>{\text{very long label}}>> C \\
-    @. @AAA @| \\
-    D @= E @<<< F
+    \text{Image 39 x 39 x 3} @>{f^{\left[ 1 \right]} = 3, s^{\left[ 1 \right]} = 1 }> {p^{\left[ l \right]} = 0}, \text{10 filters}> \text{37 x 37 x 10}  \\
+    @. @V{f^{\left[ 2 \right]} = 5, s^{\left[ 2 \right]} = 2 }V {p^{\left[ 2 \right]} = 0}, \text{20 filters}V \\
+    \text{7 x 7 x 40}@<{f^{\left[ 3 \right]} = 5, s^{\left[ 3 \right]} = 2 }< {p^{\left[ 3 \right]} = 0}, \text{40 filters}< \text{17 x 17 x 20}  \\
+@VV{\text{unroll it}}V \\
+\text{1960 vectors} @>{\text{logistic regression}}>{\text{or softmax unit}}> output 
 \end{CD}
 $$
+
+role out ` 7 x7 x 40 = 1960 ` to unroll 1960 units into a long vector and feed into a logistic regression unit or a softmax unit 
+
+Lots of work in designing convolutional neural net <span style="background-color:#FFFF00">is selecting hyparameters like deciding what's total size? filter size? padding? how many filter are use? </span>
+
+<span style="background-color:#FFFF00">Typically, start with a large image, **then height and width will stay the same for a while and gradually trend down as go deeper in the neural network whereas the number of channel general increase**</span>
+
+
+#### Pooling Layer
+
+**Pooling**:  reduce the size of the representation to speed computation as well as make some of the features that detects a bit more robust. 
+
+**Max Pooling**: Intuition: If these features detected anywhere in this filter, then keep a high number. If feature not detected, then maybe this feature doesn't exist in this quadrant. People Found a lot of experiences to work well.
+
+![](/img/post/cnn/week1pic11.png)
+
+**Property**: Above example, hyparameter filter size = 2(because take 2 by 2 region) and stride = 2, <span style="background-color:#FFFF00">but has no parameter to learn</span>. Once fix f and s, just a fixed computation and gradient descent doesn't change anything
+
+If have 3D input, max pooling is done independently on each of channel one by one and stack output together
+
+**Average Pooling**: Instead of taking max of each filter, take the average of each filter. <span style="color:red">not used often compared Max Pooling</span>. <span style="background-color:#FFFF00">One exception: Very deep neural network, you might use average pooling to collapse representation</span>. e.g. (`7 x 7 x 1000` to `1 x 1 x 1000`)
+
+![](/img/post/cnn/week1pic12.png)
+
+
+
+Max or average pooling.   或者有时候 (very very rare ) add padding , most of time max pooling p = 0,   no parameter to learn! 
+
+Common choice of f = 2, s = 2, has the effect of shrinking the height and with of representation by factor of two. Some use f = 3, s = 2
+
+The formula still works. Since pooling applies each of channel independently, the number of input channel match the number of output channel
+
+$$n_H \times n_W \times n_c  =   \lfloor \frac{n + 2p -f}{s} + 1 \rfloor  \times \lfloor  \frac{n + 2p -f }{s} + 1\rfloor \times n_c  $$  
+
+
