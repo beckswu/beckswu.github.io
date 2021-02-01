@@ -272,12 +272,10 @@ Input : `39 x 39 x 3` image
 
 $$
 $\require{AMScd}$
-\begin{CD}
-    \text{Image 39 x 39 x 3} @>{f^{\left[ 1 \right]} = 3, s^{\left[ 1 \right]} = 1 }> {p^{\left[ l \right]} = 0}, \text{10 filters}> \text{37 x 37 x 10}  \\
-    @. @V{f^{\left[ 2 \right]} = 5, s^{\left[ 2 \right]} = 2 }V {p^{\left[ 2 \right]} = 0}, \text{20 filters}V \\
-    \text{7 x 7 x 40}@<{f^{\left[ 3 \right]} = 5, s^{\left[ 3 \right]} = 2 }< {p^{\left[ 3 \right]} = 0}, \text{40 filters}< \text{17 x 17 x 20}  \\
-@VV{\text{unroll it}}V  @. \\
-\text{1960 vectors} @>{\text{logistic regression}}>{\text{or softmax unit}}> output 
+    \begin{CD}
+    A @>>> B @>{\text{very long label}}>> C \\
+    @. @AAA @| \\
+    D @= E @<<< F
 \end{CD}
 $$
 
@@ -318,4 +316,30 @@ $$n_H \times n_W \times n_c  =   \lfloor \frac{n + 2p -f}{s} + 1 \rfloor  \times
 
 example inspired by LeNet-5
 
+![](/img/post/cnn/week1pic13.png)
 
+
+
+|         | Activation shape           | Activation Size  | num of parameters |
+| :-------------: |:-------------:| :-----:|:-----:|
+| Input     | (32, 32,3) | 3072  | 0 |
+| CONV1(f=5, s = 1)  | (28,28,8)      |  6272  | 608 `((5*5*3+1)*8)` |
+| POOL1 |   (14,14,8)   | 1568  | 0 |
+| CONV2(f=5, s=1) | (10,10,16) | 1600 | 3216 `(5*5*8+1)*16` |
+| POOL2 | (5,5,16) | 400 | 0 |
+| FC3 | (120, 1) | 120 | 48120 `400*120+120`(120 bias) | 
+| FC4 | (84, 1) | 84 | 10164 `120*84 + 84` | 
+| Softmax | (10, 1) | 10 | 850 |
+
+
+When report number of layer, people usually report the number of layers that have weight, that have parameters. Beacuse pooling layer has no weights and no parameters only has hyperparameters, so put ConV and pooling layer together in convention. 
+
+**Guideline**: not to invent your own hyperparameter, <span style="color:red">but look into literature to see what hyper parameters you work for others</span>, just choose a architecture that works well for others and there is a chance that works well for you as well. 
+
+**Common pattern** <span style="background-color:#FFFF00">one or more conv layers followed by a pooling layer and in the end have a few fully connected layers then followed by a softmax </span>
+
+Notice:
+
+1. pooling layer has no parameters
+2. Conv layer tend to have a few parameters and lots of parameters tend to be in the fully connected layer
+3. Activation size tend of go down gradually as go deeper in the neural network. If drop too quickly, not great for performance as well
