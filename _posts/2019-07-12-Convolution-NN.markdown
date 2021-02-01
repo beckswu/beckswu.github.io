@@ -232,5 +232,40 @@ A: each filter has `3x3x3 = 27` filter plus one bias, so 10 filter has `28x10 = 
 
 if layer l is a convolution layer:
 
-$$ f^{\left[ l \right]} = \text{filter size} $$ 
-$$ p^{\left[ l \right]} = \text{padding} $$
+$$ f^{\left[ l \right]} = \text{filter size} $$  <br/>
+$$ p^{\left[ l \right]} = \text{padding} $$ <br/>
+$$ s^{\left[ l \right]} = \text{stride} $$  <br/>
+$$ n_c^{\left[ l \right]} = \text{number of filters} $$  
+
+
+Input: $$n_c$$ is the number of, use superscript l-1 because that's the activation from previous layer, H and W denotes height and width
+
+$$ n_H^{\left[ l-1 \right]} \times  n_W^{\left[ l-1 \right]} \times  n_c^{\left[ l - 1 \right]}$$  <br/>
+$$ n_H^{\left[ l \right]} \times  n_W^{\left[ l \right]} \times  n_c^{\left[ l  \right]}$$  <br/>
+$$ \text{where the height and width: } n^{\left[ l \right]}=   \lfloor \frac{n^{\left[ l-1 \right]} + 2p^{\left[ l \right]} -f^{\left[ l \right]}}{s^{\left[ l \right]}} + 1 \rfloor $$  
+
+$$ \text{Each filter is } f^{\left[ l \right]} \times  f^{\left[ l \right]} \times  n_c^{\left[ l-1  \right]}$$  <br/>
+$$\text{where }n_c^{\left[ l-1  \right]} \text{ last layer's number of channel}$$ <br/>
+$$\text{Activations: } a^{\left[ l \right]} -> n_H^{\left[ l \right]} \times  n_W^{\left[ l \right]} \times  n_c^{\left[ l  \right]} \text{or some write} a^{\left[ l \right]} -> n_c^{\left[ l \right]} \times  n_H^{\left[ l \right]} \times  n_W^{\left[ l  \right]}   $$  <br/>
+$$\text{Weights}: f^{\left[ l \right]} \times  f^{\left[ l \right]} \times  n_c^{\left[ l-1  \right]} \times  n_c^{\left[ l  \right]}  $$ <br/>
+$$\text{bias: }  n_c^{\left[ l-1  \right]}, \text{in program, deminsion write: } \left(1,1,1,n_c^{\left[ l  \right]} \right) $$
+
+If using batch gradient descent or mini batch gradient descent:
+
+$$\text{Activations: } A^{\left[ l \right]} -> m \times n_H^{\left[ l \right]} \times  n_W^{\left[ l \right]} \times  n_c^{\left[ l  \right]}, \text{m examples}  $$
+
+
+An example of ConvNet
+
+![](/img/post/cnn/week1pic10.png)
+
+Input : `39 x 39 x 3` image 
+
+$$
+\require{AMScd}
+\begin{CD}
+    A @>>> B @>{\text{very long label}}>> C \\
+    @. @AAA @| \\
+    D @= E @<<< F
+\end{CD}
+$$
