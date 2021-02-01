@@ -215,3 +215,22 @@ If want to detect both horizontal and vertical edges, use multiple filters at th
 ![](/img/post/cnn/week1pic8.png)
 
 Summary:    `n*n*n_c(the number of channel)    *    n*n*n_c    =  (n – f + 1) * (n – f + 1) * n_c’  (n_c’ is the number of filter we used)`, assumed stride one and no padding
+
+#### Convolutional Network
+
+After convolve using filter, add a real number bias to every number in the output then apply non-linearity (e.g. Relu)
+
+![](/img/post/cnn/week1pic9.png)
+
+Notice: filter is the $$W$$
+
+Q: if have 10 filters that are `3x3x31 in one leayr of a neural network, how many parameters that layer have
+
+A: each filter has `3x3x3 = 27` filter plus one bias, so 10 filter has `28x10 = 280` parameters
+
+#### Notation
+
+if layer l is a convolution layer:
+
+$$ f^{\left[ l \right]} = \text{filter size} $$ 
+$$ p^{\left[ l \right]} = \text{padding} $$
