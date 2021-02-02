@@ -15,7 +15,7 @@ tags:
 <script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"> </script>
 
 
-## 1.1 Convolution Neural Networks
+## 1 Convolution Neural Networks
 
 
 
@@ -298,7 +298,7 @@ Lots of work in designing convolutional neural net <span style="background-color
 
 **Property**: Above example, hyparameter filter size = 2(because take 2 by 2 region) and stride = 2, <span style="background-color:#FFFF00">but has no parameter to learn</span>. Once fix f and s, just a fixed computation and gradient descent doesn't change anything
 
-If have 3D input, max pooling is done independently on each of channel one by one and stack output together
+<span style="background-color:#FFFF00">If have 3D input, max pooling is done independently on each of channel one by one and stack output together(每个channel分开max pooling, 然后stack together)</span>
 
 **Average Pooling**: Instead of taking max of each filter, take the average of each filter. <span style="color:red">not used often compared Max Pooling</span>. <span style="background-color:#FFFF00">One exception: Very deep neural network, you might use average pooling to collapse representation</span>. e.g. (`7 x 7 x 1000` to `1 x 1 x 1000`)
 
@@ -374,3 +374,296 @@ $$
 Cost function: Use gradient descent or gradient descent momentum, RMSProp or Adams to optimize parameters to reduce J
 
 $$J = \frac{1}{m} \sum_{i=1}^m L\left(\hat y^{\left(i \right)},  y^{\left(i \right)}\right),\text{where }, \hat y \text{ is the predicted label and y is true label} $$
+
+<br/><br/><br/>
+
+## 2. Classic Networks
+
+#### LeNet-5 
+
+Last year is softmax layer although back then, LeNet-5 used a different classifier at the output which is useless today.
+
+![](/img/post/cnn/week2pic1.png)
+
+Above model has 60k parameters. Today, often see a network with 10 million to 100 million parameters. When you go deeper with your network, the height and weight tend to go down and the number of channel tend to increase. 
+
+Pattern often used today: 
+
+$$
+\require{AMScd}
+\begin{CD}
+    \text{one or more Conv Layer} @>>> \text{Pooling Layer} @>>> \text{one or more Conv Layer} @>>> \text{Pooling Layer} \\
+@. @. @. @VVV \\
+@. \text{output} @<<<  \text{fully-connected layer} @<<< \text{fully-connected layer}
+\end{CD}
+$$
+
+
+(Optional): In paper, use sigmoid and tanh in the paper (no ReLu used at that time). Besides, in paper, use sigmoid non-linearity after the pooling layer(not used today)
+
+
+#### Alexnet
+
+
+Alexnet has a **lot of similarity to Lenet but it was much bigger**. Lenet has around 60 thousand parameters whereas Alexnet has 60 million parameters. 
+
+![](/img/post/cnn/week2pic2.png)
+
+- Compared to LeNet, the fact that they could take similar building block, but a lot more hidden units and training on a lot of more data to  allow it to have a remarkable performance
+- Another aspects make it much better than letnet is <span style="color:red">using Relu activation function </span>
+- had a complicated way of training on two GPUs. A lot of ConV and pooling layer split across two different GPUs and  a thoughtful way for when two GPUs communicate with each others.
+- **Local Response Normalization**(not use too much): 方法: 一个block 是 `13*13*256`，比如把第一维是5， 第二维是6的上所有的256 的数，normalize 这256个数据
+  - Motivation: maybe you don’t want for each position in 13 by 13 image，you don’t want too many neurons with a very high activation. But subsequently, some researcher 发现local response normalization less important(Andrew Ng doesn't use it)
+
+#### VGG-16 
+
+Motivation: instead of having so many hyperparameters, use a much simpler network where  focus on just having <span style="color:red">ConV layers</span> that are just <span style="color:red">3 by 3 filters with stride one</span>, and <span style="color:red">always use the same padding</span>. And make all your <span style="color:red">max pulling layers 2 by 2 with stride of two</span>; it simplify this neural network architectures.  
+
+<span style="background-color:#FFFF00">**Downside**: large netowrk in terms of the number of parameters you train</span>
+
+![](/img/post/cnn/week2pic3.png)
+
+- VGG-16: 16 layers have weights
+- This network has 138 million parameters, large network
+- The architecture is really quite uniform, a few ConV layers followed by a polling layer whereas the pooling layers reduce the height and weight. Number of channel from 64 到128， 到256，到512(512 is big enough, not need to double)， <span style="background-color:#FFFF00">roughly doubling on every step or doubling through every stack of ConV layers is another principle used to desgin the architecture of this network</span>
+
+Some literature mention VGG-19. It's even bigger version of this network.
+
+<br/><br/><br/>
+
+## 3. ResNets
+
+**ResNets**:  Very deep neural Networks are difficult to train because <span style="color:red">**gradient vanishing/exploding**</span> problem. ResNets enables you to train very very deep networks (sometimes even over 100 hundred layers)
+
+Residual Blocks : take $$a^{\left[l \right]}$$ fast foward it, copy it to much further into the neural networks,<span style="background-color:#FFFF00">inject after the linear part but before perform nonlinear function (ReLu)</span>: called it  **Shortcut(skip connection)** using 
+
+<span style="background-color:#FFFF00">Residual blocks allow you train much deeper neural network</span>. The way to build ResNet is by taking many of these **residual blocks** and stacking them together to form a deep network
+
+![](/img/post/cnn/week2pic4.png)
+
+$$
+\require{AMScd}
+\begin{CD}
+    @>{\text{short cut}}>> --> @>{\text{short cut}}>> --> @>{\text{short cut}}>>  a^{\left[l \right]}  \\
+    
+    @AAA @. @. @VVV \\
+    a^{\left[l \right]} @>{ w^{\left[l+1 \right]}a^{\left[l \right]} + b^{\left[l+1 \right]}}>> Linear: z^{\left[l+1 \right]} @>{g\left(z^{\left[l+1 \right]} \right)}>> ReLu: a^{\left[l+1 \right]} @>{ w^{\left[l+2 \right]}a^{\left[l+1 \right]} + b^{\left[l+2 \right]}}>> Linear: z^{\left[l+2 \right]} @>{g\left(z^{\left[l+2 \right]} + a^{\left[l \right]} \right)}>> ReLu: a^{\left[l+2 \right]}
+\end{CD}
+$$
+
+if use optimization algorithm such as gradient descent to train a plain neural network, without extra shortcuts or skip connections, training error like below graph. <span style="color:red">But in reality your training error get worse if you pick a network that’s too deep</span>. 
+
+<span style="background-color:#FFFF00">For ResNet is that even as the number of layers gets deeper, having the performance of training error keeping going down, even train over a hundred of layers. It **helps with the vanishing and exploding problems**. It allows  train much deeper neural networks without appreciable loss in performance </span>
+
+![](/img/post/cnn/week2pic5.png)
+
+#### Why work?
+
+For example, if have a network below, we have Relu and assume a is bigger than or equal to 0.
+
+$$
+\require{AMScd}
+\begin{CD}
+    @. @. @>{\text{short cut}}>> --> @>{\text{short cut}}>>  a^{\left[l \right]}  \\
+    
+    @. @. @AAA @.  @VVV \\
+    x @>>> BigNN @>>> a^{\left[l \right]} @>>> layer1 @>>> layer2 @>>> a^{\left[l+2 \right]}
+\end{CD}
+$$
+
+then 
+
+$$ \begin{align}
+  a^{\left[l + 2 \right]} &= g\left(  z^{\left[l + 2 \right]} + a^{\left[l \right]} \right) \\
+&=  g\left(  w^{\left[l + 2 \right]}a^{\left[l + 1 \right]} + b^{\left[l + 2 \right]} + a^{\left[l \right]} \right) 
+\end{align}
+$$
+
+
+If you use L2 regularization to shrink $$w^{\left[l + 2 \right]}$$ , then if you apply weight to b it will also shrink weight to b) although in practice don’t apply regularization weight to b, 
+
+$$
+  a^{\left[l + 2 \right]} = g\left( a^{\left[l \right]}  \right) = a^{\left[l \right]} 
+ 
+$$ 
+
+
+<span style="background-color:#FFFF00">Note: we assume $$z^{\left[l + 2 \right]}  $$ and $$a^{\left[l \right]} $$ have the same dimension. **Use the same convolution**</span>
+
+But if they don't have the same dimension, add $$W_s$$, e.g. $$z^{\left[l + 2 \right]} $$ 256 维, $$a^{\left[l \right]} $$ 128 维, then $$W_S$$ is 256 by 128. <span style="color:red">$$W_S$$ could a parameter to learn or a fixed matrix that just implement zero paddings (padding 128 to 256</span>)
+
+$$a^{\left[l + 2 \right]} = g\left(  z^{\left[l + 2 \right]} + W_Sa^{\left[l \right]} \right)$$
+
+
+ It shows the <span style="background-color:#FFFF00">because of skip connection, it's so easy for residual networks to learn identity function, guarantee adding residual blocks doesn't hurt neural network performance</span>, it's easy to get $$a^{\left[l + 2\right]} $$ equal to $$a^{\left[l \right]} $$. Hidden units if actually learn something useful then can do even better than learning the identity function
+
+ In plain network without Residual Network, when you make the network deeper and deeper, it is very difficult for it to choose parameters that learn even the identity function, which a lot of layer end-up  worse.
+
+#### Resnet on Image
+
+
+ ![](/img/post/cnn/week2pic6.png)
+
+ - lots 3 by 3 convolutions. And most of them are 3 by 3 same convolution instead of fully-connected layer . That's why $$z^{\left[l + 2 \right]} + a^{\left[l \right]} $$ make senses
+ - After pooling layer, need to adjust dimension, liked discussed above by $$W_S $$
+ - In the end, have a fully connected layer that makes a prediction using a softmax
+
+<br/><br/><br/>
+
+
+## 3. 1x1 Convolution
+
+sometimes 1x1 Convolution called **Network in Network**
+
+What does it do in the below example: look at each of the 36 different positions, and take the <span style="background-color:#FFFF00">element-wise product between 32 numbers on the input</span> (same height and same width)<span style="background-color:#FFFF00"> and 32 numbers in the filter, add together(summation) then apply Relu non-linearity</span>(32 -> 1 number).
+
+One way to think of 1 by 1 convolution is bsically having a fully connected neural network that applies to each of 36 different position
+
+ ![](/img/post/cnn/week2pic7.png)
+
+#### Use of 1x1 Convolution
+
+-	Shrink the number of  channel（save computation）: usually  pooling is used to shrink height and weight.  而1*1 convolution 是 比如input 是`28*28*192`，`1*1` dimension convolution 是 `1*1*192`  32 filters，output is `28*28*32` <span style="background-color:#FFFF00">which allow shrink $$n_c$$ as well whereas Pooling layer only shrink $$n_H$$ and $$n_W$$</span>
+- If want to keep the number of Channel, <span style="background-color:#FFFF00">1 by 1 convolution add linearity to allow to learn more complex function of your network by adding another layer that inputs </span>, 接着上面例子, filter size is `1x1x192` and have 192 filters, output will be `28*28*192`
+
+<br/><br/><br/>
+
+
+## 4. Inception Network
+
+Instead of choosing to filter size, or choose convolutional layer or pooling layer, let use them all together, stack(concatenate) all output \ together 
+
+
+e.g. image input is `28 x 28 x 192`,
+
+  1. use 64 filters with size `1 x 1 x 192`, get `28 x 28 x 64`
+  2. use 128 filters with size `3 x 3 x 192`, same convolution, get `28 x 28 x 128`
+  3. use 32 filters with size `5 x 5 x 192`, same convolution, get `28 x 28 x 32`
+  4. max pooling and 1 by 1 convolution, get `28 x 28 x 32`, need padding to get the same height and width
+  5. Stack previous output together
+
+ ![](/img/post/cnn/week2pic8.png)
+
+ A problem: <span style="color:red">Computational Cost</span>
+
+e.g. 32 filters with each size `5 x 5 x 192`, output size is `28 x 28 x 32`, each output is needed to calculate `5 x 5 x 192` multiplications. Total number of multiplications is `28 x 28 x 32 x 5 x 5 x 192 = 120 million`, expensive operation. <span style="color:red">Could use 1 by 1 convolution to reduce the computational cost</span>s by a factor of 10
+
+  ![](/img/post/cnn/week2pic9.png)
+
+Use 1 by 1 convolution, can see output dimension is the same. First shrink to much smaller intermediate volume `28 x 28 x 16` called **bottleneck layer**
+
+
+  ![](/img/post/cnn/week2pic10.png)
+
+  Computation Cost: Cost of first convolutional layer `28 x 28 x 16 x 1 x 1 x 192 = 2.4 million`. `28 x 28 x 32 x 5 x 5 x 16 = 10 million`. total is `12.4 million << 120 million`
+
+
+1. Apply 64 filters of 1 by 1 convolution, get `28 x 28 x 64` output
+2. Apply 96 filters of 1 by 1 convolution, then apply 128 `5 x 5` filters to get `28 x 28 x 128` output
+3. Apply 96 filters of 1 by 1 convolution, 
+4. For above example pooling,<span style="color:red">in order to concatenate all of outputs at the end, use the same type of padding for pooling.</span>. the output will be `28 x 28 x 192`. Then apply one more 1 by 1 convolutional layer to shrink the number of channel to `28 x 28 x 32`
+5.  In the end, channel concatenation
+
+ ![](/img/post/cnn/week2pic11.png)
+
+What the inception network does is to put all inception block together. 下面的inception network 是多个上面的repeated inception block stack在一起. 红色小箭头是max pooling to change the height and width
+
+Inception network 有**side branch**，takes a hidden layer to pass through a few fully-connected layer, then has a softmax to make prediction， It is said even in intermediate(hidden) layer 加上几层用softmax, not so bad to predict outcomes. It also <span style="background-color:#FFFF00">has regularization effect, prevent network overfitting (避免训练network too deep) </span>
+
+ ![](/img/post/cnn/week2pic12.png)
+
+
+<br/><br/><br/>
+
+## 5. Advices for ConvNets
+
+#### Transfer Learning
+
+
+Sometimes, training takes several weeks and might take many GPU. Can download open source weight that took someone else many weeks or months as a good initialization for your own neural network.
+
+**When don't have enough training data**:
+
+download Github open-source implementation and weight, <span style="color:red">then get rid of softmax layer and create your own softmax unit. Take early stage layers and parameters as frozon. And train the parameters associated with your softmax layer</span>. Then might get good performance even with a small dataset
+
+Some deep learning framework can let you specify whether to train parameter or freeze parameters.
+
+**Trick**: because of all of early layers are frozon, Use some fixed function to take a image to the activation in the layer which you begin to train. <span style="color:red">Can pre-compute that layer(image 和所有froozen layer 到开始训练的layer) and save to disk</span>. Then train a shallow softmax model to make a prediction <br/> 
+<span style="background-color:#FFFF00">**Advantage**</span>: don't need to recompute the activations everytimes
+
+**If have a large training set**:
+
+- freeze a fewer layer, then train latter layers and create the your own output unit.
+-  Or delete these latter layers and just use your own new hidden units and your own softmax output. 
+-  Or train some other size neural networks(different size of hidden layers)  that comprise last layer of your own softmax output
+
+<span style="background-color:#FFFF00">When having more data, the number of layers freeze could be smaller and the number of layers trained could be greater.</span>
+
+If have lots of data, take whole things as initialization(to replace random initialization) and train the whole network and update all the weights of all the layers of the network by gradient descent
+
+ ![](/img/post/cnn/week2pic13.png)
+
+ Transfer learning is something should always do unless have exceptionally large data and very large computation budge
+
+#### Data Augmentation
+
+- **Mirroring**: 比如一个猫的图片左右颠倒下 and Mirroring preserves what is in the picture 
+- **Random Cropping**:  随机选取图片的一部分剪切下来，当做新的，random cropping <span style="color:red">isn’t the perfect way</span> for data augmentation. In practice, it works well.
+- Some other method: **rotation**, **shearing**(正方形变平行四边形), local warping: no harm with trying of all these things. But in practice, they seem to be used a bit less. perhaps because of complexity
+- **Color shifting**: 比如red 增加 20， green 减小20， 蓝色增加20. <span style="color:red">In practice, R,G, and B are drawn from some probability distribution</span>
+  - Motivation: maybe sunlight might a little bit yellow that could easily change the color of the image but the indentity of the content (y) should stay the same
+  - Introduce color shifting, make learning algorithm more robust to change in colors of image
+
+ ![](/img/post/cnn/week2pic14.png)
+
+
+One of the ways to implement color distortion algorithm: **PCA color Augmentation**
+
+What PCA do: 比如 image mainly has red and blue tints, and very little green. PCA color Augmentation will add / subtract a lot for red and blue and very little green so that keeps the overall color the tint the same. 
+
+**Implementing distortions during training**:
+
+if you have large training set:
+
+- have a CPU thread that is <span style="color:red">constantly loading images</span> of your hard disk, then <span style="color:red">implement distortion</span> (random cropping, color shifting, or mirroring) to form a batch or mini-batches of data
+- Then batch / mini-batches are constantly are constantly <span style="color:red">passed to</span>  some other thread or process for <span style="color:red">training</span>(CPU or increasingly GPU if have a large neural network to train)
+- Above two thread can run in parallel
+
+Data augmentation 有时候还可以 有hyperparameter 去tune，比如 how much color shifting do you implement and exactly what parameters you use for random cropping.(If you think someone else doesn't not captured more in variances in their implementation, it might be reasonable to use hyperparameters yourself)
+
+ ![](/img/post/cnn/week2pic15.png)
+
+#### State of Computer Vision
+
+
+Image recognition 是给图片告诉是猫还是狗，object detection 是给你图片where in picture 有障碍物（autonomous driving）we tend to have less data for objection detection than for image recognition (because of the cost of getting bounding box to label is more expensive than label the objects)
+
+![](/img/post/cnn/week2pic16.png)
+
+- When have lots of data, Can have a giant neural networks, use simple algorithms as well as less hand-engineering. Less needing to carefully desgin features for the problem to learn whatever to learn if having lots of data
+- When don't have too much data, more hand-engineering. Hand-engineering is the best way to get good performance when has less data.
+
+Two sources of knowledge:
+
+- Label data (x, y)
+- Hand engineered features/network architecture/other components
+
+
+Computer Vision is trying to learn really a complex function. We don't have enough data for computer vision. Even datasets are getting bigger and bigger, often we don't have as much data as we need. That's why computer vision relied more on hand-engineering.  That's way computer vision has developed complex architectures becaue of the absence of more data. 即使最近data increase dramatically, results in a significant reduction in amount f hand-engineering. 但是still lots of hand-engineering of network architectures in computer vision compared to other disciplines.
+
+When don't have enough data, hand-engineering is very diffcult, skillful task taht requires a lot of insight. If have lots of data, wouldn't spend time hand-engineering, would spend time to build up the learning system. 
+
+
+**Tips for doing well on benchmarks**:
+	
+- **Ensembling**: Run several neural network independently(3-15 network) and average their output (average $$\hat y$$, not average weight which won’t work) 因为速度会降很多倍，所以用它来win in competition not use in actual production to serve customer 同时ensembling 因为是run 了很多network，会用掉很多memory to keep all these network around (Computational expensive)
+- **Multi-crop at test time**: Run classifier on multiple versions of test image and average results. Multi-crop is applying data agumentation to your test image. It might get a little bit better performance in a production system.
+  - 一张图片随机选取其中好几个部分作为test sample，每一个sample运行network through classifier，average results
+
+Andrew Ng: 以上方法是research 中提到的，不建议用in production or a system that deploy in an actual application
+
+建议： 
+
+- Use open-source code implementations if possible 
+- Use architectures of networks published in the literature 
+- use pretrained models and fine-tune on your dataset to get faster  on an application(transfer learning: someone else may train a model on half dozen GPU and over a million images)
