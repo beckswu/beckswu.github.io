@@ -480,7 +480,7 @@ $$ \begin{align}
 $$
 
 
-If you use L2 regularization to shrink $$w^{\left[l + 2 \right]}$$ , then if you apply weight to b it will also shrink weight to b) although in practice don’t apply regularization weight to b, 
+If you use L2 regularization to shrink $$w^{\left[l + 2 \right]}$$ , then if you apply weight to b it will also shrink weight to b although in practice don’t apply regularization weight to b, if $$w^{\left[l + 2 \right]} = $$ and $$b^{\left[l + 2 \right]} = 0$$
 
 $$
   a^{\left[l + 2 \right]} = g\left( a^{\left[l \right]}  \right) = a^{\left[l \right]} 
@@ -495,9 +495,10 @@ But if they don't have the same dimension, add $$W_s$$, e.g. $$z^{\left[l + 2 \r
 $$a^{\left[l + 2 \right]} = g\left(  z^{\left[l + 2 \right]} + W_Sa^{\left[l \right]} \right)$$
 
 
- It shows the <span style="background-color:#FFFF00">because of skip connection, it's so easy for residual networks to learn identity function, guarantee adding residual blocks doesn't hurt neural network performance</span>, it's easy to get $$a^{\left[l + 2\right]} $$ equal to $$a^{\left[l \right]} $$. Hidden units if actually learn something useful then can do even better than learning the identity function
+ It shows the <span style="background-color:#FFFF00">because of skip connection, it's so easy for residual networks to learn identity function, guarantee adding residual blocks doesn't hurt neural network performance and gradient descent can improve the solution
+ </span>, it's easy to get $$a^{\left[l + 2\right]} $$ equal to $$a^{\left[l \right]} $$. Hidden units if actually learn something useful then can do even better than learning the identity function
 
- In plain network without Residual Network, when you make the network deeper and deeper, it is very difficult for it to choose parameters that learn even the identity function, which a lot of layer end-up  worse.
+ In plain network without Residual Network, <span style="color:red">when you make the network deeper and deeper, it is very difficult for it to choose parameters that learn even the identity function, which a lot of layer end-up  worse</span>.
 
 #### Resnet on Image
 
@@ -667,3 +668,276 @@ Andrew Ng: 以上方法是research 中提到的，不建议用in production or a
 - Use open-source code implementations if possible 
 - Use architectures of networks published in the literature 
 - use pretrained models and fine-tune on your dataset to get faster  on an application(transfer learning: someone else may train a model on half dozen GPU and over a million images)
+
+
+
+<br/><br/><br/>
+
+## 6. Object Detection
+
+#### Object Localization
+
+- **Image classification**: recognize it's a car
+- **Classification with localization**: algorithm not only label the image as a car but aslo responsible for putting a bounding box. Localization 表示 where in the picture care you've detected. Usually one big object in the middle of the image that trying to recognize
+- **Detection**: multiple objects in the picture, detect them all and localized them all. Or even multiple objects of different categories within a single image.
+
+
+![](/img/post/cnn/week3pic1.png)
+
+For Autonomous driving, softmax may predict four categories: pedestrain, car, motorcycle, or backaground.
+
+**Localization**: Change your neural networks to have a few more output units that output a bounding box.
+- Use upper left of the image as (0,0) and lower-right as (1,1). Specifying the bounding box, red rectangle <span style="color:red">reqires specifying the midpoint ($$b_x, b_y$$), height and widths of the rounding box ($$b_h, b_w$$)</span>. $$b_h， b_w$$ bounding box的长宽 占整个图片的多少，而不是起始点的坐标
+- So training set not only contain class label and also contain 4 additional numbers ($$b_x, b_y, b_h, b_w$$) 
+
+![](/img/post/cnn/week3pic2.png)
+
+$$
+  y = \begin{bmatrix}
+    P_c \\
+    b_x  \\
+     b_y  \\
+      b_h  \\
+       b_w  \\
+       b_x  \\
+       c_1 \\
+       c_2 \\
+       c_3 \\
+    \end{bmatrix}
+$$
+
+- $$P_c = 1 $$ if object is predestrian, car, else motorcycle; $$P_c = 0 $$ if background. $$P_c$$ is the probability that one of the classes you're trying to detect is there 
+- $$c_1, c_2, c_3$$ tell if $$P_c = 1 $$ tell the class if pedestrian, car, or motorcycle.
+- if $$P_c = 0 $$, don't care following output in y
+
+
+
+![](/img/post/cnn/week3pic3.png)
+
+**Loss Function**
+
+$$
+y = \left\{
+\begin{array}{ll}
+\left( \hat y_1 - y_1 \right)^2 + \left( \hat y_2 - y_2 \right)^2 + \cdots + \left( \hat y_8 - y_8 \right)^2 & \text{for y = 1} \\ 
+\left( \hat y_1 - y_1 \right)^2 & \text{for y = 0}\\ 
+\end{array} 
+\right.
+$$
+
+<span style="background-color:#FFFF00">Squared error for all outputs is simplified description. In practice, use loglikelihood loss for $$c_1, c_2, c_3$$ (the softmax output); squared error for bounding box cordinates  ($$b_x, b_y, b_h, b_w$$)  ;$$p_c$$ could use logistic regression loss</span>.  Although use squared error, it works ok.
+
+
+**Landmark**
+
+- Landmark: you can have neural network just output $$l_X$$ and $$l_Y$$ of important points and image that you want your neural network model to train. 
+- 比如recognize eyes, tell all corners of the eyes. 
+- By Selecting a number of landmarks and generate a label training sets that contains all of these landmarks, you could have neural networks to tell you where are all the key landmarks on a face
+- Neural network not only output if it is face or not, also output, $$l_{1X}, l_{1y}; l_{2X}, l_{2y} \cdots $$
+- <span style="background-color:#FFFF00">Landmark must be consistent across different images</span>. like One image landmark1 must be left eye left corner, landmark2 must be left eye right corner. Cannot have landmark1 on right eye right corner on different image
+- Application: 比如给一个人脸带上皇冠/帽子; specify the pose of the image; recognize emotion
+
+
+![](/img/post/cnn/week3pic4.png)
+
+#### Sliding Windows
+
+1. closely cropped image: take a picture, crop out and make car enter d in the entire image or no car in image 
+2. Use ConvNet to recognize if it is car or not for those image
+
+**Sliding windows**: 
+
+1. take a small rectangle region, then go through every region of the size(e.g. from top-left to bottom right), pass those little cropped images into ConvNet and make prediction
+2. <span style="color:red">Take a slightly larger</span> region and slide the new window with some stride throughout entire image until get to the end, pass those windows into ConvNet and make prediction
+3. Take a <span style="color:red">even larger window</span> throughout entire image into ConvNet to make prediction
+
+
+![](/img/post/cnn/week3pic5.gif)
+
+![](/img/post/cnn/week3pic6.gif)
+
+
+As long as there's car in the image, there will be a window to detect the car. 
+
+**Disadvantage**: computationtal cost: 因为slide window 太多次to run each of them indepdently through ConvNet，所以花很多时间slide window， 
+  - 但是假如说用一个bigger stride，可能图片没有被captured， hurt performance。
+  - 但如果用小的stride, A huge number of all these regions pass through ConvNet means there is a very high computational cost，also cannot localize objects
+  - Before, object detection run sliding windows with a simple linear classification is ok. But now, use ConvNet is computational expensive
+
+**Convolutional Implementation of Sliding windows**: 
+
+Truning Fully-connected layer into convolutional layers:
+
+1.  `5 x 5 x 16` fully-connected `400 x 1`. Now use 400 filters size with ``5 x 5 x 16` convolve it to `1 x 1 x 400`(volume). Mathematically, same as fully connected layer, each number in `1 x 1 x 400` is some linear function of these `5 x 5 x 16` activations from previous layer. 
+2. Then implement 1 by 1 convolution with 400 filters size of `1 x 1 x 400`
+3. Then implement 1 by 1 convolutions with 4 filters size of `1 x 1 x 400`, and followed by softmax activation and get output size `1 x 1 x 4`
+
+![](/img/post/cnn/week3pic7.png)
+
+
+e.g. trainset is `14 x 14 x 3` and test set image is `16 x 16 x 3` image and stride = 2, then slide right two pixel into ConvNet, then move down to ConvNet, finally run right bottom corner window into ConvNet; -> these 4 ConvNets is highly duplicative. So Convolutional implementation of sliding windows is to allow share a lot of computation for those windows
+
+<span style="background-color:#FFFF00">Instead of run four propagation on four subsets of input image independently, it **combines all four into one form of computation** and shares a lot of the computation in the regions of the image that are common </span>
+-  the upper-left`2 x 2 x 4` gives the result of upper-left corner `14 x 14 x 3`, the upper-right `2 x 2 x 4` gives the result of upper-right corner `14 x 14 x 3`,  the upper-left`2 x 2 x 4` gives the result of lower-left corner `14 x 14 x 3`, the upper-right `2 x 2 x 4` gives the result of lower-right corner `14 x 14 x 3`
+-  because of max pooling 2 correspond to run your neural network with a stride of two
+-  <span style="background-color:#FFFF00">**weakness**</span>: the position of the bounding boxes is not to be accurate
+
+$$
+\require{AMScd}
+\begin{CD}
+
+    16 \times 16 \times 3 @>{\text{16 filters } 5 \times 5 \times 16 }>> 12 \times 12 \times 16 @>{\text{Max pool } 2 \times 2}>> 6 \times 6 \times 3  \\
+@.  @.   @V{\text{FC layer 400 filters } 5 \times 5 \times 16  }VV \\
+ 2 \times 2 \times 4 @<{\text{FC layer 4 filters } 1\times 1 \times 400  }<< 2 \times 2 \times 400 @<{\text{FC layer 400 filters } 1\times 1 \times 400  }<<  2 \times 2 \times 400
+\end{CD} 
+$$
+
+![](/img/post/cnn/week3pic8.png)
+
+
+#### YOLO Algorithm
+
+maybe none of boxes really match up perfectly with the position of the car and maybe perfect box is not square, maybe a slightly wider rectangle
+
+![](/img/post/cnn/week3pic9.png)
+
+YOLO: you only look at once. 
+
+- split image into grid (e.g. `19 x 19` grid). If a grid contain object, <span style="background-color:#FFFF00">assigns the object to the grid cell containing the midpoint</span>. 如果一个grid cell 有了车的一小部分，但是假如这个grid cell 没有车的mid point，we assume it does not contain the car 
+  - By using `19 x 19` grid cell, the chance of an object of two midpoints of objects appearing in the same grid cell is just a bit smaller
+- run through each grid through ConvNet. <span style="color:red">It's one single convolutional implementation, not run it grid x grid size times</span> -> efficient algorithm. This works for real time object detection.
+- For each grid, output $$y = \begin{bmatrix}P_c \\
+    b_x  \\
+     b_y  \\
+      b_h  \\
+       b_w  \\
+       b_x  \\
+       c_1 \\
+       c_2 \\
+       c_3 \\
+    \end{bmatrix}$$
+  - if grid size is `3 x 3`,  output volume is `3 x 3 x 8` 
+- <span style="color:red">Advantages: neural network otuput precise bounding boxes for each grid; Convolutional implementation, run fast</span>
+- <span style="color:red">if don't have more than objects in grid cell, this algorithm works ok</span>
+
+![](/img/post/cnn/week3pic10.png)
+
+For each grid, use top-left as `(0,0)` and bottom-right as `(1,1)`, height and width set as fraction of overall height and width of grid cell, <span style="background-color:#FFFF00">`(bx, by)` (midpoint) has to be less than 1. `(bh, b_w)` could be larger than 1, because bounding box could be large than grid cell</span>
+
+![](/img/post/cnn/week3pic11.png)
+
+
+
+**YOLO Algorithm**: put everything together
+
+- 对于anchor，真实y 给IoU 最大的anchor box 赋值，其他的anchor box 的pc 赋值为0, 比如下图car more similar to anchor 2 given IoU
+- y size is `3 x 3 x 16`, for each of nine grid positions, come up with a vector 16 dimensions
+  - In practice, use grid size `19 x 19` and 5 anchor boxes, y will be `19 x 19 x 40`
+- run with non-max supression to output the non-max supressed output
+  - if using 2 anchor boxes, for each nine grid box, get 2 anchor boxes. Some of them may have low probability (low $$P_c$$), but still get two bounding box for each nine grid cell
+  - get rid of low probability prediction
+  - For each class(predestrian, car, motorcycle) use non-max suppression indepdently to generate final predictions
+
+![](/img/post/cnn/week3pic16.png)
+
+Note: below picture "For each grid **cell**" instead of "For each grid call".
+
+![](/img/post/cnn/week3pic17.gif)
+
+
+#### Intersection Over Union
+
+**Intersection Over Union**(IOU) computes the intersection over union of two bounding boxes(predicted and true labelled). 
+- Union是 area ideal 的bounding box 和预测的bounding box 全部的面积。Intersection 是 两个图片重合的部分
+-  IoU= (size of intersection)/(size of union)
+-  <span style="color:red">judge output is correct if loU >= 0.5.</span>.0,5 is convention. if more stringent, the threshold can be like 0.6/ The higher of the IoU, the more accurate the predicted bounding box. Rare to pick threshold below 0.5
+-  if the predicted and the ground-truth bounding boxes overlapped perfectly, IoU = 1.
+
+![](/img/post/cnn/week3pic12.png)
+
+
+#### Non-max Suppression
+
+**Non-max Suppression**: algorithm may find multiple detections of the same object, Non-max Suppression is to make sure you object only be detected only once
+
+some grid may think it can midpoint from the algorithm. End up with multiple detections of each object.
+
+![](/img/post/cnn/week3pic13.png)
+
+**Non-max Suppression**:  Non-max means you are gonna output the maximal probabilities classification but suppress the close-by ones that are non-maximal
+
+
+1. Discard all boxes with $$P_c \leq 0.6$$
+2. look at the probability for each detection. Pick the one with the highest $$P_c$$(probability of detection) and highlight this bounding box as prediction
+3. Look at all remaining bounding box who <span style="color:red">has a high overlap</span>(high IoU with the one which is highlighted, $$IoU \geq 0.5 $$) with the one (highest $$P_c$$) will get <span style="color:red">suppress/discarded</span>
+4. Then the highlight one is final prediction
+5. Carry out non-max suppresion 3 (categories size) times, one on each of pedestrian, car, and motorcycles
+
+![](/img/post/cnn/week3pic14.png)
+
+
+#### Anchor Boxes
+
+之前一个grid 只能预测一个值，但是假如一个grid 有两个我们想预测的值，我们可以用anchor box
+
+e.g. the midpoint of a car and pedestrian fell in the same grid cell
+
+- predefine two different shapes called anchor boxes, then associate two predictions with two anchor boxes
+  - in practice may use more anchor boxes, e.g. 5
+- use anchor box1 to encode that object and bounding box is pedestrian, use anchor box2 to encode that object and bounding box is car
+- With two anchor boxes: each object in training image is assigned to grid cell that contains object’s midpoint and anchor box for the grid cell with <span style="color:red">highest IoU.</span> 
+  - Anchor boxes compared to ground true bounding box with highest IoU 
+- object in the training set is labeled as (grid cell, pairs of anchor boxes)
+  - output y is `3 x 3 x 16`, can viewed it as `3 x 3 x 2 x 8` two anchor boxes
+- If have more objects, the dimension of Y would be even higher
+- <span style="background-color:#FFFF00">**Disadvantages**</span>:      - <span style="background-color:#FFFF00">Doesn't handle well if the category of objects in the same grid cell bigger than anchor boxes. </span>
+  - **Doesn't handle well if two objects have the same anchor box shape in the same grid cell**
+  - It happens quite rarely if two objects appear in the same grid cell, especially `19 x 19` grid cell
+- Since it is rare two objects in the same grid cell, anchor boxes gives learning algorithm to better specialize. e.g. tall and skinny object like pedestrian, wide and fat object like cars
+- How to choose anchor boxes: choose 5  10 shapes that spans a variety of shapes to cover the types of objects seem to detect 
+  - Advance version: use K-means algorithm, to group together two types of objects shapes you tend to get, then use that to select a set of anchor boxes that most stereotypciclly representative of multiple objects you're trying to detect
+
+$$y = \begin{bmatrix} \text{anchor Box1} \begin{cases} P_c \\
+    b_x  \\
+     b_y  \\
+      b_h  \\
+       b_w  \\
+       b_x  \\
+       c_1 \\
+       c_2 \\
+       c_3 \end{cases} \\
+     \text{anchor Box2} \begin{cases}  P_c  \\
+    b_x  \\
+     b_y  \\
+      b_h  \\
+       b_w  \\
+       b_x  \\
+       c_1 \\
+       c_2 \\
+       c_3 \\ \end{cases}
+    \end{bmatrix}$$
+
+
+![](/img/post/cnn/week3pic15.png)
+
+Previously: each object in training image is assigned to grid cell that contains that object’s midpoint.
+
+
+#### Region Proposal
+
+- When run sliding windows, run detector to see if there's car, pedestrian or motorcycle. You could run algorithm convolutionaly. <span style="color:red">Downside of sliding windows: a lot of regions where there's clearly no object </span>
+- Algorithm called R-CNN stands for Regions with convolutional networks or regions with CNNs. It just tried to <span style="color:red">pick a few regions that make sense to run you convnet classifier </span> rather than running sliding windows on every single window
+  - Perform the region proposals is to run an algorithm called a **segmentation algorithm**, pick a bounding box that is more likely to have object. The algorithm may find 2000 blobs/regions and run classifier on those 2000 blobs, which is smaller than run your ConvNet classifier
+
+![](/img/post/cnn/week3pic18.png)
+
+
+Faster Algorithms: 
+
+- **R-CNN**:  
+  -  propose regions. Classify proposed regions one at a time. Output label + bounding box. RCNN not trust the bounding box which is given, but also output bounding box ($$b_x,b_y,b_h,b_w$$)
+  -  <span style="background-color:#FFFF00"> Downside:  it is quite slow (classify region one at the time)</span>
+-  **Fast R-CNN**:  
+   -  propose regions. Use convolution implementation of sliding widows to classify all the proposed regions. (use convolutional implementation of sliding windows). 
+   -  **Downside**: the <span style="color:red">clustering step</span> to propose the regions is still quite slow
+- **Faster R-CNN**: Use convolutional network instead of segmentation algorithms to propose regions. Faster R-CNN implementation are usually still quite a bit slower than the YOLO algorithm 
