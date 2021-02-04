@@ -941,3 +941,110 @@ Faster Algorithms:
    -  propose regions. Use convolution implementation of sliding widows to classify all the proposed regions. (use convolutional implementation of sliding windows). 
    -  **Downside**: the <span style="color:red">clustering step</span> to propose the regions is still quite slow
 - **Faster R-CNN**: Use convolutional network instead of segmentation algorithms to propose regions. Faster R-CNN implementation are usually still quite a bit slower than the YOLO algorithm 
+
+
+<br/><br/><br/>
+
+## 7. Face Recognition
+
+**face verification**  vs.  **face recognition** 
+
+- Verification ( 1 to 1 problem)
+  -	input image , name / ID
+  -	output whether the input image is that of claimed person 
+- Recognition
+  -	has a database of K persons 
+  -	Get an input image 
+  -	Output ID if the image is any of the K persons  ( or “not recognized” )
+
+#### One Shot Learning
+
+One Shot Learning problem: for most face recognition applications, you need to be able to recognize a person given just one single image. Historically, deep learning don't work well if have only one training example.
+
+Instead to train softmax to learn 100 people in database, use **similarity function**
+
+Input: two images,  output = `d(img1, img2)`  = degree of difference between images , 如果those two images are the same person, want this output a small number. If two images are different person, want this output a large number
+
+If `d(img1, img2) ≤ τ`  predict they are the “same”  person, If `d(img1, img2) > τ` , predict they are different person. This is to address face verification problem 
+
+Use this in recognition, given new pciture, use this function(`d(img1, img2)`) to compare this new picture and other pictures in the database. If someone join in the team, add this person to your database. 
+
+
+#### Siamese Network
+
+Pass a image through a sequence of convolutional, pooling, and fully-connected layer and end-up with a feature vector  $$f\left( x^{]\left( 1 \right)} \right)$$  as encoding of $$x^{]\left( 1 \right)}$$ (e.g. size `128 x 1`, not pass to softmax unit). Then pass a second image through the same network and get the second encoding $$x^{]\left( 2 \right)}$$, 
+
+Norm of the difference
+
+$$ d\left( x^{]\left( 1 \right)}, x^{]\left( 2 \right)}\right) =  \| f\left( x^{]\left( 1 \right)} \right) - f\left( x^{]\left( 2 \right)} \right) \|_2^2$$ 
+
+**Siamese Neural Network Architecture**: run two identical convolutional neural networks on two different inputs and compare them
+- these two neural networks have the same parameters
+- Parameters of NN define an encoding $$f\left( x^{]\left( 1 \right)}$$
+- learn parameter that
+  1. if $$x^{]\left( i \right)}, x^{]\left( j \right)} $$ are the same person, $$ d\left( x^{]\left( 1 \right)}, x^{]\left( 2 \right)}\right) =  \| f\left( x^{]\left( 1 \right)} \right) - f\left( x^{]\left( 2 \right)} \right) \|_2^2$$ 
+  2. If $$x^{]\left( i \right)}, x^{]\left( j \right)} $$ are the different person, $$ d\left( x^{]\left( 1 \right)}, x^{]\left( 2 \right)}\right) =  \| f\left( x^{]\left( 1 \right)} \right) - f\left( x^{]\left( 2 \right)} \right) \|_2^2$$ 
+- So as you vary the parameters in all of these layers of the neural network end up different encoding, then use back propagation to vary all those parameters in order to make sure these conditions (1,2) are satisfied 
+
+![](/img/post/cnn/week4pic1.png)
+
+
+#### Triplet Loss
+
+**Learning Objective**
+
+Always looking at three images at a time, look at anchor(A) image,positive(P) image（跟anchor 属于一个人的），, negative(N) image（跟anchor 图片不是一个人）
+
+![](/img/post/cnn/week4pic2.png)
+
+$$ \underbrace{ \| f\left(A \right) - f\left( P \right) \|_2^2}_{ d\left(A, P \right)} \leq \underbrace{\| f\left(A \right) - f\left( N \right) \|_2^2}_{ d\left(A, N \right)} $$
+
+$$ \| f\left(A \right) - f\left( P \right) \|_2^2 - \| f\left(A \right) - f\left( N \right) \|_2^2 \leq 0 $$
+
+如果f always output zero, will satisfy this equation, to make sure that it doesn’t set all the encodings equal to each other, 所以为了避免这个，我们加上一个<span style="background-color:#FFFF00">α （margin）, another hyperparameter</span>， margin does to push anchor positive pair further away from anchor negative pair 
+
+
+$$ \| f\left(A \right) - f\left( P \right) \|_2^2 + \alpha  \leq \| f\left(A \right) - f\left( N \right) \|_2^2  $$
+
+$$ \| f\left(A \right) - f\left( P \right) \|_2^2 - \| f\left(A \right) - f\left( N \right) \|_2^2  + \alpha $$
+
+$$\text{Loss Function: } L\left(A,P,N\right) = max\left(\| f\left(A \right) - f\left( P \right) \|_2^2 - \| f\left(A \right) - f\left( N \right) \|_2^2  + \alpha, 0  \right)$$
+
+$$\text{Cost Function: }  J = \sum_{i=1}^m L\left( A^{\left( i \right)} , P^{\left( i \right)}, N^{\left( i \right)}  \right) $$
+
+
+If you have 10k picture with 1000 different persons, then generate/select triplet  and then train gradient descent on this type of cost function. you <span style="color:red">do need multiple pictures for the same person</span>, then you can apply it to one shot learning problem after training (但是training 需要一个人多个图片, if have just one picture of each person, can't train the system)
+
+
+**Choose the triples A.P.N**
+
+During training, <span style="color:red">if A,P, N are chosen randomly, d(A,P) + α≤d(A,N) is easily satisfied </span>. So choose triplets that’re hard to train on<span style="background-color:#FFFF00">. Choose d(A,P) quite close to d(A,N), so algorithm will try to push d(A,P) down and push d(A,N) up to keep at least a margin of alpha between the d(A,P) and d(A,N)</span>
+
+Commercial face recognition train a fairly large dataset some million images (10 million images)
+
+Andrew Ng 建立： download someone pretrain model from open-source
+
+
+#### As Binary Classification Problem 
+
+Triplet loss is one good way to learn the parameters of a C onvNet for a face recognition
+
+Another way to train neural network is to take a pair neural networks to take Siamese Network and have them <span style="color:red">both compute these embeddings $$f\left( x^{\left(i \right) } \right)$$  ( maybe 128 feature vector) and use these input to a logistic regression to make prediction</span>, if output = 1, they are the same person whereas output = 0 they are different persons
+
+![](/img/post/cnn/week4pic3.png)
+
+The output $$\hat y$$ will be 
+
+$$
+\hat y = \sigma \left(\underbrace{\sum_{k=1}^{128} w_k\mid f\left( x^{\left(i \right) } \right)_k - f\left( x^{\left(j \right) } \right)_k  \mid}_{ \text{element-wise difference in absolute values between encodings} } + b \right)
+$$
+
+can think of these 128 numbers as features that you then feed into logistic regression , and train the weight w,b  in order to predict whether or not two images are of the same person
+
+There are a few other variations on how to compute $$\hat y$$
+
+$$
+\hat y = \sigma \left( \sum_{k=1}^{128} w_k \frac{ \left( f\left( x^{\left(i \right) } \right)_k - f\left( x^{\left(j \right) } \right)_k  \right)^2 } { f\left( x^{\left(i \right) } \right)_k + f\left( x^{\left(j \right) } \right)_k } + b \right) \chi^2 similarity
+$$
+
+One single trick is to **precompute the feature vector**(通过Siamese network算出来)in the database to save computational cost (not need to store raw image). This works for Siamese Network where treat face recognition as a binary classification problem or when you were learning encodings using Triplet Loss function
