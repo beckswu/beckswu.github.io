@@ -1048,3 +1048,52 @@ $$
 $$
 
 One single trick is to **precompute the feature vector**(通过Siamese network算出来)in the database to save computational cost (not need to store raw image). This works for Siamese Network where treat face recognition as a binary classification problem or when you were learning encodings using Triplet Loss function
+
+
+<br/><br/><br/>
+
+## 8. Neural Style Transfer
+
+![](/img/post/cnn/week4pic4.png)
+
+Neural Style Transfer: generate image from content image but drawn in the style of the style image
+
+
+**What are deep ConvNets learning?** 
+
+e.g. Pick a unit in layer 1. Find the nine different image patches(`3 x 3` ) that maximize the unit’s activation (there are many activations in layer1). pass training set into neural network and figure out what is the image that maximizes that particular units activation. By doing this, will see what is hidden layer recognizing such as looking for simple features like averitical line
+
+![](/img/post/cnn/week4pic5.png)
+
+In the deeper layer, a hidden unit will see a larger region of the image. Each pixel could hypothetically affect the output of later layers of neural network. Later units are actually seen larger image patches.
+
+![](/img/post/cnn/week4pic6.png)
+
+
+#### Cost Function
+
+$$J\left(G \right) = \alpha J_{content}\left(C,G \right)+\beta J_{style} \left(S,G \right)$$
+
+$$ \text{G:generated image; C: content image; S: style image} $$
+
+ $$J_{content}\left(C,G \right)$$ measures how similar content image to generated image, $$J_{style} \left(S,G \right)$$ measures how similar style image to generated image. $$\alpha, \beta$$ two hyperparameters to specify relative weighting for content cost and style cost.
+
+ Find the generated image G:
+
+1. 	Initiate G randomly.  might be G: `100 x 100 x 3`. Initialize G just white noise image with each pixel value chosen at random
+2.	Use gradient descent to minimize J(G) , $$G := G - \frac{\partial}{\partialG} J\left( G \right)$$ to slowly update the pixel value so get an image that looks more and more like content image rendered in style image
+  - In the process, actually updating the pixel values of image G
+
+![](/img/post/cnn/week4pic7.png)
+
+#### Content Cost Function
+
+
+
+
+
+## 8 Paper for Reference
+
+- [Visualizing and Understanding Convolutional Networks
+Matthew D Zeiler, Rob Fergus](https://arxiv.org/abs/1311.2901): What are deep ConvNets Learning
+- [A Neural Algorithm of Artistic Style](https://arxiv.org/abs/1508.06576): Neural Style Transfer Cost Function 
