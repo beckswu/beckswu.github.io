@@ -1076,12 +1076,12 @@ $$J\left(G \right) = \alpha J_{content}\left(C,G \right)+\beta J_{style} \left(S
 
 $$ \text{G:generated image; C: content image; S: style image} $$
 
- $$J_{content}\left(C,G \right)$$ measures how similar content image to generated image, $$J_{style} \left(S,G \right)$$ measures how similar style image to generated image. $$\alpha, \beta$$ two hyperparameters to specify relative weighting for content cost and style cost.
+ $$ J_{content}\left(C,G \right) $$ measures how similar content image to generated image, $$J_{style} \left(S,G \right)$$ measures how similar style image to generated image. $$\alpha, \beta$$ two hyperparameters to specify relative weighting for content cost and style cost.
 
  Find the generated image G:
 
 1. 	Initiate G randomly.  might be G: `100 x 100 x 3`. Initialize G just white noise image with each pixel value chosen at random
-2.	Use gradient descent to minimize J(G) , $$G := G - \frac{\partial}{\partialG} J\left( G \right)$$ to slowly update the pixel value so get an image that looks more and more like content image rendered in style image
+2.	Use gradient descent to minimize J(G) , $$G := G - \frac{\partial}{\partial G} J\left( G \right)$$ to <span style="color:red">slowly update the pixel value so get an image</span> that looks more and more like content image rendered in style image
   - In the process, actually updating the pixel values of image G
 
 ![](/img/post/cnn/week4pic7.png)
@@ -1089,7 +1089,16 @@ $$ \text{G:generated image; C: content image; S: style image} $$
 #### Content Cost Function
 
 
+-	Say you use hidden layer l to compute content cost 
+  - if l is a small number, hidden layer 1, it will force your generated image pixel values very similar to content image.
+  - if l is a large number, a deep layer. If there is a dog in your content image, it will generate dog somewhere in the generated image
+  - In practice, l is chosen neither too shallow nor too deep in the neural network. l is chosen in the middle layer of the neural network
+-	Use pre-trained ConvNet (E.g, VGG network)
+- 	Let $$a^{\left[ l \right]\left( C \right)}$$ and $$a^{\left[ l \right]\left( G \right)}$$ be the activation of layer l on the images 
+  - if  $$a^{\left[ l \right]\left( C \right)}$$ and $$a^{\left[ l \right]\left( G \right)}$$ similar, imply both images havve similar content
+  - 有没有1/2都可以, <span style="background-color:#FFFF00">element wise sum of square difference between activations of C and G</span>
 
+$$J_{content}\left(G \right) = \frac{1}{2} \| a^{\left[ l \right]\left(  \right)} - a^{\left[ l \right]\left( G \right)} \|^2$$
 
 
 ## 8 Paper for Reference
