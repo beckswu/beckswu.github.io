@@ -20,7 +20,7 @@ tags:
 
 
 
-Computer Vision **Challenge**: the input can be really big, e.g if a image `1000*1000` pixel，Each pixel is controlled by three **rgb** channel，image input is `1000*1000*3`. Input for Neural Network model is 3 million, and the first hidden layer(e.g. fully-connected network)  is 1000 hidden units, the weight will be `(1000, 3 Million)`, 3 billion parameters. <span style="background-color:#FFFF00">It is difficult to get enough data to avoid overfitting and the computational requirement and memory requirement to train is infeasible</span>
+Computer Vision **Challenge**: the input can be really big, e.g if a image `1000*1000` pixel，Each pixel is controlled by three **rgb** channel，image input is `1000*1000*3`. Input is 3 million, and the first hidden layer(e.g. fully-connected network) has 1000  units, the weight will be `(1000, 3 Million)`, 3 billion parameters. <span style="background-color:#FFFF00">It is difficult to get enough data to avoid overfitting and the computational requirement and memory requirement to train is infeasible/expensive</span>
 
 
 #### Edge Detection
@@ -33,14 +33,14 @@ e.g. Vertical edge detection
 
 ![](/img/post/cnn/week1pic1.gif)
 
-Why above filter works for vertical detection?  e.g. the image(left matrix), left half give brigther pixel intensive and right half give darker pixel intensive values.
+**Why above filter works for vertical detection?**  e.g. the image(left matrix), left half give brigther pixel intensive and right half give darker pixel intensive values.
 
 ![](/img/post/cnn/week1pic2.png)
 
 
 Above detected edge (value 30, 2 columns) seems very thick, because we use only small iamges. If you are using 1000 by 1000 image rather than 6 and 6, it does pretty good job
 
-**Inituition**: vertical edge detection, since example use 3 by 3 region where <span style="color:red">bright pixels on the left and dark pixels on the right (don't care about what's in middle)</span>
+**Inituition**: vertical edge detection, since example filter use 3 by 3 region where <span style="color:red">bright pixels on the left and dark pixels on the right (don't care about what's in middle in filter)</span>
 
 ![](/img/post/cnn/week1pic3.png)
 
@@ -53,7 +53,11 @@ Above detected edge (value 30, 2 columns) seems very thick, because we use only 
 
 ![](/img/post/cnn/week1pic4.png)
 
-30 is the edge that light on top and dark on bottom and -30 is the edge that dark on top and light on bottom. -10 reflect that parts of positive edge on the left and parts of negative edge on the right, so blending those together gives some *intermediate value*. <span style="color:red">But if a image is 1000x1000, won't see these transitions regions of 10s. The intermediate values would be quite small relative to the size of iamge.</span>
+Above example: 
+
+- 30 is the edge that light on top and dark on bottom 
+- -30 is the edge that dark on top and light on bottom. 
+- -10 reflect that parts of positive edge on the left and parts of negative edge on the right, gives some *intermediate value*. <span style="color:red">But if a image is 1000x1000, won't see these transitions regions of 10s. The intermediate values would be quite small relative to the size of iamge.</span>
 
 
 ```Python
@@ -86,25 +90,24 @@ $$
 
 
 也许不用hand pick those number，让computer 自己学
-
 $$    \begin{bmatrix}
     w_1 & w_2 & w_3 \\
     w_4 & w_5 & w_6 \\
     w_7 & w_8 & w_9 \\
     \end{bmatrix}
 $$
-<span style="color:red">The goal: give a image, convolve it with 3x3 filter, that gives a good edge detector. It may learn something even better than hand coded filter.</span> 通过neural network backprop，也许不是vertical的，也许是 45度的，70度的，不是完全vertical, horizontal
+<span style="color:red">The goal: give a image, convolve it with 3x3 filter, that gives a good edge detector. It may learn something even better than hand coded filter.</span> 通过neural network backprop，也许不是vertical的，也许是 detect 45度的，70度的
 
 
 
 #### Padding
 
-if image is `n x n` the filter is `f x f` and  the output is ` n-f+1 x n-f+1`
+if image is `n x n` the filter is `f x f` and  the output is $$ n-f+1  \times  n-f+1$$
 
 <span style="background-color:#FFFF00">Downside of filter</span>: 
 
 1. Image will shrink if performing convolution neural networks (to (n-f+1)*(n-f+1) ) 
-2. Corner pixel only be used once(e.g. upper-left, upper-right), but middle pixel used by multiple times, <span style="color:red">throw away a lot of information near the edge of the image</span>
+2.<span style="color:red"> Corner pixel only be used once</span>(e.g. upper-left, upper-right), but middle pixel used by multiple times, <span style="color:red">throw away a lot of information near the edge of the image</span>
   
 **Solution**: <span style="background-color:#FFFF00">pad the image by additional border</span>. e.g. `6 x 6` pad to `8 x 8`, filter is `3 x 3`, then the output is `6 x 6`
 
@@ -117,7 +120,7 @@ Denote `p = padding amount`, above example `6 x 6` to `8 x 8`, `p = 1`, padding 
 
 
 <span style="color:red">Filter size `f` usually be odd
-nu convention in computer vision</span>. If `f` is even, you will come up asymmetrix padding, Besides, when have odd number of padding, you will have a central position in the middle for the filter.  
+number, the convention in computer vision</span>. If `f` is even, you will come up asymmetrix padding, Besides, when have odd number of padding, you will have a central position in the middle for the filter.  
 
 
 #### Strided Convolution
@@ -138,7 +141,7 @@ If after padding, the the filter box hangs outside of image, don't do that compu
 
 The operation done before is called <span style="color:red">**cross-correlation**</span> instead of convolution operation. 
 
-By convention in machine learning, 通常忽略 flipping operation. The operation done before btter called cross-correlation, but most of deep learning literature called it convolutional operater(without flip)
+By convention in machine learning, 通常忽略 flipping operation. The operation done before better called cross-correlation, but most of deep learning literature called it convolutional operater(without flip)
 
 <span style="color:red">The convolution before product and summing is to flip filter horizontal and vertically. Then use flipped filter to compute element wise product and summation </span>e.g.
 
@@ -164,10 +167,12 @@ $$\left( A * B \right) * C = A * \left( B * C \right) $$
 
 #### Convolutions Over Volume
 
-input is `6 x 6 x 3` where 3 is the color channel(red, green, blue), the filter is `3 x 3 x 3`. Denote first demension is height, second demension is width, third dimension is channel(*in literature, some people called it depth*). <span style="color:red">The number of channel in image must match the channel of the filter</span>
+input is `6 x 6 x 3` where 3 is the color channel(red, green, blue), the filter is `3 x 3 x 3`. Denote first demension is height, second demension is width, third dimension is channel(*in literature, some people called it depth*). <span style="color:red">**The number of channel in image must match the channel of the filter**</span>
 
 
-above example, filter size is `3 x 3 x 3`, element wise product for image and filter, for the first channel, second channel, third channel one by one. then add those 27 number together as output
+Below example, filter size is `3 x 3 x 3`, element wise product for image and filter, for the first channel, second channel, third channel one by one. then add those 27 number together as output
+
+$$Z\left(1,1 \right) = \sum_{k = 1}^3 \sum_{i = 1}^3 \sum_{j=1}^3 a_{i,j}^{\left( k \right) \left( image \right)} a_{i,j}^{\left( k \right) \left( filter \right)}$$
 
 ![](/img/post/cnn/week1pic7.png)
 
@@ -209,16 +214,16 @@ $$    \underbrace{\begin{bmatrix}
     \end{bmatrix}}_{blue}, 
 $$
 
-If want to detect both horizontal and vertical edges, use multiple filters at the same time to convolve the image. Then the first output at the front, and second output at back
+If want to detect both horizontal and vertical edges, <span style="color:red">use multiple filters</span> (first filter to detect horizontal and second filter to detect vertifal). Then the first output at the front, and second output at back
 
 
 ![](/img/post/cnn/week1pic8.png)
 
-Summary:    `n*n*n_c(the number of channel)    *    n*n*n_c    =  (n – f + 1) * (n – f + 1) * n_c’  (n_c’ is the number of filter we used)`, assumed stride one and no padding
+Summary:    `n x n x n_c(the number of channel)    *    f x f x n_c    =  (n – f + 1) x (n – f + 1) x n_c’  (n_c’ is the number of filter we used)`, assumed stride one and no padding
 
 #### Convolutional Network
 
-After convolve using filter, add a real number bias to every number in the output then apply non-linearity (e.g. Relu)
+After convolve using filter, add a real number bias to every number in the output then apply non-linearity (e.g. Relu) (一个filter 一个bias)
 
 ![](/img/post/cnn/week1pic9.png)
 
@@ -243,9 +248,9 @@ $$ n_c^{\left[ l \right]} = \text{number of filters} $$
 
 Input: $$n_c$$ is the number of, use superscript l-1 because that's the activation from previous layer, H and W denotes height and width
 
-$$ n_H^{\left[ l-1 \right]} \times  n_W^{\left[ l-1 \right]} \times  n_c^{\left[ l - 1 \right]}$$  
+$$ \text{Input:  }n_H^{\left[ l-1 \right]} \times  n_W^{\left[ l-1 \right]} \times  n_c^{\left[ l - 1 \right]}$$  
 
-$$ n_H^{\left[ l \right]} \times  n_W^{\left[ l \right]} \times  n_c^{\left[ l  \right]}$$
+$$ \text{Output:  }n_H^{\left[ l \right]} \times  n_W^{\left[ l \right]} \times  n_c^{\left[ l  \right]}$$
 
 $$ \text{where the height and width: } n^{\left[ l \right]}=   \lfloor \frac{n^{\left[ l-1 \right]} + 2p^{\left[ l \right]} -f^{\left[ l \right]}}{s^{\left[ l \right]}} + 1 \rfloor $$  
 
@@ -253,7 +258,7 @@ $$ \text{Each filter is } f^{\left[ l \right]} \times  f^{\left[ l \right]} \tim
 
 $$\text{where }n_c^{\left[ l-1  \right]} \text{ last layer's number of channel}$$ 
 
-$$\text{Activations: } a^{\left[ l \right]} -> n_H^{\left[ l \right]} \times  n_W^{\left[ l \right]} \times  n_c^{\left[ l  \right]} \text{or some write} a^{\left[ l \right]} -> n_c^{\left[ l \right]} \times  n_H^{\left[ l \right]} \times  n_W^{\left[ l  \right]}   $$ 
+$$\text{Activations: } a^{\left[ l \right]} -> n_H^{\left[ l \right]} \times  n_W^{\left[ l \right]} \times  n_c^{\left[ l  \right]} \text{or some write } a^{\left[ l \right]} -> n_c^{\left[ l \right]} \times  n_H^{\left[ l \right]} \times  n_W^{\left[ l  \right]}   $$ 
 
 $$\text{Weights}: f^{\left[ l \right]} \times  f^{\left[ l \right]} \times  n_c^{\left[ l-1  \right]} \times  n_c^{\left[ l  \right]}  $$ 
 
@@ -354,8 +359,8 @@ Two main advantage of using Conv layer instead of fully connected layer
 
 - **parameter sharing**: A feature detector (such as vertical edge detector) that’s useful in one part of the image is probably useful in another part of the image (因为parameter 少了，<span style="color:red">allowed to train a smaller training set and less proned to overfitting)</span>. 
   - e.g. apply 3 by 3 filter on the top-left of the image and apply the same filter on top-right of the image. 
-  - True for low-level features like edges as well as high-level features like detecting the eye that indicates a face or a cat
-- **sparsity of connections** : In each layer, each output value depends only on a small number of inputs.  比如filter 是 3*3， output 第1行1个只取决于 input 的top left 3*3 parameter，不取决于 第一行第四个或者第五个值
+  - True for low-level features(edges and blobs) like edges as well as high-level features(objects) like detecting the eye that indicates a face or a cat
+- **sparsity of connections** : In each layer, each output value depends only on a small number of inputs.  比如filter 是 `3*3`， output 第1行1个只取决于 input 的top left `3*3` parameter，不取决于 第一行第四个或者第五个值
 - Convolution neural network aslo very good at capturing **translation invariance**（即使原来图片发生一点点位移，还是原来feature) e.g 比如一只猫shift couple of pixels to right 仍是猫. And convolutional structure helps that shifted a few pixels should result pretty similar feature. Apply the same filter on the image helps to be more robust to caputre the desirable property of translation invariance
 
 e.g. 
@@ -368,7 +373,7 @@ $$
 $$
 
 - A fully-connected layer: the number of parameters is `3072 x 4074 = 14 million`
-- Convolutional layer: `(5 x 5 + 1 ) x 6  = 156 ` parameters
+- Convolutional layer: `(5 x 5 x 3 + 1 ) x 6  = 456 ` parameters
 
 
 Cost function: Use gradient descent or gradient descent momentum, RMSProp or Adams to optimize parameters to reduce J
