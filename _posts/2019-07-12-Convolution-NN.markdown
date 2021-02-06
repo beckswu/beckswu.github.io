@@ -355,13 +355,13 @@ Notice:
 #### Why Convolutions
 
 
-Two main advantage of using Conv layer instead of fully connected layer
+Two main advantage of using Conv layer instead of fully connected layer(**parameter sharing** & **sparsity of connections** : 因为parameter 少了，<span style="color:red">allowed to train a smaller training set and less proned to overfitting)</span>.
 
-- **parameter sharing**: A feature detector (such as vertical edge detector) that’s useful in one part of the image is probably useful in another part of the image (因为parameter 少了，<span style="color:red">allowed to train a smaller training set and less proned to overfitting)</span>. 
+- <span style="background-color:#FFFF00">**parameter sharing**</span>: A feature detector (such as vertical edge detector) that’s useful in one part of the image is probably useful in another part of the image 
   - e.g. apply 3 by 3 filter on the top-left of the image and apply the same filter on top-right of the image. 
   - True for low-level features(edges and blobs) like edges as well as high-level features(objects) like detecting the eye that indicates a face or a cat
-- **sparsity of connections** : In each layer, each output value depends only on a small number of inputs.  比如filter 是 `3*3`， output 第1行1个只取决于 input 的top left `3*3` parameter，不取决于 第一行第四个或者第五个值
-- Convolution neural network aslo very good at capturing **translation invariance**（即使原来图片发生一点点位移，还是原来feature) e.g 比如一只猫shift couple of pixels to right 仍是猫. And convolutional structure helps that shifted a few pixels should result pretty similar feature. Apply the same filter on the image helps to be more robust to caputre the desirable property of translation invariance
+- <span style="background-color:#FFFF00">**sparsity of connections**</span> : In each layer, each output value depends only on a small number of inputs.  比如filter 是 `3*3`， output 第1行1个只取决于 input 的top left `3*3` parameter，不取决于 第一行第四个或者第五个值
+- Convolution neural network aslo very good at capturing <span style="background-color:#FFFF00">**translation invariance**</span>（即使原来图片发生一点点位移，还是原来feature) e.g 比如一只猫shift couple of pixels to right 仍是猫. And convolutional structure helps that shifted a few pixels should result pretty similar feature. Apply the same filter on the image helps to be more robust to caputre the desirable property of translation invariance
 
 e.g. 
 
