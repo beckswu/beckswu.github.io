@@ -1176,6 +1176,7 @@ Instead of having 1D listor 2D matrix of numbers, now have 3 D block, a three di
 
 what filters do is rally to detect across your 3D data
 
+e.g. Movie data where the different slices could be different slices in time through a movie. could use this to detect motion or people taking actions in movies
 
 
 <br/><br/><br/>
