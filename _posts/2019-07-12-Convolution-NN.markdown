@@ -1086,6 +1086,12 @@ $$ \text{G:generated image; C: content image; S: style image} $$
 
 ![](/img/post/cnn/week4pic7.png)
 
+**Overall Cost Function**: use gradient descent or sophisticated optimization algorithm in order to try ot find an image G that minimize the cost function $$J\left( G \right) $$
+
+$$J\left(G\right) = \alpha J_{content} \left( C,G\right) + \Beta J_{style} \left( S,G\right)$$
+
+
+
 #### Content Cost Function
 
 
@@ -1100,8 +1106,81 @@ $$ \text{G:generated image; C: content image; S: style image} $$
 
 $$J_{content}\left(G \right) = \frac{1}{2} \| a^{\left[ l \right]\left(  \right)} - a^{\left[ l \right]\left( G \right)} \|^2$$
 
+#### Style Cost Function
 
-## 8 Paper for Reference
+Say you are using layer l's activation to measure "style". Define style as correlation between activations across channels
+
+the correlation tells you which of these high level texture components tend to occur or not occur together in part of an image. And degree of correlation gives measuring how often in generated image these different high level features come together or not such as 第一个 channel activation 识别 vertical texture 与 第二个channel activation 识别  orange tint  correlate
+
+
+**Style Matrix**
+
+Let $$a_{i,j,k}^{\left[ l \right]} = $$ activation at (i,j,k), i is height, j is width, and k is channel. $$G^{\left[ l \right]}$$ is $$n_c^{\left[ l \right} \times n_c^{\left[ l \right}$$ dimension matrix. You can $$n_c$$ channel so $$G^{\left[ l \right]}$$ measure how correlated each pair of them is. $$G_{k, k'}^{\left[ l \right]}$$ meaures how correlated activations in channel k compared to the activations in channel k'. k is range $$\left[1, n_c \right]$$
+
+For style image
+
+$$G_{k, k'}^{\left[ l \right] \left( S \right) } = \sum_{i=1}^{n_H^{ \left[ l \right] }}\sum_{j=1}^{n_W^{ \left[ l \right]  }}a_{i,j,k}^{\left[ l \right] \left( S \right)} a_{i,j,k'}^{\left[ l \right] \left( S \right)} $$
+
+For generated image
+
+$$G_{k, k'}^{\left[ l \right] \left( G \right) } = \sum_{i=1}^{n_H^{ \left[ l \right] }}\sum_{j=1}^{n_W^{ \left[ l \right]  }}a_{i,j,k}^{\left[ l \right] \left( G \right)} a_{i,j,k'}^{\left[ l \right] \left( G \right)} $$
+
+In linear algebra,  style matrix also called **gram matrix**
+
+
+If $$a_{i,j,k}^{\left[ l \right]} a_{i,j,k'}^{\left[ l \right]} $$ correlate, $$G_{k, k'}^{\left[ l \right]} $$ will be larger. If $$a_{i,j,k}^{\left[ l \right]} a_{i,j,k'}^{\left[ l \right]} $$ uncorrelate, $$G_{k, k'}^{\left[ l \right]} $$ will be small.
+
+
+$$J_{style}^{\left[ l \right]} \left( S,G \right)  = \frac{1}{ \left( 2 n_H^{ \left[ l \right] } n_w^{ \left[ l \right] } n_c^{ \left[ l \right] } \right)^2} \| G^{\left[ l \right] \left( S \right)} - G^{\left[ l \right] \left( G \right)} \|_F^2 \text{ Frobenius norm}  $$
+
+$$J_{style}^{\left[ l \right]} \left( S,G \right)  =  \frac{1}{ \left( 2 n_H^{ \left[ l \right] } n_w^{ \left[ l \right] } n_c^{ \left[ l \right] } \right)^2} \sum_{k=1}^{n_c }\sum_{k'=1}^{ n_c } \left( G_{k, k'}^{\left[ l \right] \left( S \right) } - G_{k, k'}^{\left[ l \right] \left( G \right) }   \right)^2 \text{ Frobenius norm}  $$
+
+This is just the sum of squares of element wise differences between two matrices 
+
+**Overall Style Cost Function**
+
+$$J_{style} \left( S,G \right)  = \sum_{l} \lambda^{\left[ l \right]}J_{style}^{\left[ l \right]} \left( S,G \right) $$
+
+
+$$\lambda$$ are a set of hyperparameters. It allows you to use different layers in neural network, in lower layer simple low level features (early one) whereas in latter layer measure high level features and cause neural network to take both low level and high level features to take into account when computing style 
+
+
+
+<br/><br/><br/>
+
+## 1D and 3D Generalizations
+
+#### 1D
+
+1D time series data. Take the 1D filter and similarly apply that in lots of different positions throughout 1D data
+
+![](/img/post/cnn/week4pic8.gif)
+
+e.g. 
+
+$$
+\require{AMScd}
+\begin{CD}
+    \text{14 dimension 1D} @>{\text{1 D 16 filters size of 5}}>> 10 \times {16} \text{dimension}
+\end{CD}
+$$
+
+
+#### 3D
+
+Instead of having 1D listor 2D matrix of numbers, now have 3 D block, a three dimensional input volume of numbers
+
+3D 要考虑 height, width and depth(height, width, and depth can be dfiffeent), <span style="background-color:#FFFF00">filter also need to be 3 D (height, width, depth)</span>
+
+![](/img/post/cnn/week4pic9.png)
+
+what filters do is rally to detect across your 3D data
+
+
+
+<br/><br/><br/>
+
+## 9 Paper for Reference
 
 - [Visualizing and Understanding Convolutional Networks
 Matthew D Zeiler, Rob Fergus](https://arxiv.org/abs/1311.2901): What are deep ConvNets Learning
