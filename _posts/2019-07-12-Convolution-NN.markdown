@@ -380,6 +380,58 @@ Cost function: Use gradient descent or gradient descent momentum, RMSProp or Ada
 
 $$J = \frac{1}{m} \sum_{i=1}^m L\left(\hat y^{\left(i \right)},  y^{\left(i \right)}\right),\text{where }, \hat y \text{ is the predicted label and y is true label} $$
 
+#### Backprop
+
+use `l` denote layer, `f` denote filter size and assume stride = 0 and only 1 filter(So, if input is `9x9x3` and filter is `3x3x3` output will be `7x7`), `A` denote the activation, $$n_c$$ denotes the number of channel. `H,W` denotes heights and width
+
+$$Z_{m,n}^{l} = \left( \sum_{i=0}^{k}\sum_{j=0}^k  \sum_{k=0}^{n_c} w_{i,j,k}^{l} A_{i+m, j+n,k}^{l-1} \right) + b \\
+$$
+
+So 
+
+$$
+\begin{align}
+\frac{\partial L}{\partial W_{i,j,k}^l} &= \sum_{m=0}^{H} \sum_{n=0}^{W} \frac{\partial L}{\partial Z_{m,n}^l}\frac{\partial Z_{m,n}^l }{\partial W_{i,j,k}^l} \\
+
+&= \sum_{m=0}^{H} \sum_{n=0}^{W} \frac{\partial L}{\partial Z_{m,n}^l}  A_{i+m,j+n,k}^{l-1}
+\end{align}
+$$
+
+In vectorized expression
+
+
+$$dw \left[:,:,: \right] += A^{l-1}\left[m:m+f, n:n+f,: \right] * dz\left[m, n\right]$$
+
+
+Point `Z[m,n]` convolve from $$A^{l-1}\left[m:m+f, n:n+f,: \right]$$ and the whole filter
+
+$$
+\begin{align}
+\frac{\partial L}{\partial b^l} &= \sum_{m=0}^{H} \sum_{n=0}^{W} \frac{\partial L}{\partial Z_{m,n}^l}\frac{\partial Z_{m,n}^l }{\partial b^l} \\
+
+&= \sum_{m=0}^{H} \sum_{n=0}^{W} \frac{\partial L}{\partial Z_{m,n}^l}
+\end{align}
+$$
+
+In vectorized expression, db size is `1 x 1` 
+
+
+$$db \left[:,: \right] +=  dz\left[m, n\right]$$
+
+
+$$
+\begin{align}
+\frac{\partial L}{\partial A_{i,j,k}^{l-1}} &= \sum_{m=0}^{H} \sum_{n=0}^{W} \frac{\partial L}{\partial Z_{m,n}^l}\frac{\partial Z_{m,n}^l }{\partial A_{i,j,k}^{l-1}} \\
+
+&= \sum_{m=0}^{H} \sum_{n=0}^{W} \frac{\partial L}{\partial Z_{m,n}^l}  W_{i-m,j-n,k}^{l}
+\end{align}
+$$
+
+$$dA_prev \left[m:m+f, n:n+f,:  \right] += W * dz\left[m, n\right]$$
+
+
+In vectorized expression
+
 <br/><br/><br/>
 
 ## 2. Classic Networks
