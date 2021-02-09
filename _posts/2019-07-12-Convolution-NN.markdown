@@ -467,8 +467,8 @@ Alexnet has a **lot of similarity to Lenet but it was much bigger**. Lenet has a
 ![](/img/post/cnn/week2pic2.png)
 
 - Compared to LeNet, the fact that they could take similar building block, but a lot more hidden units and training on a lot of more data to  allow it to have a remarkable performance
-- Another aspects make it much better than letnet is <span style="color:red">using Relu activation function </span>
-- had a complicated way of training on two GPUs. A lot of ConV and pooling layer split across two different GPUs and  a thoughtful way for when two GPUs communicate with each others.
+- Another aspects make it much better than LeNet is <span style="color:red">using Relu activation function </span>
+- had a complicated way of <span style="background-color:#FFFF00">training on two GPUs</span>. A lot of ConV and pooling layer split across two different GPUs and  a thoughtful way for when two GPUs communicate with each others.
 - **Local Response Normalization**(not use too much): 方法: 一个block 是 `13*13*256`，比如把第一维是5， 第二维是6的上所有的256 的数，normalize 这256个数据
   - Motivation: maybe you don’t want for each position in 13 by 13 image，you don’t want too many neurons with a very high activation. But subsequently, some researcher 发现local response normalization less important(Andrew Ng doesn't use it)
 
@@ -508,7 +508,7 @@ $$
 \end{CD}
 $$
 
-if use optimization algorithm such as gradient descent to train a plain neural network, without extra shortcuts or skip connections, training error like below graph. <span style="color:red">But in reality your training error get worse if you pick a network that’s too deep</span>. 
+if use optimization algorithm such as gradient descent to train a plain neural network, without extra shortcuts or skip connections, training error like below graph. <span style="color:red">But in reality your training error get worse(train error first decrease then increase) if you pick a network that’s too deep</span>. 
 
 <span style="background-color:#FFFF00">For ResNet is that even as the number of layers gets deeper, having the performance of training error keeping going down, even train over a hundred of layers. It **helps with the vanishing and exploding problems**. It allows  train much deeper neural networks without appreciable loss in performance </span>
 
@@ -552,7 +552,7 @@ But if they don't have the same dimension, add $$W_s$$, e.g. $$z^{\left[l + 2 \r
 $$a^{\left[l + 2 \right]} = g\left(  z^{\left[l + 2 \right]} + W_Sa^{\left[l \right]} \right)$$
 
 
- It shows the <span style="background-color:#FFFF00">because of skip connection, it's so easy for residual networks to learn identity function, guarantee adding residual blocks doesn't hurt neural network performance and gradient descent can improve the solution
+ It shows the <span style="background-color:#FFFF00">because of skip connection, it's so easy for residual networks to learn **identity function**, guarantee adding residual blocks doesn't hurt neural network performance and gradient descent can improve the solution
  </span>, it's easy to get $$a^{\left[l + 2\right]} $$ equal to $$a^{\left[l \right]} $$. Hidden units if actually learn something useful then can do even better than learning the identity function
 
  In plain network without Residual Network, <span style="color:red">when you make the network deeper and deeper, it is very difficult for it to choose parameters that learn even the identity function, which a lot of layer end-up  worse</span>.
@@ -562,8 +562,8 @@ $$a^{\left[l + 2 \right]} = g\left(  z^{\left[l + 2 \right]} + W_Sa^{\left[l \ri
 
  ![](/img/post/cnn/week2pic6.png)
 
- - lots 3 by 3 convolutions. And most of them are 3 by 3 same convolution instead of fully-connected layer . That's why $$z^{\left[l + 2 \right]} + a^{\left[l \right]} $$ make senses
- - After pooling layer, need to adjust dimension, liked discussed above by $$W_S $$
+ - lots 3 by 3 convolutions. And most of them are 3 by 3(filter size) <span style="background-color:#FFFF00">**same convolution**</span> instead of fully-connected layer . That's why $$z^{\left[l + 2 \right]} + a^{\left[l \right]} $$ make senses
+ - <span style="color:red">After pooling layer, need to adjust dimension</span>, liked discussed above by $$W_S $$
  - In the end, have a fully connected layer that makes a prediction using a softmax
 
 <br/><br/><br/>
@@ -581,8 +581,8 @@ One way to think of 1 by 1 convolution is bsically having a fully connected neur
 
 #### Use of 1x1 Convolution
 
--	Shrink the number of  channel（save computation）: usually  pooling is used to shrink height and weight.  而1*1 convolution 是 比如input 是`28*28*192`，`1*1` dimension convolution 是 `1*1*192`  32 filters，output is `28*28*32` <span style="background-color:#FFFF00">which allow shrink $$n_c$$ as well whereas Pooling layer only shrink $$n_H$$ and $$n_W$$</span>
-- If want to keep the number of Channel, <span style="background-color:#FFFF00">1 by 1 convolution add linearity to allow to learn more complex function of your network by adding another layer that inputs </span>, 接着上面例子, filter size is `1x1x192` and have 192 filters, output will be `28*28*192`
+-	Shrink the number of  channel（save computation）: usually <span style="background-color:#FFFF00"> pooling is used to shrink height and weight</span>.  而1*1 convolution 是 比如input 是`28*28*192`，`1*1` dimension convolution 是 `1*1*192`  32 filters，output is `28*28*32` <span style="background-color:#FFFF00">which allow shrink $$n_c$$ as well whereas Pooling layer only shrink $$n_H$$ and $$n_W$$</span>
+- If want to keep the number of Channel, <span style="background-color:#FFFF00">1 by 1 convolution add linearity to allow to learn more complex function of your network by adding this layer </span>, 接着上面例子, filter size is `1x1x192` and have 192 filters, output will be `28*28*192` ( `28*28*192 -> 28*28*192`)
 
 <br/><br/><br/>
 
@@ -617,9 +617,9 @@ Use 1 by 1 convolution, can see output dimension is the same. First shrink to mu
 
 
 1. Apply 64 filters of 1 by 1 convolution, get `28 x 28 x 64` output
-2. Apply 96 filters of 1 by 1 convolution, then apply 128 `5 x 5` filters to get `28 x 28 x 128` output
-3. Apply 96 filters of 1 by 1 convolution, 
-4. For above example pooling,<span style="color:red">in order to concatenate all of outputs at the end, use the same type of padding for pooling.</span>. the output will be `28 x 28 x 192`. Then apply one more 1 by 1 convolutional layer to shrink the number of channel to `28 x 28 x 32`
+2. Apply 96 filters of 1 by 1 convolution, then apply 128 `3 x 3` filters to get `28 x 28 x 128` output
+3. Apply 16 filters of 1 by 1 convolution, then apply 32 `5 x 5` filters to get `28 x 28 x 32` output 
+4. For above example pooling,<span style="color:red">in order to concatenate all of outputs at the end, use the same type of padding for pooling.</span> The output will be `28 x 28 x 192`. Then apply one more 1 by 1 convolutional layer to shrink the number of channel to `28 x 28 x 32`
 5.  In the end, channel concatenation
 
  ![](/img/post/cnn/week2pic11.png)
@@ -642,7 +642,7 @@ Sometimes, training takes several weeks and might take many GPU. Can download op
 
 **When don't have enough training data**:
 
-download Github open-source implementation and weight, <span style="color:red">then get rid of softmax layer and create your own softmax unit. Take early stage layers and parameters as frozon. And train the parameters associated with your softmax layer</span>. Then might get good performance even with a small dataset
+download Github open-source implementation and weight, <span style="color:red">then get rid of softmax layer and create your own softmax unit. Take early stage layers and parameters as frozon. And train the parameters associated with your softmax layer</span>. Then might get good performance even with a small dataset(只train softmax layer)
 
 Some deep learning framework can let you specify whether to train parameter or freeze parameters.
 
@@ -654,10 +654,11 @@ Some deep learning framework can let you specify whether to train parameter or f
 - freeze a fewer layer, then train latter layers and create the your own output unit.
 -  Or delete these latter layers and just use your own new hidden units and your own softmax output. 
 -  Or train some other size neural networks(different size of hidden layers)  that comprise last layer of your own softmax output
+-  If have lots of data, take whole things as initialization(to replace random initialization) and train the whole network and update all the weights of all the layers of the network by gradient descent
 
 <span style="background-color:#FFFF00">When having more data, the number of layers freeze could be smaller and the number of layers trained could be greater.</span>
 
-If have lots of data, take whole things as initialization(to replace random initialization) and train the whole network and update all the weights of all the layers of the network by gradient descent
+
 
  ![](/img/post/cnn/week2pic13.png)
 
@@ -684,7 +685,7 @@ What PCA do: 比如 image mainly has red and blue tints, and very little green. 
 if you have large training set:
 
 - have a CPU thread that is <span style="color:red">constantly loading images</span> of your hard disk, then <span style="color:red">implement distortion</span> (random cropping, color shifting, or mirroring) to form a batch or mini-batches of data
-- Then batch / mini-batches are constantly are constantly <span style="color:red">passed to</span>  some other thread or process for <span style="color:red">training</span>(CPU or increasingly GPU if have a large neural network to train)
+- Then batch / mini-batches are constantly  <span style="color:red">passed to</span>  some other thread or process for <span style="color:red">training</span>(CPU or increasingly GPU if have a large neural network to train)
 - Above two thread can run in parallel
 
 Data augmentation 有时候还可以 有hyperparameter 去tune，比如 how much color shifting do you implement and exactly what parameters you use for random cropping.(If you think someone else doesn't not captured more in variances in their implementation, it might be reasonable to use hyperparameters yourself)
@@ -698,8 +699,8 @@ Image recognition 是给图片告诉是猫还是狗，object detection 是给你
 
 ![](/img/post/cnn/week2pic16.png)
 
-- When have lots of data, Can have a giant neural networks, use simple algorithms as well as less hand-engineering. Less needing to carefully desgin features for the problem to learn whatever to learn if having lots of data
-- When don't have too much data, more hand-engineering. Hand-engineering is the best way to get good performance when has less data.
+- When <span style="color:red">have lots of data, Can have a giant neural networks</span>, use simple algorithms as well as less hand-engineering. Less needing to carefully desgin features for the problem to learn whatever to learn if having lots of data
+- When<span style="color:red"> don't have too much data, more hand-engineering</span>. Hand-engineering is the best way to get good performance when has less data.
 
 Two sources of knowledge:
 
@@ -709,16 +710,16 @@ Two sources of knowledge:
 
 Computer Vision is trying to learn really a complex function. We don't have enough data for computer vision. Even datasets are getting bigger and bigger, often we don't have as much data as we need. That's why computer vision relied more on hand-engineering.  That's way computer vision has developed complex architectures becaue of the absence of more data. 即使最近data increase dramatically, results in a significant reduction in amount f hand-engineering. 但是still lots of hand-engineering of network architectures in computer vision compared to other disciplines.
 
-When don't have enough data, hand-engineering is very diffcult, skillful task taht requires a lot of insight. If have lots of data, wouldn't spend time hand-engineering, would spend time to build up the learning system. 
+When don't have enough data, hand-engineering is very diffcult, skillful task that requires a lot of insight. If have lots of data, wouldn't spend time hand-engineering, would spend time to build up the learning system. 
 
 
 **Tips for doing well on benchmarks**:
 	
-- **Ensembling**: Run several neural network independently(3-15 network) and average their output (average $$\hat y$$, not average weight which won’t work) 因为速度会降很多倍，所以用它来win in competition not use in actual production to serve customer 同时ensembling 因为是run 了很多network，会用掉很多memory to keep all these network around (Computational expensive)
+- **Ensembling**: Train and Run several neural network independently(3-15 network) and average their output (average $$\hat y$$, not average weight which won’t work) 因为速度会降很多倍，所以用它来win in competition not use in actual production to serve customer 同时ensembling 因为是run 了很多network，会用掉很多memory to keep all these network around (Computational expensive)
 - **Multi-crop at test time**: Run classifier on multiple versions of test image and average results. Multi-crop is applying data agumentation to your test image. It might get a little bit better performance in a production system.
   - 一张图片随机选取其中好几个部分作为test sample，每一个sample运行network through classifier，average results
 
-Andrew Ng: 以上方法是research 中提到的，不建议用in production or a system that deploy in an actual application
+Andrew Ng: 以上方法是research 中提到的，<span style="color:red">不建议用in production or a system that deploy in an actual application</span>
 
 建议： 
 
@@ -774,7 +775,7 @@ $$
 **Loss Function**
 
 $$
-y = \left\{
+L\left(\hat y, y \ri  = \left\{
 \begin{array}{ll}
 \left( \hat y_1 - y_1 \right)^2 + \left( \hat y_2 - y_2 \right)^2 + \cdots + \left( \hat y_8 - y_8 \right)^2 & \text{for y = 1} \\ 
 \left( \hat y_1 - y_1 \right)^2 & \text{for y = 0}\\ 
@@ -782,7 +783,7 @@ y = \left\{
 \right.
 $$
 
-<span style="background-color:#FFFF00">Squared error for all outputs is simplified description. In practice, use loglikelihood loss for $$c_1, c_2, c_3$$ (the softmax output); squared error for bounding box cordinates  ($$b_x, b_y, b_h, b_w$$)  ;$$p_c$$ could use logistic regression loss</span>.  Although use squared error, it works ok.
+<span style="background-color:#FFFF00">Squared error for all outputs is simplified description. In practice, use **loglikelihood loss** for $$c_1, c_2, c_3$$ (the softmax output); **squared error** for bounding box cordinates  ($$b_x, b_y, b_h, b_w$$)  ;$$p_c$$ could use logistic regression loss</span>.  Although use squared error, it works ok.
 
 
 **Landmark**
@@ -808,6 +809,7 @@ $$
 2. <span style="color:red">Take a slightly larger</span> region and slide the new window with some stride throughout entire image until get to the end, pass those windows into ConvNet and make prediction
 3. Take a <span style="color:red">even larger window</span> throughout entire image into ConvNet to make prediction
 
+下图省去了一些中间步骤
 
 ![](/img/post/cnn/week3pic5.gif)
 
@@ -817,13 +819,13 @@ $$
 As long as there's car in the image, there will be a window to detect the car. 
 
 **Disadvantage**: computationtal cost: 因为slide window 太多次to run each of them indepdently through ConvNet，所以花很多时间slide window， 
-  - 但是假如说用一个bigger stride，可能图片没有被captured， hurt performance。
-  - 但如果用小的stride, A huge number of all these regions pass through ConvNet means there is a very high computational cost，also cannot localize objects
+  - <span style="background-color:#FFFF00">但是假如说用一个bigger stride，可能图片没有被captured， hurt performance</span>
+  - <span style="background-color:#FFFF00">但如果用小的stride, A huge number of all these regions pass through ConvNet means there is a very high computational cost，also cannot localize objects</span>
   - Before, object detection run sliding windows with a simple linear classification is ok. But now, use ConvNet is computational expensive
 
 **Convolutional Implementation of Sliding windows**: 
 
-Truning Fully-connected layer into convolutional layers:
+Turning Fully-connected layer into convolutional layers:
 
 1.  `5 x 5 x 16` fully-connected `400 x 1`. Now use 400 filters size with ``5 x 5 x 16` convolve it to `1 x 1 x 400`(volume). Mathematically, same as fully connected layer, each number in `1 x 1 x 400` is some linear function of these `5 x 5 x 16` activations from previous layer. 
 2. Then implement 1 by 1 convolution with 400 filters size of `1 x 1 x 400`
@@ -834,10 +836,10 @@ Truning Fully-connected layer into convolutional layers:
 
 e.g. trainset is `14 x 14 x 3` and test set image is `16 x 16 x 3` image and stride = 2, then slide right two pixel into ConvNet, then move down to ConvNet, finally run right bottom corner window into ConvNet; -> these 4 ConvNets is highly duplicative. So Convolutional implementation of sliding windows is to allow share a lot of computation for those windows
 
-<span style="background-color:#FFFF00">Instead of run four propagation on four subsets of input image independently, it **combines all four into one form of computation** and shares a lot of the computation in the regions of the image that are common </span>
+<span style="background-color:#FFFF00">Instead of run four propagation on four subsets of input image independently, it **combines all four into one form of computation** and **shares a lot of the computation** in the regions of the image that are common </span>
 -  the upper-left`2 x 2 x 4` gives the result of upper-left corner `14 x 14 x 3`, the upper-right `2 x 2 x 4` gives the result of upper-right corner `14 x 14 x 3`,  the upper-left`2 x 2 x 4` gives the result of lower-left corner `14 x 14 x 3`, the upper-right `2 x 2 x 4` gives the result of lower-right corner `14 x 14 x 3`
 -  because of max pooling 2 correspond to run your neural network with a stride of two
--  <span style="background-color:#FFFF00">**weakness**</span>: the position of the bounding boxes is not to be accurate
+-  <span style="background-color:#FFFF00">**weakness**</span>:<span style="color:red"> the position of the bounding boxes is not to be accurate</span>
 
 $$
 \require{AMScd}
@@ -860,7 +862,7 @@ maybe none of boxes really match up perfectly with the position of the car and m
 
 YOLO: you only look at once. 
 
-- split image into grid (e.g. `19 x 19` grid). If a grid contain object, <span style="background-color:#FFFF00">assigns the object to the grid cell containing the midpoint</span>. 如果一个grid cell 有了车的一小部分，但是假如这个grid cell 没有车的mid point，we assume it does not contain the car 
+- split image into grid (e.g. `19 x 19` grid). If a grid contain object, <span style="background-color:#FFFF00">assigns the object to the grid cell containing the **midpoint**</span>. 如果一个grid cell 有了车的一小部分，但是假如这个grid cell 没有车的mid point，we assume it does not contain the car 
   - By using `19 x 19` grid cell, the chance of an object of two midpoints of objects appearing in the same grid cell is just a bit smaller
 - run through each grid through ConvNet. <span style="color:red">It's one single convolutional implementation, not run it grid x grid size times</span> -> efficient algorithm. This works for real time object detection.
 - For each grid, output $$y = \begin{bmatrix}P_c \\
@@ -879,7 +881,7 @@ YOLO: you only look at once.
 
 ![](/img/post/cnn/week3pic10.png)
 
-For each grid, use top-left as `(0,0)` and bottom-right as `(1,1)`, height and width set as fraction of overall height and width of grid cell, <span style="background-color:#FFFF00">`(bx, by)` (midpoint) has to be less than 1. `(bh, b_w)` could be larger than 1, because bounding box could be large than grid cell</span>
+ <span style="background-color:#FFFF00">For each grid, use top-left as `(0,0)` and bottom-right as `(1,1)`, height and width set as fraction of overall height and width of grid cell,`(bx, by)` (midpoint) has to be less than 1. `(bh, b_w)` could be larger than 1, because bounding box could be large than grid cell</span>
 
 ![](/img/post/cnn/week3pic11.png)
 
@@ -906,7 +908,7 @@ Note: below picture "For each grid **cell**" instead of "For each grid call".
 
 **Intersection Over Union**(IOU) computes the intersection over union of two bounding boxes(predicted and true labelled). 
 - Union是 area ideal 的bounding box 和预测的bounding box 全部的面积。Intersection 是 两个图片重合的部分
--  IoU= (size of intersection)/(size of union)
+-  <span style="background-color:#FFFF00">IoU= (size of intersection)/(size of union)</span>
 -  <span style="color:red">judge output is correct if loU >= 0.5.</span>.0,5 is convention. if more stringent, the threshold can be like 0.6/ The higher of the IoU, the more accurate the predicted bounding box. Rare to pick threshold below 0.5
 -  if the predicted and the ground-truth bounding boxes overlapped perfectly, IoU = 1.
 
@@ -924,11 +926,11 @@ some grid may think it can midpoint from the algorithm. End up with multiple det
 **Non-max Suppression**:  Non-max means you are gonna output the maximal probabilities classification but suppress the close-by ones that are non-maximal
 
 
-1. Discard all boxes with $$P_c \leq 0.6$$
-2. look at the probability for each detection. Pick the one with the highest $$P_c$$(probability of detection) and highlight this bounding box as prediction
+1. <span style="color:red">Discard all boxes with $$P_c \leq 0.6$$</span>
+2. look at the probability for each detection. Pick the one with the highest $$P_c$$(probability of detection) and <span style="background-color:#FFFF00">highlight this bounding box as prediction</span>
 3. Look at all remaining bounding box who <span style="color:red">has a high overlap</span>(high IoU with the one which is highlighted, $$IoU \geq 0.5 $$) with the one (highest $$P_c$$) will get <span style="color:red">suppress/discarded</span>
 4. Then the highlight one is final prediction
-5. Carry out non-max suppresion 3 (categories size) times, one on each of pedestrian, car, and motorcycles
+5. <span style="background-color:#FFFF00">Carry out non-max suppresion 3 (categories size) times, one on each of pedestrian, car, and motorcycles</span>
 
 ![](/img/post/cnn/week3pic14.png)
 
@@ -940,9 +942,9 @@ some grid may think it can midpoint from the algorithm. End up with multiple det
 e.g. the midpoint of a car and pedestrian fell in the same grid cell
 
 - predefine two different shapes called anchor boxes, then associate two predictions with two anchor boxes
-  - in practice may use more anchor boxes, e.g. 5
+  - in practice may use more anchor boxes, e.g. 5 anchor boxes
 - use anchor box1 to encode that object and bounding box is pedestrian, use anchor box2 to encode that object and bounding box is car
-- With two anchor boxes: each object in training image is assigned to grid cell that contains object’s midpoint and anchor box for the grid cell with <span style="color:red">highest IoU.</span> 
+- With two anchor boxes: each object in training image is <span style="background-color:#FFFF00">assigned to grid cell that contains object’s midpoint and anchor box for the grid cell with **highest IoU**.</span>
   - Anchor boxes compared to ground true bounding box with highest IoU 
 - object in the training set is labeled as (grid cell, pairs of anchor boxes)
   - output y is `3 x 3 x 16`, can viewed it as `3 x 3 x 2 x 8` two anchor boxes
@@ -951,7 +953,7 @@ e.g. the midpoint of a car and pedestrian fell in the same grid cell
   - **Doesn't handle well if two objects have the same anchor box shape in the same grid cell**
   - It happens quite rarely if two objects appear in the same grid cell, especially `19 x 19` grid cell
 - Since it is rare two objects in the same grid cell, anchor boxes gives learning algorithm to better specialize. e.g. tall and skinny object like pedestrian, wide and fat object like cars
-- How to choose anchor boxes: choose 5  10 shapes that spans a variety of shapes to cover the types of objects seem to detect 
+- How to choose anchor boxes: choose 5 or 10 shapes that spans a variety of shapes to cover the types of objects seem to detect 
   - Advance version: use K-means algorithm, to group together two types of objects shapes you tend to get, then use that to select a set of anchor boxes that most stereotypciclly representative of multiple objects you're trying to detect
 
 $$y = \begin{bmatrix} \text{anchor Box1} \begin{cases} P_c \\
@@ -1240,6 +1242,16 @@ e.g. Movie data where the different slices could be different slices in time thr
 
 ## 9 Paper for Reference
 
+- [Gradient-Based Learning Applied to Document Recognition, Yann LeCun, 1998](https://ieeexplore.ieee.org/abstract/document/726791): LeNet5
+- [ImageNet Classification with Deep Convolutional Neural Networks
+, Alex Krizhevsky, 2012](http://www.cs.toronto.edu/~kriz/imagenet_classification_with_deep_convolutional.pdf): AlexNet
+- [Very Deep Convolutional Networks for Large-Scale Image Recognition
+, Karen Simonyan, Andrew Zisserman, 2016](https://arxiv.org/abs/1409.1556): VGG - 16
+- [Deep Residual Learning for Image Recognition, Kaiming He, Xiangyu Zhang, Shaoqing Ren, Jian Sun, 2015](https://arxiv.org/abs/1512.03385): ResNet
+- [Network In Network, Min Lin, Qiang Chen, Shuicheng Yan, 2013](https://arxiv.org/abs/1312.4400): 1 x 1 Convolutions
+- [Going Deeper with Convolutions, 2014](https://arxiv.org/abs/1409.4842) Inception Network
+- [You Only Look Once: Unified, Real-Time Object Detection, Redmon 2015](https://arxiv.org/abs/1506.02640): YOLO Algorithm
+- [Rich feature hierarchies for accurate object detection and semantic segmentation, Girshik, 2014](https://arxiv.org/abs/1311.2524): Regional Proposals
 - [Visualizing and Understanding Convolutional Networks
 Matthew D Zeiler, Rob Fergus](https://arxiv.org/abs/1311.2901): What are deep ConvNets Learning
 - [A Neural Algorithm of Artistic Style](https://arxiv.org/abs/1508.06576): Neural Style Transfer Cost Function 
