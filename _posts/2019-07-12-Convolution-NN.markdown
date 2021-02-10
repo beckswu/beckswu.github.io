@@ -775,7 +775,7 @@ $$
 **Loss Function**
 
 $$
-L\left(\hat y, y \ri  = \left\{
+L\left(\hat y, y \right)  = \left\{
 \begin{array}{ll}
 \left( \hat y_1 - y_1 \right)^2 + \left( \hat y_2 - y_2 \right)^2 + \cdots + \left( \hat y_8 - y_8 \right)^2 & \text{for y = 1} \\ 
 \left( \hat y_1 - y_1 \right)^2 & \text{for y = 0}\\ 
@@ -877,7 +877,7 @@ YOLO: you only look at once.
     \end{bmatrix}$$
   - if grid size is `3 x 3`,  output volume is `3 x 3 x 8` 
 - <span style="color:red">Advantages: neural network otuput precise bounding boxes for each grid; Convolutional implementation, run fast</span>
-- <span style="color:red">if don't have more than objects in grid cell, this algorithm works ok</span>
+- <span style="color:red">if don't have more than one object in grid cell, this algorithm works ok</span>
 
 ![](/img/post/cnn/week3pic10.png)
 
@@ -887,7 +887,7 @@ YOLO: you only look at once.
 
 
 
-**YOLO Algorithm**: put everything together
+<span style="background-color:#FFFF00">**YOLO Algorithm**: put everything together</span>
 
 - 对于anchor，真实y 给IoU 最大的anchor box 赋值，其他的anchor box 的pc 赋值为0, 比如下图car more similar to anchor 2 given IoU
 - y size is `3 x 3 x 16`, for each of nine grid positions, come up with a vector 16 dimensions
@@ -928,9 +928,13 @@ some grid may think it can midpoint from the algorithm. End up with multiple det
 
 1. <span style="color:red">Discard all boxes with $$P_c \leq 0.6$$</span>
 2. look at the probability for each detection. Pick the one with the highest $$P_c$$(probability of detection) and <span style="background-color:#FFFF00">highlight this bounding box as prediction</span>
-3. Look at all remaining bounding box who <span style="color:red">has a high overlap</span>(high IoU with the one which is highlighted, $$IoU \geq 0.5 $$) with the one (highest $$P_c$$) will get <span style="color:red">suppress/discarded</span>
-4. Then the highlight one is final prediction
-5. <span style="background-color:#FFFF00">Carry out non-max suppresion 3 (categories size) times, one on each of pedestrian, car, and motorcycles</span>
+     <ol type="I">
+
+     <li> Look at all remaining bounding box who <span style="color:red">has a high overlap</span>(high IoU with the one which is highlighted, IoU ≥ 0.5) with the one (highest P_c ) will get <span style="color:red">suppress/discarded</span> </li>
+     <li> Then the highlight one is final prediction </li>
+     <li>Repeat the process and select the highest probability which are not suppressed yet</li>
+    </ol>
+3. <span style="background-color:#FFFF00">Carry out non-max suppresion 3 (categories size) times, one on each of pedestrian, car, and motorcycles</span>
 
 ![](/img/post/cnn/week3pic14.png)
 
@@ -949,8 +953,9 @@ e.g. the midpoint of a car and pedestrian fell in the same grid cell
 - object in the training set is labeled as (grid cell, pairs of anchor boxes)
   - output y is `3 x 3 x 16`, can viewed it as `3 x 3 x 2 x 8` two anchor boxes
 - If have more objects, the dimension of Y would be even higher
-- <span style="background-color:#FFFF00">**Disadvantages**</span>:      - <span style="background-color:#FFFF00">Doesn't handle well if the category of objects in the same grid cell bigger than anchor boxes. </span>
-  - **Doesn't handle well if two objects have the same anchor box shape in the same grid cell**
+- <span style="background-color:#FFFF00">**Disadvantages**</span>:  
+  - <span style="background-color:#FFFF00">Doesn't handle well if the category of objects in the same grid cell bigger than anchor boxes. </span>(e.g. 3 categories, 2 anchor boxes in a grid cell)
+  -  <span style="background-color:#FFFF00">**Doesn't handle well if two objects have the same anchor box shape in the same grid cell**</span>
   - It happens quite rarely if two objects appear in the same grid cell, especially `19 x 19` grid cell
 - Since it is rare two objects in the same grid cell, anchor boxes gives learning algorithm to better specialize. e.g. tall and skinny object like pedestrian, wide and fat object like cars
 - How to choose anchor boxes: choose 5 or 10 shapes that spans a variety of shapes to cover the types of objects seem to detect 
@@ -997,9 +1002,9 @@ Faster Algorithms:
   -  propose regions. Classify proposed regions one at a time. Output label + bounding box. RCNN not trust the bounding box which is given, but also output bounding box ($$b_x,b_y,b_h,b_w$$)
   -  <span style="background-color:#FFFF00"> Downside:  it is quite slow (classify region one at the time)</span>
 -  **Fast R-CNN**:  
-   -  propose regions. Use convolution implementation of sliding widows to classify all the proposed regions. (use convolutional implementation of sliding windows). 
+   -  propose regions. Use <span style="color:red">convolution implementation</span> of sliding widows to classify all the proposed regions. (use convolutional implementation of sliding windows). 
    -  **Downside**: the <span style="color:red">clustering step</span> to propose the regions is still quite slow
-- **Faster R-CNN**: Use convolutional network instead of segmentation algorithms to propose regions. Faster R-CNN implementation are usually still quite a bit slower than the YOLO algorithm 
+- **Faster R-CNN**: <span style="color:red">Use convolutional network instead of segmentation algorithms to propose regions</span>. Faster R-CNN implementation are usually still quite a bit slower than the YOLO algorithm 
 
 
 <br/><br/><br/>
@@ -1024,9 +1029,9 @@ Instead to train softmax to learn 100 people in database, use **similarity funct
 
 Input: two images,  output = `d(img1, img2)`  = degree of difference between images , 如果those two images are the same person, want this output a small number. If two images are different person, want this output a large number
 
-If `d(img1, img2) ≤ τ`  predict they are the “same”  person, If `d(img1, img2) > τ` , predict they are different person. This is to address face verification problem 
+<span style="background-color:#FFFF00">If `d(img1, img2) ≤ τ`  predict they are the “same”  person, If `d(img1, img2) > τ` , predict they are different person.</span> This is to address face verification problem 
 
-Use this in recognition, given new pciture, use this function(`d(img1, img2)`) to compare this new picture and other pictures in the database. If someone join in the team, add this person to your database. 
+Use this in recognition, given new pciture, use this function(`d(img1, img2)`) to compare this new picture and other pictures in the database. 
 
 
 #### Siamese Network
@@ -1035,15 +1040,15 @@ Pass a image through a sequence of convolutional, pooling, and fully-connected l
 
 Norm of the difference
 
-$$ d\left( x^{]\left( 1 \right)}, x^{]\left( 2 \right)}\right) =  \| f\left( x^{]\left( 1 \right)} \right) - f\left( x^{]\left( 2 \right)} \right) \|_2^2$$ 
+$$ d\left( x^{\left( 1 \right)}, x^{\left( 2 \right)}\right) =  \| f\left( x^{\left( 1 \right)} \right) - f\left( x^{\left( 2 \right)} \right) \|_2^2$$ 
 
 **Siamese Neural Network Architecture**: run two identical convolutional neural networks on two different inputs and compare them
 - these two neural networks have the same parameters
-- Parameters of NN define an encoding $$f\left( x^{]\left( 1 \right)}$$
+- Parameters of NN define an encoding $$f\left( x^{\left( 1 \right)} \right)$$
 - learn parameter that
-  1. if $$x^{]\left( i \right)}, x^{]\left( j \right)} $$ are the same person, $$ d\left( x^{]\left( 1 \right)}, x^{]\left( 2 \right)}\right) =  \| f\left( x^{]\left( 1 \right)} \right) - f\left( x^{]\left( 2 \right)} \right) \|_2^2$$ 
-  2. If $$x^{]\left( i \right)}, x^{]\left( j \right)} $$ are the different person, $$ d\left( x^{]\left( 1 \right)}, x^{]\left( 2 \right)}\right) =  \| f\left( x^{]\left( 1 \right)} \right) - f\left( x^{]\left( 2 \right)} \right) \|_2^2$$ 
-- So as you vary the parameters in all of these layers of the neural network end up different encoding, then use back propagation to vary all those parameters in order to make sure these conditions (1,2) are satisfied 
+  1. <span style="background-color:#FFFF00">if $$x^{\left( i \right)}, x^{\left( j \right)} $$ are the same person, $$ d\left( x^{\left( 1 \right)}, x^{\left( 2 \right)}\right) =  \| f\left( x^{\left( 1 \right)} \right) - f\left( x^{\left( 2 \right)} \right) \|_2^2$$ is small</span>
+  2. <span style="background-color:#FFFF00"> If $$x^{\left( i \right)}, x^{\left( j \right)} $$ are the different person, $$ d\left( x^{\left( 1 \right)}, x^{\left( 2 \right)}\right) =  \| f\left( x^{\left( 1 \right)} \right) - f\left( x^{\left( 2 \right)} \right) \|_2^2$$ is large</span>
+- So as you vary the parameters in all of these layers of the neural network end up different encoding, then **use back propagation** to vary all those parameters in order to make sure these conditions (1,2) are satisfied 
 
 ![](/img/post/cnn/week4pic1.png)
 
@@ -1065,7 +1070,7 @@ $$ \| f\left(A \right) - f\left( P \right) \|_2^2 - \| f\left(A \right) - f\left
 
 $$ \| f\left(A \right) - f\left( P \right) \|_2^2 + \alpha  \leq \| f\left(A \right) - f\left( N \right) \|_2^2  $$
 
-$$ \| f\left(A \right) - f\left( P \right) \|_2^2 - \| f\left(A \right) - f\left( N \right) \|_2^2  + \alpha $$
+$$ \| f\left(A \right) - f\left( P \right) \|_2^2 - \| f\left(A \right) - f\left( N \right) \|_2^2  + \alpha \leq 0 $$
 
 $$\text{Loss Function: } L\left(A,P,N\right) = max\left(\| f\left(A \right) - f\left( P \right) \|_2^2 - \| f\left(A \right) - f\left( N \right) \|_2^2  + \alpha, 0  \right)$$
 
@@ -1086,13 +1091,13 @@ Andrew Ng 建立： download someone pretrain model from open-source
 
 #### As Binary Classification Problem 
 
-Triplet loss is one good way to learn the parameters of a C onvNet for a face recognition
+Triplet loss is one good way to learn the parameters of a ConvNet for a face recognition
 
 Another way to train neural network is to take a pair neural networks to take Siamese Network and have them <span style="color:red">both compute these embeddings $$f\left( x^{\left(i \right) } \right)$$  ( maybe 128 feature vector) and use these input to a logistic regression to make prediction</span>, if output = 1, they are the same person whereas output = 0 they are different persons
 
 ![](/img/post/cnn/week4pic3.png)
 
-The output $$\hat y$$ will be 
+The output $$\hat y$$ will be (element-wise difference of encodings)
 
 $$
 \hat y = \sigma \left(\underbrace{\sum_{k=1}^{128} w_k\mid f\left( x^{\left(i \right) } \right)_k - f\left( x^{\left(j \right) } \right)_k  \mid}_{ \text{element-wise difference in absolute values between encodings} } + b \right)
@@ -1100,10 +1105,10 @@ $$
 
 can think of these 128 numbers as features that you then feed into logistic regression , and train the weight w,b  in order to predict whether or not two images are of the same person
 
-There are a few other variations on how to compute $$\hat y$$
+There are a few other variations on how to compute $$\hat y$$, using $$ \chi^2 similarity$$
 
 $$
-\hat y = \sigma \left( \sum_{k=1}^{128} w_k \frac{ \left( f\left( x^{\left(i \right) } \right)_k - f\left( x^{\left(j \right) } \right)_k  \right)^2 } { f\left( x^{\left(i \right) } \right)_k + f\left( x^{\left(j \right) } \right)_k } + b \right) \chi^2 similarity
+\hat y = \sigma \left( \sum_{k=1}^{128} w_k \frac{ \left( f\left( x^{\left(i \right) } \right)_k - f\left( x^{\left(j \right) } \right)_k  \right)^2 } { f\left( x^{\left(i \right) } \right)_k + f\left( x^{\left(j \right) } \right)_k } + b \right)
 $$
 
 One single trick is to **precompute the feature vector**(通过Siamese network算出来)in the database to save computational cost (not need to store raw image). This works for Siamese Network where treat face recognition as a binary classification problem or when you were learning encodings using Triplet Loss function
@@ -1120,7 +1125,7 @@ Neural Style Transfer: generate image from content image but drawn in the style 
 
 **What are deep ConvNets learning?** 
 
-e.g. Pick a unit in layer 1. Find the nine different image patches(`3 x 3` ) that maximize the unit’s activation (there are many activations in layer1). pass training set into neural network and figure out what is the image that maximizes that particular units activation. By doing this, will see what is hidden layer recognizing such as looking for simple features like averitical line
+e.g. Pick a unit in layer 1. Find the nine different image patches(`3 x 3` ) that maximize the unit’s activation (there are many activations in layer1). pass training set into neural network and figure out what is the image that maximizes that particular units activation. By doing this, will see what is hidden layer recognizing such as looking for simple features like a veritical line
 
 ![](/img/post/cnn/week4pic5.png)
 
@@ -1147,7 +1152,7 @@ $$ \text{G:generated image; C: content image; S: style image} $$
 
 **Overall Cost Function**: use gradient descent or sophisticated optimization algorithm in order to try ot find an image G that minimize the cost function $$J\left( G \right) $$
 
-$$J\left(G\right) = \alpha J_{content} \left( C,G\right) + \Beta J_{style} \left( S,G\right)$$
+$$J\left(G\right) = \alpha J_{content} \left( C,G\right) + \beta J_{style} \left( S,G\right)$$
 
 
 
@@ -1155,26 +1160,26 @@ $$J\left(G\right) = \alpha J_{content} \left( C,G\right) + \Beta J_{style} \left
 
 
 -	Say you use hidden layer l to compute content cost 
-  - if l is a small number, hidden layer 1, it will force your generated image pixel values very similar to content image.
-  - if l is a large number, a deep layer. If there is a dog in your content image, it will generate dog somewhere in the generated image
-  - In practice, l is chosen neither too shallow nor too deep in the neural network. l is chosen in the middle layer of the neural network
--	Use pre-trained ConvNet (E.g, VGG network)
+    - if l is a small number, hidden layer 1, it will force your generated image pixel values very similar to content image.
+    - if l is a large number, a deep layer. If there is a dog in your content image, it will generate dog somewhere in the generated image
+    - In practice, l is chosen neither too shallow nor too deep in the neural network. l is chosen in the middle layer of the neural network
+-	<span style="color:red">Use pre-trained ConvNet (E.g, VGG network)</span>
 - 	Let $$a^{\left[ l \right]\left( C \right)}$$ and $$a^{\left[ l \right]\left( G \right)}$$ be the activation of layer l on the images 
-  - if  $$a^{\left[ l \right]\left( C \right)}$$ and $$a^{\left[ l \right]\left( G \right)}$$ similar, imply both images havve similar content
+  - if  $$a^{\left[ l \right]\left( C \right)}$$ and $$a^{\left[ l \right]\left( G \right)}$$ similar, imply both images have similar content
   - 有没有1/2都可以, <span style="background-color:#FFFF00">element wise sum of square difference between activations of C and G</span>
 
-$$J_{content}\left(G \right) = \frac{1}{2} \| a^{\left[ l \right]\left(  \right)} - a^{\left[ l \right]\left( G \right)} \|^2$$
+$$J_{content}\left(G \right) = \frac{1}{2} \| a^{\left[ l \right]\left( C \right)} - a^{\left[ l \right]\left( G \right)} \|^2$$
 
 #### Style Cost Function
 
-Say you are using layer l's activation to measure "style". Define style as correlation between activations across channels
+Say you are using layer l's activation to measure "style". Define style as <span style="background-color:#FFFF00">**correlation**</span> between activations across channels
 
 the correlation tells you which of these high level texture components tend to occur or not occur together in part of an image. And degree of correlation gives measuring how often in generated image these different high level features come together or not such as 第一个 channel activation 识别 vertical texture 与 第二个channel activation 识别  orange tint  correlate
 
 
 **Style Matrix**
 
-Let $$a_{i,j,k}^{\left[ l \right]} = $$ activation at (i,j,k), i is height, j is width, and k is channel. $$G^{\left[ l \right]}$$ is $$n_c^{\left[ l \right} \times n_c^{\left[ l \right}$$ dimension matrix. You can $$n_c$$ channel so $$G^{\left[ l \right]}$$ measure how correlated each pair of them is. $$G_{k, k'}^{\left[ l \right]}$$ meaures how correlated activations in channel k compared to the activations in channel k'. k is range $$\left[1, n_c \right]$$
+Let $$a_{i,j,k}^{\left[ l \right]} = $$ activation at (i,j,k), i is height, j is width, and k is channel. $$G^{\left[ l \right]}$$ is $$n_c^{\left[ l \right]} \times n_c^{\left[ l \right]}$$ dimension matrix (Squared matrix). You can $$n_c$$ channel so $$G^{\left[ l \right]}$$ measure how correlated each pair of them is. $$G_{k, k'}^{\left[ l \right]}$$ meaures how correlated activations in channel k compared to the activations in channel k'. k is range $$\left[1, n_c \right]$$
 
 For style image
 
@@ -1201,7 +1206,7 @@ This is just the sum of squares of element wise differences between two matrices
 $$J_{style} \left( S,G \right)  = \sum_{l} \lambda^{\left[ l \right]}J_{style}^{\left[ l \right]} \left( S,G \right) $$
 
 
-$$\lambda$$ are a set of hyperparameters. It allows you to use different layers in neural network, in lower layer simple low level features (early one) whereas in latter layer measure high level features and cause neural network to take both low level and high level features to take into account when computing style 
+<span style="background-color:#FFFF00">$$\lambda$$ are a set of hyperparameters</span>. It allows you to use different layers in neural network, in lower layer simple low level features (early one) whereas in latter layer measure high level features and cause<span style="color:red"> neural network to take both low level and high level features to take into account when computing style </span>
 
 
 
@@ -1252,6 +1257,8 @@ e.g. Movie data where the different slices could be different slices in time thr
 - [Going Deeper with Convolutions, 2014](https://arxiv.org/abs/1409.4842) Inception Network
 - [You Only Look Once: Unified, Real-Time Object Detection, Redmon 2015](https://arxiv.org/abs/1506.02640): YOLO Algorithm
 - [Rich feature hierarchies for accurate object detection and semantic segmentation, Girshik, 2014](https://arxiv.org/abs/1311.2524): Regional Proposals
+- [DeepFace: Closing the Gap to Human-Level Performance in Face Verification, Taigman, 2014](https://www.cs.toronto.edu/~ranzato/publications/taigman_cvpr14.pdf)
+- [FaceNet: A Unified Embedding for Face Recognition and Clustering, Schroff, 2015](https://arxiv.org/abs/1503.03832): Face Recognition, Triplets loss
 - [Visualizing and Understanding Convolutional Networks
 Matthew D Zeiler, Rob Fergus](https://arxiv.org/abs/1311.2901): What are deep ConvNets Learning
 - [A Neural Algorithm of Artistic Style](https://arxiv.org/abs/1508.06576): Neural Style Transfer Cost Function 
