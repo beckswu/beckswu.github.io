@@ -2,7 +2,7 @@
 layout:     post
 title:      "Deep Learning —— Sequence Model Summary"
 subtitle:   "深度学习 Deep Learning —— Sequence Model note"
-date:       2018-09-12 19:00:00
+date:       2018-10-12 19:00:00
 author:     "Becks"
 header-img: "img/post/Deep_Learning-Sequence_Model_note/bg.jpg"
 catalog:    true
@@ -14,172 +14,347 @@ tags:
     - 学习笔记
 ---
 
-## Week1 Recurrent Neural Networks
+## 1. Recurrent Neural Networks
 Examples of sequence data:
                 
 1. Speech Recognition: given audio clip X ----> text Y (both input and output sequence data)
-2.  music generation:  output is sequence(音乐), input maybe music 的类型 or nothing
-3. sentiment classfication: 像影: "there is nothing to like in this move" ---> 这样的review是几分
+2.  music generation:  output is sequence(音乐), input maybe music genre you want to generate or nothing
+3. sentiment classfication: Movie: "there is nothing to like in this move" ---> positive / negative, score from 1 to 5
 4. DNA sequence Analysis:  given DNA AGCCTGA... ---> label which part of DNA sequence corresponds to a protein
-5. machine translation
-6. video activty recogntion : 给一段录像 -> 在running
-7. Name entity recognation：给一段话 --> 挑出人名
+5. machine translation: sentences -> sentences in a different language
+6. video activty recogntion : a sequence of video => recognize the activity
+7. Name entity recognation：sentence --> ask the people in the sentence
 
-sometimes 输入X 和 输出Y 可以是不同的长度，sometimes X和Y(example 4,7)是同样长度的, sometimes 只有X或者只有Y是sequence的 (example 2)
+- sometimes <span style="color:red">X and Y can be different lengths</span>
+- sometimes X和Y(example 4,7)是同样长度的
+- sometimes only either X or Y is sequence的 (example 2)
 <script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"> </script>
+
+
 #### Notation: 
 
-![](/img/post/Deep_Learning-Sequence_Model_note/week1pic1.png)
+Motivating Example: Named Entity Recognition(used by search engines to index all of last 24 hours news of all people/ companies/ name/ times/ llocations / countries names etcs mentioned in the news articles so that they can index them appropriately) to tell people names in the sentence 
 
 
-example: given a sentence 判断哪个是人名<br/> 
-$$x^{({i})<{t}>}$$:  表示第i个training example 中第t个word <br/> 
-$$y^{({i})<{t}>}$$:  表示第i个training example 中第t个word的输出label<br/> 
-$$T_x^{i}$$:  表示第i个training example的长度<br/> 
-$$T_y^{i}$$:  表示第i个training example的ouput长度<br/> 
+Below example not perfect representation, some sophisticated output representations tell the start and ends of people's names in the sentence
+
+```
+x: Harry Potter and Hermione Granger invented a new spell
+y   1     1     0     1        1       0      0  0   0
+
+```
+
+- $$x^{({i})<{t}>}$$:  t-th element of the sequence in ith- training example. <span style="background-color:#FFFF00">Different training examples in training set can have different length</span>. In above example,$$x^{({i})<{1}>}$$ represent Harry 
+- $$y^{({i})<{t}>}$$: t-th element in the output sequence of ith training example 
+- $$T_x^{i}$$:  length of  input sequnece in i-th traning example, in above example,$$T_x^{i} = 9 $$ 
+- $$T_y^{i}$$:  length of output sequence in i-th training example .in above example,$$T_y^{i} = 9 $$, Note ,$$T_x^{i} $$  and  $$T_y^{i}$$ can be different
 
 
-**representing words:** <br/>
 
-use dictionary and give each word an index, <br/>
-$$x^{<{t}>}$$:  是one hot vector(meaning: only one in one position, everywhere else 0), 比如字典的长度是10000, x = apple, apple出现在字典的100位, $$x^{<{t}>} = \begin{bmatrix}
+
+
+**representing words:** :use Vocabulary(dictionary) and give each word an index,
+
+e.g. size 10000 (Quite small for modern NLP applications. For commercial applications, vocabulary size is 30,000 - 50,000. Some large internet companies use 1 million vocabulary size )
+   - Look at training set and find top 10,000 occurring words
+   - Or look at some online dictionary to tell you what are the most common 10,000 words in English Language
+   - Use <span style="color:red">**One hot representation**</span>(only 一个one and zero everywhere else) to represent each of these words
+   - if encounter word not in vocabulary，create a new token or a new fake word called unknown word  ```<unk>``` 
+
+$$x^{<{t}>} = \begin{bmatrix}
+    a \\ 
+    aaron \\
+    \vdots \\
+    and \\
+    \vdots \\
+    harry \\
+    \vdots \\
+    portter  \\
+	\vdots\\
+   zulu\\
+    \end{bmatrix}
+
+    \begin{matrix}
+    1 \\ 
+    2 \\ 
+    \vdots \\
+    367 \\
+    \vdots \\
+    4075 \\
+    \vdots \\
+    6830  \\
+	\vdots\\
+   10,000 \\
+    \end{matrix}
+$$
+
+$$
+\text{For word Harry }
+x^{<{t}>} = \begin{bmatrix}
+    0 \\ 
     0 \\
+    \vdots \\
+    0 \\
+    \vdots \\
+    1 \\
+    \vdots \\
+    0  \\
+	\vdots\\
+   0 \\
+    \end{bmatrix}
+
+    \begin{matrix}
+    1 \\ 
+    2 \\ 
+    \vdots \\
+    367 \\
+    \vdots \\
+    4075 \\
+    \vdots \\
+    6830  \\
+	\vdots\\
+   10,000 \\
+    \end{matrix}
+
+\text { For word Porter }
+x^{<{t}>} = \begin{bmatrix}
+    0 \\ 
+    0 \\
+    \vdots \\
+    0 \\
+    \vdots \\
+   0 \\
     \vdots \\
     1  \\
 	\vdots\\
+   0 \\
     \end{bmatrix}
-$$ 只有第100位是1，剩下都是0. if 遇见了word不在字典中，create a new token or a new fake word called unknown word e.g. ```<unk>```
 
-Note: Some internet company use dictionary maybe 1 million or een bigger than that 
+    \begin{matrix}
+    1 \\ 
+    2 \\ 
+    \vdots \\
+    367 \\
+    \vdots \\
+    4075 \\
+    \vdots \\
+    6830  \\
+	\vdots\\
+   10,000 \\
+    \end{matrix}
 
-比如下面看是不是name的，output是长度为9，0代表不是name, 1代表是name
-![](/img/post/Deep_Learning-Sequence_Model_note/week1pic2.png)
+$$
+
 
 
 #### Recurrent Neural Network Model:
-<span style="background-color: #FFFF00">Why not a standard network?</span>(e.g. sentiment in NLP ) <br/>
-problems:
-1. Input, output can be <span style="color:red">different lengths</span> in different example (不是所有的input的都是一样长度)
-2. Doesn't share features learned across <span style="color:red">**different positions**</span> of text(也许word Harry在位置1，但是也许Harry也许出现在位置7)
+
+![](/img/post/Deep_Learning-Sequence_Model_note/week1pic3.png)
+
+<span style="background-color: #FFFF00">Why not a standard network?</span>(e.g. sentiment in NLP ) problems:
+1. <span style="background-color:#FFFF00">Input, output can be different lengths in different example</span> (不是所有的input的都是一样长度)
+   - Maybe for every sentence has a maximum length. can pad or zero-pad every inputs up to maximum length. But it still not a good representation
+2. <span style="background-color:#FFFF00">Doesn't share features learned across **different positions**</span> of text
+   - Maybe Harry on position one gives a sign(implies) that position t would be a person's name
+3. <span style="background-color:#FFFF00">Parameter size is large</span>, e.g. use 10,000 one hot vector size and 9 sequence of input, input shape is `9 x 10000`, weight matrix will end up enormous number of parameters 
 
 
 
-- At time 0, have some either made-up activation( initialized randomly or 全部是0的vector) as $$a^{<{0}>}$$. <br/>
-- step 1: Take a word(first word) to a neural network layer, then try to predict if this word is name or not. <br/>
-- step 2: Use activation value from step 1 and $$x_{2}$$ to predict $$y_2$$. Then take activation value from step 2 to step 3. 
-- The <span style="color:red">activation parameters</span> () used in each step are <span style="color:red">**shared**</span>. 
-  - $$W_{ax}$$, (from x to activation) govern the connection between $$x_{<i+1>}$$ $$x_{<i>}$$
-  - $$W_{aa}$$, (from activation to activation) govern the horizontal activation connection  
-  - $$W_{ya}$$ (from activition to y) (用x得到y like quantity) 控制governs the output prediction
+RNN doesn't have above disadvantages
 
-Below structure $$T_x = T_y$$,  e.g.  $$y_{<3>}$$ not only get infomation from $$x_{<3>}$$ but aslo from $$x_{<1>}$$ and $$x_{<2>}$$
+Below architecture for $$T_x = T_y$$. Each timestep, <span style="background-color:#FFFF00">recurrent neural network pass activation to next time step</span>. To kick off the whole thing, <span style="color:red">make-up activation of  $$a^{<0>}$$(usually vector of zeros most common , and some researchers initialize it randomly) at time zero </span>
 
-One <span style="color:red">**weakness**</span> for RNN: only use <span style="color:red">information</span> that is <span style="color:red">earlier</span> in the sequence to make a prediction （Bidirection RNN (BRNN) 可以解决这个问题）e.g. when prediciting  $$y_{<3>}$$ not use  $$x_{<4>}$$
+1. Read first word $$x^{<1>}$$, take this word and feed into a neural network layer and predict a output $$\hat y^{<1>}$$
+2. Read the second word $$x^{<2>}$$, <span style="color:red">instead of just predicting $$\hat y_2$$ using only  $$x^{<2>}$$, also gets some information from step one. The activation value from step one passed to step two</span>.
+3. RNN input the third word $$x^{<3>}$$ and activation $$a^{<2>}$$ from step two and try to output $$\hat y^{<3>}$$ 
+
+下图左面是unroll diagram, 右侧一个单独的是 rolled diagram
+
+![](/img/post/Deep_Learning-Sequence_Model_note/week1pic3.png)
+
+Recurrent Neural Network scans through the data from left to right. <span style="background-color:#FFFF00">The parameters it uses for each time step **are shared**</span>. 
+- The same $$W_{ax}$$ used for every time step. $$W_{ax}$$, govern the connection between $$x_{<i+1>}$$ to hidden layer
+- $$W_{aa}$$, (from activation to activation) govern the horizontal activation connection. It is the same  $$W_{aa}$$ for every timestep
+- $$W_{ya}$$ (from activition to y) (用x得到y like quantity) governs the output prediction
+
+So when make prediction for $$y_3$$, gets the information not only from $$x_3$$ but also the information from $$x_1$$ and $$x_2$$
 
 
-![][pic3]
+One <span style="color:red">**weakness**</span> for this RNN: only use <span style="color:red">information</span> that is <span style="color:red">earlier</span> in the sequence but not information later in the sequence to make a prediction （Bidirection RNN (BRNN) can solve this problem）e.g. when prediciting  $$y_{<3>}$$ not use  $$x_{<4>}$$
+- e.g. *He said "Teddy Roosevelt was a great President* and *He said "Teddy bears are on sale*". Given only first three words, it is not possible to know if Teddy is part of a person's name. In order to decide whether Teddy is part of person's name. It's really useful to know not just information from first two words but also latter words
 
 
-**Forward Propagation**:
+
+
+
+#### Forward Propagation
 
 $$\begin{align} a^{<{0}>} &= \vec0  \\
-a^{<{1}>} &= g_1\left(W_{aa}\cdot a^{<{0}>}+ W_{ax}\cdot X^{<{a}>} + b_a \right) \\
-y^{<{1}>} &= g_2\left(W_{ya}\cdot a^{<{1}>} + b_y \right)
-\end{align}$$ <br/>
-从$$a^{<{t-1}>} $$和 $$x^{<{t}>}$$ 生成$$a^{<{t}>}$$ 的可以是<span style="color: red">tanh/Relu</span>, 从$$a^{<{t}>}$$ 到$$y^{<{t}>}$$的是<span style="color: red">softmax</span>
+a^{<{1}>} &= g_1\left(W_{aa}\cdot a^{<{0}>}+ W_{ax}\cdot X^{<{1}>} + b_a \right) ->  \bbox[yellow]{\text{ often tanh(more common)/ReLu function}} \\
+y^{<{1}>} &= g_2\left(W_{ya}\cdot a^{<{1}>} + b_y \right)  -> \bbox[yellow]{\text{ often sigmoid/softmax function}}
+\end{align}$$  
 
-![](/img/post/Deep_Learning-Sequence_Model_note/week1pic4.png)
+More general representation
 
-简化符号
+$$\begin{align} 
+a^{<{t}>} &= g\left(W_{aa}\cdot a^{<{t-1}>}+ W_{ax}\cdot X^{<{t}>} + b_a \right) ->  \bbox[yellow]{\text{ often tanh(more common)/ReLu function}} \\
+y^{<{t}>} &= g\left(W_{ya}\cdot a^{<{t}>} + b_y \right)  -> \bbox[yellow]{\text{ often sigmoid/softmax function}}
+\end{align}$$  
+
+For output activation function, if it is binary classification problem, use sigmoid. If it is k-classification problem, use softmax
+
+
 ![](/img/post/Deep_Learning-Sequence_Model_note/week1pic5.png)
 
+Simplified Notation:
+
+$$a^{<{t}>} = g\left(W_{a} \left[ a^{<{t-1}>}, x^{<{t}>} \right] + b_a \right) $$
+
+$$ y^{<{t}>} = g\left(W_y\cdot a^{<{t}>} + b_y \right) $$
+
+Where $$W_a, b_a$$ denotes to compute activation and $$W_y, b_y$$ denote to compute to y-like quantity
+
+$$W_{a} = \left[ W_{aa} \mid W_{ax} \right]$$
+
+$$\left[ a^{<{t-1}>}, x^{<{t}>} \right] = \begin{bmatrix} a^{<{t-1}>} \\[2ex] \hline \\ x^{<{t}>}  \end{bmatrix}$$
+
+$$ \left[ W_{aa} \mid W_{ax} \right] \begin{bmatrix} a^{<{t-1}>} \\[2ex] \hline \\ x^{<{t}>}  \end{bmatrix} = W_{aa}\cdot a^{<{t-1}>}+ W_{ax}\cdot X^{<{t}>} $$
+
+e.g. if $$a^{<{t}>} $$ is `100 x 1`, $$x^{<{t}>} $$ is `10000 x 1`, $$ W_{aa}$$ is `100 x 100` and $$W_{ax}$$ is `100 x 10000` matrix. So stacking $$ W_{aa}, W_{ax} $$ together, 
+
+$$\underbrace{W_{a}}_{100 \times 10100} = 100 \begin{cases}
+\left[ \underbrace{W_{aa}}_{100} \mid \underbrace{W_{ax}}_{10000} \right] \end{cases}$$
+
+$$\left[ a^{<{t-1}>}, x^{<{t}>} \right] = \left. \begin{bmatrix}  a^{<{t-1}>} \updownarrow 100 \\[2ex]  \hline \\  x^{<{t}>}  \updownarrow 10000 \end{bmatrix} \right\} 10100$$
 
 
-#### Backpropagation Through Time
-
-Single Loss Function: $$ L^{<{t}>}\left( \hat y^{<{t}>},  y^{<{t}>} \right) = - y^{<{t}>}log \left( \hat y^{<{t}>} \right) - 
-    \left( 1- y^{<{t}>} \right) log\left(1- \hat y^{<{t}>} \right) $$<br/>
-
-Overall Loss Function:  $$ L \left(  \hat y , y \right) =  \displaystyle \sum_{t=1}^{T_x} {L^{<{t}>} \left( \hat y^{<{t}>}, y^{<{t}>} \right) } $$
 
 
+#### Backpropagation
 
-foward propation goes from left to right. back propagation go from right to left 
+**Backpropagation through time**: For fowardprop scans from left to right and increase the indices time t, whereas for back propagation go from right to left 
+
+Single Loss Function( **Cross Entropy Loss**) associated with a single prediction for single position or single time set: 
+
+$$ L^{<{t}>}\left( \hat y^{<{t}>},  y^{<{t}>} \right) = - y^{<{t}>}log \left( \hat y^{<{t}>} \right) - 
+    \left( 1- y^{<{t}>} \right) log\left(1- \hat y^{<{t}>} \right) $$
+
+Overall Loss Function:  sume up all loss for all timestamps
+
+$$ L \left(  \hat y , y \right) =  \displaystyle \sum_{t=1}^{T_x} {L^{<{t}>} \left( \hat y^{<{t}>}, y^{<{t}>} \right) } $$
+
+
 ![](/img/post/Deep_Learning-Sequence_Model_note/week1pic6.png)
 
 
 #### RNN Architectures
 
-<span style="color: red">**Many to Many** Architectures</span>: 比如word识别名字，输入的每word，都有输出0，1; 注：many-to-many, input length 和 Output length可以相同，也可以不同，比如翻译先把法语(encoder)句子读完，然后一个一个generate 英语(decoder), English and French sentences can be different length <br/>
-<span style="color: red">**Many to One** Architectures</span>:  Sentiment Classification: 给一个word，只最后输出0-5代表几个星<br/>
-<span style="color: red">**One to One** Architectures</span>: standard neural network<br/>
-<span style="color: red">**One to Many** Architectures</span>: e.g. music generation output set of notes 代表a piece of music (x 可以是null)
+- <span style="color: red">**Many to Many** Architectures</span>: 比如named entity recognition，输入的每word，都有输出0，1(表示是不是人名); 注：many-to-many, input length 和 Output length可以相同，也可以不同，比如翻译先把法语(encoder)句子读完，然后一个一个generate 英语(decoder), English and French sentences can be different length(图片的右下方)
+- <span style="color: red">**Many to One** Architectures</span>:  Sentiment Classification: X is sequence(review)，y might be 0 and 1 (positive review/negative review), or 1 to 5 (one star? two star?five-star review)
+- <span style="color: red">**One to One** Architectures</span>: standard neural network
+- <span style="color: red">**One to Many** Architectures</span>: X could be genre of music or what is the first note of the music you want or x 可以是null. e.g. music generation output a set of notes ($$ y^{<{1}>},  y^{<{2}>}, ...,  y^{<{T_y}>}$$) 代表a piece of music 
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week1pic7.png)
 
-#### Sequence generation
-Language Model: the way that speech recognition pick words based on probability. Output only sentences that are likely. 比如, then pick the second sentences<br/>
+#### Language Model
+
+Speech recognition
+
+*The apple and pair salad* vs *The apple and pear salad*
+
+ 第二个更likely. That is a good speech recognition system would output even though these two sentences sound exactly the same. The way speech recognition system picks the second is by using a lanuage model that tells the probability of either of those two sentences. 
+
 P(The apple and pair salad) = $$3.2\times10^{-13} $$<br/>
 P(The apple and pair salad) = $$5.7\times10^{-10} $$
 
-Training Set: large corpus of English text; corpus: NLP terminalogy means a large body/set. 
-- 首先<span style="background-color: #FFFF00"> **tokenize** </span>把word map到字典上，生成vector. 有时add extra token EOS 表示句子的结尾。 也可以决定是否把标点符号也tokenize. 如果word 不在字典中，用<span style="color: red">UNK</span> substitue for unknown word
- 
-RNN Model:
+Language model tell you the probability of a sentence: `P(sentence) = ?`. It is the fundamental component in Speech Recognition systems and Machine Translation systems, where translation systems want output only sentences that are likely. Estimate the probabilities ofp articular sequence of words
+
+$$P\left( y^{<1>},  y^{<2>}, \cdots,  y^{<3>} \right)$$
+
+
+**How to build a lanuage model?**
+
+1. Need a training set comprising large corpus of English text; corpus: NLP terminalogy means a large body/set. 
+2. **Tokenize** each sentence to form a vocabulary. 
+   1. Map each word to one hot vector
+   2. Add extra token `EOS` (end of sentences) which can help figure out when a sentence ends。 也可以决定是否把标点符号也tokenize. 
+   3. 如果word 不在字典中，用`UNK` substitue for unknown word
+3. <span style="background-color:#FFFF00">Set $$x^{<t>} = y^{<t-1>}$$ </span>
+
+**RNN Model**: each step in the RNN will look at some set of preceding words
+
+
+1. At time 0, $$x^{<1>} = \vec 0$$, set x1 to be all zeros. Also set $$a^{<0>} = \vec 0$$. 
+   - $$a^{<1>}$$ make a softmax to predict the probability of any word in the dictionary to be the first word $$y^{<1>}$$(What is the chance the first word "Aaron"? what is the chance the first word "cat"? ... what is the chance the first word "Zulu"? what is the chance the first word "UNK"?). If vocabulary size is 10002(+ `UNK` and `EOS` ), there are 10002 softmax outputs
+2. Next step, the job is to try to figure out the second word. <span style="background-color:#FFFF00">Also give the **correct** first word $$x^{<2>} = y^{<1>}$$</span>. `P(average | Cats)`
+3. At 3rd step, predict third word, we can give the first two words, $$x^{<3>} = y^{<2>}$$. To figure out  `P(__ | Cats average)` given first two words are cats average
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week1pic8.png)
 
-Training
 
-1. 从$$a^{<{1}>} $$到 $$\hat y^{<{1}>}$$ 是softmax matrix, <span style="color:red">得到字典中每个字的概率</span>， $$y^{<{1}>}$$是一个10002(10000 + unknown + EOS) vector，到了$$a^{<{2}>}$$, 
-2. At $$a^{<{2}>}$$, <span style="color:red">given the first correct answer</span>, what is the distribution of P(__ \| cats); 
-3. At $$a^{<{3}>}$$, given the first correct answer, P(__ \| cats, average);
-4. At the last one, predict P(_ \|....前面所有的), 
+cost function is softmax loss function; 
 
-cost function is softmax cost function; $$L\left( \hat y^{t}, y^{t} \right) = - \sum_{i} {y_i^{t} log \hat y_i^{t} } $$, $$ L = \sum_{t} {L^{t} \left( \hat y^{t}, y^{t} \right)}
+$$L\left( \hat y^{<t>}, y^{<t>} \right) = - \sum_{i} {y_i^{<t>} log \hat y_i^{<t>} } $$
 
-given the first word, $$P\left( y^{<{1}>}, y^{<{2}>}, y^{<{3}>} \right) = P\left( y^{<{1}>}\right) \cdot P\left(y^{<{2}>} \mid y^{<{1}>} \right)\cdot  P\left(y^{<{3}>} \mid y^{<{1}>}, y^{<{2}>} \right) $$
+Overall loss is just the sume overall time steps of the loss associated with individual predictions
+
+$$ L = \sum_{t} {L^{<t>} \left( \hat y^{<t>}, y^{<t>} \right)} $$
+
+given the sentence which comprise just three words, the probability of entire sentences will be
+
+$$P\left( y^{<{1}>}, y^{<{2}>}, y^{<{3}>} \right) = P\left( y^{<{1}>}\right) \cdot P\left(y^{<{2}>} \mid y^{<{1}>} \right)\cdot  P\left(y^{<{3}>} \mid y^{<{1}>}, y^{<{2}>} \right) $$
 
 
-#### Sampling novel Sequence:
+
+#### Sampling Novel Sequence:
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week1pic9.png)
 
 Sample from distribution to generate noble sequences of words
  
-1. 得到$$\hat y^{<{1}>}$$后，random sample according to softmax的distribution(a的概率多大，aaron的概率多大)，```np.random.choice``` to sample according to this distribution. 
-2. take the $$\hat y^{<{1}>}$$ you just sample in step 1 to pass as input to next timestamp.再得到$$\hat y^{<{2}>}$$; 
-    - 比如$$\hat y^{<{1}>}$$sample = The, 把the 作为input，得到另一个softmax distribution P( _ \| the), 再sample $$\hat y^{<{2}>}$$,  把sample的 pass 到next time step. 
-3. <span style="color: red">**When to end**:</span>,
-   - keep sampling until generate EOS token. 
-   - 如果没有设置EOS. then decide to sample 20 个或者100个words 知道到达这个次数(20 or 100 words). 有时可能生成unknown word token, 可以确保algorithm 生成sample 不是unknown token，遇到unknown token, reject and keep sampling until get non-unknown word. can leave it in output if don't mind having unknown word output
+1. At time 0, <span style="background-color:#FFFF00">After get $$\hat y^{<{1}>} (size `10002 x 1`)$$，have some softmax probabilities over possible output. random sample according to softmax distribution</span>. The softmax distribution gives what is the chance of first word being Aaron, cats, Zulu.```np.random.choice``` to sample according to this distribution defined by output vector proabilities from softmax
+   - 有时可能生成unknown word token, 可以确保algorithm 生成sample 不是unknown token，<span style="background-color:#FFFF00">遇到unknown token, reject and keep sampling until get non-unknown word</span>. Or you can leave it(`UNK`) in output if don't mind having unknown word output
+2. Next timestamp, expecting $$y^{<{1}>}$$ is the input. <span style="background-color:#FFFF00">Take the $$\hat y^{<{1}>}$$ you just sample in step 1 (not the correct one) to pass as input.</span> Then softmax will make predict $$\hat y^{<{2}>}$$; 
+    - E.g. For sample at timestamp 0, get the first word "The". Pass "The" as $$x^{<{2}>}$$ ，And get softmax distribution `P( _ | the)`, and sample $$\hat y^{<{2}>}$$.  把sample的 pass 到next time step. 
+3. **When to end**:
+   -<span style="color:red"> keep sampling until generate EOS token. </span>, which tells you it the end of a sentence
+   - 如果没有设置`EOS`. then decide to sample 20 个或者100个words 直到到达这个次数(20 or 100 words)
 
-字典除了是vocabulary，也可以是character base， 如果想build character level 而不是word level 的，$$y^{<{1}>}, y^{<{2}>}, y^{<{3}>}$$是individual characters， E.g. Cat average. $$y^{<1>} = c$$, $$y^{<2>} = a$$ , $$y^{<3>} = t$$, $$y^{<4>} = space$$   
 
-Advantage: 
-- <span style="background-color: #FFFF00">character 就不会遇见unknown word的情况</span>. 比如 Mau, not in vocabulary, assign unknown, for character letter, 不会是unknown
+字典除了是vocabulary，也可以是character base, `vocabulary = [a,b,c, ... , z, ., ; ,0,1,2,...,9, A,...,Z]`, lowercases, punctuations, digits, uppercases. Or look at training corpus and look at the chracters that appears there and use that to define the vocabulary
+
+
+ 如果想build character level 而不是word level 的，$$y^{<{1}>}, y^{<{2}>}, y^{<{3}>}$$是individual characters instead of individual words， 
+ - E.g. Cat average. $$y^{<1>} = c$$, $$y^{<2>} = a$$ , $$y^{<3>} = t$$, $$y^{<4>} = \text{\space}$$  
+
+**Advantage**: <span style="background-color: #FFFF00">character level don't worry abut unknown word tokens</span>. Character level is able to assign 比如 Mau, a non-zero probability, whereas if Mau not in vocabulary for word level lanuage model, assign unknown word token
   
-Disadvantage: 
+**Disadvantage**: 
 
-- end up much **longer sequence**.  一句话可能有10个词，但会有很多的characters，
-- Character level 不如word level 能capture long range dependencies between how the earlier parts of sentence aslo affect the later part of the sentence.
--  Character level more <span style="color:red">**computationally expensive**</span> to train. 当计算机变得越来越快，more people look at character level models (not widespread today for character level)
+- <span style="color:red">end up much **longer sequence**</span>.  一句话可能有10个词，但会有很多的characters，
+- Character level 不如word level capture long range dependencies between how the earlier parts of sentence aslo affect the later part of the sentence.
+-  Character level more <span style="color:red">**computationally expensive**</span> to train. In NLP, word level language model are still used. But as computers get faster，more and more applications start to look at character level models which are much harder and computationally expensive to train (not widespread today for character level except for specialized applications where need to deal with unknown words or used in more specialized application where have a more specialized vocabulary )
 
 
 #### Vanishing gradients
 
+RNN processing data over 1000 or 10000 time steps, that basically a 1000 layer or 10000 layer neural network. So it runs into gradient vanishing or gradient exploding problems
+
+One of the problems with A basic RNN algorithm is that it runs into vanishing gradient problems.  
+
 languages that comes earlier 可以影响 later的， e.g.  choose was or were
 
-The cat which .... was full <br/>
-The cats which .... were full
+- The cat which .... was full
+- The cats which .... were full
 
-The basic RNN <span color="style:red">not very good at capturing very long-term dependency</span>.  because for very deep neural network e.g. 100 layers, <span style="color:red">later layer</span> had <span style="color:red">hard time propagating back</span> to affect the weights of these earlier layers. 
+The basic RNN <span color="style:red">not very good at capturing very long-term dependency</span>.  <span style="background-color:#FFFF00">because for very deep neural network e.g. 100 layers, the gradient from output y  had hard time propagating back to affect the weights of these earlier layers.  The outputs of errors associated at latter timestep to affect computation  eariler in the sequence </span>
+   - 上面的例子, it might be difficult to get a neural network to realize that it needs to memorize if see a singular noun or pural noun to generate was or were
+   - Because of the problem,<span style="color:red"> the basic RNN model has many ocal influences</span>, meaning that output $$\hat y$$ is mainly influenced by values close to $$\hat y$$
 
-It means the output only influenced by close input, $$y^{<20>}$$ is affected by $$x^{<20>},x^{<19>}, x^{<18>} $$, not $$x^{<1>}$$. The errors associated at latter timestep to affect computation that are eariler. e.g. cats or cat affect was, were.
-
-Exploding Gradient: aslo happen for RNN, increase exponentially with the number of layers go through. Whereas Vanish Gradient tends to a bigger problem for RNN 
-    - 导致 parameters blow up, often see NaNs, have overflow in neural network computation,  
-    - <span style="background-color: #FFFF00"> exploding gradient 可以用**gradient clipping**</span>，<span style="color: red">当超过某个threshold得时候，rescale避免too large. thare are clips 不超过最大值</span>, 比如gradient超过$$\left[-10,10\right]$$, 就让gradient 保持10 or -10
+Exploding Gradient: aslo happen for RNN. When doing backprop, the gradient(slop) not decrease exponentially, instead increase exponentially with the number of layers go through. Whereas Vanish Gradient tends to a bigger problem for RNN 
+    - Can cause parameters become so large and make neural network messed up.
+    - It is easy to saw and often see NaNs, meaning results of a numerical overflow in neural network computation,  
+    - <span style="background-color: #FFFF00"> exploding gradient 可以用**gradient clipping**</span>，<span style="color: red">当超过某个threshold得时候，rescale gradient vector so that is not too big. there are clips 不超过最大值</span>, 比如gradient超过$$\left[-10,10\right]$$, 就让gradient 保持10 or -10
 
 
 

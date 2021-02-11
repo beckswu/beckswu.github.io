@@ -1,7 +1,7 @@
 ---
 layout:     post
 title:      "Convolutional Neural Networks"
-subtitle:   "coursera note"
+subtitle:   "CNN, ResNets, Inception Networks, Object Detection, Face Recgnition, Neural Style Transfer"
 date:       2019-07-12 20:00:00
 author:     "Becks"
 header-img: "img/post-bg-city-night.jpg"
