@@ -361,68 +361,161 @@ Exploding Gradient: aslo happen for RNN. When doing backprop, the gradient(slop)
 
 #### GRU && LSTM
 
-**GRU**: Gated Recurrent Unit, capture long range connection and solve Vanishing Gradient
-
- $$\begin{align} \tilde c^{<{t}>} &= tanh \left( W_c \left[ \Gamma_r \times c^{<{t-1}>}, x^{<{t}>}  \right] + b_c \right) \\ \Gamma_r &= \sigma \left( W_r \left[ c^{<{t-1}>}, x^{<{t}>}  \right] + b_r \right) \\  \Gamma_u &= \sigma \left( W_u \left[ c^{<{t-1}>}, x^{<{t}>}  \right] + b_u \right) \\ c^{<{t}>} &= \Gamma_u \cdot \tilde c^{<{t}>}  + \left( 1 - \Gamma_u \right) \cdot  c^{<{t-1}>}  \\ a^{<{t}>} &= c^{<{t}>}  \end{align}$$  
-
-
-1. c是memory cell, a 是output cell, c = memory cell 比如记录cat 是单数还是复数, 用于后面记录是was or were 
-2. $$\tilde c^{<{t}>}$$是candidate value 代替$$c^{<{t}>}$$， 
-3. $$\Gamma_u$$是表示gate, value between 0 and 1, For most of possible range, it will very close to 0 or very close to 1. The job of $$\Gamma_u$$ is to decide when to update $$c^{<t>}$$ value, 如果gate = 1, $$c^{<{t}>}$$ 更新值为 candidate 值 $$\tilde c^{<{t}>}$$, 比如遇到cat gate = 1更新 $$c^{<{t}>}$$为1表示单数, the cat, which already ate.... was full, 从cat 到was, gate =0, means don't update, 直到was, $$c^{<{t}>}$$还为1 . Because $$\Gamma_u$$ can be so close to zero, <span style="color:red">it won't suffer that vanish gradient problem </span>, allow nerual network to learn long range dependency
-4. sigmoid function for $$\Gamma_u$$ easy to set zero, 只要 $$ W_u \left[ c^{<{t-1}>}, x^{<{t}>}  \right] + b_u $$ 是非常大的负数
-5. $$c^{<{t}>}$$可以是vector (比如100维，100维都是bits), then$$\Gamma_u$$,$$\tilde c^{<{t}>}$$都是same dimension,  $$ \Gamma_u \cdot \tilde c^{<{t}>}  + \left( 1 - \Gamma_u \right) \cdot  c^{<{t-1}>} $$ 是 <span style="color:red">**element wise operation**</span>, to tell bit需要update, to keep some bits as before and update other bits，哪个保持上一个value，比如用第一个维度代表单数复数，第二维度代表是不是food
-6. $$\Gamma_r $$: relevance, how relevant $$c^{<{t-1}>}$$ to update $$c^{<{t}>}$$
+**GRU**: Gated Recurrent Unit, <span style="background-color:#FFFF00">capture long range connection and solve Vanishing Gradient</span>. 
+- There are many different possible versions of how to desgin these units to try to have longer range connections, to have longer range effects, and aggress vandishing gradient problem. GRU is one of the most commonly used versions that researchers found **robust and useful** for many different problems
 
 
-**LSTM**: Long Short Term Memory
+ $$\begin{align} 
+ 
+  \Gamma_r &= \sigma \left( W_r \left[ c^{<{t-1}>}, x^{<{t}>}  \right] + b_r \right) \\  
+ \tilde c^{<{t}>} &= tanh \left( W_c \left[ \Gamma_r * c^{<{t-1}>}, x^{<{t}>}  \right] + b_c \right) \\ 
+ \Gamma_u &= \sigma \left( W_u \left[ c^{<{t-1}>}, x^{<{t}>}  \right] + b_u \right) \\ 
+ c^{<{t}>} &= \Gamma_u * \tilde c^{<{t}>}  + \left( 1 - \Gamma_u \right) *  c^{<{t-1}>}  \\ 
+ a^{<{t}>} &= c^{<{t}>}  \end{align}$$  
 
- $$\begin{align} \tilde c^{<{t}>} &= tanh \left( W_c \left[ \Gamma_r \times a^{<{t-1}>}, x^{<{t}>}  \right] + b_c \right) \\ \Gamma_u &= \sigma \left( W_u \left[ a^{<{t-1}>}, x^{<{t}>}  \right] + b_u \right) \\ 
- \\  \Gamma_f &= \sigma \left( W_f \left[ a^{<{t-1}>}, x^{<{t}>}  \right] + b_f \right) 
- \\  \Gamma_o &= \sigma \left( W_o \left[ a^{<{t-1}>}, x^{<{t}>}  \right] + b_o \right) \\ c^{<{t}>} &= \Gamma_u \cdot \tilde c^{<{t}>}  + \Gamma_f  \cdot  c^{<{t-1}>}  \\ a^{<{t}>} &= \Gamma_o \cdot tanh\left(c^{<{t}>} \right) \end{align}$$  
+-  `c`: memory cell. Used to provide a bit of memory to remember e.g. whether cat was singular or pural
+-   `a` output activation value, <span style="background-color:#FFFF00">GRU Unit $$c^{<t>} = a^{<t>}$$ (LSTM they are different value)</span>
+-   At each time step,  produce memory cell  $$\tilde c^{<{t}>}$$ (the candidate for replacing $$c^{<{t}>}$$)
+- $$\Gamma_u$$: **update gate**, value between 0 and 1. <span style="background-color:#FFFF00">The update gate will decide whether or not to update $$ c^{<{t}>}$$ using $$\tilde c^{<{t}>}$$</span>. to compute $$\Gamma_u$$ use a sigmoid function. 
+  - For most of possible range of input, the value of sigmoid function output will very close to 0 or very close to 1. <span style="color:red">For intuition, can think of gamma as being either 0 or 1 most of the time</span>.
+  - 如果gate $$\Gamma_u=1$$, set $$c^{<{t}>}$$ equal to candidate value $$\tilde c^{<{t}>}$$, 比如下面例子, 遇到"*cat*" gate = 1更新 $$c^{<{t}>}$$为1表示单数, the cat, which already ate.... was full, 从 “*cat*“ 到 ”*was*“, gate =0
+  - Because $$\Gamma_u$$ is quite easy set to zero when $$W_u \left[ c^{<{t-1}>}, x^{<{t}>} \right] + b_u$$ is large negative value, it is good at maintaining the value of the cell  $$c^{<{t}>} = c^{<{t-1}>}$$. <span style="color:red">it won't suffer that vanish gradient problem </span>, <span style="background-color:#FFFF00">allow nerual network to learn long range dependency</span>
+- $$\Gamma_r$$: tell how relevant $$c^{<{t-1}>}$$ to compute the next candidate $$\tilde c^{<{t}>}$$
+
+
+**GRU Step**:
+
+1. Takes $$  c^{<{t-1}>} $$(= $$  a^{<{t}>} $$  in GRU) as input also take input $$ x^{<{t}>} $$. 
+2. Then $$  c^{<{t-1}>} $$ and $$ x^{<{t}>} $$ with a set of parameters and through a **sigmoid activation** function to get relevant gate $$\mathbf{ \Gamma_r }$$. 
+3. Then $$  c^{<{t-1}>} $$ and $$ x^{<{t}>} $$ combine together with **tanh** gives $$\mathbf{\tilde c^{<{t}>} }$$ (candidate for replacing $$c^{<{t}>} $$)
+4. Then $$  c^{<{t-1}>} $$ and $$ x^{<{t}>} $$ with different set of parameters and through a **sigmoid activation** function to get **update gate $$ \mathbf{\Gamma_u }$$**.
+5. Then take $$c^{<{t-1}>} $$), $$ \tilde c^{<{t}>} $$  and $$ \Gamma_r $$ to generate new value for the **memory cell $$\mathbf{c^{<{t}>} = a^{<{t}>}}$$**
+6. Also can take $$c^{<{t-1}>} $$, $$ \tilde c^{<{t}>} $$  and $$ \Gamma_u $$ to pass to a softmax to **make a prediction $$\mathbf{\hat y}$$** at timestamp t
+
+
+**Example**: if "*cat*" -> set $$c^{<{t}>} = 1$$ singular.  if "*cats*" -> set $$c^{<{t}>} = 0$$ pural. GRU unit would memorize the value of  $$c^{<{t}>} $$ all the way until "*was*". <span style="color:red">The gate  $$\Gamma_u$$ is to decide when do you update the value of $$c^{<{t}>}$$. </span>
+
+
+$$
+\require{AMScd}
+\begin{CD}
+    c^{<{t}>} = 1, \Gamma_u = 1 @>>>  \Gamma_u = 0 ... @.  \Gamma_u = 0 ... @>>>  c^{<{t}>} = 1  \\
+    
+    @AAA @. @. @VVV  \\
+    \text{The cat,} @. \text{which already ate} @. ... @. \text{, was} @. full. \\
+\end{CD}
+$$
+
+   - When see "*cat*" , set $$\Gamma_u=1$$ and update $$ c^{<{t}>}$$.  When done using it, see *was*, then realize don't need it anymore
+   - For all values in the middle, should have $$\Gamma_u=0$$ means don't update and don't forget this value, so just set $$c^{<{t}>} = c^{<{t-1}>}$$
+   - When get the way down *was*, still memorize cat is singular. 
 
 
 
-1. $$\Gamma_u$$是表示update gate,  $$\Gamma_f$$是表示forget gate, $$\Gamma_o$$是表示output gate. Different from GRU, <span style="color: red">LSTM use separate update and forget gate</span>.
-2. One variation: **peephole connection** ($$c^{<{t-1}>}$$): gate value may not only depend on $$a^{<{t-1}>}$$ & $$x^{<{t}>}$$, 也可能depend on $$c^{<{t-1}>}$$, $$\Gamma_o = \sigma \left( W_o \left[ a^{<{t-1}>}, x^{<{t}>}, c^{<{t-1}>}  \right] + b_o \right)$$
+
+
+
+Note: $$c^{<{t}>}$$ can be a vector (比如100维，100维都是bits, values mostly zero and one) => <span style="background-color:#FFFF00">$$\tilde  c^{<{t}>}$$ would be the same dimension =>  $$\Gamma_u$$ would also be the same dimension</span>. So `*` is <span style="color:red">element-wise multiplication</span>.  
+
+$$ c^{<{t}>} = \Gamma_u * \tilde c^{<{t}>}  + \left( 1 - \Gamma_u \right) *  c^{<{t-1}>}  $$
+
+   - $$\Gamma_u$$ is also vector of bits (mostly zero and one,  In practice, not exactly zero and one, it is convenient to think for inituition). <span style="color:red">Tell you of 100 dimensional memory cell which bits want to update</span>.
+   - **element-wise operation**: <span style="background-color:#FFFF00">element-wise tell GRU unit which bits of memory cell vector to update at every time step</span>. To keep some bits constant while updating other bits. Maybe one bit to remember the singular or pural of cat. Maybe some other bits to realize that you're talking about food
+  
+
+
+In literature, some peole use $$\tilde{h}$$ as $$\tilde{c^{<{t}>}}$$, $$u$$ as $$\Gamma_u$$, r as $$\Gamma_r$$ and h as $$c^{<{t}>}$$
+
+***
+
+**LSTM**: Long Short Term Memory: $$ c^{<{t}>} \neq a^{<{t}>}$$
+
+ $$\begin{align} \tilde c^{<{t}>} &= tanh \left( W_c \left[ a^{<{t-1}>}, x^{<{t}>}  \right] + b_c \right) \\
+  \Gamma_u &= \sigma \left( W_u \left[ a^{<{t-1}>}, x^{<{t}>}  \right] + b_u \right) \\ 
+ \\  \Gamma_f &= \sigma \left( W_f \left[ a^{<{t-1}>}, x^{<{t}>}  \right] + b_f \right)  \\  
+ \Gamma_o &= \sigma \left( W_o \left[ a^{<{t-1}>}, x^{<{t}>}  \right] + b_o \right) \\ 
+ c^{<{t}>} &= \Gamma_u \cdot \tilde c^{<{t}>}  + \Gamma_f  \cdot  c^{<{t-1}>}  \\ 
+  a^{<{t}>} &= \Gamma_o \cdot tanh\left(c^{<{t}>} \right) \end{align}$$  
+
+
+
+
+
+1. No Relevance gate  $$\Gamma_r$$ for more common version of LSTM, could put $$\Gamma_r$$ when computing $$\tilde c^{<{t}>}$$ in a variation of LSTM
+2. Instead of having one update gate control in GRU unit($$\Gamma_u$$ and $$1-\Gamma_u$$), LST have <span style="background-color:#FFFF00">two separate term update gate $$Gamma_u$$ and forget gate $$\Gamma_f$$</span>
+   - as long as set forget and update gate appropriately, it's easy for LSTM pass some value  $$c^{<{0}>}$$ to later layer, maybe  $$c^{<{l}>} =  c^{<{0}>}$$. That's why <span style="background-color:#FFFF00">LSTM is very good at memorizing certain values for a long time</span>
+3. $$Gamma_o$$: output gate
+
+
+One Common variation: **peephole connection** ($$c^{<{t-1}>}$$): gate value may not only depend on $$a^{<{t-1}>}$$ & $$x^{<{t}>}$$, also depend on previous memory cell value $$c^{<{t-1}>}$$, 
+
+- Relationship One-to-One: only first element of $$c^{<{t-1}>}$$ affect the first element of corresponding gate; only fifth element of $$c^{<{t-1}>}$$ affect the fifth element of corresponding gate(e.g. $$ \Gamma_o$$), 
+
+ $$\begin{align} 
+  \Gamma_u &= \sigma \left( W_u \left[ a^{<{t-1}>}, x^{<{t}>} , c^{<{t-1}>}  \right] + b_u \right) \\ 
+ \\  \Gamma_f &= \sigma \left( W_f \left[ a^{<{t-1}>}, x^{<{t}>} , c^{<{t-1}>}  \right] + b_f \right)  \\  
+ \Gamma_o &= \sigma \left( W_o \left[ a^{<{t-1}>}, x^{<{t}>}, c^{<{t-1}>}  \right] + b_o \right) 
+ \end{align}$$  
 
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week1pic10.png)
+
+上图 四个小方块依次是 forget gate, update gate, tanh, and output gate
+
+
+LSTM:
+
+![](/img/post/Deep_Learning-Sequence_Model_note/week1pic2.png)
  
- 上图 四个小方块依次是 forget gate, update gate, tanh, and output gate
 
-| GRU | LSTM |
-| ------:| -----------:|
-| $$c^{<{t}>} $$ 等于 $$a^{<{t}>} $$ | $$c^{<{t}>} $$ 不等于 $$a^{<{t}>} $$ |
-| update $$c^{<{t}>} $$是由gate $$\Gamma_u$$控制，如果不update, gate = 0, $$c^{<{t}>} $$ = $$c^{<{t-1}>} $$   | 有三个gate  $$\Gamma_u$$,$$\Gamma_f$$,$$\Gamma_o$$ 分别控制update, forget, 和output |
-
-when use GRU or LSTM: isn't widespread consensus in this(some problem GRU win and some problem LST win); Andrew: GRU is simpler model than LSTM and GRU is recently invention than LSTM, <span style="background-color: #FFFF00">easy to build much bigger network</span> than LSFT, LSTM is <span style="background-color: #FFFF00">more powerful and effective</span> since it has three gates instead of two. LSTM is more historical proven， default first try. Now more and more team use GRU, more simpler but work as well.
+**when use GRU or LSTM**: isn't widespread consensus in this(some problem GRU win and some problem LST win); Andrew:
+-  <span style="background-color:#FFFF00">GRU is simpler model than LSTM</span> and GRU is recently invention that maybe derived as simplification of more complicated LSTM model, <span style="background-color: #FFFF00">easy to build much bigger network</span> than LSFT, 
+-  LSTM is <span style="background-color: #FFFF00">more powerful and effective</span> since it has three gates instead of two. 
+-  LSTM is more historical proven choice, default first try. Now more and more team use GRU, more simpler but work as well.
 
 
-#### Bidirection RNN && Deep RNNS:
+#### Bidirection RNN 
 
-单向的RNN的问题，比如 
+Unidirectional or Forward directional only RNN的问题，Motivated example: 
 
-He said "Teddy bears are on sale"; <br/>
-He said “Teddy Roosevelt was a great President".<br/>
+- He said "Teddy bears are on sale"; 
+- He said “Teddy Roosevelt was a great President".
+  
 Teddy都是第三个单词且前两个都一样，而只有第二句话的Teddy表示名字
 
-Bidirection RNN: forward prop从左向右 and 从右向左, 每个Bidirection RNN block还可以是GRU or LSTM的block
+Bidirection RNN(also defines a acyclic graph): forward prop从左向右 and 从右向左, 每个Bidirection RNN block还可以是GRU or LSTM的block. <span style="color:red">Lots of NLP problem, Birectional RNN with LSTM are commonly used</span>(first thing to try)
+- Bidirectional RNN is able to predict anywhere even in the middle of a sequence by taking into account information potentially from the entire sequence 
+- for NLP, when you can get entire sentence all the same time, standard BRNN algorithm is very effective
+
+ $$ \tilde y^{<{t}>} = g\left( W_y\left[ \overrightarrow a^{<{t}>}, \overleftarrow a^{<{t}>}   \right] + b_y \right)$$
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week1pic11.png)
 
- $$ \tilde y^{<{t}>} = g\left( W_y\left[ \overrightarrow a^{<{t}>}, \overleftarrow a^{<{t}>}   \right] + b_y \right)$$  
 
-Lots of NLP problem, BRNN with LSTM are commonly used
+<span style="background-color: #FFFF00">Disadvantage</span>: 需要entire sequence of data before you can make prediction; 比如speech recognition: 需要person to stop talking to get entire utterance before process and make prediction
 
-<span style="background-color: #FFFF00">Disadvantage</span>: 需要entire sequence of data before you can make prediction; 比如speech recognition: 需要person 停止讲话 to get entire utterance before process and make prediction
+
+#### Deep RNNs
+
+
+
+
+- $$a^{\left[ l \right] <{t}>}$$ denote the activation with layer l over time t
+- $$w_a^{\left[ 1 \right]},b_a^{\left[ 1 \right]} $$ used for every computation in first layer; $$w_a^{\left[ 2 \right]},b_a^{\left[ 2 \right]} $$ used for every computation in layer 2; 
+- 每个block 也可以是GRU, 也可以是LSTM, 也可以build deep version of bidirectional RNN,
+- 在output layer也可以有recurrent layers stack on top of each other, 下图中$$y^{<{1}>}$$的上边，have a bunch of deep layers that are not connected horizontally, then finally predict $$y^{<{1}>}$$，  
+- <span style="background-color: #FFFF00">**Disadvantage**: computational expensive to train</span>
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week1pic12.png)
 
-For RRN,  <span style="color:red">三层已经是very deep</span>, $$a^{\left[{1}\right]<{0}>}$$表示第1层第0个input，在output layer也可以有stack recurrent layer，但这些layer没有horizon connection， 每个block 也可以是GRU, 也可以是LSTM, 也可以build deep version of bidirectional RNN, 
 
-比如计算$$a^{\left[{2}\right]<{3}>}$$:   $$a^{\left[{2}\right]<{3}>} = g\left( W_a^2 \left[a^{\left[{2}\right] <{2}>}, a^{\left[ {1}  \right] <{3}>}  \right] \right)$$
+比如计算$$a^{\left[{2}\right]<{3}>}$$:   $$a^{\left[{2}\right]<{3}>} = g\left( W_a^{\left[ 2 \right]} \left[a^{\left[{2}\right] <{2}>}, a^{\left[ {1}  \right] <{3}>}  \right] \right)$$
 
-<span style="background-color: #FFFF00">**Disadvantage**: computational expensive to train</span>
+For RRN,  <span style="color:red">三层已经是very deep</span>, don't see many deep recurrent layers that are connected in time, whereas there could be many layers in a deep conventional neural network.
+
+
+
+
 
 <br/><br/><br/>
 
@@ -432,54 +525,90 @@ For RRN,  <span style="color:red">三层已经是very deep</span>, $$a^{\left[{1
 
 
 #### Word Embedding:
-<span style="background-color: #FFFF00">Word Embedding: </span> 让algorithm学会同义词：比如男人vs女人，king vs queen<br/> 
-<span style="background-color: #FFFF00">One hot vector的缺点</span>: 10000中(10000是字典)，只有1个为1表示这个词，不能表示gender. age, fruit..., 因为任何两个one-hot vector的inner product是zero and Eludian distance between any pair is the same.
+
+**Word Embedding**: The way of representing words. 让algorithm学会同义词：比如男人vs女人，king vs queen. With Word Embedding, it is able to build NLP with a small training sets
+
+<span style="background-color: #FFFF00">**One hot** vector的缺点: it deoesn;t alow an algorithm to easily generalize across words</span>:
+   -  10000中(10000是字典)，只有1个为1表示这个词，不能表示gender. age, fruit..., 
+   -  <span style="background-color:#FFFF00">any product between any two different one-hot vector is zero and Eludian distance between any pair is the same</span>. e.g. *King* vs *Apple* and *Orange* vs *Apple* are the same
+       - e.g. *orange juice* then should know *Apple ___*, juice is popular choice since orange and apple is similar
+
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week2pic1.png)
 
-- featurized representation (**embeddings**) with each of these words, 比如一个 vocabulary dictionary size 10000, 而每个word 比如有3000 feature, feature vector size = 3000, 
-   - e.g. Gender 在 第0个位置, Age 在第2个位置, 比如man 的feature vector \[0] = -1,  woman 的feature vector \[0] = 1, King 的 feature vector \[2] = 0.7, Queen 的 feature vector \[2] = 0.69.  
+- featurized representation (**embeddings**) with each of these words, 比如一个 vocabulary dictionary size 10000, 而每个word 比如有300 feature, feature vector size = 300, 
+   - use $$e_{5391}$$ denote the embedding for Man, 5391 is the position of one hot vector equal to 1
 - Featurized representaion will be similar for analogy. e.g. Apple vs Orange, Kings vs Queens
 - In practice, feature(word embedding)  that used for learning won't have a easy interpretation like gender, age, food ...
-- <span style="background-color: #FFFF00">T-SNE</span> 把3000vector visualize 到2-D, analogy tends to close
+- It allow to <span style="background-color:#FFFF00">generalize better across different words</span>
+- **T-SNE**(complicated, non-linear mapping): take 3000vector visualize to 2-Dimensional space, analogy tends to close (上图右侧)
 
-Embedding training dataset 需要很大的，会发现比如durian 和orange， farmer 和cultivator是同义词, 
-1. 所以当training set有限的时候，可以先train 从网上的文本（100 billion 个）or use pre-training embedding from online，
-2. 然后再apply <span style="background-color: #FFFF00">transfer learning</span> 到你的task上(<span style="background-color:#FFFF00">size smaller than the set used for training embedding </span> ), then use 300 dimension embedding vector（位置一表示性别，位置二表示color...） to represent word instead of one hot vector(dimension: 10000),<span style="background-color: #FFFF00">**advantage**</span>: use low dimension feature vector (size 300) rather than one-hot vector (size = 10000).  
-3. Optional: continue to fine-tune word embeddings with new data(only your task dataset is really large) 
+E,g, *apple farmer* vs *durian cultivator*: If have a small trianing set for named entity recognition, might not seen durian or cultivator in training set. But if learn from embedding, it can still generialize from having seen an orange farmer in your training set to  tell durian is a fruit and cultivator is a farmer 
 
-Application: for many NLP task, such as named Entity Recognition, text summarization, co-reference resolution, parsing. Less useful for language modeling, machine traslation especially having large dataset
+1. Word Embedding can be learned from very large <span style="color:red">**unlabeled** training datasets</span> (~1 billion - 100 billion), then can find *apple* and *durian*, *farmer* and *cultivator* are kind of similar 
+   - Or can download pre-trainined embedding online
+2. Take the word embedding from first steps to new task with  <span style="background-color:#FFFF00">much smaller **labeled** training set</span>. (maybe ~ 100k)
+   - carry out transfer learning where take information you've learned from huge amount of unlabeled ext from step 1, and transfter to a taask such as named entity recognition
+   - can use <span style="background-color:#FFFF00">relative lower dimensional feature vector</span> from word embedding (mabe ~300 dense vector rather than 10000 of one hot vector)
+3.  Optional: continue to fine-tune(adjust) word embeddings with new data(only your task dataset is really large) 
+
+**Advantage**: word embeddings can allow to be carried out with <span style="background-color:#FFFF00">a relatively smaller labeled training set </span>
+   - used for many NLP Application: such as named Entity Recognition, text summarization, co-reference resolution, parsing.(transfer from task A to some task B, when A has large dataset and B has relative smaller dataset) Less useful for language modeling, machine traslation especially having large dataset
 
 Difference between face recognition and word embedding: 
-- face recognition can have neural network to compute an encoding for new picture
-- word embedding, 比如 we have 10000 word vocabularies, only learn those 10000 word embedding in our vocabularies (fetaures)
+- face recognition can have neural network to compute an encoding(embedding) for any picture even the picture haven't seen before
+- word embedding, 比如 we have a fixed 10000 word vocabularies, only learn those 10000 word embedding in our vocabularies (fetaures)
+
+Word Embedding **Applications**: can be learn from large text corpus
+
+- learn analogy such as *boy - girl* as *man - womann*
+- learn capital. such as *Ottawa: Canada* as *Nairobi : Kenya*
+- learn  *Yen: Japn* as *Ruble: Russia*
+- learn *Big: Bigger* as *Tall: Taller*
 
 
-**Cosine Similarity**: 
+#### Cosine Similarity
 
-比如 $$e_{man} - e_{woman} \approx e_{king} - e_{?} 用similarity function $$ 
+比如 $$e_{man} - e_{woman} \approx e_{king} - e_{?} \text{用similarity function} $$ 
 
-$$argmax_{w} sim\left( e_{w}, e_{king} - e_{man} + e_{woman} \right)$$, <br/>
+Find a word w to maximize the similarity between  $$e_{w}$$, and$$ e_{king} - e_{man} + e_{woman} $$. In practice, it works by finding a word to maximize the similarity and can get the exact right answer. And count the analogy is correct only get exact word right
+
+$$argmax_{w} sim\left( e_{w}, e_{king} - e_{man} + e_{woman} \right)$$
+
+- $$u^Tv$$ inner product, if u and v are very similar, it tends to be large. The idea is if u,v similar, similarity will be large, 因为$$u^Tv$$表示他们的夹角(cos)
+-  or use Euclidian distance: $${||u-v||}^2$$ 通常 <span style="background-color:#FFFF00">measure **dissimilarity** than similarity</span>. if measure simialrity, should take $$-{||u-v||}^2$$ Cosine Similarity being used often.
+-  Difference between cosine and Euclidian distance similarity is how to normalize the length of the vectors u and v
+
 $$sim\left( u, v \right)  = \frac{u^Tv}{||u||_2 ||v||_2 } $$ 
 
-The idea is if u,v similar, similarity will be large, 因为$$u^Tv$$表示他们的夹角(cos), 
- <br/>or measure dissimilarity Euclidian distance:
-$${||u-v||}^2$$ 通常 <span style="background-color:#FFFF00">measure dissimilarity than similarity</span>. Cosine Similarity being used often.
+
+
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week2pic2.png)
+
 
 
 **Embedding Matrix**:
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week2pic3.png)
-what we learn is 300 features by 10000 words vocabulares. The goal to learn 300 x 10000 embedding matrix (E) is to <span style="color:red">intialize E **randomly**</span> and use <span style="color:red">gradient descent</span> to learn all the parameter in E. $$E \dot o_j = e_j $$ , $$o_j$$ is <span style="color:red">**one-hot vector**</span> and $$e_j$$ is <span style="color:red">**embedding vector**</span>
+
+Goal: learn 300 features by 10000 words vocabulares **embedding matrix**(` 300 x 10000`). 
+- <span style="color:red">Intialize E **randomly**</span> and use <span style="color:red">gradient descent</span> to learn all the parameter in E. 
+- $$E * o_j = e_j $$ , $$o_j$$ is <span style="color:red">**one-hot vector**</span> and $$e_j$$ is <span style="color:red">**embedding vector**</span>
+- In practice, not use matrix multiplication ($$E * o_j = e_j $$ ) to get embedding vector，not efficient, <span style="color:red">用just lookup word emdding matrix column e</span>
+- 
+e.g. 
+
+$$
+
+ \underbrace{E}_{\text{300 x 10k}} * \underbrace{O_{6257}}_{\text{10k x 1}} = \underbrace{\begin{bmatrix} e_{1, 6257} * 1\\ e_{2, 6257} * 1 \\ \vdots \\ e_{300, 6257} * 1  \end{bmatrix}}_{\text{300 x 1}} = e_{6257} \text{ embedding vector for 6257-th word}
+ 
+$$
 
 
-但是通常不用matrix multiplication to get embedding vector，因为不efficient, <span style="color:red">in practice用just lookup 那个word的emdding matrix column e</span>
+
 
 #### Word2vec 
-
-**Word2Vec**:
 
 <span style="background-color:#FFFF00">**Fixed window**</span>: 比如I want a glass of orange ___ , 
 1. only use 4 words fixed window, 预测填入的是juice，只代入把前四个word, a glass of orange 的 one-hot vector(size 10000) 
@@ -866,3 +995,12 @@ Method 2: **CTC cost for speech recognition (CTC: connectionist temporal classif
 ![](/img/post/Deep_Learning-Sequence_Model_note/week3pic13.png)
 
 [pic3]: https://raw.githubusercontent.com/beckswu/beckswu.github.io/master/img/post/Deep_Learning-Sequence_Model_note/week1pic3.png
+
+
+## Paper Reference
+
+- [On the Properties of Neural Machine Translation: Encoder-Decoder Approaches, Cho, 2014](https://arxiv.org/abs/1409.1259): GRU Unit
+- [Empirical Evaluation of Gated Recurrent Neural Networks on Sequence Modeling, Chung, 2014](https://arxiv.org/abs/1412.3555):  GRU Unit
+- [Long Short-Term Memory, hochreiter & schmidhuber, 1997](https://www.bioinf.jku.at/publications/older/2604.pdf): LSTM 
+- [Visualizing Data using t-SNE, van der Maaten and Hinton, 2008](https://www.jmlr.org/papers/volume9/vandermaaten08a/vandermaaten08a.pdf): Visualize Word Embedding
+- [Linguistic Regularities in Continuous Space Word Representations, Mikolov, 2013](https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/rvecs.pdf): Cosine Similarity

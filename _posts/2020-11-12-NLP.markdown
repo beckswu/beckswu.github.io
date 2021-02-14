@@ -1081,7 +1081,7 @@ Build a vocabulary: assign integer to word, <span style="color:red"> Problem: or
 -  <span style="color:red"> Advantage: not imply any relationship between any two words</span>. e.g. Each vector says the word either happy or not , either zebra or not
 - <span style="color:red"> Disadvantage:</span>
    -  Huge vectors: <span style="color:red">require a lot of space and processing time</span>. If created with English word, may have 1 million rows, one row for each English word
-   -  <span style="color:red">No embedding meaning</span>: if calculate the distance btween one-hot vectors, always get the same distance btween any two pairs of words. ```d(paper, excited) = d(paper, happy) = d(excited, happy)```, (inner product of any 2 one-hot vector is zero). 但是intuitively, happy is more similar to excited than paper
+   -  <span style="color:red">No embedding meaning</span>: if calculate the distance between one-hot vectors, always get the same distance btween any two pairs of words. ```d(paper, excited) = d(paper, happy) = d(excited, happy)```, (inner product of any 2 one-hot vector is zero). 但是intuitively, happy is more similar to excited than paper
 
 
 e.g. each vector has 1000 elements,
@@ -1099,7 +1099,7 @@ e.g. each vector has 1000 elements,
 
 - Low dimension: Word embedding represent words in  a vector form that has a relative low dimension
 - Carry embed meaning:  
-  - e.g. semantic distance:  $$\text{forst} \approx \text{tree, forest} \not\approx \text{ticket}$$$
+  - e.g. semantic distance:  $$\text{forst} \approx \text{tree, forest} \not\approx \text{ticket}$$
   - e.g. analgies :  Paris -> France similar as Rome -> Italy
 
 ![](/img/post/Natural-Language-Processing/course2/week4pic4.png)
@@ -1108,7 +1108,7 @@ e.g. each vector has 1000 elements,
 **Create Word Embedding**
 
 - If you want to generate word embedding based on Shakespeare, corpus should be full and original text of Shakespeare, not study notes, slide presentation or keywords from Shakespeare. 
-- <span style="background-color:#FFFF00">Context(combination of words to occur around that particular word) is important, give meaning to each word embedding</span>. a simple vocabulary list of Shakespeare's most common words not enough to create mebedding. 
+- <span style="background-color:#FFFF00">Context(combination of words to occur around that particular word) is important, give meaning to each word embedding</span>. a simple vocabulary list of Shakespeare's most common words not enough to create embedding. 
 - Objective of word embedding is to predict missing word given context words
 - Embedding method, machine learning models which are set to learn word embeddings. <span style="color:red">The meaning of words, as carred by word embeddings depends on the embedding approach</span>
   - <span style="background-color:#FFFF00">**Self-supervised learning**: Both unsupervised (input data are unlabeled) and supervised(text provide necessary context which would ordinarily make up the label)</span>
@@ -1216,7 +1216,7 @@ Dimension(single input):  $$W_1$$ : N (size of word embedding) rows and V (size 
 
 Dimension(Batch input):  <span style="color:red"> m: batch size</span>: hyperparameter model defined at training time
 
-note: $$B_1$$ size is Nx1 broadcasting to NxM
+note: $$b_1$$ size is Nx1 broadcasting to NxM
 
 
 ![](/img/post/Natural-Language-Processing/course2/week4pic13.gif)
@@ -1302,12 +1302,12 @@ $$\frac{\partial Cross-entropy \, Loss}{\partial w_j} = \frac{\partial Cross-ent
 
 After iterate training data serval times,
 
-**Option 1**:  can consider <span style="color:red">each column of $$W_1$$ as embedding vector of a word of the vocabulary</span>, $$W_1$$ size is VxN, it has one column for each word in the vocabulary, 比如下面例子，总共5列，第一列 is the word embedding column vector for *am*, 第二列for *because*
+**Option 1**:  can consider <span style="color:red">each column of $$W_1$$ as embedding vector of a word of the vocabulary</span>, $$W_1$$ size is NxV, it has one column for each word in the vocabulary, 比如下面例子，总共5列，第一列 is the word embedding column vector for *am*, 第二列for *because*
 
 ![](/img/post/Natural-Language-Processing/course2/week4pic19.png)
 
 
-**Option 2**: Use <span style="color:red">each row in $$W_2$$ as the embedding row vector for corresponding word</span>. $$W_1$$ size is NxV,  order is the same as input vector or matrix 比如 第一行表示 embedding row vector for *am*, 第二行for *because*
+**Option 2**: Use <span style="color:red">each row in $$W_2$$ as the embedding row vector for corresponding word</span>. $$W_1$$ size is VxV,  order is the same as input vector or matrix 比如 第一行表示 embedding row vector for *am*, 第二行for *because*
 
 ![](/img/post/Natural-Language-Processing/course2/week4pic20.png)
 
