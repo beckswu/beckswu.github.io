@@ -1102,25 +1102,28 @@ Visualization of attention weights: Attention weights tend to be high for corres
 - Because human doesn't process raw wave forms. Human ears measures the intensity of different frequency.
 - <span style="color: red">A common step to preprocess audio data is to run raw audio clip and generate a spectrogram</span>.  
    - x-axis is time, y-axis is frequencies, intensify of different colors shows the amount of energy(how loud the sound, different frequecies at different time?)
-- need large dataset, academic dataset on speech recognition might be 3000 hrs. Best commerical system now train over 10000 hrs and somestiems over 100,000 hours of audio
+- Once Trend in Speech Recognition: speech recognition systems used to be built using phonemes(hand-engineer basic unit of cells)"de", "kwik"... language can break down to these baisc unit of sound. Find that phonemes representations are no longer necessary
+- need large dataset, academic dataset on speech recognition might be 3000 hrs. Best commerical system now train over 10000 hrs and sometimes over 100,000 hours of audio
 
 **Way to build Speech Recognition Model**
 
-Method 1: **Attention Model**
+Method 1: **Attention Model**: take different time frames of audio input and use attention model output transcript
 
-Method 2: **CTC cost for speech recognition (CTC: connectionist temporal classification)** Rule: collapse repeated characters not separated by "blank"
+Method 2: **CTC cost for speech recognition (CTC: connectionist temporal classification)** <span style="background-color:#FFFF00">Rule: collapse repeated characters not separated by "blank"</span>
 
-- In speech recognition, <span style="color: red"> input time steps are much bigger than output time steps</span>; 
+- Equal number of input x and output y and use bidirectional LSTM or bidirectional GRU in practice
+- In speech recognition, <span style="color: red"> input time steps are much bigger than output time steps(not equal)</span>; 
    - 比如10 seconds audio, feature come at 100 hertz so 100 samples每秒; 10 seconds audio clip has 1000 inputs, but output don't have 1000 outputs for 1000 characters; 
-- CTC cost function is to <span style="color: red">collapse repeated not separated by blank</span>. Then can have for example a thousand outputs by repeating characters to end up short transcrapt. 
+- CTC cost function is to <span style="color: red">collapse repeated characters not separated by blank</span>. Then can have for example a thousand outputs by repeating characters to end up short transcrapt. 
    - \_ : called special character, \|\_\|: space character; 
    - e.g. ```the_h_eee___|_|___qqq__``` end up ```the|_|q```
+   - "The quick brown fox" only has 19 characters, CTC can allow have a thousand outputs by repeating charcters and inserting blank characters and still end up with 19 characters from 1000 outputs of values of Y
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week3pic12.png)
 
 **Trigger Word Detection** 
 
-- 比如amazon echo; 用audio clip 计算spectrogram to generate features; to define target label y before trigger word as 0, after as 1
+- 比如amazon echo; 用audio clip 计算spectrogram to generate features then pass to RNN; to define target label y when someone saying trigger word (小度小度，or hey Alexa) as 1, before and after trigger word set as 1
    - could work. not work well, because it creates <span style="color: red"> very imbalanced training set</span>, a lots of zero than 1
    - Solution: instead of setting single timestep as 1, make it 1 for a fixed period of time before revert back to 0.
 
@@ -1149,3 +1152,4 @@ Method 2: **CTC cost for speech recognition (CTC: connectionist temporal classif
 - [BLEU: a Method for Automatic Evaluation of Machine Translation, Papineni, 2002](https://www.aclweb.org/anthology/P02-1040.pdf): BLeu Score
 - [Neural Machine Translation by Jointly Learning to Align and Translate](https://arxiv.org/abs/1409.0473): Attention Model
 - [Show, Attend and Tell: Neural Image Caption Generation with Visual Attention, Xu, 2015](https://arxiv.org/abs/1502.03044):  Attention Model Application: look at the picture and pay attention only to parts of picture at a time while writing a caption for a picture
+- [Connectionist Temporal Classification: Labelling Unsegmented Sequence Data with Recurrent Neural Networks, Graves, 2006](https://www.cs.toronto.edu/~graves/icml_2006.pdf): CTC cost for speech recognition
