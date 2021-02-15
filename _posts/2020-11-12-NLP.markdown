@@ -2147,7 +2147,7 @@ Greedy Decoding only select one best candidate as input sequence for each time s
 - Istead of offering a best output like greedy decoding, beam seach select multiple options for the best input based on conditional probability
 - Beam width B: limit the number of branching paths. Select B number of best alternatives at each time step with the highest probabilities
   - Once have B probability, can choose the one with highest probability
-  - <span style="background-color:#FFFF00">A larger beam width -> better model performance  ut slower decoding speed.</span> 
+  - <span style="background-color:#FFFF00">A larger beam width -> better model performance  but slower decoding speed.</span> 
 - Problem: 
   - Since the model learns a distribution, that tends to carry more weight than single tokens
   - Can cause translation problems, 比如 in a speech corpus that hasn't been cleaned. 比如if have filler word "Uhm" which appear as translation with lower probability . That single element can throw off entire translation. 比如 at time step, most probable word 是 "Uhm"
