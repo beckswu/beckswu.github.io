@@ -33,10 +33,10 @@ Examples of sequence data:
 
 #### Notation: 
 
-Motivating Example: Named Entity Recognition(used by search engines to index all of last 24 hours news of all people/ companies/ name/ times/ llocations / countries names etcs mentioned in the news articles so that they can index them appropriately) to tell people names in the sentence 
+Motivating Example: Named Entity Recognition(used by search engines to index all of last 24 hours news of all people/ companies/ name/ times/ llocations / countries names etcs mentioned in the news articles so that they can index them appropriately) 
 
 
-Below example not perfect representation, some sophisticated output representations tell the start and ends of people's names in the sentence
+Below example for Named Entity Recognition not perfect representation, some sophisticated output representations tell the start and ends of people's names in the sentence
 
 ```
 x: Harry Potter and Hermione Granger invented a new spell
@@ -152,7 +152,7 @@ $$
 ![](/img/post/Deep_Learning-Sequence_Model_note/week1pic3.png)
 
 <span style="background-color: #FFFF00">Why not a standard network?</span>(e.g. sentiment in NLP ) problems:
-1. <span style="background-color:#FFFF00">Input, output can be different lengths in different example</span> (不是所有的input的都是一样长度)
+1. <span style="background-color:#FFFF00">**Input, output can be different lengths in different example**</span> (不是所有的input的都是一样长度)
    - Maybe for every sentence has a maximum length. can pad or zero-pad every inputs up to maximum length. But it still not a good representation
 2. <span style="background-color:#FFFF00">Doesn't share features learned across **different positions**</span> of text
    - Maybe Harry on position one gives a sign(implies) that position t would be a person's name
@@ -166,7 +166,7 @@ Below architecture for $$T_x = T_y$$. Each timestep, <span style="background-col
 
 1. Read first word $$x^{<1>}$$, take this word and feed into a neural network layer and predict a output $$\hat y^{<1>}$$
 2. Read the second word $$x^{<2>}$$, <span style="color:red">instead of just predicting $$\hat y_2$$ using only  $$x^{<2>}$$, also gets some information from step one. The activation value from step one passed to step two</span>.
-3. RNN input the third word $$x^{<3>}$$ and activation $$a^{<2>}$$ from step two and try to output $$\hat y^{<3>}$$ 
+3. To output $$\hat y^{<3>}$$, RNN input the third word $$x^{<3>}$$ and activation $$a^{<2>}$$ from step two  
 
 下图左面是unroll diagram, 右侧一个单独的是 rolled diagram
 
@@ -274,7 +274,7 @@ $$P\left( y^{<1>},  y^{<2>}, \cdots,  y^{<3>} \right)$$
 
 **How to build a lanuage model?**
 
-1. Need a training set comprising large corpus of English text; corpus: NLP terminalogy means a large body/set. 
+1. Need a training set comprising **large corpus of English text**; corpus: NLP terminalogy means a large body/set. 
 2. **Tokenize** each sentence to form a vocabulary. 
    1. Map each word to one hot vector
    2. Add extra token `EOS` (end of sentences) which can help figure out when a sentence ends。 也可以决定是否把标点符号也tokenize. 
@@ -284,7 +284,7 @@ $$P\left( y^{<1>},  y^{<2>}, \cdots,  y^{<3>} \right)$$
 **RNN Model**: each step in the RNN will look at some set of preceding words
 
 
-1. At time 0, $$x^{<1>} = \vec 0$$, set x1 to be all zeros. Also set $$a^{<0>} = \vec 0$$. 
+1. At time 0, $$x^{<1>} = \vec 0$$, set $$x_1$$ to be all zeros. Also set $$a^{<0>} = \vec 0$$. 
    - $$a^{<1>}$$ make a softmax to predict the probability of any word in the dictionary to be the first word $$y^{<1>}$$(What is the chance the first word "Aaron"? what is the chance the first word "cat"? ... what is the chance the first word "Zulu"? what is the chance the first word "UNK"?). If vocabulary size is 10002(+ `UNK` and `EOS` ), there are 10002 softmax outputs
 2. Next step, the job is to try to figure out the second word. <span style="background-color:#FFFF00">Also give the **correct** first word $$x^{<2>} = y^{<1>}$$</span>. `P(average | Cats)`
 3. At 3rd step, predict third word, we can give the first two words, $$x^{<3>} = y^{<2>}$$. To figure out  `P(__ | Cats average)` given first two words are cats average
@@ -306,16 +306,16 @@ $$P\left( y^{<{1}>}, y^{<{2}>}, y^{<{3}>} \right) = P\left( y^{<{1}>}\right) \cd
 
 
 
-#### Sampling Novel Sequence:
+#### Sampling Novel Sequence
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week1pic9.png)
 
 Sample from distribution to generate noble sequences of words
  
 1. At time 0, <span style="background-color:#FFFF00">After get $$\hat y^{<{1}>} (size `10002 x 1`)$$，have some softmax probabilities over possible output. random sample according to softmax distribution</span>. The softmax distribution gives what is the chance of first word being Aaron, cats, Zulu.```np.random.choice``` to sample according to this distribution defined by output vector proabilities from softmax
-   - 有时可能生成unknown word token, 可以确保algorithm 生成sample 不是unknown token，<span style="background-color:#FFFF00">遇到unknown token, reject and keep sampling until get non-unknown word</span>. Or you can leave it(`UNK`) in output if don't mind having unknown word output
+   - 有时可能生成unknown word token, 可以确保algorithm 生成sample 不是unknown token，<span style="background-color:#FFFF00">遇到unknown token, reject and keep sampling until get non-unknown word</span>. Or you can leave it(`UNK`) in output if don't care unknown
 2. Next timestamp, expecting $$y^{<{1}>}$$ is the input. <span style="background-color:#FFFF00">Take the $$\hat y^{<{1}>}$$ you just sample in step 1 (not the correct one) to pass as input.</span> Then softmax will make predict $$\hat y^{<{2}>}$$; 
-    - E.g. For sample at timestamp 0, get the first word "The". Pass "The" as $$x^{<{2}>}$$ ，And get softmax distribution `P( _ | the)`, and sample $$\hat y^{<{2}>}$$.  把sample的 pass 到next time step. 
+    - E.g. For sample at timestamp 0, get the first word "*The*". Pass "*The*" as $$x^{<{2}>}$$ ，And get softmax distribution `P( _ | the)`, and sample $$\hat y^{<{2}>}$$.  把sample的 pass 到next time step. 
 3. **When to end**:
    -<span style="color:red"> keep sampling until generate EOS token. </span>, which tells you it the end of a sentence
    - 如果没有设置`EOS`. then decide to sample 20 个或者100个words 直到到达这个次数(20 or 100 words)
@@ -327,13 +327,13 @@ Sample from distribution to generate noble sequences of words
  如果想build character level 而不是word level 的，$$y^{<{1}>}, y^{<{2}>}, y^{<{3}>}$$是individual characters instead of individual words， 
  - E.g. Cat average. $$y^{<1>} = c$$, $$y^{<2>} = a$$ , $$y^{<3>} = t$$, $$y^{<4>} = \text{\space}$$  
 
-**Advantage**: <span style="background-color: #FFFF00">character level don't worry abut unknown word tokens</span>. Character level is able to assign 比如 Mau, a non-zero probability, whereas if Mau not in vocabulary for word level lanuage model, assign unknown word token
+**Advantage**: <span style="background-color: #FFFF00">character level don't worry abut unknown word tokens</span>. Character level is able to assign 比如 Mau(人名/地名), a non-zero probability, whereas if Mau not in vocabulary for word level lanuage model, assign unknown word token
   
 **Disadvantage**: 
 
 - <span style="color:red">end up much **longer sequence**</span>.  一句话可能有10个词，但会有很多的characters，
-- Character level 不如word level capture long range dependencies between how the earlier parts of sentence aslo affect the later part of the sentence.
--  Character level more <span style="color:red">**computationally expensive**</span> to train. In NLP, word level language model are still used. But as computers get faster，more and more applications start to look at character level models which are much harder and computationally expensive to train (not widespread today for character level except for specialized applications where need to deal with unknown words or used in more specialized application where have a more specialized vocabulary )
+- <span style="color:red">**Character level 不如word level capture long range dependencies**</span> between how the earlier parts of sentence aslo affect the later part of the sentence.
+-  Character level more <span style="color:red">**computationally expensive**</span> to train. In NLP, word level language model are still used. But as computers get faster, more and more applications start to look at character level models which are much harder and computationally expensive to train (not widespread today for character level except for specialized applications where need to deal with unknown words or used in more specialized application where have a more specialized vocabulary )
 
 
 #### Vanishing gradients
@@ -347,9 +347,9 @@ languages that comes earlier 可以影响 later的， e.g.  choose was or were
 - The cat which .... was full
 - The cats which .... were full
 
-The basic RNN <span color="style:red">not very good at capturing very long-term dependency</span>.  <span style="background-color:#FFFF00">because for very deep neural network e.g. 100 layers, the gradient from output y  had hard time propagating back to affect the weights of these earlier layers.  The outputs of errors associated at latter timestep to affect computation  eariler in the sequence </span>
-   - 上面的例子, it might be difficult to get a neural network to realize that it needs to memorize if see a singular noun or pural noun to generate was or were
-   - Because of the problem,<span style="color:red"> the basic RNN model has many ocal influences</span>, meaning that output $$\hat y$$ is mainly influenced by values close to $$\hat y$$
+The basic RNN <span color="style:red">not very good at capturing very long-term dependency</span>.  <span style="background-color:#FFFF00">because for very deep neural network e.g. 100 layers, the gradient from output y  had hard time propagating back to affect the weights of these earlier layers.  The outputs of errors associated at latter timestep is difficult to affect computation  eariler in the sequence </span>
+   - 上面的例子, it might be difficult to get a neural network to realize that it needs to memorize if see a singular noun or pural noun to generate "*was*" or "*were*"
+   - Because of the problem,<span style="color:red"> the basic RNN model has many local influences</span>, meaning that output $$\hat y$$ is mainly influenced by values close to $$\hat y$$
 
 Exploding Gradient: aslo happen for RNN. When doing backprop, the gradient(slop) not decrease exponentially, instead increase exponentially with the number of layers go through. Whereas Vanish Gradient tends to a bigger problem for RNN 
     - Can cause parameters become so large and make neural network messed up.
@@ -526,30 +526,32 @@ For RRN,  <span style="color:red">三层已经是very deep</span>, don't see man
 
 #### Word Embedding:
 
-**Word Embedding**: The way of representing words. 让algorithm学会同义词：比如男人vs女人，king vs queen. With Word Embedding, it is able to build NLP with a small training sets
+**Word Embedding**: The way of representing words. 
 
-<span style="background-color: #FFFF00">**One hot** vector的缺点: it deoesn;t alow an algorithm to easily generalize across words</span>:
-   -  10000中(10000是字典)，只有1个为1表示这个词，不能表示gender. age, fruit..., 
-   -  <span style="background-color:#FFFF00">any product between any two different one-hot vector is zero and Eludian distance between any pair is the same</span>. e.g. *King* vs *Apple* and *Orange* vs *Apple* are the same
+<span style="background-color: #FFFF00">**One hot** vector **Disadvantages**</span>:
+   -  it deoesn‘t alow an algorithm to <span style="color:red">easily generalize across words</span>
+      -  10000中(10000是字典)，只有1个为1表示这个词，不能表示gender. age, fruit..., 
+   -  <span style="background-color:#FFFF00">any **dot product** between any two different one-hot vector is zero and **Eludian distance** between any pair is the same</span>. e.g. *King* vs *Apple* and *Orange* vs *Apple* dot product are the same(zero)
        - e.g. *orange juice* then should know *Apple ___*, juice is popular choice since orange and apple is similar
+   - Computational expensive, high dimensional vector
 
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week2pic1.png)
 
 - featurized representation (**embeddings**) with each of these words, 比如一个 vocabulary dictionary size 10000, 而每个word 比如有300 feature, feature vector size = 300, 
    - use $$e_{5391}$$ denote the embedding for Man, 5391 is the position of one hot vector equal to 1
-- Featurized representaion will be similar for analogy. e.g. Apple vs Orange, Kings vs Queens
+- <span style="background-color:#FFFF00">Featurized representaion will be similar for analogy</span>. e.g. *Apple* vs *Orange*, *Kings* vs *Queens*
 - In practice, feature(word embedding)  that used for learning won't have a easy interpretation like gender, age, food ...
 - It allow to <span style="background-color:#FFFF00">generalize better across different words</span>
+  - E,g, "*apple farmer*" vs "*durian cultivator*": If have a small trianing set for named entity recognition, "*durian*" or "*cultivator*" might bno in training set. But if learn from embedding, it can still generialize to  tell durian is a fruit and cultivator is a farmer 
 - **T-SNE**(complicated, non-linear mapping): take 3000vector visualize to 2-Dimensional space, analogy tends to close (上图右侧)
 
-E,g, *apple farmer* vs *durian cultivator*: If have a small trianing set for named entity recognition, might not seen durian or cultivator in training set. But if learn from embedding, it can still generialize from having seen an orange farmer in your training set to  tell durian is a fruit and cultivator is a farmer 
 
-1. Word Embedding can be learned from very large <span style="color:red">**unlabeled** training datasets</span> (~1 billion - 100 billion), then can find *apple* and *durian*, *farmer* and *cultivator* are kind of similar 
+1. Word Embedding can be learned from <span style="color:red">very large **unlabeled** training datasets</span> (~1 billion - 100 billion), then can find *apple* and *durian*, *farmer* and *cultivator* are kind of similar 
    - Or can download pre-trainined embedding online
-2. Take the word embedding from first steps to new task with  <span style="background-color:#FFFF00">much smaller **labeled** training set</span>. (maybe ~ 100k)
-   - carry out transfer learning where take information you've learned from huge amount of unlabeled ext from step 1, and transfter to a taask such as named entity recognition
-   - can use <span style="background-color:#FFFF00">relative lower dimensional feature vector</span> from word embedding (mabe ~300 dense vector rather than 10000 of one hot vector)
+2. Take the learned word embedding from step 1 to new task with  <span style="background-color:#FFFF00">much smaller **labeled** training set</span>. (maybe ~ 100k)
+   - carry out <span style="background-color:#FFFF00">**transfer learning**</span> to a new task such as named entity recognition
+   - can use <span style="background-color:#FFFF00">relative lower dimensional feature vector</span> from word embedding (maybe ~300 dense vector rather than 10000 of one hot vector)
 3.  Optional: continue to fine-tune(adjust) word embeddings with new data(only your task dataset is really large) 
 
 **Advantage**: word embeddings can allow to be carried out with <span style="background-color:#FFFF00">a relatively smaller labeled training set </span>
@@ -561,7 +563,7 @@ Difference between face recognition and word embedding:
 
 Word Embedding **Applications**: can be learn from large text corpus
 
-- learn analogy such as *boy - girl* as *man - womann*
+- learn analogy such as *boy - girl* as *man - woman*
 - learn capital. such as *Ottawa: Canada* as *Nairobi : Kenya*
 - learn  *Yen: Japn* as *Ruble: Russia*
 - learn *Big: Bigger* as *Tall: Taller*
@@ -575,8 +577,8 @@ Find a word w to maximize the similarity between  $$e_{w}$$, and$$ e_{king} - e_
 
 $$argmax_{w} sim\left( e_{w}, e_{king} - e_{man} + e_{woman} \right)$$
 
-- $$u^Tv$$ inner product, if u and v are very similar, it tends to be large. The idea is if u,v similar, similarity will be large, 因为$$u^Tv$$表示他们的夹角(cos)
--  or use Euclidian distance: $${\|u-v\|}^2$$ 通常 <span style="background-color:#FFFF00">measure **dissimilarity** than similarity</span>. if measure simialrity, should take $$-{\|u-v\|}^2$$ Cosine Similarity being used often.
+- $$u^Tv$$ inner product, <span style="background-color:#FFFF00">if u and v are very similar, it tends to be large</span>. 因为$$u^Tv$$表示他们的夹角(cos)
+-  or use Euclidian distance: $${\|u-v\|}^2$$ 通常 <span style="background-color:#FFFF00">measure **dissimilarity** than similarity</span>. if measure similiarity, should take $$-{\|u-v\|}^2$$ Cosine Similarity being used often.
 -  Difference between cosine and Euclidian distance similarity is how to normalize the length of the vectors u and v
 
 $$sim\left( u, v \right)  = \frac{u^Tv}{||u||_2 ||v||_2 } $$ 
@@ -612,17 +614,17 @@ $$
 
 <span style="background-color:#FFFF00">**Fixed window**</span>: 比如I want a glass of orange ___ , e.g. fixed window size = 4
 
-1.  预测填入的是juice，只代入把前四个word, a glass of orange 的 one-hot vector(size 10000) 
+1.  预测是juice，代入前四个words, *a glass of orange* 的 one-hot vector 
 2. lookup get 300 dimension **embedded vector** (e.g $$e_{4343}, e_{9665}$$) from embedding-matrix ($$E$$: is the same for all training examples)
 3. Then feed those Embedding vectors to  <span style="background-color:#FFFF00">a neural network and then feed to a **softmax**</span> which output 10k output.
 4. can use backprop to perform gradient descent to maximize likelihood of training set
-5. repeatedly predict given four words in a sequence, what is the next word in your text corpus
+5. repeatedly predict nxt word given four words in a sequence in text corpus
 
 <span style="background-color: #FFFF00">Advantage</span>: can deal with arbitrary long 句子，因为input size is fixed 
 
 - it can learn similar embedding for *orange* and *apple*
 
-$$ \underbrace{O_{4343}}_{\text{One Hot vector, 10k dimension}} -> \underbrace{E}_{\text{Embedding matrix}} = \underbrace{e_{4343}}_{\text{Embedding Vector, 300 dimensional}}
+$$ \underbrace{O_{4343}}_{\text{One Hot vector, 10k dimension}} -> \underbrace{E}_{\text{Embedding matrix}} = \underbrace{e_{4343}}_{\text{Embedding Vector, 300 dimension}}
 $$
 
 
@@ -631,19 +633,19 @@ $$
 **Ohter Context / target pairs**:
 
 
-1. 4 Words on left & right to feed into neural network and ask predict word in middle
+1. Input: 4 Words on left & right. predict: word in middle
 
 
 $$ \text{I want } \underbrace{\text{a glass of orange }}_{\color{fuchsia}{context}}  \underbrace{\text{ juice }}_{\color{red}{target}}  \underbrace{\text{ to go along }}_{\color{fuchsia}{context}} \text{with my cereal}
 $$
 
-2. Last One word: use the one previous word try to predict next word
+1. Input: Last One word. predict: next word
 
 
 $$ \text{I want a glass of} \underbrace{\text{ orange }}_{\color{fuchsia}{context}}  \underbrace{\text{ juice }}_{\color{red}{target}} \text{ to go along with my cereal}
 $$
 
-3. Nearby one word: saw the word *glass*, then there's another words somewhere close to glass, what do you think that word is (an example **Skip Grams**, it works remarkably well)
+1. Nearby one word: Input: saw the word "*glass*", Predict: then there's another words somewhere close to "*glass*"(an example **Skip Grams**, it works remarkably well)
 
 $$ \text{I want a}  \underbrace{\text{glass}}_{\color{fuchsia}{context}}  \text{ orange  juice to go along with my cereal}
 $$
@@ -651,17 +653,15 @@ $$
 
 #### Word2Vec Skip-grams:
 
-Rather than the context always be the last N words immediately before the target word
-
 比如句子: I want a glass of orange juice to go along with my cereal; 
-- 先pick<span style="color: red">context word</span> e.g. orange, 
+- 先 pick <span style="color: red">context word</span> e.g. *orange*, 
 - Then <span style="color: red">randomly pick another word **within some window** as **target word**</span>  比如context word前后的5个或者10个词; 
   - e.g 1. context: orange -> target: juice; 
   - e.g 2. context: orange -> target: glass; 
   - e.g 3. context: orange -> target: my; 
-- Not a easy learning problem. Because there are too many different words that can be chosen within windows
-- **Goal**: Not to do well on the supervised learning (predict target from context). Instead <span style="background-color:#FFFF00">Using learning problem to learn a good embedding</span>. 
-- Supervised learning:  Learning the mapping from content C to target t;  vocabulary size  = 10,000, context: orange (word index 6257) ->  target: juice (word index 4834)  
+- Not a easy learning problem, because too many different words can be chosen within windows
+- **Goal**: Not to do well on the supervised learning (predict target from context). Instead <span style="background-color:#FFFF00">using learning problem to learn a good embedding</span>. 
+- Supervised learning:  Learning the mapping from content C (e.g. orange (word index 6257)  ) to target t (e.g. juice (word index 4834)  )
 
 Model: 
 
@@ -676,23 +676,23 @@ Model:
  \end{CD}
  $$  
 
- where softmax is as below, $$\theta_t$$ is parameter associated with output t, the chance of word t being label
+ where softmax is as below, $$\theta_t$$ is parameter associated with output t, used to predict the chance of word t being label
 
 $$ p(t |c) = \frac{ \theta_t^T e_c }{ \sum_{j=1}^{10,000} { e^{ \theta_j^T e_c  }  } } $$
 
 
-Loss function:  where $$y_i$$ is one hot vector;   $$y_i$$ and  $$log\hat{y_i}$$ both are 10000 dimenional  <span style="background-color:#FFFF00">$$y_i log\hat{y_i}  $$, is dot product</span>
+**Loss function**:  where $$y_i$$ is one hot vector;   $$y_i$$ and  $$log\hat{y_i}$$ both are 10000 dimenional  <span style="background-color:#FFFF00">$$y_i log\hat{y_i}  $$, is dot product</span>
 
 $$ L \left(\hat y , y \right) = - \sum_{i=1}^{10,000} { y_i log\hat{y_i}  }$$ 
 
 
 <span style="background-color: #FFFF00">**Problem with softmax classification**</span>: 
-- computationtal speed, every time need to calculate the sum of all vocabulary $$ \sum_{j=1}^{10,000} { e^{ \theta_j^T e_c  }  } $$ if use vocabulary size is 1 million, it gets really slow
+- <span style="color:red">**computationtal expensive**</span>, every time need to calculate the sum of all vocabulary $$ \sum_{j=1}^{10,000} { e^{ \theta_j^T e_c  }  } $$ if use vocabulary size is 1 million, it gets really slow
 
 **Solution** <span style="color:red">**Hierarchical Softmax**</span>, [link](https://www.youtube.com/watch?v=B95LTf2rVWM):  
 - 如下面图，instead of carrying 10000 all the time , tell if target word in `[0, 5000)` or `[5000, 10000]` in vocabulary, then find if in `[0,2500)`, or `[2500, 5000)`, then find the target node and calculate the probability without sum over all vocab size to make a single prediction
--   每一个parent 记录所有的susoftmax的和of all childs; complexity: $$log \mid v\mid$$ ; 
-- In practice, <span style="color:red">don't use perfectly balanced tree or symmetric tree</span>, more common word on the top, less common word on deeper of the tree(because don't need to go to that deep frequently), 如下图右侧的图 
+-   <span style="color:red">每一个parent 记录所有的softmax的和of all childs</span>; complexity: $$log \mid v\mid$$ ; 
+- In practice, <span style="color:red">don't use perfectly balanced tree or symmetric tree, more common word on the top, less common word on deeper of the tree(because don't need to go to that deep frequently)</span>, 如下图右侧的图 
    
 ![](/img/post/Deep_Learning-Sequence_Model_note/week2pic5.png)
 
@@ -700,18 +700,19 @@ $$ L \left(\hat y , y \right) = - \sum_{i=1}^{10,000} { y_i log\hat{y_i}  }$$
 
 
 How to choose/sample <span style="background-color:#FFFF00">**context word**</span> c: 
-- if uniformly random sample from training corpus, 可能会选择很多the, a, of, and, to,但我们更想让model训练比如orange, durian这样的词. want to make sure that speed some time updating embedding, even less common words like durian
-- In practice, <span style="background-color:#FFFF00">the **distribution** of words is not entirely uniform</span>. Instead, there are different heuristics that you could use in order to balance out something from common words together with less common words
+- if uniformly random sample from training corpus, 可能会选择很多the, a, of, and, to,但我们更想让model训练比如orange, durian这样的词. want to spend some time updating even less common words  embedding like *durian*
+- In practice, <span style="background-color:#FFFF00">the **distribution** of words is not entirely uniform</span>. Instead, there are different heuristics that you could use to balance out common words together with less common words
 
 
 #### Negative Sampling
 
 
-Create a new supervise learning problem: Given pair word: orange & juice. <span style="color:red">Is context - target pair?</span>
+Create a new supervise learning problem: Given pair word: orange & juice. <span style="color:red">Is this a context - target pair?</span>
 - Generate **positive example**: <span style="background-color:#FFFF00">Sample(choose) a context word, look around a window of e.g. $$\pm 10$$ words and pick a target word</span>
-  - 比如: I want a glass of orange juice to go along with my cereal.  pick context word as *orange*, then choose target word as *juice*
-- Generate **negative example**: <span style="background-color:#FFFF00">take the same context word, and then pick **k** word at random from the dictionary/vocabulary</span>. pick context word as *orange*, then choose word *king* from vocabulary
-  - It is okay if the word chosen from vocabulary also appear in the window. e.g. 下面的 *of* 
+  - 比如: "*I want a glass of orange juice to go along with my cereal*".  pick "*orange*" as context word, then choose "*juice*" as target word 
+- Generate **negative example**: <span style="background-color:#FFFF00">take the same context word,  then pick **k** word randomly from the dictionary/vocabulary</span>. 
+  - e.g. pick context word as "*orange*", then choose word "*king*" from vocabulary
+  - It is okay if the word chosen from vocabulary also appear in the window. e.g. 下面的 "*of*" 
 -  create supervise learning problem, <span style="color:red">x is context and word</span>, <span style="color:red">y as label</span>. Try to distinguish the <span style="color:red">**distribution** from chosen near context and chosen from dictionary</span>
 - `k = [5,20]` for small dataset, `k = [2,5]` for large dataset
 
@@ -729,10 +730,10 @@ $$P\left( y = 1 \mid c,t \right) = \sigma \left( \theta^T e_t \right)$$
 
 where  $$ \theta_t^{T} $$  parameter vector theta for each possible target word, $$ e_c $$ for embedding vector.
 
-- so for every positive example, having k negative example to train the logistic regression model
+- For every positive example, having k negative example to train the logistic regression model
 - <span style="background-color:#FFFF00">Turn into 10000 binary classification problem(每一个problem 对应一个 $$ \theta_t $$ ) instead of 10000 way softmax</span> which is expensive to compute (given orange, predict 10000 all vocabulary).On every iteration, only train k+1 example(1 positive example, k randomly negative example)
 - Select samples: If you choose words 根据its empirical frequence 可能有很多词 如 the, of, and;  or sample uniformly random based on vocab size $$\frac{1}{\mid V \mid}$$. It is also non-representative of the distribution of English word  <span style="background-color:#FFFF00">use $$ P(W_i) =  \frac{ f \left(w_i \right)^{3/4} }{ \sum_{j=1}^{10,000} { f\left(w_i \right)^{3/4}  } } $$ 这个分布选取</span>, $$f \left(w_i \right)$$ is frequency of each word in English text
-- Or can use someone else pre-trained embedding vectors as starting point 
+- Or can use pre-trained embedding vectors as starting point 
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week2pic6.png)
 
@@ -757,11 +758,9 @@ $$minimize :  \sum_{i = 1}^{10,000} \sum_{j = 1}^{10,000} {f\left(X_{ij} \right)
   -  当 $$X_{ij} = 0 $$,$$f\left(X_{ij} \right) = 0$$ ,  避免 当 $$X_{ij} = 0$$时, $$log\left( 0\right)$$ undefined, 
   - also, $$f\left(X_{ij} \right)$$ give more weight to less frequent word like *durian*, and give less weight for common word like *this*, *is*, *of*, *a*
 - $$\theta_i$$, and $$e_j$$ are symmetric(could reverse then can get the same optimization objective)
-  - <span style="background-color:#FFFF00">Initialize $$\theta$$, and $$e$$ both uniformly random and perform gradient descent to minimize the objective</span>. Take average when finish training $$e_w^{final} = \frac{\left( e_w + \theta_w \right)} {2} $$
+  - <span style="background-color:#FFFF00">Initialize $$\theta$$, and $$e$$ both uniformly random</span> and perform gradient descent to minimize the objective. <span style="background-color:#FFFF00">Take **average** when finish training $$e_w^{final} = \frac{\left( e_w + \theta_w \right)} {2} $$</span>
   - $$\theta$$, and $$e$$ play the symmetic roles unlike others previously play different role
 - Even though the objective function is simple, it works
-
-Model:  use gradient descent to minimize below function; 为了避免log0 出现, 乘以weight term $$f\left(X_{ij}\right)$$; $$\theta_j$$ 和 $$e_j$$是symmetric的，可以reversed or 对调，会得到同样的目标函数， when do gradient descent, 所以可以取个平均值; <span style="background-color: #FFFF00">Initialize</span> both $$\theta_i$$ 和 $$ e_j $$ randomly uniformly at beginning 
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week2pic7.png)
 
@@ -782,27 +781,26 @@ which prove that axis used to represent the features will be well-aligned with w
 
 <span style="background-color: #FFFF00">Chanllenge: </span> not have a huge dataset, 1 millon is not common, sometimes around 10000 words
 
-下面两个方法都用到embedding matrix, if embeding matrix is trained from large training set(e,g 1 million), it can learn feature for infrequent word even the word not in Sentiment classification training set (比如 durian not in Sentiment classification training dataset, but in embedding matrix dataset, 下面两种方法预测sentiment都可以 get right and generalize better result like durian)
+If embeding matrix is trained from large training set(e,g 1 million), it can learn <span style="color:red">feature for infrequent word even the word not in Sentiment classification training set</span> (比如 durian not in Sentiment classification training dataset, but e learned from word embedding, then can better generalize result)
 
 **Method 1: Simple Sentiment Classification Model**
 
-1. use one hot vector, lookup embedding matrix then get embedded vector e.g $$e_{8928}$$ for all words in the sentence
+1. use one hot vector, lookup embedding matrix then get embedding vector
    - If embedding matrix is trained on large dataset, it allows to take a lot of knowledge even from infrequent word, and apply them to your problem even words not in your labeled training set
 2. then get all embedded word in a word, then take **average** or **sum** of all embedded vector as input layer (`300 x 1` feature vectors  )
    - because <span style="background-color: #FFFF00">take **average**, it works for review sentences that short or long</span>
 3. Pass embedding vectors from step 2 to a softmax and output $$\hat y$$ (5 outcomes, 1-5 stars)
 
-<span style="background-color: #FFFF00">**Problem: Ignore order** </span>：比如: "*completely lacking good taste, good service an good ambience*": 即使有3个good，也是negative review. So if using algorithm like this which ignore the order, and sum or average of all embedding different words, then end up having a lot of representation of good in final feature vector then classifer think it's a good review
+<span style="background-color: #FFFF00">**Problem: Ignore order** </span>：比如: "*completely lacking good taste, good service an good ambience*": 即使有3个good，也是negative review. w
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week2pic9.png)
 
 **Method 2: RNN for sentiment Classification** <span style="background-color: #FFFF00">many-to-one architecture </span> : 
 
-1. use one hot vector, lookup embedding matrix then get embedded vector e.g $$e_{8928}$$, 
-2. then <span style="background-color:#FFFF00">feed  embedding vectors into RNN</span>. 
-3. The job of RNN is to compute the re presentation at last time step for $$\hat y$$
-4. it can train to realize "lack of good" and "not good" is negative review
-   - Because word embedding can be trainied from a much larger data set, this will do a better job to generalizing even new words that not seen in labeled training set, e.g. "*absent of good*", and *absent* not in labeld training set
+1. use one hot vector, lookup embedding matrix then get embedded vector e.g $$e_{8928}$$
+2. then <span style="background-color:#FFFF00">feed  embedding vectors into RNN</span>. The job of RNN is to compute the representation at last time step for $$\hat y$$
+3. it can train to realize "lack of good" and "not good" is negative review
+   - Because word embedding can be trainied from a much larger data set, this will do a better job to generalizing even new words that not seen in labeled training set, e.g. "*absent of good*", and *absent* not in labeld training set -> negative review
 
 
 
@@ -811,9 +809,9 @@ which prove that axis used to represent the features will be well-aligned with w
 #### Debiasing Word Embeddings
 
 - bias here not meaning bias/variance,<span style="color:red"> means the gender, ethnicity, sexual orientation bias</span>. 
-   - 比如 man: programmer as Woman: Homemaker; 比如 man: Doctor as Mother: Nurse; should be preferable output man as programmer and woman as programer
-- Word embeddings可以reflect gender, ethnicity ages... <span style="color:red"> biases of text used to train to model</span> as bias is related to socioeconomic status
-- we try to change learning algorithm to diminish as much as possible to eliminiate these types of undesirable biases
+   - 比如 man: programmer as Woman: Homemaker; 比如 man: Doctor as Mother: Nurse;
+- Word embeddings可以reflect gender, ethnicity ages... <span style="color:red"> bias of text used to train model</span> as bias is related to socioeconomic status
+- we try to change learning algorithm to eliminiate these types of undesirable biases
   - The bias the model pick up tend to reflect the biases in text written by people
 
 
@@ -821,15 +819,15 @@ which prove that axis used to represent the features will be well-aligned with w
 
 1. <span style="background-color:#FFFF00">**Identiy bias direction**</span>-
    - 比如用 embeded vector $$ e_{he} - e_{she}; e_{male} - e_{female} $$... then averge them(In original paper, use Singular Value Decomposition instead of average) 
-   - average 得到<span style="color:red">**bias direction**</span>(1 dimension. In original paper, bias direction can be higher than 1 dimensional), 垂直的bias direction是 non-bias direction(if bias is 1 dimension,  non-bias is 299 dimension)
+   - average 得到<span style="color:red">**bias direction**</span>(1 dimension. In original paper, bias direction can be higher than 1 dimensional), 垂直的bias direction是 <span style="color:red">**non-bias direction**</span>(if bias is 1 dimension,  non-bias is 299 dimension)
 2. <span style="background-color:#FFFF00">**Neutralization**</span>: 
-   - _definitional e.g gender is intrinsic in definition 的是grandmother, grandfather, non-definitional比如 doctor, babysitter_
-   - 对于non-definitional 的word， <span style="color:red">**project** them onto **non-bias direction** to get rid of bias</span>; 
-   - 对于如何选取什么word neutralized,, e,g, doctor is not gender specific need to be neutralized,  whereas grandfather / grandmother should not made non-gender specific. 再比如 Beard should be close to male not female
+   - _**definitional** e.g gender is **intrinsic** in definition 的是grandmother, grandfather, **non-definitional**比如 doctor, babysitter_
+   - For non-definitional words， <span style="color:red">**project** them onto **non-bias direction** to get rid of bias</span>; 
+   - 对于如何选取什么word neutralized,, e,g, doctor is not gender specific need to be neutralized,  whereas grandfather / grandmother should not neutralized (made gender specific). 再比如 Beard should be close to male not female
      -  author；train a classifier to try to figure out 什么word是definitional(e.g. 什么word是gender specific) 什么不是; 大多数英语单词都是not definitional的
 3. <span style="background-color:#FFFF00">**Equalize pairs**</span>: 
    - 比如 grandfather vs grandmother, boy vs girl-> <span style="color:red">want to only difference in embedding is gender</span>, 比如下图中 distance between babysitter's projection and grandmother is smaller than the distance between babysitter's projection and grandfather, which is a bias; 
-    - 所以移动grandfather 和 grandmother to <span style="color:red">pair points</span> (到距离Non-bias axis的距离一样的点); 
+    - 所以移动grandfather 和 grandmother to <span style="color:red">pair points</span> (<span style="color:red">到距离Non-bias axis的距离一样的点</span>); 
     - 选取equalized pairs不会很多，可以hand-picked
 
 
@@ -845,20 +843,20 @@ which prove that axis used to represent the features will be well-aligned with w
 
 Machine translation: 
 
-- RNN <span style="color: red">encoder network</span> can be built as GRU or LSTM; feed French word(需要被翻译的) one word each time, then RNN generates a vector that represents the input sentence. figure out some representation of sentence.\
-- <span style="color: red">**Decoder netork**</span> take the encoding output by encoder network as input. Then trained the output as translation one word at time( 一个一个output 翻译的单词). Then at the end of sentence, decoder stops.  
+- RNN <span style="color: red">**encoder network**</span> can be built as GRU or LSTM; French word(需要被翻译的) one word each time as input, then RNN generates a vector that represents the input sentence.
+- <span style="color: red">**Decoder netork**</span> take the encoding output by encoder network as input. Then generate translation one word at time( 一个一个output 翻译的单词). Then at the end of sentence, decoder stops.  
 - This model works decently well, given enough pair French and English sentences
-- Difference from synthesizing novel text using language model: 不需要randomly choose translation, want the most likely translation. 
+- Difference from synthesizing novel text using language model: <span style="color:red">不需要randomly choose translation, want the most likely translation.</span> 
   
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week3pic1.png)
 
 
-Applications: Image captioning
+**Applications: Image captioning**
 
-- AlexNet can give 4096 dimensional feature vector to reprsent the picture before the softmax. <span style="background-color:#FFFF00">The pretrained AlexNet can be Encoder network </span>for image
-- Feed 4096 dimensional feature vector into RNN whose job to generate the caption one word at a time. 
-- This model works well for image captioning, especially the caption you generated is not too long
+- AlexNet gives 4096 dimensional feature vector(softmax 之前) to represent the picture. <span style="background-color:#FFFF00">The pretrained AlexNet can be **Encoder network** </span>for image
+- Feed 4096 dimensional feature vector into RNN to generate the caption one word at a time. 
+- This model works well for image captioning, especially the caption is not too long
 
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week3pic2.png)
@@ -866,15 +864,15 @@ Applications: Image captioning
 
 **Pick the Most likely Sentence**
 
-Machine translation as building a **conditional language model**. Instead of modelling probability of any sentences, it model the probability of output English translation condtion on some input French sentence.
+Machine translation as building a **conditional language model**. Instead of modelling probability of any sentences, it model the probability of output English translation condition on some input French sentence.
 
  $$P \left( y ^{<{1}>}, y ^{<{2}>},\cdots,  y^{<{T_x}>}\vert x ^{<{1}>}, \cdots, y ^{<{T_x}>} \right)$$
 
-- Language model use previous generated $$\hat y^{<{t-1}>}$$ as next time input $$x^{<{t}>}$$.<span style="background-color:#FFFF00">Decoder network looks very similar to Lanuage model except $$a^{<{0}>}$$ of decoder network are from encoder network instead of a vector of all zeros</span>
+- Language model use <span style="color:red">previous generated $$\hat y^{<{t-1}>}$$ as next time input </span>$$x^{<{t}>}$$.<span style="background-color:#FFFF00">Decoder network looks very similar to Lanuage model except $$a^{<{0}>}$$ of decoder network are from encoder network instead of a vector of all zeros</span>
 - can think machine translation as building a <span style="color:red">**conditional**</span> language model. 
 
 Finding the most likely translation : 
-<span style="background-color: #FFFF00"> 不能用random sample output </span>from $$y^{<{t-1}>}$$ to $$y^{<{t}>}$$, 有时候可能得到好的，有时候得到不好的翻译;  Instead should find y that maximized the conditional probability. The most common algorithm is **Beam Search** to maximize below probability
+<span style="background-color: #FFFF00"> 不能用random sample output </span>from $$y^{<{t-1}>}$$ to $$y^{<{t}>}$$, 有时候可能得到好的，有时候得到不好的翻译;  Instead should find y that maximized the conditional probability. The most common algorithm is **Beam Search**
 
 $$\underbrace{arg max}_{y^{<{1}>}, \cdots, y^{<{T_y}>}}  P\left( y^{<{1}>}, \cdots, y^{<{T_y}>} \vert x  \right)$$
 
@@ -889,14 +887,10 @@ The goal should maximize the probability  $$P \left( y ^{<{1}>}, y ^{<{2}>},\cdo
 
 **Why not Greedy Search** 
 
-Greedy Search: 
-- after pick first word that most likely，选择概率最高的第二个单词，再选择概率最高的第三个单词
-- bc need to maximimize joint probability $$ P \left( y ^{<{1}>}, y ^{<{2}>},\cdots,  y ^{<{T_x}>} \vert  x \right) $$, 这么选出的word组成的句子 不一定是接近最大的joint proability 的句子;
-- 比如翻译的句子是 Jane is visiting Africa in September这个是perfect翻译, 但是greedy翻译出来的是 Jane is going to be visiting Africa in September. 因为Jane is going 的概率大于Jane is visiting (因为going is more frequent)
-- The total number of combinations of words in sentence is expotentially large. E.g. vocabulary size is 10000, and 10 words in a sentence, then there are $$10000^{10}$$ possibility. That's way to use an approximate search algorithm. The algorithm are not always succeed. It will try to pick sentence y to maximize the $$\underbrace{arg max}_{y^{<{1}>}, \cdots, y^{<{T_y}>}}  P\left( y^{<{1}>}, \cdots, y^{<{T_y}>} \vert x  \right)$$. It usually do a good job.
-
-<span style="color: red">不能run 全部combination of words，算哪个概率最大</span>， 比如有10000个词组成的字典，句子长度为10，总共有 $$10000^{10} $$种组合, 所以需要approximate search algorithm，it won't always succeed，不同 try to find sentences to maximize joint conditional probability.
-
+- after pick first word that most likely，then choose 概率最高的第二个单词，再选择概率最高的第三个单词
+- because need to maximimize joint probability $$ P \left( y ^{<{1}>}, y ^{<{2}>},\cdots,  y ^{<{T_x}>} \vert  x \right) $$, 这么选出的word组成的句子 不一定是接近最大的joint probability 的句子;
+    - 比如Jane is visiting Africa in September: perfect翻译, 但是greedy翻译出来 Jane is going to be visiting Africa in September. 因为 `P(Jane is going) > P( Jane is visiting)` (因为going is more frequent)
+- The total number of combinations is expotentially large. E.g. vocabulary size is 10000, and 10 words in a sentence, then there are $$10000^{10}$$ possibility. That's way to use an approximate search algorithm. The algorithm are not always succeed. It will try to pick sentence y to maximize the $$\underbrace{arg max}_{y^{<{1}>}, \cdots, y^{<{T_y}>}}  P\left( y^{<{1}>}, \cdots, y^{<{T_y}>} \vert x  \right)$$. It usually do a good job.
 
 #### Beam Search
 
@@ -904,10 +898,10 @@ Greedy Search:
 **Beam Search Algorithm** (a approximate/heuristic search algorithm), <span style="background-color: #FFFF00"> B = beam width</span>: 不像greedy search 每次只考虑最大可能的一个词，beam search 会考虑最大可能的B个词； 注: 当B=1, 相当于greedy search.
    - Every step, <span style="background-color:#FFFF00">instantiate B copies of network to evaluate</span>  partial sentence fragments and output
    - <span style="background-color:#FFFF00">**Beam Search** usually find much better output sentence than **greedy search**</span>
-   - 不像BFS, DFS. Beam Search runs faster, but <span style="background-color:#FFFF00">is not guaranteed to find exact maximum </span>for $$arg \underbrace{max}_{y} P\left(y\|x \right) $$ 
+   - 不像BFS, DFS. Beam Search runs faster, but <span style="background-color:#FFFF00">is not guaranteed to find exact maximum </span>for $$arg \underbrace{max}_{y} P\left(y \vert x \right) $$ 
 
 Example： B = 3 (case insensitive in this example)
-1. Step1: using decoder network to run through French sentence. The first step of decoder network a softmax $$ P\left(y^{<{1}>} \vert x\right) $$, find *in*, *jane*, *september* most likely 3 possibility based on $$ P\left(y^{<{1}>} \vert x\right)$$, keep `[in, jane, september]` in memory
+1. Step1: The first step of decoder network a softmax $$ P\left(y^{<{1}>} \vert x\right) $$, find *in*, *jane*, *september* most likely 3 possibility based on $$ P\left(y^{<{1}>} \vert x\right)$$, keep `[in, jane, september]` in memory
 2. Step2:  using decoder network to  <span style="background-color:#FFFF00">evulate $$ P\left(y^{<{2}>} \vert y^{<{1}>}, x\right) $$ separately</span> given the $$ \hat y_{1} = in$$,  $$ \hat y_{1} = jane$$, and  $$ \hat y_{1} = september $$, to maximize $$ P\left(y^{<{1}>},  y^{<{2}>} \vert x\right) = P\left(y^{<{1}>} \vert x\right) P\left(y^{<{2}>} \vert y^{<{1}>}, x\right) $$  
    - 比如字典有10000个词，考虑来自step1三个词作为开始，every step consider maximized only 10000*3个词, then pick top3; 比如发现最大可能性的三个词 [In september, jane is, jane visit] -> reject september 作为第一个词的可能
 3. Step 3: decoder ends at when output end-of-sentence (`EOS`) token e.g. Jane visits africa in september <EOS>
@@ -917,7 +911,7 @@ Example： B = 3 (case insensitive in this example)
 
 **Length normalization**,
 
-Problem 1: 可能概率的乘积越来的越小, mutliply the number less than 1 (probability less than 1) result in tiny number which can result in <span style="color: red">numerical **underflow**</span>, floating part representation maynot store accurately 
+**Problem 1: 可能概率的乘积越来的越小**, mutliply the number less than 1 (probability less than 1) result in tiny number which can result in <span style="color: red">numerical **underflow**</span>, floating part representation maynot store accurately 
 
 $$\begin{align}
 
@@ -925,16 +919,16 @@ arg \underbrace{max}_{y} \prod_{t=1}^{T_y} P\left( y^{<{t}>} \vert x,  y^{<{1}>}
 
  &= P\left( y^{<1>} \vert x \right) P\left( y^{<2>} \mid x, y^{<1>} \right) ... P\left(y^{<{t}>} \vert x, y^{<{1}>}, y^{<{2}>}, \cdots, y^{<{t-1}>}    \right) \end{align} $$
 
-Solution: In practice, instead of maximizing product, we <span style="color:red">maximize sum of log probability to get more stable numerical value less prone to rounding error</span>. Log functon is strictly monotonically increasing function, maximizing log probability is the same as maxmizing probability
+**Solution**: In practice, instead of maximizing product, we <span style="color:red">maximize sum of **log probability** to get more stable numerical value less prone to rounding error</span>. Log functon is strictly monotonically increasing function, maximizing log probability is the same as maxmizing probability
 
 $$arg max_{y} \sum_{y=1}^{T_y} log P\left(y^{<{t}>} \vert x, y^{<{1}>}, y^{<{2}>}, \cdots, y^{<{t-1}>}    \right) $$
 
-Problem 2: <span style="color: red"> 可能prefer更短的句子, 因为probability都是小于1，句子越长概率乘积越小，同样log都是小于0，句子越长sum越小</span>
+**Problem 2**: <span style="color: red"> **可能prefer更短的句子**, 因为probability都是小于1，句子越长概率乘积越小，同样log都是小于0，句子越长sum越小</span>
 
-Solution: <span style="background-color: #FFFF00">Solution: use **normalized** log likelihood objective function，除以句子长度</span>, reduce penalty of otput longer translation. 
+<span style="background-color: #FFFF00">**Solution: use normalized log likelihood objective function**，除以句子长度</span>, reduce penalty of otput longer translation. 
 - maybe $$\alpha = 0.7$$, 表示 $$T_y$$ 的0.7 次方. 0.7是between full normalization and no normalization; 
-- 当$$\alpha$$=1, complete normalize by length; 
-- 当$$\alpha$$=0, $$ \frac{1}_{T_y^\alpha} = \frac{1}{1}$$: not normalized at all.
+- 当$$\alpha = 1 $$, complete normalize by length; 
+- 当$$\alpha = 0$$, $$ \frac{1}{T_y^{\alpha}} = 1 $$: not normalized at all.
 -  <span style="color: red">同时alpha也可以作为hyperparameter 用来tune</span>
 
 
