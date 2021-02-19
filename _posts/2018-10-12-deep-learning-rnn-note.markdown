@@ -638,7 +638,8 @@ $$ \begin{align}
 
 $$ \begin{align} 
    dc^{<{t-1}>} &= \frac{\partial L}{\partial c^{<{t}>} }\frac{\partial c^{<{t}>}}{\partial c^{<{t-1}>}} +  \frac{\partial L}{\partial a^{<{t}>}}\frac{\partial a^{<{t}>}}{\partial c^{<{t}>}}\frac{\partial c^{<{t}>}}{\partial c^{<{t-1}>}} \ \\
-&= \color{fuchsia}{dc^{<{t}>}* \Gamma_f^{<{t}>} + da^{<{t}>} *\Gamma_O^{<{t}>}* \left(1 - tanh\left(c^{<{t}>} \right)^2 \right) * \Gamma_f^{t}} \\
+&= \left( \frac{\partial L}{\partial c^{<{t}>} } +  \frac{\partial L}{\partial a^{<{t}>}}\frac{\partial a^{<{t}>}}{\partial c^{<{t}>}} \right)\frac{\partial c^{<{t}>}}{\partial c^{<{t-1}>}} \ \\
+&= \color{fuchsia}{\left(dc^{<{t}>} + da^{<{t}>} *\Gamma_O^{<{t}>}* \left(1 - tanh\left(c^{<{t}>} \right)^2 \right) \right) * \Gamma_f^{t}} \\
  \end{align}$$
 
 
