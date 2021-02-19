@@ -31,7 +31,7 @@ Examples of sequence data:
 <script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"> </script>
 
 
-#### Notation: 
+#### Notation
 
 Motivating Example: Named Entity Recognition(used by search engines to index all of last 24 hours news of all people/ companies/ name/ times/ llocations / countries names etcs mentioned in the news articles so that they can index them appropriately) 
 
@@ -243,8 +243,51 @@ Overall Loss Function:  sume up all loss for all timestamps
 
 $$ L \left(  \hat y , y \right) =  \displaystyle \sum_{t=1}^{T_x} {L^{<{t}>} \left( \hat y^{<{t}>}, y^{<{t}>} \right) } $$
 
-
 ![](/img/post/Deep_Learning-Sequence_Model_note/week1pic6.png)
+
+
+`*` denote element-wise product, derivate with respect to <span style="color:red">**activation**</span>
+
+$$
+\begin{align}
+\underbrace{a^{<{t}>}}_{n_a\text{ x m dimension}} &= tanh \left(\underbrace{W_{aa}}_{n_a\text{ x } n_a}  a^{<{t-1}> +} + \underbrace{W_{ax}}_{n_a\text{ x } n_x}  \overbrace{x^{<{t}>}}^{n_x \text{ x m}} + b  \right) \\
+
+\frac{\partial tanh \left(x\right)}{\partial x} &= 1 - tanh \left(x\right)^2 \\
+
+\frac{\partial a^{<{t}>} }{\partial W_{ax}}  &= \left(1- tanh \left(W_{aa} a^{<{t-1}>} + W_{ax} x^{<{t}>}   + b\right)^2 \right)  \left(x^{<{t}>}\right)^T \\
+
+\frac{\partial a^{<{t}>} }{\partial W_{aa}}  &= \left(1- tanh \left(W_{aa} a^{<{t-1}>} + W_{ax} x^{<{t}>} + b  \right)^2 \right) \left(a^{<{t-1}>}\right)^T \\
+
+\frac{\partial a^{<{t}>} }{\partial W_{b}}  &= \sum_{batch} \left(1- tanh \left(W_{aa} a^{<{t-1}>} + W_{ax} x^{<{t}>}  + b \right)^2 \right) \\
+
+\frac{\partial a^{<{t}>} }{\partial x^{<{t}>}}  &= W_{ax}^T  \left(1- tanh \left(W_{aa} a^{<{t-1}>} + W_{ax} x^{<{t}>}  + b \right)^2 \right) \\
+
+\frac{\partial a^{<{t}>} }{\partial a^{<{t-1}>}}  &= W_{aa}^T  \left(1- tanh \left(W_{aa} a^{<{t-1}>} + W_{ax} x^{<{t}>} + b \right)^2 \right) \\
+\end{align}
+$$
+
+derivate with respect to <span style="color:red">**loss**</span> 
+
+$$
+\begin{align}
+
+\frac{\partial L }{\partial W_{ax}} = \frac{\partial L }{\partial a^{<{t}>}}\frac{\partial a^{<{t}>} }{\partial W_{ax}} &= \left(d_a^{<{t}>}*\left(1- tanh \left(W_{aa} a^{<{t-1}>} + W_{ax} x^{<{t}>}   + b\right)^2 \right)\right)  \left(x^{<{t}>}\right)^T \\
+
+\frac{\partial L }{\partial W_{aa}} = \frac{\partial L }{\partial a^{<{t}>}}\frac{\partial a^{<{t}>} }{\partial W_{aa}}   &= \left( d_a^{<{t}>}* \left(1- tanh \left(W_{aa} a^{<{t-1}>} + W_{ax} x^{<{t}>} + b  \right)^2 \right)\right) \left(a^{<{t-1}>}\right)^T \\
+
+\frac{\partial L }{\partial b} = \frac{\partial L }{\partial a^{<{t}>}}\frac{\partial a^{<{t}>} }{\partial b}   &= \sum_{batch} \left( d_a^{<{t}>}* \left(1- tanh \left(W_{aa} a^{<{t-1}>} + W_{ax} x^{<{t}>}  + b \right)^2 \right) \right) \\
+
+\frac{\partial L }{\partial x^{<{t}>}} = \frac{\partial L }{\partial a^{<{t}>}}\frac{\partial a^{<{t}>} }{\partial  x^{<{t}>}}  &= W_{ax}^T  \left(d_a^{<{t}>}* \left(1- tanh \left(W_{aa} a^{<{t-1}>} + W_{ax} x^{<{t}>}  + b \right)^2 \right)\right) \\
+
+\frac{\partial L }{\partial  a^{<{t-1}>}} = \frac{\partial L }{\partial a^{<{t}>}}\frac{\partial a^{<{t}>} }{\partial   a^{<{t-1}>}}   &= W_{aa}^T \left( d_a^{<{t}>}* \left(1- tanh \left(W_{aa} a^{<{t-1}>} + W_{ax} x^{<{t}>} + b \right)^2 \right) \right) \\
+
+\text{where, } d_a^{<{t}>} &= \frac{\partial L }{\partial  a^{<{t}>}}
+\end{align}
+$$
+
+[More Detailed Derivation](https://www.coursera.org/learn/nlp-sequence-models/discussions/weeks/1/threads/ARHscz_1Eemm7Q61-SEYkg)
+[More Detailed Derivation2](https://drive.google.com/file/d/1n8ybwq0D2W0kR_8l7ywreHuNnsjYGC6K/view)
+
 
 
 #### RNN Architectures
@@ -408,7 +451,7 @@ $$
 
    - When see "*cat*" , set $$\Gamma_u=1$$ and update $$ c^{<{t}>}$$.  When done using it, see *was*, then realize don't need it anymore
    - For all values in the middle, should have $$\Gamma_u=0$$ means don't update and don't forget this value, so just set $$c^{<{t}>} = c^{<{t-1}>}$$
-   - When get the way down *was*, still memorize cat is singular. 
+   - When get the way down "*was*", still memorize cat is singular. 
 
 
 
@@ -430,12 +473,15 @@ In literature, some peole use $$\tilde{h}$$ as $$\tilde{c^{<{t}>}}$$, $$u$$ as $
 
 **LSTM**: Long Short Term Memory: $$ c^{<{t}>} \neq a^{<{t}>}$$
 
- $$\begin{align} \tilde c^{<{t}>} &= tanh \left( W_c \left[ a^{<{t-1}>}, x^{<{t}>}  \right] + b_c \right) \\
+ $$\begin{align} 
   \Gamma_u &= \sigma \left( W_u \left[ a^{<{t-1}>}, x^{<{t}>}  \right] + b_u \right) \\ 
- \\  \Gamma_f &= \sigma \left( W_f \left[ a^{<{t-1}>}, x^{<{t}>}  \right] + b_f \right)  \\  
- \Gamma_o &= \sigma \left( W_o \left[ a^{<{t-1}>}, x^{<{t}>}  \right] + b_o \right) \\ 
+  \Gamma_f &= \sigma \left( W_f \left[ a^{<{t-1}>}, x^{<{t}>}  \right] + b_f \right)  \\  
+ \Gamma_o &= \sigma \left( W_o \left[ a^{<{t-1}>}, x^{<{t}>}  \right] + b_o \right) \\ \\
+ \tilde c^{<{t}>} &= tanh \left( W_c \left[ a^{<{t-1}>}, x^{<{t}>}  \right] + b_c \right) \\
  c^{<{t}>} &= \Gamma_u \cdot \tilde c^{<{t}>}  + \Gamma_f  \cdot  c^{<{t-1}>}  \\ 
-  a^{<{t}>} &= \Gamma_o \cdot tanh\left(c^{<{t}>} \right) \end{align}$$  
+  a^{<{t}>} &= \Gamma_o \cdot tanh\left(c^{<{t}>} \right) \\
+ y^{<{t}>} &=  softmax\left( W_y c^{<{t}>} + b_y  \right) 
+  \end{align}$$  
 
 
 
@@ -449,7 +495,7 @@ In literature, some peole use $$\tilde{h}$$ as $$\tilde{c^{<{t}>}}$$, $$u$$ as $
 
 One Common variation: **peephole connection** ($$c^{<{t-1}>}$$): gate value may not only depend on $$a^{<{t-1}>}$$ & $$x^{<{t}>}$$, also depend on previous memory cell value $$c^{<{t-1}>}$$, 
 
-- Relationship One-to-One: only first element of $$c^{<{t-1}>}$$ affect the first element of corresponding gate; only fifth element of $$c^{<{t-1}>}$$ affect the fifth element of corresponding gate(e.g. $$ \Gamma_o$$), 
+- Relationship One-to-One: only first element(bit) of $$c^{<{t-1}>}$$ affect the first element(bit) of corresponding gate; only fifth element of $$c^{<{t-1}>}$$ affect the fifth element of corresponding gate(e.g. $$ \Gamma_o$$), 
 
  $$\begin{align} 
   \Gamma_u &= \sigma \left( W_u \left[ a^{<{t-1}>}, x^{<{t}>} , c^{<{t-1}>}  \right] + b_u \right) \\ 
@@ -473,6 +519,133 @@ LSTM:
 -  LSTM is <span style="background-color: #FFFF00">more powerful and effective</span> since it has three gates instead of two. 
 -  LSTM is more historical proven choice, default first try. Now more and more team use GRU, more simpler but work as well.
 
+#### LSTM Backprop
+
+define $$d \Gamma_u, d \Gamma_f, d \Gamma_o, d \tilde c^{<{t}>}$$ with respect to their argument inside sigmid or tanh function  
+
+ $$\begin{align} 
+  \Gamma_u &= \sigma \left( \underbrace{ W_u \left[ a^{<{t-1}>}, x^{<{t}>}  \right] + b_u}_{d \Gamma_u} \right) \\ 
+  \Gamma_f &= \sigma \left( \underbrace{W_f \left[ a^{<{t-1}>}, x^{<{t}>}  \right] + b_f }_{d \Gamma_f} \right)  \\  
+ \Gamma_o &= \sigma \left( \underbrace{W_o \left[ a^{<{t-1}>}, x^{<{t}>}  \right] + b_o }_{d \Gamma_o}  \right) \\ 
+ \tilde c^{<{t}>} &= tanh \left( \underbrace{W_c \left[ a^{<{t-1}>}, x^{<{t}>}  \right] + b_c }_{d \tilde c^{<{t}>}}   \right) \\
+ c^{<{t}>} &= \Gamma_u \cdot \tilde c^{<{t}>}  + \Gamma_f  \cdot  c^{<{t-1}>}  \\ 
+  a^{<{t}>} &= \Gamma_o \cdot tanh\left(c^{<{t}>} \right) \\
+ y^{<{t}>} &=  softmax\left( W_y c^{<{t}>} + b_y  \right) 
+  \end{align}$$  
+
+  $$ a^{<{t}>} $$ is next layer input, so define $$ da_{next} = \frac{dL}{da^{<{t}>}}$$, as we know 
+
+$$\begin{align} 
+\frac{\partial tanh\left(x \right)} {\partial x} &= 1 - tanh\left(x \right)^2 \\
+\frac{\partial sigmoid\left(x \right)} {\partial x} &= \sigma\left( x\right) * \left(1-\sigma\left( x\right)\right)
+\end{align}$$ 
+
+
+<span style="color:red">Because $$  c^{<{t}>} $$ is used as parameter to output $$y^{<{t}>} $$, when calculating partial derivative, need to include $$\frac{\partial L}{\partial c^{<{t}>}}$$</span>
+
+
+<span style="color:red">Define $$W_c \left[ a^{<{t-1}>}, x^{<{t}>}  \right] + b_c $$ as $$ \phi$$</span>
+
+$$
+
+dc^{<{t}>} =  \frac{\partial L}{\partial a^{<{t}>}} \frac{\partial a^{<{t}>}}{\partial c^{<{t}>}} + \frac{\partial L}{\partial a^{<{t}>}} \frac{\partial a^{<{t}>}}{\partial c^{<{t}>}} = da^{<{t}>} * \Gamma_o * \left(1-tanh\left( c^{<{t}>} \right)^2 \right) \\ \\
+
+\begin{align} 
+d\tilde c^{<{t}>} &= \frac{\partial L}{\partial c^{<{t}>}}\frac{\partial c^{<{t}>}}{\partial \tilde c^{<{t}>} } \frac{\partial \tilde c^{<{t}>} }{\partial \phi } + \frac{\partial L}{\partial a^{<{t}>}} \frac{\partial a^{<{t}>}}{\partial c^{<{t}>}}\frac{\partial c^{<{t}>}}{\partial \tilde c^{<{t}>} } \frac{\partial \tilde c^{<{t}>} }{\partial \phi }  \\
+&= \left( \frac{\partial L}{\partial c^{<{t}>}} + \frac{\partial L}{\partial a^{<{t}>}} \frac{\partial a^{<{t}>}}{\partial c^{<{t}>}} \right) \frac{\partial c^{<{t}>}}{\partial \tilde c^{<{t}>} } \frac{\partial \tilde c^{<{t}>} }{\partial \phi } \\
+&=  \color{fuchsia}{\left( dc^{<{t}>} +  da^{<{t}>}*\Gamma_O^{<{t}>} * \left( 1- tanh\left( c^{<{t}>}  \right)^2 \right) \right) * \Gamma_u^{<{t}>} * \left(1 - \left( \tilde c^{<{t}>} \right)^2 \right)} \\
+  \end{align}
+
+$$  
+
+<span style="color:red">Define $$ W_u \left[ a^{<{t-1}>}, x^{<{t}>}  \right] + b_u $$ as $$ \phi$$</span>
+
+
+
+$$
+\begin{align} 
+d\Gamma_u^{<{t}>} &= \frac{\partial L}{\partial c^{<{t}>}}\frac{\partial c^{<{t}>}}{\partial \Gamma_u^{<{t}>}} \frac{\partial \Gamma_u^{<{t}>}}{\partial \phi } + \frac{\partial L}{\partial a^{<{t}>}} \frac{\partial a^{<{t}>}}{\partial c^{<{t}>}}\frac{\partial c^{<{t}>}}{\partial \Gamma_u^{<{t}>}  } \frac{\partial \Gamma_u^{<{t}>} }{\partial \phi }  \\
+&= \left( \frac{\partial L}{\partial c^{<{t}>}} + \frac{\partial L}{\partial a^{<{t}>}} \frac{\partial a^{<{t}>}}{\partial c^{<{t}>}} \right) \frac{\partial c^{<{t}>}}{\partial \Gamma_u^{<{t}>} } \frac{\partial \Gamma_u^{<{t}>} }{\partial \phi } \\
+&=  \color{fuchsia}{\left( dc^{<{t}>} +  da^{<{t}>}*\Gamma_O^{<{t}>} * \left( 1- tanh\left( c^{<{t}>}  \right)^2 \right) \right) * \tilde c^{<{t}>} * \Gamma_u^{<{t}>} * \left(1 - \Gamma_u^{<{t}>} \right)} \\
+  \end{align}
+$$
+
+<span style="color:red">Define $$ W_f \left[ a^{<{t-1}>}, x^{<{t}>}  \right] + b_f $$ as $$ \phi$$</span>
+
+
+
+$$
+\begin{align} 
+d\Gamma_f^{<{t}>} &= \frac{\partial L}{\partial c^{<{t}>}}\frac{\partial c^{<{t}>}}{\partial \Gamma_f^{<{t}>}} \frac{\partial \Gamma_f^{<{t}>}}{\partial \phi } + \frac{\partial L}{\partial a^{<{t}>}} \frac{\partial a^{<{t}>}}{\partial c^{<{t}>}}\frac{\partial c^{<{t}>}}{\partial \Gamma_f^{<{t}>}  } \frac{\partial \Gamma_f^{<{t}>} }{\partial \phi }  \\
+&= \left( \frac{\partial L}{\partial c^{<{t}>}} + \frac{\partial L}{\partial a^{<{t}>}} \frac{\partial a^{<{t}>}}{\partial c^{<{t}>}} \right) \frac{\partial c^{<{t}>}}{\partial \Gamma_f^{<{t}>} } \frac{\partial \Gamma_f^{<{t}>} }{\partial \phi } \\
+&=  \color{fuchsia}{\left( dc^{<{t}>} +  da^{<{t}>}*\Gamma_O^{<{t}>} * \left( 1- tanh\left( c^{<{t}>}  \right)^2 \right) \right) *  c^{<{t-1}>} * \Gamma_f^{<{t}>} * \left(1 - \Gamma_f^{<{t}>} \right)} \\
+  \end{align}
+
+$$  
+
+
+<span style="color:red">Define $$ W_o \left[ a^{<{t-1}>}, x^{<{t}>}  \right] + b_o $$ as $$ \phi$$</span>
+
+$$
+\begin{align} 
+d\Gamma_o^{<{t}>} &= \frac{\partial L}{\partial c^{<{t}>}}\frac{\partial c^{<{t}>}}{\partial \Gamma_o^{<{t}>}} \frac{\partial \Gamma_o^{<{t}>}}{\partial \phi } + \frac{\partial L}{\partial a^{<{t}>}} \frac{\partial a^{<{t}>}}{\partial \Gamma_o^{<{t}>}  } \frac{\partial \Gamma_o^{<{t}>} }{\partial \phi }  \\
+&= \left( \frac{\partial L}{\partial c^{<{t}>}}*0 + \frac{\partial L}{\partial a^{<{t}>}}\frac{\partial a^{<{t}>}}{\partial \Gamma_o^{<{t}>} }  \right) \frac{\partial \Gamma_o^{<{t}>} }{\partial \phi } \\
+&=  \color{fuchsia}{da^{<{t}>}*  tanh \left(c^{<{t}>}\right) * \Gamma_o^{<{t}>} * \left(1 - \Gamma_o^{<{t}>} \right)} \\
+  \end{align}
+
+$$  
+
+So the derivatives for weights are:
+
+
+
+$$ \begin{align} 
+   \underbrace{dW_f^{\langle t \rangle}}_{a^{\langle t \rangle} \text{ x } \left( a^{\langle t-1 \rangle} + x^{\langle t \rangle} \right)} &= \underbrace{d\Gamma_f^{\langle t \rangle}}_{a^{\langle t \rangle} \text{ x } m} \underbrace{\begin{bmatrix} a^{\langle t-1 \rangle} \\ x^{\langle t \rangle} \end{bmatrix}^T}_{ m \text{ x } \left( a^{\langle t-1 \rangle} + x^{\langle t \rangle} \right)} \\ 
+   db_f^{\langle t \rangle} &= \sum_{batch} d\Gamma_f^{\langle t \rangle} \text{ where } db_f^{\langle t \rangle} \text{ dimension is  } a^{\langle t \rangle} by 1  \\ 
+   dW_u^{\langle t \rangle} &= d\Gamma_u^{\langle t \rangle} \begin{bmatrix} a^{\langle t-1 \rangle} \\ x^{\langle t \rangle} \end{bmatrix}^T \\
+db_u^{\langle t \rangle} &= \sum_{batch} d\Gamma_u^{\langle t \rangle} \text{ where } db_u^{\langle t \rangle} \text{ dimension is  } a^{\langle t \rangle} by 1  \\ 
+   dW_c^{\langle t \rangle} &= d\widetilde c^{\langle t \rangle} \begin{bmatrix} a^{\langle t-1 \rangle} \\ x^{\langle t \rangle}\end{bmatrix}^T \\
+db_c^{\langle t \rangle} &= \sum_{batch} d\widetilde c^{\langle t \rangle} \text{ where } d\widetilde c^{\langle t \rangle} \text{ dimension is  } a^{\langle t \rangle} by 1  \\ 
+   dW_o^{\langle t \rangle} &= d\Gamma_o^{\langle t \rangle} \begin{bmatrix} a^{\langle t-1 \rangle} \\ x^{\langle t \rangle}\end{bmatrix}^T \\
+db_f^{\langle o \rangle} &= \sum_{batch} d\Gamma_o^{\langle t \rangle} \text{ where } db_o^{\langle t \rangle} \text{ dimension is  } a^{\langle t \rangle} by 1  \\ 
+\end{align}$$
+
+<span style="color:red">Define</span>
+
+
+
+$$ \begin{align} 
+   \color{red}{\phi_1} =  W_u \left[ a^{<{t-1}>}, x^{<{t}>}  \right] + b_u \\
+\color{red}{\phi_2} =  W_f \left[ a^{<{t-1}>}, x^{<{t}>}  \right] + b_f \\
+\color{red}{\phi_3} =  W_o \left[ a^{<{t-1}>}, x^{<{t}>}  \right] + b_o \\
+\color{red}{\phi_4} =  W_c \left[ a^{<{t-1}>}, x^{<{t}>}  \right] + b_c \\
+
+\end{align}$$
+
+Then 
+
+$$ \begin{align} 
+   d_a^{<{t-1}>} &= \frac{\partial L}{\partial \phi_1}\frac{\partial \phi_1}{\partial a^{<{t-1}>}} +  \frac{\partial L}{\partial \phi_2}\frac{\partial \phi_2}{\partial a^{<{t-1}>}} +  \frac{\partial L}{\partial \phi_3}\frac{\partial \phi_3}{\partial a^{<{t-1}>}} + \frac{\partial L}{\partial \phi_4}\frac{\partial \phi_4}{\partial a^{<{t-1}>}} \\
+&= \color{fuchsia}{w_u^T d\Gamma_u^{<{t}>} + w_f^T d\Gamma_f^{<{t}>} + w_o^T d\Gamma_o^{<{t}>} + w_c^T d\widetilde c^{<{t}>}}
+\end{align}$$
+
+
+$$ \begin{align} 
+   d_c^{<{t-1}>} &= \frac{\partial L}{\partial \phi_1}\frac{\partial \phi_1}{\partial a^{<{t-1}>}} +  \frac{\partial L}{\partial \phi_2}\frac{\partial \phi_2}{\partial a^{<{t-1}>}} +  \frac{\partial L}{\partial \phi_3}\frac{\partial \phi_3}{\partial a^{<{t-1}>}} + \frac{\partial L}{\partial \phi_4}\frac{\partial \phi_4}{\partial a^{<{t-1}>}} \\
+&= \color{fuchsia}{w_u^T d\Gamma_u^{<{t}>} + w_f^T d\Gamma_f^{<{t}>} + w_o^T d\Gamma_o^{<{t}>} + w_c^T d\widetilde c^{<{t}>}}\\
+ 
+   d_c^{<{t-1}>} &= \frac{\partial L}{\partial \phi_1}\frac{\partial \phi_1}{\partial x^{<{t}>}} +  \frac{\partial L}{\partial \phi_2}\frac{\partial \phi_2}{\partial x^{<{t}>}} +  \frac{\partial L}{\partial \phi_3}\frac{\partial \phi_3}{\partial x^{<{t}>}} + \frac{\partial L}{\partial \phi_4}\frac{\partial \phi_4}{\partial x^{<{t}>}} \\
+&= \color{fuchsia}{w_u^T d\Gamma_u^{<{t}>} + w_f^T d\Gamma_f^{<{t}>} + w_o^T d\Gamma_o^{<{t}>} + w_c^T d\widetilde c^{<{t}>}}
+
+\end{align}$$
+
+$$ \begin{align} 
+   dc^{<{t-1}>} &= \frac{\partial L}{\partial c^{<{t}>} }\frac{\partial c^{<{t}>}}{\partial c^{<{t-1}>}} +  \frac{\partial L}{\partial a^{<{t}>}}\frac{\partial a^{<{t}>}}{\partial c^{<{t}>}}\frac{\partial c^{<{t}>}}{\partial c^{<{t-1}>}} \ \\
+&= \color{fuchsia}{dc^{<{t}>}* \Gamma_f^{t} + da^{<{t}>} *\Gamma_O^{<{t}>}* \left(1 - tanh\left(c^{<{t}>} \right)^2 \right) * \Gamma_f^{t}} \\
+ \end{align}$$
+
+
+
 
 #### Bidirection RNN 
 
@@ -492,7 +665,7 @@ Bidirection RNN(also defines a acyclic graph): forward prop从左向右 and 从�
 ![](/img/post/Deep_Learning-Sequence_Model_note/week1pic11.png)
 
 
-<span style="background-color: #FFFF00">Disadvantage</span>: 需要entire sequence of data before you can make prediction; 比如speech recognition: 需要person to stop talking to get entire utterance before process and make prediction
+<span style="background-color: #FFFF00">Disadvantage: 需要entire sequence of data before you can make prediction</span>; 比如speech recognition: 需要person to stop talking to get entire utterance before process and make prediction
 
 
 #### Deep RNNs
@@ -524,7 +697,7 @@ For RRN,  <span style="color:red">三层已经是very deep</span>, don't see man
 ## 2. NLP & Word Embedding
 
 
-#### Word Embedding:
+#### Word Embedding
 
 **Word Embedding**: The way of representing words. 
 
@@ -651,7 +824,7 @@ $$ \text{I want a}  \underbrace{\text{glass}}_{\color{fuchsia}{context}}  \text{
 $$
 
 
-#### Word2Vec Skip-grams:
+#### Word2Vec Skip-grams
 
 比如句子: I want a glass of orange juice to go along with my cereal; 
 - 先 pick <span style="color: red">context word</span> e.g. *orange*, 

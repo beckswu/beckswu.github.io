@@ -296,10 +296,10 @@ $$\delta_{i}^{\left[ l\right]} = \sum_k \delta_k^{ \left[ l + 1\right] } w_{ki}^
 ------------
 
 $$dZ^{\left[ 2 \right]} = A^{\left[ 2 \right]} -  Y; \space \space \text{  Y }, dZ^{\left[ 2 \right]}  \text{ is 1 by m matrix} $$<br/>
-$$dW^{\left[ 2 \right]} = \frac{1}{m} dZ^{\left[ 2 \right]}  A^{\left[ 1 \right] T} $$ <br/>
+$$dW^{\left[ 2 \right]} = \frac{1}{m} dZ^{\left[ 2 \right]}  A^{\left[ 1 \right] T} $$, where $$dW^{\left[ 2 \right]}$$ `a_2(=1) x  a_1` dimension <br/>
 $$db^{\left[ 2 \right]} = \frac{1}{m} np.sum\left(  dZ^{\left[ 2 \right]}, \text{ axis = 1, keepdims = true} \right)$$ <br/>
 如果不加keepdims 可能产生 np.array funny (n, )array, 加上keepdims = true 给出shape = $$\left( n^{\left[ 2 \right]} , 1\right)$$ <br/>
-$$dZ^{\left[ 1 \right]} = W^{\left[ 2 \right]T}   dZ^{\left[ 2 \right]} \cdot  {g'}^{\left[ 1 \right] }  \left( Z^{\left[ 1 \right]} \right) $$, $$\cdot$$ is element wise operation <br/>
+$$dZ^{\left[ 1 \right]} = W^{\left[ 2 \right]T}   dZ^{\left[ 2 \right]} \cdot  {g'}^{\left[ 1 \right] }  \left( Z^{\left[ 1 \right]} \right) $$, $$\cdot$$ is element wise operation  $$W^{\left[ 2 \right]}$$  `a_2(=1) x a_1 ` dimension, $$dZ^{\left[ 2 \right]}$$ `a_2 x m` dimension, $$ Z^{\left[ 1 \right]}$$ `a_1 x m` dimension  <br/>
 $$W^{\left[ 2 \right]T}   dZ^{\left[ 2 \right]} $$ is $$\left( n^{ \left[ 1 \right] }, m \right) $$ matrix, $${g'}^{\left[ 1 \right] }  \left( Z^{\left[ 1 \right]} \right) $$ is also a $$\left( n^{\left[ 1 \right]}, m \right) $$ matrix<br/>
 $$dW^{\left[ 1 \right]} = \frac{1}{m} dZ^{\left[ 1 \right]}  X^{T} $$<br/>
 $$db^{\left[ 1 \right]} = \frac{1}{m} np.sum\left(  dZ^{\left[ 1 \right]}, \text{ axis = 1, keepdims = true} \right)$$
@@ -379,7 +379,7 @@ Not having test set might be okay (only dev set) (the goal of test 是为了 giv
    - Big network (更多的 hidden layers 或者更多的 hidden units)
    - try some more advanced optimization algorithms (可以跟 base error 对比)(get more data 不会有帮助)
 
-2. 是否有 high variance: 
+1. 是否有 high variance: 
    - get more data, 
    - regularization
   
