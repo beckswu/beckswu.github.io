@@ -541,14 +541,13 @@ $$\begin{align}
 \end{align}$$ 
 
 
-<span style="color:red">Because $$  c^{<{t}>} $$ is used as parameter to output $$y^{<{t}>} $$, when calculating partial derivative, need to include $$\frac{\partial L}{\partial c^{<{t}>}}$$</span>
+<span style="color:red">when calculating partial derivative, need to include $$\frac{\partial L}{\partial c^{<{t}>}}$$ and $$\frac{\partial L}{\partial a^{<{t}>}}$$</span>
 
 
 <span style="color:red">Define $$W_c \left[ a^{<{t-1}>}, x^{<{t}>}  \right] + b_c $$ as $$ \phi$$</span>
 
 $$
 
-dc^{<{t}>} =  \frac{\partial L}{\partial a^{<{t}>}} \frac{\partial a^{<{t}>}}{\partial c^{<{t}>}} + \frac{\partial L}{\partial a^{<{t}>}} \frac{\partial a^{<{t}>}}{\partial c^{<{t}>}} = da^{<{t}>} * \Gamma_o * \left(1-tanh\left( c^{<{t}>} \right)^2 \right) \\ \\
 
 \begin{align} 
 d\tilde c^{<{t}>} &= \frac{\partial L}{\partial c^{<{t}>}}\frac{\partial c^{<{t}>}}{\partial \tilde c^{<{t}>} } \frac{\partial \tilde c^{<{t}>} }{\partial \phi } + \frac{\partial L}{\partial a^{<{t}>}} \frac{\partial a^{<{t}>}}{\partial c^{<{t}>}}\frac{\partial c^{<{t}>}}{\partial \tilde c^{<{t}>} } \frac{\partial \tilde c^{<{t}>} }{\partial \phi }  \\
@@ -625,23 +624,21 @@ $$ \begin{align}
 Then 
 
 $$ \begin{align} 
-   d_a^{<{t-1}>} &= \frac{\partial L}{\partial \phi_1}\frac{\partial \phi_1}{\partial a^{<{t-1}>}} +  \frac{\partial L}{\partial \phi_2}\frac{\partial \phi_2}{\partial a^{<{t-1}>}} +  \frac{\partial L}{\partial \phi_3}\frac{\partial \phi_3}{\partial a^{<{t-1}>}} + \frac{\partial L}{\partial \phi_4}\frac{\partial \phi_4}{\partial a^{<{t-1}>}} \\
+   d a^{<{t-1}>} &= \frac{\partial L}{\partial \phi_1}\frac{\partial \phi_1}{\partial a^{<{t-1}>}} +  \frac{\partial L}{\partial \phi_2}\frac{\partial \phi_2}{\partial a^{<{t-1}>}} +  \frac{\partial L}{\partial \phi_3}\frac{\partial \phi_3}{\partial a^{<{t-1}>}} + \frac{\partial L}{\partial \phi_4}\frac{\partial \phi_4}{\partial a^{<{t-1}>}} \\
 &= \color{fuchsia}{w_u^T d\Gamma_u^{<{t}>} + w_f^T d\Gamma_f^{<{t}>} + w_o^T d\Gamma_o^{<{t}>} + w_c^T d\widetilde c^{<{t}>}}
 \end{align}$$
 
 
 $$ \begin{align} 
-   d_c^{<{t-1}>} &= \frac{\partial L}{\partial \phi_1}\frac{\partial \phi_1}{\partial a^{<{t-1}>}} +  \frac{\partial L}{\partial \phi_2}\frac{\partial \phi_2}{\partial a^{<{t-1}>}} +  \frac{\partial L}{\partial \phi_3}\frac{\partial \phi_3}{\partial a^{<{t-1}>}} + \frac{\partial L}{\partial \phi_4}\frac{\partial \phi_4}{\partial a^{<{t-1}>}} \\
-&= \color{fuchsia}{w_u^T d\Gamma_u^{<{t}>} + w_f^T d\Gamma_f^{<{t}>} + w_o^T d\Gamma_o^{<{t}>} + w_c^T d\widetilde c^{<{t}>}}\\
  
-   d_c^{<{t-1}>} &= \frac{\partial L}{\partial \phi_1}\frac{\partial \phi_1}{\partial x^{<{t}>}} +  \frac{\partial L}{\partial \phi_2}\frac{\partial \phi_2}{\partial x^{<{t}>}} +  \frac{\partial L}{\partial \phi_3}\frac{\partial \phi_3}{\partial x^{<{t}>}} + \frac{\partial L}{\partial \phi_4}\frac{\partial \phi_4}{\partial x^{<{t}>}} \\
+   dx^{<{t-1}>} &= \frac{\partial L}{\partial \phi_1}\frac{\partial \phi_1}{\partial x^{<{t}>}} +  \frac{\partial L}{\partial \phi_2}\frac{\partial \phi_2}{\partial x^{<{t}>}} +  \frac{\partial L}{\partial \phi_3}\frac{\partial \phi_3}{\partial x^{<{t}>}} + \frac{\partial L}{\partial \phi_4}\frac{\partial \phi_4}{\partial x^{<{t}>}} \\
 &= \color{fuchsia}{w_u^T d\Gamma_u^{<{t}>} + w_f^T d\Gamma_f^{<{t}>} + w_o^T d\Gamma_o^{<{t}>} + w_c^T d\widetilde c^{<{t}>}}
 
 \end{align}$$
 
 $$ \begin{align} 
    dc^{<{t-1}>} &= \frac{\partial L}{\partial c^{<{t}>} }\frac{\partial c^{<{t}>}}{\partial c^{<{t-1}>}} +  \frac{\partial L}{\partial a^{<{t}>}}\frac{\partial a^{<{t}>}}{\partial c^{<{t}>}}\frac{\partial c^{<{t}>}}{\partial c^{<{t-1}>}} \ \\
-&= \color{fuchsia}{dc^{<{t}>}* \Gamma_f^{t} + da^{<{t}>} *\Gamma_O^{<{t}>}* \left(1 - tanh\left(c^{<{t}>} \right)^2 \right) * \Gamma_f^{t}} \\
+&= \color{fuchsia}{dc^{<{t}>}* \Gamma_f^{<{t}>} + da^{<{t}>} *\Gamma_O^{<{t}>}* \left(1 - tanh\left(c^{<{t}>} \right)^2 \right) * \Gamma_f^{t}} \\
  \end{align}$$
 
 
