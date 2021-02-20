@@ -17,7 +17,7 @@ tags:
 
 ***
 
-Some mathematic derivation in the blog is based on the fundation of calculus and linear algebra which can be found in below linked 
+Some mathematic derivation in the blog is based on the fundation of calculus and linear algebra which can be found in the below linked 
 
 - [The Matrix Calculus You Need For Deep Learning](https://explained.ai/matrix-calculus/index.html)
 - [Vector, Matrix, and Tensor Derivatives](http://cs231n.stanford.edu/vecDerivs.pdf)
@@ -347,7 +347,7 @@ $$P\left( y^{<1>},  y^{<2>}, \cdots,  y^{<3>} \right)$$
 **RNN Model**: each step in the RNN will look at some set of preceding words
 
 
-1. At time 0, $$x^{<1>} = \vec 0$$, set $$x_1$$ to be all zeros. Also set $$a^{<0>} = \vec 0$$. 
+1. <span style="background-color:#FFFF00">At time 0, $$x^{<1>} = \vec 0$$, set $$x_1$$ to be all zeros. Also set $$a^{<0>} = \vec 0$$ </span>
    - $$a^{<1>}$$ make a softmax to predict the probability of any word in the dictionary to be the first word $$y^{<1>}$$(What is the chance the first word "Aaron"? what is the chance the first word "cat"? ... what is the chance the first word "Zulu"? what is the chance the first word "UNK"?). If vocabulary size is 10002(+ `UNK` and `EOS` ), there are 10002 softmax outputs
 2. Next step, the job is to try to figure out the second word. <span style="background-color:#FFFF00">Also give the **correct** first word $$x^{<2>} = y^{<1>}$$</span>. `P(average | Cats)`
 3. At 3rd step, predict third word, we can give the first two words, $$x^{<3>} = y^{<2>}$$. To figure out  `P(__ | Cats average)` given first two words are cats average
@@ -370,6 +370,11 @@ $$P\left( y^{<{1}>}, y^{<{2}>}, y^{<{3}>} \right) = P\left( y^{<{1}>}\right) \cd
 
 
 #### Sampling Novel Sequence
+
+- <span style="background-color:#FFFF00">When at training, pass **ground truth** $$y^{<{t-1}>}$$ as the input for $$x^{<{t}>}$$</span>
+- <span style="background-color:#FFFF00">When finish training, pass **random sampled** $$\hat y^{<{t-1}>}$$ from last time step as the input for $$x^{<{t}>}$$ (not pick the highest probablity, use the one from random sample)</span>
+  - Note: for encoder-decoder network to generate translation, need to pick the highest probability using beam search
+
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week1pic9.png)
 
