@@ -14,6 +14,17 @@ tags:
     - 学习笔记
 ---
 
+
+***
+
+Some mathematic derivation in the blog is based on the fundation of calculus and linear algebra which can be found in below linked 
+
+- [The Matrix Calculus You Need For Deep Learning](https://explained.ai/matrix-calculus/index.html)
+- [Vector, Matrix, and Tensor Derivatives](http://cs231n.stanford.edu/vecDerivs.pdf)
+
+***
+
+
 ## 1. Recurrent Neural Networks
 Examples of sequence data:
                 
