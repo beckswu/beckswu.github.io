@@ -281,9 +281,18 @@ $$
 
 \frac{\partial L }{\partial  a^{<{t-1}>}} = \frac{\partial L }{\partial a^{<{t}>}}\frac{\partial a^{<{t}>} }{\partial   a^{<{t-1}>}}   &= W_{aa}^T \left( d_a^{<{t}>}* \left(1- tanh \left(W_{aa} a^{<{t-1}>} + W_{ax} x^{<{t}>} + b \right)^2 \right) \right) \\
 
-\text{where, } d_a^{<{t}>} &= \frac{\partial L }{\partial  a^{<{t}>}}
+\text{where, } d_a^{<{t}>} &= \frac{\partial L }{\partial  a^{<{t}>}} = \left(\underbrace{\frac{\partial L }{\partial z}}_{\text{softmax/sigmoid derivative}} \frac{\partial z^{<{t}>}}{\partial a^{<{t}>}}   + d_a^{<{t+1}>} \right) \\
+
+& =  \left(W_{ya}^T \frac{\partial L }{\partial z}  + d_a^{<{t+1}>} \right) \\
+
 \end{align}
 $$
+
+For $$d a^{<{t}>}$$, When $$a^{<{t}>}$$ changes, it affects the cost function in 2 ways. First, it changes the output of the layer t (the value of $$y^{<{t}>}$$) and second, it changes all further cells / output values to the right (t+1, t+2 ....).
+
+So, the derivative of cost function by $$a^{<{t}>}$$ is a sum of two items: partial derivative of cost by $$y^{<{t}>}$$ (that's the function argument `da[:,:,t]` in the below diagram), and sum of derivatives of all further laters (that's the `da_prevt` from the cell to the right). BTW, <span style="color:red">as expected $$d a^{<{t}>}$$ is zero for the last cell</span>.
+
+![](/img/post/Deep_Learning-Sequence_Model_note/week1pic4.png)
 
 [More Detailed Derivation](https://www.coursera.org/learn/nlp-sequence-models/discussions/weeks/1/threads/ARHscz_1Eemm7Q61-SEYkg)
 [More Detailed Derivation2](https://drive.google.com/file/d/1n8ybwq0D2W0kR_8l7ywreHuNnsjYGC6K/view)
