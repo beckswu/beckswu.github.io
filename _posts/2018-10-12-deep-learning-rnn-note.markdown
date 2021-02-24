@@ -544,6 +544,95 @@ LSTM:
 -  LSTM is <span style="background-color: #FFFF00">more powerful and effective</span> since it has three gates instead of two. 
 -  LSTM is more historical proven choice, default first try. Now more and more team use GRU, more simpler but work as well.
 
+#### Keras
+
+**return_sequences=True**: output all hidden state $$a^{<{t}>}$$ as return output for LSTM layer
+
+e.g. input with shape `(num_seq, seq_len, num_feature)`. If we don’t set `return_sequences=True`, our output will have the shape `(num_seq, num_feature)`, but if we do, we will obtain the output with shape `(num_seq, seq_len, num_feature)`.
+
+
+```python
+# return_sequences=False
+
+inputs1 = Input(shape=(3, 1))
+lstm1 = LSTM(1)(inputs1)
+model = Model(inputs=inputs1, outputs=lstm1)
+data = np.array([0.1, 0.2, 0.3]).reshape((1,3,1))
+# make and show prediction
+
+print(model.predict(data)) # [[0.05182764]]
+
+#注: 因为weight initialization 不一样, 每次model.predict(data)值会不同
+
+
+# return_sequences=True
+
+lstm2 = LSTM(1, return_sequences=True)(inputs1)
+model = Model(inputs=inputs1, outputs=lstm1)
+print(model.predict(data)) #[[[0.00028653] [0.00073207  [0.00125595]]]
+ 
+```
+
+Besides, <span style="background-color:#FFFF00">You must set `return_sequences=True` when stacking LSTM layers so that the second LSTM layer has a three-dimensional sequence input.</span>
+
+
+下面的code 中LSTM 会计算所有的 $$a^{\left[ 1\right] <{1}>}, a^{\left[ 1\right] <{2}>} ... a^{\left[ 1\right] <{T_x}>}$$
+
+```python
+embeddings = Embedding(input_dim =vocab_size, output_dim = emb_dim)   
+X = LSTM(128, return_sequences=True)(embeddings)
+```
+
+- 下图底层的 LSTM 需要all pass hidden state output(activation) to 上层的LSTM as input. 所以`return_sequences=True`
+- 上层LSTM 不generate output for each time step, so `return_sequences=False`
+
+
+![](/img/post/Deep_Learning-Sequence_Model_note/LSTM_model.png)
+
+
+**return_state=True**: LSTM layer that will provide the final hidden state activation $$a^{<T_x>}$$ and the final state memory cell $$c^{<T_x>}$$ .
+
+- 如果设 **return_sequences=False**, `lstm` = `state_a` , 都final hidden state activation 
+- 如果设  **return_sequences=True**, 则`lstm` 为所有hidden state的activation, `state_a`为final state activation.  `lstm[-1]` = `state_a`
+
+```python
+inputs1 = Input(shape=(3, 1))
+lstm, state_a, state_c = LSTM(1, return_state=True)(inputs1)
+model = Model(inputs=inputs1, outputs=[lstm1, state_a, state_c])
+data = np.array([0.1, 0.2, 0.3]).reshape((1,3,1))
+print(model.predict(data)) 
+# [array([[-0.11814568]], dtype=float32), 
+
+#   array([[-0.11814568]], dtype=float32),
+
+#   array([[-0.20811582]], dtype=float32)]
+
+
+lstm2, state_a, state_c = LSTM(1, return_sequences=True, return_state=True)(inputs1)
+model = Model(inputs=inputs1, outputs=[lstm1, state_a, state_c])
+data = np.array([0.1, 0.2, 0.3]).reshape((1,3,1))
+print(model.predict(data))
+# [array([[[-0.01104685], [-0.02694019], [-0.0446003 ]]], dtype=float32), 
+
+#  array([[-0.0446003]], dtype=float32),
+
+#  array([[-0.10694385]], dtype=float32)]
+
+```
+
+**TimeDistributed layer**
+
+Since we set `return_sequences=True` in the LSTM layers, the output is now a three-dimension vector `(num_seq, seq_len, num_feature)`. If we input that into the **Dense layer**, it will raise an error because the Dense layer only accepts two-dimension input. In order to input a three-dimension vector, we need to use a wrapper layer called `TimeDistributed`. This layer will help us maintain output’s shape, so that we can achieve a sequence as output in the end.
+
+比如下图红框的实现方式：
+
+```python
+from tensorflow.keras.layers import  TimeDistributed,
+X = TimeDistributed(Dense(1, activation = "sigmoid"))(X) # time distributed  (sigmoid)
+```
+![](/img/post/Deep_Learning-Sequence_Model_note/TimeDistributed.png)
+
+
 #### LSTM Backprop
 
 define $$d \Gamma_u, d \Gamma_f, d \Gamma_o, d \tilde c^{<{t}>}$$ with respect to their argument inside sigmid or tanh function  
@@ -1260,6 +1349,13 @@ E.g French translate to English
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week3pic9.png)
 
+![](/img/post/Deep_Learning-Sequence_Model_note/attn_model.png)
+
+![](/img/post/Deep_Learning-Sequence_Model_note/attn_mechanism.png)
+
+
+
+
 **Attention Model Training**
 
 - 下面network 是BRNN(or Bidirectional GRU or Bidirectional LSTM) to compute features for each word, 上面network 是standarad RNN
@@ -1270,8 +1366,8 @@ E.g French translate to English
    - $$ \displaystyle \sum_{ t }^{} {\alpha^{<{1, t'}>}} = 1$$ all weights which used to generate 第一个的词的和等于1 (适用于每个词)
    - $$\alpha^{<{t,t'}>} = \frac{ exp\left( e^{<{t,t'}>} \right) } { \sum_{t' = 1}^{T_x} { exp\left( e^{<{t,t'}>} \right) } }$$  is softmax, ensure the sum of all weight equal 1
    - to compute $$e^{<{t,t'}>}$$, use small nerual network 如下图二 (通常只有一个hidden layer). input is
-     -  $$s^{<{t-1}>}$$ activation from previous time step in above RNN, 
-     -   $$a^{<{t'}>}$$ the feature from timestep $$t'$$. 
+     -  <span style="color:red">$$s^{<{t-1}>}$$ activation from previous time step in above RNN,</span> 
+     -   <span style="color:red">$$a^{<{t'}>}$$ the feature from timestep $$t'$$</span>. 
      -   The intuition is to calculate attention for t from $$t'$$, it depends on the what is hidden state activation from previous timestep and hidden stages RNN generating to look at French word feature
      -   Trust backprop and gradient descent to learn the right function
 - <span style="background-color: #FFFF00">**Downside**</span>: take <span style="color: red"> **quadratic time**</span> to run this algorithm. total number of attention parameter is $$T_x$$ x $$T_y$$, where $$T_x$$ total number of input and $$T_y$$ the total number of output
@@ -1315,7 +1411,7 @@ Method 2: **CTC cost for speech recognition (CTC: connectionist temporal classif
 
 - 比如amazon echo; 用audio clip 计算spectrogram to generate features then pass to RNN; to define target label y when someone saying trigger word (小度小度，or hey Alexa) as 1, before and after trigger word set as 1
    - could work. not work well, because it creates <span style="color: red"> very imbalanced training set</span>, a lots of zero than 1
-   - Solution: instead of setting single timestep as 1, make it 1 for a fixed period of time before revert back to 0.
+   - <span style="background-color:#FFFF00">Solution: instead of setting single timestep as 1, make it 1 for a fixed period of time before revert back to 0(比如接下来的几秒都设为1)</span>
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week3pic13.png)
 
