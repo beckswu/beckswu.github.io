@@ -66,7 +66,7 @@ $$z^{\left[ i \right]} = W^{\left[ i \right]}a^{\left[ i-1 \right]} + b^{\left[ 
 ![](\img\post\Deep-Learning\pic3.png)
 
 
-#### Cost Function
+#### Cross-Entropy loss Function
 
 $$\mathbf{\text{Loss function: }\mathscr{L} \left(\hat y, y \right) = \bbox[yellow]{ - ylog\left( \hat y \right) - \left( 1- y \right) log\left( 1 - \hat y \right)} }$$
 
@@ -81,6 +81,52 @@ $$\mathbf{\text{Cost function: }} J \left(w, b\right) =  -\frac{1}{m} \sum_{i=1}
 
 Loss (error) function 不用 $$L\left(\hat y, y \right) = \frac{1}{2}\left( \hat y - y\right)^2$$ (<span style="color: red">Optimization is not a convex function having many local optimum</span>, so Grandient Descent may not find global optimum)
 
+#### Categorical Cross-Entropy loss
+
+Also called Softmax Loss. It is a Softmax activation plus a Cross-Entropy loss. Assume softmax has k classes and only one element of true label y is 1
+
+$$
+\begin{align}
+\hat y_i = softmax\left( z_i \right) &= \frac{e^{z_i}}{\sum_{j = 1}^K e^{z_j}} \\
+
+L &= - \sum_{i = 1}^K y_i * log\left ( \hat y_i \right)
+\end{align} 
+$$
+
+因为only one element of y is non-zero and assume positive class is p (p-th element in vector y)
+
+$$L = -  log \left ( \hat y_p \right) = -log \left( \frac{e^{z_p}}{\sum_{j = 1}^K e^{z_j}}  \right)
+ $$
+
+ The loss from negative classes are zero. However, the loss gradient respect those negative clases is not cancelled, since the softmax of the positive class also depends on negative classes score (分母的值是sum of expoential of $$z$$ for all classes )
+
+ The derivate respect to the positive class
+
+$$
+\begin{align}
+\text{Let } \sum &= \sum_{j = 1}^K e^{z_j} \\
+\frac{\partial }{\partial z_p } \left( -log \left( \frac{e^{z_p}}{\sum_{j = 1}^K e^{z_j}} \right)  \right) &= - \frac{\sum }{e^{z_p}} \frac{\partial }{\partial z_p } \left( \frac{e^{z_p}}{\sum_{j = 1}^K e^{z_j}} \right)  \\
+
+& = - \frac{\sum }{e^{z_p}} \left( \frac{e^{z_p}  \sum -  e^{z_p} e^{z_p}  }{\left( \sum \right)^2 } \right)\\
+& = - \frac{\sum }{e^{z_p}}\frac{e^{z_p}}{\sum }  \left( 1 - \frac{e^{z_p}}{\sum}  \right) \\
+& = \frac{e^{z_p}}{\sum_{j = 1}^K e^{z_j}} - 1
+\end{align} 
+$$
+
+ The derivate respect to the all other negative class $$e^{z_n}$$
+
+
+
+$$
+\begin{align}
+\text{Let } \sum &= \sum_{j = 1}^K e^{z_j} \\
+\frac{\partial }{\partial z_n } \left( -log \left( \frac{e^{z_p}}{\sum_{j = 1}^K e^{z_j}} \right)  \right) &= - \frac{\sum }{e^{z_p}} \frac{\partial }{\partial z_p } \left( \frac{e^{z_p}}{\sum_{j = 1}^K e^{z_j}} \right)  \\
+
+& = - \frac{\sum }{e^{z_p}} \left( \frac{0  \sum -  e^{z_p} e^{z_n}  }{\left( \sum \right)^2 } \right)\\
+& = - \frac{\sum }{e^{z_p}}\frac{e^{z_p} e^{z_n}}{ \sum^2 }   \\
+& = \frac{e^{z_n}}{\sum_{j = 1}^K e^{z_j}} 
+\end{align} 
+$$
 
 #### Gradient Descent
 

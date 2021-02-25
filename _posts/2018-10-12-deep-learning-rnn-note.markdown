@@ -342,7 +342,7 @@ $$P\left( y^{<1>},  y^{<2>}, \cdots,  y^{<3>} \right)$$
    1. Map each word to one hot vector
    2. Add extra token `EOS` (end of sentences) which can help figure out when a sentence ends。 也可以决定是否把标点符号也tokenize. 
    3. 如果word 不在字典中，用`UNK` substitue for unknown word
-3. <span style="background-color:#FFFF00">Set $$x^{<t>} = y^{<t-1>}$$ </span>
+3. <span style="background-color:#FFFF00">Set $$x^{<t>} = y^{<t-1>}$$ </span> for training
 
 **RNN Model**: each step in the RNN will look at some set of preceding words
 
@@ -429,7 +429,7 @@ Exploding Gradient: aslo happen for RNN. When doing backprop, the gradient(slop)
 
 #### GRU && LSTM
 
-**GRU**: Gated Recurrent Unit, <span style="background-color:#FFFF00">capture long range connection and solve Vanishing Gradient</span>. 
+**GRU**: Gated Recurrent Unit, <span style="background-color:#FFFF00">**capture long range connection and solve Vanishing Gradient**</span>. 
 - There are many different possible versions of how to desgin these units to try to have longer range connections, to have longer range effects, and aggress vandishing gradient problem. GRU is one of the most commonly used versions that researchers found **robust and useful** for many different problems
 
 
@@ -745,7 +745,7 @@ $$ \begin{align}
 
 $$ \begin{align} 
  
-   dx^{<{t-1}>} &= \frac{\partial L}{\partial \phi_1}\frac{\partial \phi_1}{\partial x^{<{t}>}} +  \frac{\partial L}{\partial \phi_2}\frac{\partial \phi_2}{\partial x^{<{t}>}} +  \frac{\partial L}{\partial \phi_3}\frac{\partial \phi_3}{\partial x^{<{t}>}} + \frac{\partial L}{\partial \phi_4}\frac{\partial \phi_4}{\partial x^{<{t}>}} \\
+   dx^{<{t}>} &= \frac{\partial L}{\partial \phi_1}\frac{\partial \phi_1}{\partial x^{<{t}>}} +  \frac{\partial L}{\partial \phi_2}\frac{\partial \phi_2}{\partial x^{<{t}>}} +  \frac{\partial L}{\partial \phi_3}\frac{\partial \phi_3}{\partial x^{<{t}>}} + \frac{\partial L}{\partial \phi_4}\frac{\partial \phi_4}{\partial x^{<{t}>}} \\
 &= \color{fuchsia}{w_u^T d\Gamma_u^{<{t}>} + w_f^T d\Gamma_f^{<{t}>} + w_o^T d\Gamma_o^{<{t}>} + w_c^T d\widetilde c^{<{t}>}}
 
 \end{align}$$
@@ -1076,7 +1076,7 @@ If embeding matrix is trained from large training set(e,g 1 million), it can lea
    - because <span style="background-color: #FFFF00">take **average**, it works for review sentences that short or long</span>
 3. Pass embedding vectors from step 2 to a softmax and output $$\hat y$$ (5 outcomes, 1-5 stars)
 
-<span style="background-color: #FFFF00">**Problem: Ignore order** </span>：比如: "*completely lacking good taste, good service an good ambience*": 即使有3个good，也是negative review. w
+<span style="background-color: #FFFF00">**Problem: Ignore order** </span>：比如: "*completely lacking good taste, good service an good ambience*": 即使有3个good，也是negative review. 
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week2pic9.png)
 
@@ -1215,7 +1215,7 @@ $$arg max_{y} \sum_{y=1}^{T_y} log P\left(y^{<{t}>} \vert x, y^{<{1}>}, y^{<{2}>
 - 当$$\alpha = 1 $$, complete normalize by length; 
 - 当$$\alpha = 0$$, $$ \frac{1}{T_y^{\alpha}} = 1 $$: not normalized at all.
 -  <span style="color: red">同时alpha也可以作为hyperparameter 用来tune</span>
-
+-  句子越长， $$\frac{1}{T_y^{\alpha}}$$越小 且 $$\sum_{y=1}^{T_y} log P\left(y^{<{t}>} \vert x, y^{<{1}>}, y^{<{2}>}, \cdots, y^{<{t-1}>}    \right) $$ is negative, 所以下面formula 得到的值越大
 
 $$arg max_{y} \frac{1}{T_y^{\alpha}} \sum_{y=1}^{T_y} log P\left(y^{<{t}>} \vert x, y^{<{1}>}, y^{<{2}>}, \cdots, y^{<{t-1}>}    \right) $$
 
@@ -1411,7 +1411,7 @@ Method 2: **CTC cost for speech recognition (CTC: connectionist temporal classif
 
 - 比如amazon echo; 用audio clip 计算spectrogram to generate features then pass to RNN; to define target label y when someone saying trigger word (小度小度，or hey Alexa) as 1, before and after trigger word set as 1
    - could work. not work well, because it creates <span style="color: red"> very imbalanced training set</span>, a lots of zero than 1
-   - <span style="background-color:#FFFF00">Solution: instead of setting single timestep as 1, make it 1 for a fixed period of time before revert back to 0(比如接下来的几秒都设为1)</span>
+   - <span style="background-color:#FFFF00">Solution: instead of setting single timestep as 1, make it 1 for a fixed period of time before revert back to 0(比如听到trigger word后， 接下来的几秒都设为1)</span>
 
 ![](/img/post/Deep_Learning-Sequence_Model_note/week3pic13.png)
 
