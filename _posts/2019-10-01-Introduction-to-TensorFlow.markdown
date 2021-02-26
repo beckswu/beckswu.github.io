@@ -15,6 +15,13 @@ tags:
 ---
 
 
+***
+
+The blog is a summary of Coursera Specialization *DeepLearning.AI TensorFlow Developer Professional*. To see more detailed Tensorflow code examples, check [this repo](https://github.com/beckswu/TensorFlow/)
+
+***
+
+
 ## A New Programming Paradigm
 
 
@@ -134,17 +141,15 @@ for i in range(0,4):
     f1 = activation_model.predict(test_images[0].reshape(1, 28, 28, 1))[i]
     plt.imshow(f1[0, : , :, CONVOLUTION_NUMBER], cmap='inferno')
     print("f1.shape",f1.shape)
-"""
 
- f1.shape (1, 26, 26, 64)  -> Conv2D
+# f1.shape (1, 26, 26, 64)  -> Conv2D
 
- f1.shape (1, 13, 13, 64)  -> MaxPooling2D
+# f1.shape (1, 13, 13, 64)  -> MaxPooling2D
 
- f1.shape (1, 11, 11, 64)  -> Conv2D
+# f1.shape (1, 11, 11, 64)  -> Conv2D
 
- f1.shape (1, 5, 5, 64)    -> MaxPooling2D
+# f1.shape (1, 5, 5, 64)    -> MaxPooling2D
 
-"""
 ```
 
 #### Visualize Intermediate Representations
@@ -445,6 +450,322 @@ After applying Dropout
 
 ![](/img/post/tensorflow/c2_10.png)
 
+
+
+## NLP
+
+#### Tokenizer
+
+**Why not trained based on letters?** 比如 "*silent*" vs "*listen*", same letters but opposite meaning. 
+
+Tokenizer matters model performance. 
+
+```python
+from tensorflow import keras
+from tensorflow.keras.preprocessing.text import Tokenizer
+from tensorflow.keras.preprocessing.sequence import pad_sequences #for padding 
+
+# sentences of different lengths
+
+sentences = [
+     "I love my dog",        
+     "I, love my cat",
+     "You love my dog!", # ! won't impact token as dog!
+
+     "Do you think my dog is amazing?"
+]
+
+tokenizer = Tokenizer(num_words = 100, oov_token = "<unk>") #Take top 100 words by frequency, 
+
+# 如果不加oov_token, 比如dog 不在vocabulary, 
+
+# tokenizer.texts_to_sequences("You love my dog!")
+
+# -> 返回 【1，2，3】 ignore dog
+
+tokenizer.fit_on_texts(sentences)
+word_index = tokenizer.word_index
+sequences = tokenizer.texts_to_sequences(sentences) #transform each text in texts into integers from token
+
+padded = pad_sequences(sequences)
+print(word_index) #key is word, token is the value
+
+print(sequences)
+print(padded)
+# {'<unk>': 1, 'my': 2, 'love': 3, 'dog': 4, 'i': 5, 'you': 6, 'cat': 7, 'do': 8, 'think': 9, 'is': 10, 'amazing': 11}
+
+#[[5, 3, 2, 4], [5, 3, 2, 7], [6, 3, 2, 4], [8, 6, 9, 2, 4, 10, 11]]
+
+#[[ 0  0  0  5  3  2  4]
+
+# [ 0  0  0  5  3  2  7]
+
+# [ 0  0  0  6  3  2  4]
+
+# [ 8  6  9  2  4 10 11]]
+
+
+padded = pad_sequences(sequences, padding = 'post')
+print(padded[0])
+# [5 3 2 4 0 0 0]
+
+```
+
+If I have a sentence longer than maxlen, I'll lose information, default is pre-padding, lose the beginning of the sentences. can specify lose at the end of sentences by `truncating='post'`
+
+```python
+ pad_sequences(sequences, padding = "post", truncating='post', maxlen = 5)
+```
+
+####  TFDS Pre-tained Tokenizer
+
+- `imdb_reviews/subwords8k`: Use `tdfs.features.text.SubwordTextEncoder` with 8k vocab size 
+- `imdb_reviews/subwords32k`: Use `tdfs.features.text.SubwordTextEncoder` with 32k vocab size 
+
+
+
+```
+import tensorflow_datasets as tfds
+imdb, info = tfds.load("imdb_reviews/subwords8k", with_info = True, as_supervised = True)
+train_data, test_data = imdb["train"], imdb["test"]
+
+tokenizer = info.features["text"].encoder #access tokenizer from Pre-trained 
+
+print(tokenizer.subwords) #by looking up its vocabulary
+
+sample_string = "TensorFlow, from basics to mastery"
+
+tokenized_string = tokenizer.encode(sample_string)
+print("Tokenized string is {}".format(tokenized_string))
+
+original_string = tokenizer.decode(tokenized_string)
+print("The original string: {}".format(original_string))
+```
+
+One more thing if use `Flatten` layer after embedding from imdb embedding may crash instead using `GlobalAveragePooling1D`
+
+```python
+model = tf.keras.Sequential([
+    tf.keras.layers.Embedding(tokenizer.vocab_size, embedding_dim),
+    tf.keras.layers.GlobalAveragePooling1D(),
+    tf.keras.layers.Dense(6, activation='relu'),
+    tf.keras.layers.Dense(1, activation='sigmoid')
+])
+```
+
+<span style="background-color:#FFFF00">Above model will not do a good job because using subword. Subwords are often non-sense and only put in sequence have meaningful semantics -> should using recurrent neural networks</span>
+
+#### Embedding
+
+
+`tf.keras.layers.Embedding`: Use specified dimension `(input_dim x output_dim)` Embedded matrix to get embedded vector for each word in the sequence with length of `input_length`. Embedded matrix applied to each word is the same. Output will be `input_length` x `output_dim`
+- `input_dim` as vocabulary dimension for one-hot vector
+- `output_dim` as embedding dimension.
+- input_length: Length of input sequences, when it is constant. This argument is <span style="background-color:#FFFF00">**required if you are going to connect Flatten then Dense layers upstream**</span>(without it, the shape of the dense outputs cannot be computed).
+
+```python
+vocab_size = 10000
+embedding_dim = 16
+max_length = 120
+
+model = tf.keras.Sequential([
+    tf.keras.layers.Embedding(vocab_size, embedding_dim, input_length=max_length), # parameter is embedding matrix size = vocab_size x embedding_dim, input_length is length of sentence
+
+    tf.keras.layers.Flatten(),
+    tf.keras.layers.Dense(6, activation = tf.nn.relu),
+    tf.keras.layers.Dense(1, activation = 'sigmoid')                             
+])
+```
+
+#### Get Weight
+
+```python
+model = tf.keras.Sequential([
+    tf.keras.layers.Embedding(10000, 16, input_length=120), # parameter is embedding matrix size = vocab_size x embedding_dim, input_length is length of sentence
+
+    tf.keras.layers.Flatten(),
+    tf.keras.layers.Dense(6, activation = tf.nn.relu),
+    tf.keras.layers.Dense(1, activation = 'sigmoid')                             
+])
+
+e = model.layers[0]
+weights = e.get_weights()[0] # Note e.get_weights() return a list have only 1 element 
+
+print(weights.shape) #shape: (vocab_size, embedding_dim), (10000, 16)
+
+# 10000 words in corpus, and work in 16 dimensional array 
+
+```
+
+#### Visualize Embedding
+
+After generalize file, open [Tensorflow Projecter](https://projector.tensorflow.org/) to project word embedding and check Sphereize data
+
+![](/img/post/tensorflow/c3_1.png)
+
+```python
+import tensorflow as tf
+import tensorflow_datasets as tfds
+imdb, info = tfds.load("imdb_reviews", with_info=True, as_supervised=True)
+
+import numpy as np
+
+# Load
+train_data, test_data = imdb['train'], imdb['test']
+
+training_sentences = []
+training_labels = []
+
+testing_sentences = []
+testing_labels = []
+
+# str(s.tonumpy()) is needed in Python3 instead of just s.numpy() 
+
+for s,l in train_data:
+  training_sentences.append(s.numpy().decode('utf8'))
+  training_labels.append(l.numpy())
+  
+for s,l in test_data:
+  testing_sentences.append(s.numpy().decode('utf8'))
+  testing_labels.append(l.numpy())
+  
+training_labels_final = np.array(training_labels)
+testing_labels_final = np.array(testing_labels)
+
+vocab_size = 10000
+embedding_dim = 16
+max_length = 120
+trunc_type='post'
+oov_tok = "<OOV>"
+
+# Tokenize sentence
+
+from tensorflow.keras.preprocessing.text import Tokenizer
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+
+tokenizer = Tokenizer(num_words = vocab_size, oov_token=oov_tok)
+tokenizer.fit_on_texts(training_sentences)
+word_index = tokenizer.word_index
+sequences = tokenizer.texts_to_sequences(training_sentences)
+padded = pad_sequences(sequences,maxlen=max_length, truncating=trunc_type)
+
+testing_sequences = tokenizer.texts_to_sequences(testing_sentences)
+testing_padded = pad_sequences(testing_sequences,maxlen=max_length)
+
+
+model = tf.keras.Sequential([
+    tf.keras.layers.Embedding(vocab_size, embedding_dim, input_length=max_length),
+    tf.keras.layers.Flatten(),
+    tf.keras.layers.Dense(6, activation='relu'),
+    tf.keras.layers.Dense(1, activation='sigmoid')
+])
+model.compile(loss='binary_crossentropy',optimizer='adam',metrics=['accuracy'])
+
+num_epochs = 10
+model.fit(padded, training_labels_final, epochs=num_epochs, validation_data=(testing_padded, testing_labels_final))
+
+e = model.layers[0]
+weights = e.get_weights()[0]  # Note e.get_weights() return a list have only 1 element 
+
+print(weights.shape) # shape: (vocab_size, embedding_dim)
+
+reverse_word_index = dict([(value, key) for (key, value) in word_index.items()]) # token as key and word as value
+
+
+import io
+
+out_v = io.open('vecs.tsv', 'w', encoding='utf-8')
+out_m = io.open('meta.tsv', 'w', encoding='utf-8')
+for word_num in range(1, vocab_size):
+  word = reverse_word_index[word_num]
+  embeddings = weights[word_num]
+  out_m.write(word + "\n")
+  out_v.write('\t'.join([str(x) for x in embeddings]) + "\n")
+out_v.close()
+out_m.close()
+
+```
+
+#### To One-hot vector
+
+```python
+#labels (mx1) is a numpy array which one element is each label for trainning exmple 
+
+ys = tf.keras.utils.to_categorical(labels, num_classes=total_words)
+```
+
+
+#### Generate text
+
+
+Since below is trained for a song. May generate results which have repetition of words such as many ball, all show up 
+
+
+![](/img/post/tensorflow/c3_2.png)
+
+```python
+import tensorflow as tf
+
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+from tensorflow.keras.layers import Embedding, LSTM, Dense, Bidirectional
+from tensorflow.keras.preprocessing.text import Tokenizer
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.optimizers import Adam
+import numpy as np 
+tokenizer = Tokenizer()
+
+data="In the town of Athy one Jeremy Lanigan \n Battered away til he hadnt a pound. \nHis father died and made him a man again \n Left him a farm and ten acres of ground. \nHe gave a grand party for friends and relations \nWho didnt forget him when come to the wall, \nAnd if youll but listen Ill make your eyes glisten \nOf the rows and the ructions of Lanigans Ball. \nMyself to be sure got free invitation, \nFor all the nice girls and boys I might ask, \nAnd just in a minute both friends and relations \nWere dancing round merry as bees round a cask. \nJudy ODaly, that nice little milliner, \nShe tipped me a wink for to give her a call, \nAnd I soon arrived with Peggy McGilligan \nJust in time for Lanigans Ball. \nThere were lashings of punch and wine for the ladies, \nPotatoes and cakes; there was bacon and tea, \nThere were the Nolans, Dolans, OGradys \nCourting the girls and dancing away. \nSongs they went round as plenty as water, \nThe harp that once sounded in Taras old hall,\nSweet Nelly Gray and The Rat Catchers Daughter,\nAll singing together at Lanigans Ball. \nThey were doing all kinds of nonsensical polkas \nAll round the room in a whirligig. \nJulia and I, we banished their nonsense \nAnd tipped them the twist of a reel and a jig. \nAch mavrone, how the girls got all mad at me \nDanced til youd think the ceiling would fall. \nFor I spent three weeks at Brooks Academy \nLearning new steps for Lanigans Ball. \nThree long weeks I spent up in Dublin, \nThree long weeks to learn nothing at all,\n Three long weeks I spent up in Dublin, \nLearning new steps for Lanigans Ball. \nShe stepped out and I stepped in again, \nI stepped out and she stepped in again, \nShe stepped out and I stepped in again, \nLearning new steps for Lanigans Ball. \nBoys were all merry and the girls they were hearty \nAnd danced all around in couples and groups, \nTil an accident happened, young Terrance McCarthy \nPut his right leg through miss Finnertys hoops. \nPoor creature fainted and cried Meelia murther, \nCalled for her brothers and gathered them all. \nCarmody swore that hed go no further \nTil he had satisfaction at Lanigans Ball. \nIn the midst of the row miss Kerrigan fainted, \nHer cheeks at the same time as red as a rose. \nSome of the lads declared she was painted, \nShe took a small drop too much, I suppose. \nHer sweetheart, Ned Morgan, so powerful and able, \nWhen he saw his fair colleen stretched out by the wall, \nTore the left leg from under the table \nAnd smashed all the Chaneys at Lanigans Ball. \nBoys, oh boys, twas then there were runctions. \nMyself got a lick from big Phelim McHugh. \nI soon replied to his introduction \nAnd kicked up a terrible hullabaloo. \nOld Casey, the piper, was near being strangled. \nThey squeezed up his pipes, bellows, chanters and all. \nThe girls, in their ribbons, they got all entangled \nAnd that put an end to Lanigans Ball."
+
+corpus = data.lower().split("\n")
+
+tokenizer.fit_on_texts(corpus)
+total_words = len(tokenizer.word_index) + 1
+
+print(total_words)
+
+input_sequences = []
+for line in corpus:
+	token_list = tokenizer.texts_to_sequences([line])[0]
+	for i in range(1, len(token_list)):
+		n_gram_sequence = token_list[:i+1]
+		input_sequences.append(n_gram_sequence)
+
+# pad sequences 
+max_sequence_len = max([len(x) for x in input_sequences])
+input_sequences = np.array(pad_sequences(input_sequences, maxlen=max_sequence_len, padding='pre'))
+
+# create predictors and label
+xs, labels = input_sequences[:,:-1],input_sequences[:,-1]
+
+ys = tf.keras.utils.to_categorical(labels, num_classes=total_words)
+
+  model = Sequential()
+  model.add(Embedding(total_words, 64, input_length=max_sequence_len-1))
+  model.add(Bidirectional(LSTM(20))) 
+  model.add(Dense(total_words, activation='softmax'))
+  model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+  history = model.fit(xs, ys, epochs=500, verbose=1)
+
+# Predict
+
+seed_text = "Laurence went to dublin"
+next_words = 100
+  
+for _ in range(next_words):
+	token_list = tokenizer.texts_to_sequences([seed_text])[0]
+	token_list = pad_sequences([token_list], maxlen=max_sequence_len-1, padding='pre')
+	predicted = model.predict_classes(token_list, verbose=0)
+	output_word = ""
+    # reversed look-up 
+
+	for word, index in tokenizer.word_index.items():
+		if index == predicted:
+			output_word = word
+			break
+	seed_text += " " + output_word
+print(seed_text)
+
+```
 
 
 ## Convolutional NN Layers
@@ -786,3 +1107,6 @@ tf.keras.applications.resnet.preprocess_input(
 - [Understanding Categorical Cross-Entropy Loss, Binary Cross-Entropy Loss, Softmax Loss, Logistic Loss, Focal Loss and all those confusing names](https://gombru.github.io/2018/05/23/cross_entropy_loss/)
 - [Understanding RMSprop](http://www.cs.toronto.edu/~tijmen/csc321/slides/lecture_slides_lec6.pdf)
 - [Image Augmentation](https://github.com/keras-team/keras-preprocessing ): like rotating 90 degrees of images. It doesn't require you to edit your raw images, nor does it amend them for you on-disk. It does it in-memory as it's performing the training, allowing you to experiment without impacting your dataset
+- [Kaggle News Headlines Dataset For Sarcasm Detection Problem](https://www.kaggle.com/rmisra/news-headlines-dataset-for-sarcasm-detection/home)
+- [News headlines dataset for sarcasm detection](https://rishabhmisra.github.io/publications/)
+- [EMbedding Tensorflow Projector](https://projector.tensorflow.org/)
