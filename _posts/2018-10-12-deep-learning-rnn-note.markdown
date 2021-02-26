@@ -546,6 +546,13 @@ LSTM:
 
 #### Keras
 
+Input shape  = `[batch size, # time steps, # dims for each time step]`
+
+e.g. batch_size = 30, # dims for each time step = 1, n_a (memory cell dimension) =3. So for each time step, the input size is `4 x 1` and memory cell dimension is `4 x 3`
+
+![](/img/post/Deep_Learning-Sequence_Model_note/LSTM_dimension.png)
+
+
 **return_sequences=True**: output all hidden state $$a^{<{t}>}$$ as return output for LSTM layer
 
 e.g. input with shape `(num_seq, seq_len, num_feature)`. If we don’t set `return_sequences=True`, our output will have the shape `(num_seq, num_feature)`, but if we do, we will obtain the output with shape `(num_seq, seq_len, num_feature)`.

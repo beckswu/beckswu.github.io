@@ -281,7 +281,7 @@ test_datagen = ImageDataGenerator(rescale=1/255)
 
 # Flow training images in batches of 128 using train_datagen generator
 
-train_generator = test_datagen.flow_from_directory(
+validation_generator = test_datagen.flow_from_directory(
         validation_dir,
         target_size=(300, 300),  # All images will be resized to 300x300
 
@@ -305,7 +305,7 @@ history = model.fit_generator(
       validation_data = validation_generator,
       validation_steps = 8, #When each epoch ends, the validation generator will yield validation_steps batches, run 8个 validation batches
 
-      verbose=2) # epoch = 2 hide a little animation hiding epoch progress
+      verbose=2) # verbose = 2 hide a little animation hiding epoch progress
       
 ```
 
@@ -575,6 +575,45 @@ model = tf.keras.Sequential([
     tf.keras.layers.Dense(6, activation = tf.nn.relu),
     tf.keras.layers.Dense(1, activation = 'sigmoid')                             
 ])
+```
+#### Using Pre-Trained word embeddings
+
+```python
+word_to_vec_map = {}
+with open("glove.6B.50d.txt", 'r') as f:
+    for line in f:
+        line = line.strip().split()
+        curr_word = line[0]
+        word_to_vec_map[curr_word] = np.array(line[1:], dtype=np.float64)
+
+# Method 1
+
+emb_dim = 20
+vocab_size =  len(word_to_index)+1 # adding 1 to fit Keras embedding (requirement), word_to_index dictionary
+
+embedding_matrix = np.zeros((vocab_size, emb_dim))
+
+for word, index in word_to_index.items():
+    embedding_matrix[index,:] = word_to_vec_map[word]
+
+embedding_layer = Embedding(input_dim=vocab_size, output_dim=emb_dim, trainable = False)
+
+# Build the embedding layer, it is required before setting the weights of the embedding layer. Do not modify the "None".
+
+embedding_layer.build((None,))
+
+# Set the weights of the embedding layer to the embedding matrix. Your layer is now pretrained.
+embedding_layer.set_weights([embedding_matrix])
+e1 = embedding_layer.get_weights()[0][1][3]
+
+# Method 2
+
+embedding_layer = Embedding(input_dim=vocab_size, output_dim=emb_dim, weights=[embedding_matrix], trainable = False)
+model= tf.keras.Sequential(embedding_layer)
+e2 = model.layer[0].get_weights()[0][1][3]
+
+print(e1 == e2) # return true
+
 ```
 
 #### Get Weight
