@@ -767,6 +767,76 @@ print(seed_text)
 
 ```
 
+## Sequence, Time Series
+
+**Time Series**: have feature of trend, seasonality, autocorrelation and white noise.  some combine **trend** and **seasonality** 
+
+**White Noise**: unpredictable, random value
+
+- **Stationary**: means behavior does not change over time, more data is better
+- **Non-stationary**: the optimal time window for training vary
+
+
+![](/img/post/tensorflow/c4_1.png)
+
+Time series trend change, could train for limited period of time, e.g. last 100 steps. Will get a better performance than training on a entire dataset, which break in machine learning assuming more data the better
+
+![](/img/post/tensorflow/c4_2.png)
+
+Ideally, would like to take the whole series and generate prediction for what happen next
+
+![](/img/post/tensorflow/c4_3.png)
+
+Below is auto-correlated time series: it correlated with a delayed copy of itself called a lag
+
+![](/img/post/tensorflow/c4_4.png)
+
+#### Train Test Split 
+
+For More detailed check [this](https://github.com/beckswu/TensorFlow/blob/master/Sequences%2C%20Time%20Series%20and%20Prediction/week1%20Sequences%20and%20Prediction/Sequences%2C_Time_Series_and_Prediction_Week1_Note.ipynb)
+
+**Method 1 Fixed Partitioning**:
+
+Fixed Partitioning: 如下图. If time series has seasonality, you want to ensure that each period contains a whole number of seasons.
+
+Method 1 Fixed Partitioning**:
+Fixed Partitioning: 如下图. If time series has seasonality, you want to ensure that each period contains a whole number of seasons. 
+
+1. Train model on training period and evaluate it on validation period. tune hyper parameteres until get desired performance using validation set.
+2. Tehn can re-train on both training and validation data, and test it on test set to see if model performance just well.
+3. Could take unusual step of <span style="background-color:#FFFF00">re-training again, use all training, validation and test set</span>, because test data is closed data you have to the current point in time and has strongest signal to determine future values.
+
+It is comon that forgo test set all together, just train using training period and validation period, and test set is in the future(现在还没有的data)
+
+![](/img/post/tensorflow/c4_5.png)
+
+
+**Method 2 Roll-forward Partitiong**:
+
+start with a short training period, then gradually increase it. Say by one day at a time or one week at a time. At each iteration, we train model on a training period(day/week) and forcast the following day or following week in the validation period
+
+e.g. train model on first week in training set then test model on first week in validation set. Then train model on second week in training set then test it on second week in validation set, **gradually roll**
+
+![](/img/post/tensorflow/c4_6.png)
+
+#### Metrics
+
+- `errors = forecasts - actual`: difference from model and actual values over evalution period
+-` mse = np.square(errors).mean()` square to get rid of negative values
+- `rmse = np.sqrt(mse)`: want the mean of error calculation to be the same scale as original errors
+- `mae = np.abs(errors).mean()`: mean absolute error, also called mean absolute derivation or mad, <span style="background-color:#FFFF00">this is not penalize large errors as mush as mse does</span>. Depending on task, may prefer `mae` or `mse`. 
+  - If large errors are dangerous and cost much more than smaller errors, prefer `mse`
+  - If gain or loss is just proportional to the size of the error, `mae` is better
+- `mape = np.abs(errors / x_valid).mean()`: mean absolute percentage error. mean ratio between absolute error and absolute value. this gives the idea of size of errors compared to the values
+
+```python
+# MAE
+
+keras.metrics.mean_absolute_error(x_valid, naive_forecast).numpy()
+```
+
+
+
 
 ## Convolutional NN Layers
 
