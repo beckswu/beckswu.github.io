@@ -21,11 +21,13 @@ tags:
 
 Neural Network predict positive/negative tweets, structure:
 
+- Initial Representation for neural network is a vector of Integers, <span style="background-color:#FFFF00">List all word from vocabulary then assign integer index to each of word. Then need to 知道 maximum vector size then fill zeros to match that size (called **padding**: ensures that all vector have the same size even if your tweets don't)</span>
 - has a embedding layer that transform the representation 
 - has another hidden layer with a ReLU activation function 
 - output layer with softmax function that give probabilities for whether a tweet is positive or negative sentiment
-- This structure allow to predict complex tweets: 比如 "This moive was almost good". 不能 classify correctly using simpler method 比如 Naive Bayes
-- Initial Representation for neural network is a vector of Integers, <span style="background-color:#FFFF00">List all word from vocabulary then assign integer index to each of word. Then need to 知道 maximum vector size then fill zeros to match that size (called **padding**: ensures that all vector have the same size even if your tweets don't)</span>
+
+This structure allow to predict complex tweets: 比如 "This movie was almost good". 不能 classify correctly using simpler method 比如 Naive Bayes
+
 
 ![](/img/post/Natural-Language-Processing/course3/week1pic1.png)
 

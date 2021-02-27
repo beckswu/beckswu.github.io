@@ -1,7 +1,7 @@
 ---
 layout:     post
 title:      "Natural Language Processing"
-subtitle:   "Naive Bayes, N-gram, Word Embedding"
+subtitle:   "Naive Bayes, N-gram, Word Embedding, Perplexity"
 date:       2020-11-12 20:00:00
 author:     "Becks"
 header-img: "img/post-bg2.jpg"
@@ -1013,6 +1013,15 @@ Use log perplexity insetad of perplexity
 
 $$logPP\left(W \right) = -\frac{1}{m}\sum_{i=1}^{m}  log_2\left(P\left( w_i \mid  w_{i-1} \right)  \right), \,\, \color{red}{w_i \text{: i-th word in test set}}$$
 
+```python
+for i in range(sentence):
+    bigram = tuple(sentence[i: i + 2])
+    probability = probability * bigram_probabilities[bigram]
+M = len(sentence)    
+perplexity = probability ** (-1 / M)
+
+```
+
 
 #### Out of vocabulary
 
@@ -1319,7 +1328,9 @@ note: $$b_1$$ size is Nx1 broadcasting to NxM
 ![](/img/post/Natural-Language-Processing/course2/week4pic13_1.png)
 ![](/img/post/Natural-Language-Processing/course2/week4pic13_2.png)
 
-**Activation Function**
+#### Activation Function
+
+**Activation function: Hidden layer use ReLu, output layer use softmax**
 
 ![](/img/post/Natural-Language-Processing/course2/week4pic14.png)
 
@@ -1331,7 +1342,7 @@ $$\hat y_i = \frac{e^{z_i}}{\sum_{j=1}^{V}e^{z_j}}, \text{exponential form trans
 ![](/img/post/Natural-Language-Processing/course2/week4pic15_2.png)
 
 
-**Cost Function**
+#### Cost Function
 
 - find the parameters that minimize the loss given the training data sets
 - loss function is cross-entropy loss(often used with classification models) -> used in logistic function (log loss)
@@ -1345,12 +1356,12 @@ $$J_{bactch} = -\frac{1}{m} \sum_{i=1}^m J^{\left(i\right)} = -\frac{1}{m} \sum_
 ![](/img/post/Natural-Language-Processing/course2/week4pic16_2.png)
 ![](/img/post/Natural-Language-Processing/course2/week4pic16_3.png)
 
-**Forward prop**
+#### Forward prop
 
 ![](/img/post/Natural-Language-Processing/course2/week4pic17_1.png)
 ![](/img/post/Natural-Language-Processing/course2/week4pic17_2.png)
 
-**Backward prop**
+#### Backward prop
 
 - hyperparameter: learning rate $$\alpha$$, alpha is small positive number less than 1.
 
@@ -1359,6 +1370,9 @@ $$J_{bactch} = -\frac{1}{m} \sum_{i=1}^m J^{\left(i\right)} = -\frac{1}{m} \sum_
 ------------
 Mathematical Prove:
 
+Cost Function:
+
+$$J = -\frac{1}{m} \sum_{i=1}^m y^{\left( i \right)} log a^{\left( i \right)}$$
 
 As we know:
 
@@ -1366,35 +1380,86 @@ $$ d\frac{f\left(x\right)}{g\left(x\right)} = \frac{f'\left(x\right) g\left(x\ri
 
 We define simplified notation
 
-$$\text{Denote} \sum_i^V e^{z_i}  \, \text{ as} \sum, \hat y \text{ is the output for softmax function} $$
+$$\text{Denote} \sum_i^V e^{z_i}  \ = \sum, \text{ Denote } \hat a \left( \text {or } \hat y \right) \text{ is the activation output of softmax function} $$
 
+For $$ i == j $$: 
 
-$$\begin{align} \frac{\partial \frac{e^{z_j}}{\sum} }{\partial z_j} &= \frac{\frac{\partial e^{z_j}}{\partial z_j} \sum - \frac{ \partial \sum }{\partial z_j} e^{z_j} }{ \sum ^2} \\ &=  \frac{ e^{z_j} \sum - e^{z_j}  e^{z_j} }{ \sum ^2} \\ &= \frac{e^{z_j}}{\sum} \frac{\sum - e^{z_j}}{\sum}  = \hat y_j \left( 1-\hat y_j \right) \\
- \frac{\partial \frac{e^{z_j}}{\sum} }{\partial z_k} &= \frac{\frac{\partial e^{z_j}}{\partial z_k} \sum -\frac{ \partial \sum }{\partial z_k} e^{z_j} }{ \sum ^2} \\ &=  \frac{ 0 \sum - e^{z_j}  e^{z_k} }{ \sum ^2}  = -\hat y_k \, \hat y_j  \end{align}  $$
+$$\begin{align} \frac{\partial \frac{e^{z_i}}{\sum} }{\partial z_i} &=   \frac{ e^{z_i} \sum - e^{z_i}  e^{z_i} }{ \sum ^2} \\ &= \frac{e^{z_i}}{\sum} \frac{\sum - e^{z_i}}{\sum}  =  a_i \left( 1- a_i \right)  \end{align} $$
+
+For $$ i\neq j $$:
+
+$$
+ \frac{\partial \frac{e^{z_i}}{\sum} }{\partial z_j} =  \frac{ 0 \sum - e^{z_i}  e^{z_j} }{ \sum ^2}  = - a_i \,  a_j  $$
 
 So the derivative of softmax:
 
-$$ \frac{\partial \hat y_i}{\partial z_j} = \begin{cases}
-\hat y_j \times \left( 1-\hat y_j \right) ,  & \text{if i = j} \\
--\hat y_k \times \hat y_j , & \text{if i } \neq \text{j}
+$$ \frac{\partial a_i}{\partial z_j} = \begin{cases}
+ a_i \times \left( 1- a_i \right) ,  & \text{if i = j} \\
+- a_i \times  a_j , & \text{if i } \neq \text{j}
 \end{cases}  $$
 
 $$\text{Note: } y^{\left(i\right)},  \hat y^{\left(i\right)} \text{are label and predict(number) } i^{th} \text{word}$$
 
-$$\text{As we know }\sum_{i=1}^V \hat y_i = 1$$
+$$\text{As we know }\sum_{i=1}^V  a_i = 1$$
 
-$$ \begin{align} \frac{\partial Cross-entropy \, Loss}{\partial z_j} &= \frac{\partial  \sum_{i=1}^V y_i log \hat y_i }{\partial z_j} \\
-&= \sum_{i=1}^V y_i  \frac{\partial log\hat y_i}{\partial z_j} \\
-&= -y_j \frac{1}{\hat y_j} \hat y_j\left(1- \hat y_j\right) - \sum_{i!=j}y_i\frac{1}{\hat y_i}\left(-\hat y_i \hat y_j \right) \\
-&= -y_j + \color{blue}{y_j}\hat y_j + \hat y_j \color{blue}{\left(\sum_{i!=j}^V y_i \right)}\\
-&= -y_j + \hat y_j \left( \sum_{i}^V y_i \right) =  \hat y_j-y_j
+![](/img/post/Natural-Language-Processing/course2/formula1.png)
+
+
+
+
+$$ \begin{align} \frac{\partial Cross-entropy \, Loss}{\partial z_i} &= \frac{\partial L}{\partial a} \frac{\partial a}{\partial z_i} = \sum_{j=1}^V \frac{\partial \left(  y_j log a_j \right) }{\partial a_j} \frac{\partial   a_j }{\partial z_i} \\
+&= \sum_{j=1}^V y_j  \frac{1}{a_j} \frac{\partial a_j}{\partial z_i} \\
+&= -y_i \frac{1}{a_i} a_i\left(1- a_i \right) - \sum_{j!=i}y_j\frac{1}{ a_j }\left(-a_i a_j \right) \\
+&= -y_i + a_i\color{blue}{y_i} + a_i \color{blue}{\left(\sum_{j!=i}^V y_j \right)}\\
+&= -y_i + a_i \left( \sum_{k}^V y_k \right) =   a_i -y_i
 \end{align} $$
 
-Therefore: Note $$H_j$$ is the hidden layer output
+Vectorization Representation:
+
+![](/img/post/Natural-Language-Processing/course2/formula2.png)
+
+
+Therefore: Note $$a_1$$ is the hidden layer output
  
-$$\frac{\partial Cross-entropy \, Loss}{\partial w_j} = \frac{\partial Cross-entropy \, Loss}{\partial z_j} \frac{\partial z_j }{\partial w_j} = \left(\hat y_j-y_j \right) H_j  $$
+$$\frac{\partial Cross-entropy \, Loss}{\partial W_2} = \frac{\partial Cross-entropy \, Loss}{\partial z} \frac{\partial z }{\partial w_2} = \frac{1}{m} \left( a -y \right) a_1^T  $$
+
+$$\frac{\partial Cross-entropy \, Loss}{\partial b_2} = \frac{\partial Cross-entropy \, Loss}{\partial z} \frac{\partial z }{\partial b_2} = \frac{1}{m} \sum_{batch} \left( a -y \right)  $$
+
+$$\frac{\partial Cross-entropy \, Loss}{\partial a_1} = \frac{\partial Cross-entropy \, Loss}{\partial z} \frac{\partial z }{\partial a_1} = W_2^T \left( a -y \right)  $$
 
 
+The ReLu function derivative: 
+
+$$ d Relu \left( x \right) = \begin{cases}
+ 1  ,  & \text{if x > 0} \\
+0 , & \text{if x < 0 } 
+\end{cases}  $$
+
+
+$$ \begin{align} \frac{\partial Cross-entropy \, Loss}{\partial W_1} & = \frac{\partial L }{\partial a_1} \frac{\partial a_1 }{\partial z_1} \frac{\partial z_1 }{\partial W_1} \\
+
+& = \frac{1}{m} \left( W_2^T \left( a -y \right) \odot dZ \right) X^T 
+
+\end{align} $$
+
+
+$$ \begin{align} \frac{\partial Cross-entropy \, Loss}{\partial b_1} & = \frac{\partial L }{\partial a_1} \frac{\partial a_1 }{\partial z_1} \frac{\partial z_1 }{\partial b_1} \\
+
+& = \frac{1}{m} \sum_{batch} \left( W_2^T \left( a -y \right) \odot dZ \right)
+
+\end{align} $$
+
+
+where $$ \odot $$ denote **element-wise** dot product and 
+
+$$ dZ = \begin{cases}
+ 1  ,  & \text{if } z = W_1 X + b > 0 \\
+0 , & \text{if } z = W_1 X + b < 0
+\end{cases}  $$
+
+
+
+[Full Derivation](https://www.coursera.org/learn/probabilistic-models-in-nlp/discussions/weeks/4/threads/AdAjD8eiTnSQIw_Hon50YA)
 
 ------------
 
