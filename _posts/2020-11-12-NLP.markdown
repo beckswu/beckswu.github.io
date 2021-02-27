@@ -1,7 +1,7 @@
 ---
 layout:     post
 title:      "Natural Language Processing"
-subtitle:   "coursera note"
+subtitle:   "Naive Bayes, N-gram, Word Embedding"
 date:       2020-11-12 20:00:00
 author:     "Becks"
 header-img: "img/post-bg2.jpg"
@@ -38,7 +38,7 @@ e.g. I am happy because I am learning NLP
 
 ![](/img/post/Natural-Language-Processing/course1/week1pic1.png)
 
-**Positive & Negative Frequencies**: Build vocabulary, map word to frequencey
+**Positive & Negative Frequencies**: Build vocabulary, map word to frequencey. 对所有positive examples 数vocabulary 中每个word 出现的次数, 对所有negative examples, 数vocabulary 中每个word 出现的次数
 
 ![](/img/post/Natural-Language-Processing/course1/week1pic2.gif)
 
@@ -53,7 +53,7 @@ $$X_m = \left[ 1, \sum_{w_{pos}} freqs\left( w_{pos}, 1 \right),  \sum_{w_{neg}}
 
 
 
-Hence you end up getting the following feature vector ```[1,8,11]```. 11 corresponds to the bias, 88 the positive feature, and 11 the negative feature.
+Hence you end up getting the following feature vector ```[1,8,11]```. 1 corresponds to the bias, 8 the positive feature, and 11 the negative feature.
 
 
 #### Preprocessing 
@@ -62,11 +62,10 @@ When preprocessing, you have to perform the following:
 
 1. Eliminate handles(@...) and URLs
 2. Tokenize the string into words.
-3. Remove stop words like  “and, is, are, at, has, for ,a”: Stop words are words that don't add significant meaning to the text.
+3. Remove **stopwords** like  “and, is, are, at, has, for ,a”: Stop words are words that don't add significant meaning to the text.
 4. Stemming- or convert every word to its stem. Like dancer, dancing, danced, becomes 'danc'. You can use porter stemmer to take care of this.
 5. Convert all your words to lower case.
   
-[example](https://github.com/beckswu/Natural-Language-Processing/tree/master/Coursera/Course1-Natural%20Language%20Processing%20with%20Classification%20and%20Vector%20Spaces)
 
 
 ![](/img/post/Natural-Language-Processing/course1/week1pic9.gif)
@@ -131,10 +130,18 @@ $$L\left(  \theta \right) = \prod_{i=1}^{m}  h \left(\theta, x^{\left( i \right)
 
 ------------
 
+if X is M x <> matrix, N is the number of features 
+
+
+$$ d\theta = \frac{1}{m} \left( h\left(X, \theta \right) - y \right) X^T $$
+
+
 if X is M x N matrix, N is the number of features 
 
 
 $$ d\theta = \frac{1}{m} X^T \left( h\left(X, \theta \right) - y \right)$$
+
+
 
 ------------
 
@@ -261,7 +268,7 @@ There are many applications of naive Bayes including:
 
 - Author identification: document written by which author, calculate $$\lambda$$ for each word for both author to build vocabulary
 - Spam filtering: $$\frac{P\left(spam \mid email \right)}{P\left(nnspam \mid email \right)}$$
-- Information retrieval: filter relevant and irrelevant documents in a database, calculate the likelihood of the documents given the query, retrieve document if $$P\left(document_k \mid query \right) \approx \prod_{i=0}^{\mid query \mid} P\left(query_i \mid document_k  \right) > threshold$$
+- Information retrieval: filter relevant and irrelevant documents in a database, calculate the likelihood of the documents given the query, retrieve document if $$ \left( P\left(document_k \mid query \right) \approx \prod_{i=0}^{\mid query \mid} P\left(query_i \mid document_k  \right) \right) > threshold$$
 - Word disambiguation: e.g. don't know bank in reading, refer to river or money? to calculate the score of the document, $$\frac{P\left(river \mid text\right)}{P\left(money \mid text\right)}$$. if refer to river not money, score is bigger than 1. 
 
 
@@ -280,12 +287,12 @@ Assumption:
 
 **Error Analysis**
 
-1. Semantic meaning lost in the pre-processing step by removing punctuation and stop words
+1. **Semantic meaning lost in the pre-processing step by removing punctuation and stop words** （因为Naive Bayes removed Punctuation）
    - "My beloved grandmother :(", with punctuation indicating a sad face, after process, [belov, grandmoth], positive tweet
    - "This is not good, because your attitude is not even close to being nice." if remove neutral word, [good, attitude, close, nice] positive
-2. Word order affect meaning
+2. **Word order affect meaning**
    - "I am happy because I did not go." vs. "I am not happy because I did go."
-3. Adversarial attack: some quirks of languages come naturally to human but confuse Naive Bayes model
+3. **Adversarial attack**: some quirks of languages come naturally to human but confuse Naive Bayes model
    - some common language phenomenon, Sarcasm, Irony and Euphemisms.
    - e.g. "This is a ridiculously powerful movie. The plot was gripping and I cried right through until the ending" positive. After process. [ridicul, power, movi, plot, grip, cry, end] negative
 
@@ -354,7 +361,7 @@ d = np.linalg.norm(v-w)
 
 #### Cosine Similarity
 
-<span style="color:red">Problem with Euclidean distance</span>:  Vector space where corpora are represented by occurrence of the words "disease" and "eggs". Because Agriculture and history corpus has a similar number of words(出现单词数量一样), Suggests agriculture and history 比 agriculture and food 更想近义
+<span style="color:red">Problem with Euclidean distance: Biased by the size of appearance</span>. Vector space where corpora are represented by occurrence of the words "disease" and "eggs". Because Agriculture and history corpus has a similar number of words(出现单词数量一样), Suggests agriculture and history 比 agriculture and food 更想近义
 
 - if A and B are identical, you will get $$cos\left( \theta \right)=1$$
 - If you get $$cos\left( \theta \right)=0$$, that means that they are orthogonal (or perpendicular).
@@ -378,7 +385,7 @@ $$\begin{align} \hat{v} \cdot \hat{w} &= \Vert \hat{v} \Vert \Vert \hat{w} \Vert
 - Can use visualization to check if PCA capure relationship among words
 - <span style="color:red">**Eigenvector**</span>: <span style="background-color: #FFFF00">directions</span> of uncorrelated features for your data
 - <span style="color:red">**Eigenvalue**</span>: amount of information retained by each feature(<span style="background-color: #FFFF00">variances</span> of data in each of those new features)
-- <span style="color:red">**Dot Product**</span>: gives the <span style="background-color: #FFFF00">projection</span> on uncorrelated features
+- <span style="color:red">**Dot Product**(between x and eigenvector)</span>: gives the <span style="background-color: #FFFF00">projection</span> on uncorrelated features
 
 ![](/img/post/Natural-Language-Processing/course1/week3pic7.png)
 
@@ -456,11 +463,10 @@ A_Frobenious = np.sqrt(np.sum(A_squared))
 
 $$\frac{1}{m} \Vert XR - Y \Vert_F^2 $$
 
-- The norm is always nonnegative (we're summing up absolute values), and so is the square.
+
 - When we take the square of all non-negative (positive or zero) numbers, the order of the data is preserved. For example, if 3 > 2, 3^2 > 2^2
 - Using the norm or squared norm in gradient descent <span style="color:red">results in the same location of the minimum</span>.
-- Squaring cancels the square root in the Frobenius norm formula. Because of the chain rule for derivative, we would have to do more calculations if we had a square root in our expression for summation.
-- Dividing the function value by the positive number doesn't change the optimum of the function, for the same reason as described above.
+- Squaring cancels the square root in the Frobenius norm formula. if no square and only square root, we would have to do more calculations
 - divide by m: We're interested in transforming English embedding into the French. Thus, it is more important to <span style="background-color:#FFFF00">measure average loss per embedding</span> than the loss for the entire dictionary (which increases as the number of words in the dictionary increases).
 
 
@@ -478,17 +484,23 @@ $$  g = \frac{d}{dR}Loss = \frac{2}{m} X^T \left( XR - Y  \right) $$
 
 #### Locality Sensitive Hashing
 
-<span style="background-color: #FFFF00">Reduce computational cost(much faster) to find K-nearest neighbor </span>is to use locality sensitive hashing. For example, using word vectors with just two dimensions. **plan** can helps bucket vectors into subsets based on localtion(蓝色点在蓝色plane 上方，灰色点在灰色plane上方)
+<span style="background-color: #FFFF00">Reduce computational cost(much faster) to find K-nearest neighbor </span>is to use locality sensitive hashing. For example, 蓝色点在蓝色plane 上方，灰色点在灰色plane上方
 
 ![](/img/post/Natural-Language-Processing/course1/week4pic3.png)
 
-normal vector: perpendicular to any vectors on the plane.
+For text embedded vector, nearest neighbors refer to text with similar meaning, so can group certain vetors when find synonym by hashing => speed up searching
+
+![](/img/post/Natural-Language-Processing/course1/week4pic8.png)
+
+
+- If dot product positive, it's on one side of the plane. 
+- If dot product negative, it's on opposite side of the plane. 
+- If dot product is zero, it is on plane
 
 ![](/img/post/Natural-Language-Processing/course1/week4pic4.png)
 
-If dot product positive, it's on one side of the plane. If dot product negative, it's on opposite side of the plane. If dot product is zero, it is on plane
 
-dot product of P and V1 is equal to the do length of P multiply V1 projection onto P
+E.g. dot product of P and V1 is equal to the do length of P multiply V1 projection onto P
 
 ![](/img/post/Natural-Language-Processing/course1/week4pic5.png)
 
@@ -502,20 +514,23 @@ def side_of_plane(P,v):
   return sign_of_dot_prodcut_scalar
 ```
 
+
+
+
 #### Multiple Plane
 
-To divide vector space into manageable regions, want to use more than one plane. Get multiple signal, one for each plane, but need a single hash value 
-
-
-![](/img/post/Natural-Language-Processing/course1/week4pic7.png)
-
-Rule: 
+To divide vector space into manageable regions, want to use more than one plane with a single hash value 
 
 $$  \color{maroon}{\text{sign_i} \geq 0, \rightarrow h_i = 1}  $$
 
 $$  \color{maroon}{\text{sign_i} < 0, \rightarrow h_i = 0 } $$
 
 $$  \mathbf{hash = \sum_i^H 2^i \times h_i} $$
+
+
+![](/img/post/Natural-Language-Processing/course1/week4pic7.png)
+
+
 
 ```python
 def hash_multiple_plane(P_l, v):
@@ -559,12 +574,17 @@ num_planes_matrix = side_of_plane_matrix(random_planes_matrix, v)
 
 #       [1.]])
 
+hashvalue = hash_multiple_plane(random_planes_matrix, v)
+print(hashvalue) # 7
+
 ```
 
 
-Text can be embedded into vector space so that nearest neighbors refer to text with similar meaning
+Application: find synonym for English word.
 
-![](/img/post/Natural-Language-Processing/course1/week4pic8.png)
+1. Use word embedding transform word to embedding vector `1 x N_DIMS`
+2. Hash every word from vocabulary from above methods by calculate dot product between embedding vector and plane(`np.random.normal(size=(N_DIMS, N_PLANES))` )
+3. Find the synonym of word like "Apple" only from subset of vocabulary which has the same hash value of "Apple" ( `hash_multiple_plane(P_l, Apple embedding vector)`)
 
 <br/><br/><br/>
 
@@ -606,7 +626,7 @@ Application:
 
 #### Markov chain
 
-**Markov chain**: type of stochastic model that describes a sequence of possible events. To get probability of each event, it needs only the states of the previous events. Stochastic means random or randomness. Markov chain can be depicted as <span style="background-color: #FFFF00">directed graph</span>. A state refers to a certain condition of the present moment.
+**Markov chain**: type of stochastic model that describes a sequence of possible events. <span style="color:red">To get probability of each event, it needs only the states of the previous events</span>. Stochastic means random or randomness. Markov chain can be depicted as <span style="background-color: #FFFF00">directed graph</span>. A state refers to a certain condition of the present moment.
 
 e.g. Why not learn ... (next is verb? or norm?) depends on previous word
 
@@ -619,16 +639,12 @@ To predict the first word, because state depend on previous state, <span style="
 
 #### Hidden Markov Model
 
-For human, can recognize fly = verb, but machine cannot. Observable: can only seen by the machine
 
-![](/img/post/Natural-Language-Processing/course2/week2pic5.png)
-
-
-<span style="color:red">**Emission probability**</span>: describe the transition from hidden states of hidden Markov model(Norn, verb...) to the words of corpus(从单词的词性 到 具体的单词)
+<span style="color:red">**Emission probability**</span>: the transition from hidden states of Hidden Markov model(Noun, Verb...) to the words of corpus(I, am ...). 从单词的词性 到 具体的单词的概率)
 
 ![](/img/post/Natural-Language-Processing/course2/week2pic6.png)
 
-e.g. VB -> eat 0.5 means:  when model is currently at hidden state for a verb, 0.5 chance that observable the model will emit the word eats.  可以注意到每个word 的tag的概率都大于0，因为context 不同，tag不同, 例如 He lay on his <span style="color:red">*back*</span> V.S. I'll be <span style="color:red">*back*</span>
+e.g. VB -> eat 0.5 means:  表示current hidden state is a verb, 0.5 chance that the model will emit the word *eats*.  注意 一样的的单词 不同的词性 , Emission probability 不同, 例如 He lay on his <span style="color:red">*back*</span> V.S. I'll be <span style="color:red">*back*</span>
 
 
 ![](/img/post/Natural-Language-Processing/course2/week2pic7.png)
@@ -639,24 +655,23 @@ e.g. VB -> eat 0.5 means:  when model is currently at hidden state for a verb, 0
 
 #### Calculate Probability
 
-Process Corpus:
+**Process Corpus**:
 
 1. <span style="background-color:#FFFF00">Add start token in each line of sentence as to calculate initial probability</span>
 2. transform all words in lowercase and keep punctuation 
 
-<span style="background-color:#FFFF00">**Transition Matrix**:</span>
-
-![](/img/post/Natural-Language-Processing/course2/week2pic9.gif)
-
+**Calculate Transition Matrix**:
 
 
 ![](/img/post/Natural-Language-Processing/course2/week2pic9.png)
 
 
 
-
-
-![](/img/post/Natural-Language-Processing/course2/week2pic10.gif)
+![](/img/post/Natural-Language-Processing/course2/week2pic10_1.png)
+![](/img/post/Natural-Language-Processing/course2/week2pic10_2.png)
+![](/img/post/Natural-Language-Processing/course2/week2pic10_3.png)
+![](/img/post/Natural-Language-Processing/course2/week2pic10_4.png)
+![](/img/post/Natural-Language-Processing/course2/week2pic10_5.png)
 
 #### Soothing 
 
@@ -665,41 +680,47 @@ Process Corpus:
 - In reall world, <span style="background-color:#FFFF00">**don't apply smoothing for initial probability**. Because: if add, allow a sentence to start with any parts of speech tag, including punctuation</span>
 
 
-![](/img/post/Natural-Language-Processing/course2/week2pic11.gif)
+![](/img/post/Natural-Language-Processing/course2/week2pic11_1.png)
+![](/img/post/Natural-Language-Processing/course2/week2pic11_2.png)
 
 
 
-<span style="background-color:#FFFF00">**Populating the Emission Matrix**</span>
-
-![](/img/post/Natural-Language-Processing/course2/week2pic12.gif)
+**Populating the Emission Matrix**
 
 
 $$ C\left(t_i \right) $$: tag i 总共出现的次数，<br/>
 $$ C\left(t_i, w_i \right) $$ word_i 属于tag_i 出现的次数
 
-![](/img/post/Natural-Language-Processing/course2/week2pic13.gif)
+![](/img/post/Natural-Language-Processing/course2/week2pic13_1.png)
+![](/img/post/Natural-Language-Processing/course2/week2pic13_2.png)
 
 
 #### Viterbi Algorithm: a graph algorithm
 
-Given a sequence of words, predict 每个词属于什么tag, e.g. given corpus ```['see', 'them', 'here', 'with', 'us', '.']```,predict ```['VB', 'PRP', 'RB', 'IN', 'PRP', '.']```
+To predict part-of-speech tags（辨认每个词的词性), can divide to two steps 
 
-下面例子:
+1. Predict **Tag -> Tag** (e.g. Noun -> Verb?) (Transition Probability)
+2. Predict **Tag -> Word** (e.g. Noun -> Math?) (Emission Probability)
 
-- from O -> NN / VB has the same probability. But the emission probability of love is higher for VB.
-- From love(VB) -> to(O), because 没有其他的tag有emission probability of to
 
-![](/img/post/Natural-Language-Processing/course2/week2pic15.gif)
+下面例子: 注 from O -> NN 和 O - VB has the same probability. But the emission probability of love is higher for VB.
+
+![](/img/post/Natural-Language-Processing/course2/week2pic15_1.png)
+![](/img/post/Natural-Language-Processing/course2/week2pic15_2.png)
+![](/img/post/Natural-Language-Processing/course2/week2pic15_3.png)
+![](/img/post/Natural-Language-Processing/course2/week2pic15_4.png)
+![](/img/post/Natural-Language-Processing/course2/week2pic15_5.png)
 
 Viterbi Algorithm 通过两个matrix (C&D) 实现
 
-- Matrix C: hold ther intermediate optimal probabilities 
-  - first column C: the probability <span style="color:red">from start state $$\pi$$ to the first tag $$t_i$$</span> and  word $$W_1$$. $$  c_{i,1} = \pi_i \times b_{i,cindex\left(w_1\right)} $$: product of transition probability of initial state (from initial state to tag i) and emission probability b(from tag i to word1)
-- Matrix D: The most likely indices of previous visited state given word $$w_i$$
-  - The column is all 0, no proceeding tags traversed
+- Matrix C: C(i,j)  Given ith-tag word and j-th word, it hold the maximum probability so far. 
+  - first column C: the product of transition probability of initial state (from initial state $$\pi$$ to tag i) and emission probability. $$  c_{i,1} = \pi_i \times b_{i,cindex\left(w_1\right)} $$
+- Matrix D: D(i,j)  Given i-th tag and j-th word, the optimal previous visited state index given word $$w_i$$
+  - The column 0 is all 0, no proceeding tags traversed
 - Both matrix <span style="color:red">n rows: the number of speech tags/hidden states. K columns: the number of words in given sequences</span>
 
-![](/img/post/Natural-Language-Processing/course2/week2pic16.gif)
+![](/img/post/Natural-Language-Processing/course2/week2pic16_1.png)
+![](/img/post/Natural-Language-Processing/course2/week2pic16_2.png)
 
 
 **Forward Pass**
@@ -728,25 +749,26 @@ $$  d_{i,j} = \underset{k}{argmax} \ c_{k,j-1} \times a_{k,i} \times  b_{i,cinde
 In the below example, three states are not initial state, state can be 1,2,3. k can be 1,2,3
 
 
-![](/img/post/Natural-Language-Processing/course2/week2pic17.gif)
+![](/img/post/Natural-Language-Processing/course2/week2pic17.png)
 
 
 **Backward Pass**
 
-Extract the graph from matrix D, which represents most likely sequence of hidden states:  
+Extract the graph from matrix D step by step
 
 1. Get the index of entry of $$C_{i,k}$$ which is the highest probability in the last column C. 
 2. Use that index s ($$\underset{i}{argmax} \ c_{i,k}$$) to traverse backwards through the matrix D to reconstruct the sequence. 从后往前推
 
 e.g. 下面的例子,
 
-1. 最后一列的最大的概率是  $$C_{1,5} = 0.01$$, $$s = \underset{i}{argmax} \ c_{i,k} = 1$$. The most likely tag for word5 is tag1
+1. 最后一列的最大的概率是  $$C_{1,5} = 0.01$$, $$s = \underset{i}{argmax} \ c_{i,k} = 1$$. The most likely tag for 5th-word is tag1
 2. $$D_{1,5} = 3$$, so previous index is 3 ( tag 3 is the pervious state with the highest proabability for $$C_{1,5}$$)
 3. Algorithm stops as arrived at the start token
 
-![](/img/post/Natural-Language-Processing/course2/week2pic18.gif)
+![](/img/post/Natural-Language-Processing/course2/week2pic18_1.png)
+![](/img/post/Natural-Language-Processing/course2/week2pic18_2.png)
 
-[Forward & Backward Example](https://github.com/beckswu/Natural-Language-Processing/blob/master/Coursera/Course2-Natural%20Language%20Processing%20with%20Probabilistic%20Models/week2-Assignment-%20Part%20of%20Speech%20Tagging.ipynb)
+[Forward & Backward Example](https://github.com/beckswu/Natural-Language-Processing/blob/master/Natural%20Language%20Processing%20with%20Probabilistic%20Models/week2-Assignment-%20Part%20of%20Speech%20Tagging.ipynb)
 
 <br/><br/><br/>
 
@@ -770,11 +792,11 @@ Application:
 #### N-gram 
 
 - An N-gram: sequence of N words. <span style="background-color:#FFFF00">Order matters</span>
-- punctuation is treated as words. But all other special characters such as codes will be removed
+- <span style="background-color:#FFFF00">punctuation is treated as words</span>. But all other special characters such as codes will be removed
 
 
 E.g. 
-- Bigrams are all sets of two words that appear side by side in corpus. <span style="color:red">Notes: 下面例子, ```I am``` appear twice, 但是only include 一次在 bigram set</span>, I happy 因为不相邻，所以不是
+- Bigrams are all sets of two words that appear side by side in corpus. <span style="color:red">Notes: 下面例子, ```I am``` appear twice, 但是only include 一次在 bigram set</span>, I happy 因为不相邻，所以不是 bigram
 - Tigram: represent unique triplets of words that appear together in the sequence together in the corpus
 
 
@@ -810,7 +832,9 @@ $$C\left(w_1^2 w_3\right) = C\left(w_1 w_2 w_3 \right) \quad \text{a bigram foll
 
 $$ \text{Probabiity of N-gram} \quad P\left( w_N \mid w_1^{N-1} \right) = \frac{ C\left(w_1^{N-1} w_N\right)}{C\left(w_1^{N-1}\right)}$$
 
-![](/img/post/Natural-Language-Processing/course2/week3pic2.gif)
+![](/img/post/Natural-Language-Processing/course2/week3pic2_1.png)
+![](/img/post/Natural-Language-Processing/course2/week3pic2_2.png)
+![](/img/post/Natural-Language-Processing/course2/week3pic2_3.png)
 
 $$ \text{Chain Rule} \quad P\left(A,B,C,D\right) = P\left(A \right)P\left(B \mid A \right)P\left( C \mid\ A,B \right)P\left(D\mid A, B, C \right)$$
 
@@ -825,14 +849,12 @@ $$P\left(the \ teacher \ drinks \ tea\right) = P\left(the \right)P\left(teacher 
 $$P\left(the \ teacher \ drinks \ tea\right) \approx P\left(the \right)P\left(teacher \mid the \right)P\left( drinks \mid teacher \right)P\left(tea\mid drinks \right)$$
 
 
-- Markove assumption: only last N words matter
+- Markov assumption: only last N words matter
 - Bigram: $$P\left( w_n \mid w_1^{n-1} \right) \approx P\left( w_n \mid w_{n-1} \right) $$
 - N-gram: $$P\left( w_n \mid w_1^{n-1} \right) \approx P\left( w_n \mid w_{n-N+1}^{n-1} \right) $$
 - Entire sentence modeled with bigram: $$P\left( w_1^n \right) \approx \prod_{i=1}^{n} P\left( w_i \mid w_i-1 \right) $$
-  - contrast with Naive Bayes where approximate sentence probability without cnsidering any word history
-  - $$P\left( w_1^n \right) \approx P\left(w_1 \right)P\left(w_2 \mid w_1 \right)P ... P\left(w_n\mid w_{n-1} \right) $$: The first term of Bigram reiles on unigram probability of first word n sentence
-
-![](/img/post/Natural-Language-Processing/course2/week3pic3.gif)
+  - contrast with Naive Bayes where approximate sentence probability without considering any word history (proability of i-th word condition on i-1 th word)
+  - $$P\left( w_1^n \right) \approx P\left(w_1 \right)P\left(w_2 \mid w_1 \right)P ... P\left(w_n\mid w_{n-1} \right) $$: <span style="color:red">**The first term of Bigram reiles on unigram probability of first word n sentence**</span>
 
 
 #### Start & End of Sentences
@@ -843,7 +865,8 @@ Start:
 - Solution: add a special term ```<s>``` so can calculate the probabilities
 - For n-grams, first N words, don't have enough context, <span style="background-color: #FFFF00">add n-1 special term</span>
 
-![](/img/post/Natural-Language-Processing/course2/week3pic4.gif)
+![](/img/post/Natural-Language-Processing/course2/week3pic4_1.png)
+![](/img/post/Natural-Language-Processing/course2/week3pic4_2.png)
 
 End: 
 
@@ -854,7 +877,7 @@ e.g. Corpus:
 - ```<s> Lyn drinks chocolate```
 - ```<s> John drinks```
 
-$$\sum_w{C\left(drinks \ w \right)} = 1, C\left(drinks\right) = 2$$
+$$\underbrace{\sum_w{C\left(drinks , w \right)} = 1}_{\text{only has drinks chocolate so equal to 1}}, C\left(drinks\right) = 2$$
 
 Solution: add end of sentence token
 
@@ -918,7 +941,7 @@ e.g. Trigram:
 
 **Count Matrix & Probability Matrix**
 
-$$\text{Note: } P\left( w_n \mid w_{n-N+1}^{n-1} \right) = \frac{ C\left(w_{n-N+1}^{n-1}, w_n\right)}{C\left( w_{n-N+1}^{n-1}\right)}, \text{w_n 表示第n个word}$$
+$$\text{Note: } P\left( w_n \mid w_{n-N+1}^{n-1} \right) = \frac{ C\left(w_{n-N+1}^{n-1}, w_n\right)}{C\left( w_{n-N+1}^{n-1}\right)}, w_n \text{ 表示第n个word}$$
 
 - Count Matrix row: unique corpus (N-1)-grams
 - Count Matrix columns: unique corpus words
@@ -929,7 +952,8 @@ $$\text{Note: } P\left( w_n \mid w_{n-N+1}^{n-1} \right) = \frac{ C\left(w_{n-N+
 
 **Log probability**:  all probability in calculation <= 1 and mutiplying them brings risk of underflow
 
-![](/img/post/Natural-Language-Processing/course2/week3pic5.gif)
+![](/img/post/Natural-Language-Processing/course2/week3pic5_1.png)
+![](/img/post/Natural-Language-Processing/course2/week3pic5_2.png)
 
 #### Algorithm
 
@@ -954,7 +978,9 @@ e.g. :  choose 是绿色
 
 
 
-$$\begin{align} PP\left(W \right) &= P\left(s_1,s_2,...,s_m \right)^{\frac{1}{m}} \\ &= \sqrt[m]{\prod_{i=1}^{m}  \frac{1}{ P\left( w_i \mid  w_{i-1}...w_{i-N+1} \right)   }} \\ &= \sqrt[m]{\prod_{i=1}^{m}  \frac{C\left(w_{i-1},... w_{i-N+1}, w_i \right)}{ C \left(w_{i-1},... w_{i-N+1}\right)   }} \end{align}$$left(W \right) =  \,\, =\color{red}{w_i \text{: i-th word in test set}}$$
+$$\begin{align} PP\left(W \right) &= P\left(s_1,s_2,...,s_m \right)^{\frac{1}{m}} \\ &= \sqrt[m]{\prod_{i=1}^{m}  \frac{1}{ P\left( w_i \mid  w_{i-1}...w_{i-N+1} \right)   }} \\ &= \sqrt[m]{\prod_{i=1}^{m}  \frac{C\left(w_{i-1},... w_{i-N+1}\right)}{ C \left(w_{i-1},... w_{i-N+1}\right), w_i    }} \end{align}$$
+
+$$ \color{red}{w_i \text{: i-th word in test set}}$$
 
 
 - W : test set containing m sentence
@@ -962,7 +988,7 @@ $$\begin{align} PP\left(W \right) &= P\left(s_1,s_2,...,s_m \right)^{\frac{1}{m}
 - m: number of all words in entire test set W <span style="color:red">including ```</s>``` but not including ```<s>```</span>
 - Perplexity tells whether a set of sentences look like written by human or machine choosing words at random
 - <span style="background-color: #FFFF00">A text written by human => low perplexity score. Text generated by random word choice => high perplexity score </span>
-- Perplexity is the inverse probability of test sets normalized by <span style="color:red">the number of words</span> in the test set => higher the language model probability esitmates lower perplexity will be
+- Perplexity is the inverse probability of test sets normalized by <span style="color:red">the number of words</span> in the test set => the higher the language model probability estimates => the lower perplexity will be
 - <span style="color:red">Perplexity is closely related to **entropy** which measures uncertainty</span>
 - <span style="background-color: #FFFF00">Good language model have perplexity score between 60 to 20. Log perplexity is between 4.3 and 5.9 </span>
 - perplexity for character level language lower perplexity for than word-based model
@@ -980,7 +1006,7 @@ $$PP\left(W \right) = \sqrt[m]{\prod_{i=1}^{m} \prod_{j=1}^{ \mid s_i \mid} \fra
 
 **If all sentences in the test cases are concatenated:**
 
-$$PP\left(W \right) = \sqrt[m]{\prod_{i=1}^{m}  \frac{1}{ P\left( w_i \mid  w_{i-1} \right)   }} = \sqrt[m]{\prod_{i=1}^{m}  \frac{C\left( w_{i-1}, w_i \right)}{ C \left( w_{i-1}\right)   }} \,\, =\color{red}{w_i \text{: i-th word in test set}}$$
+$$PP\left(W \right) = \sqrt[m]{\prod_{i=1}^{m}  \frac{1}{ P\left( w_i \mid  w_{i-1} \right)   }} = \sqrt[m]{\prod_{i=1}^{m}  \frac{C\left( w_{i-1}, w_i \right)}{ C \left( w_{i-1}\right)   }} \,\, \color{red}{w_i \text{: i-th word in test set}}$$
 
 
 Use log perplexity insetad of perplexity
@@ -1002,7 +1028,7 @@ Using ```<UNK>``` in corpus
    - Criteria 2: max size of vocabulary, only include words sort by frequency to the maximum vocabulary size
 2. Replace any word in corpus and not in V by ```<UNK>```
 3. Count the probabilities with ```<UNK>``` as with any other word, 
-    - ```<UNK>``` usually lower perplexity
+    - <span style="background-color:#FFFF00">```<UNK>``` usually lower perplexity</span>
 
 Note: 
 
@@ -1029,7 +1055,7 @@ $$P\left( w_n \mid w_{n-1} \right) = \frac{ C\left(w_{n-1}, w_n\right) + 1}{\sum
 
 Note: <span style="background-color:#FFFF00">V is the size of vocabulary (而不是total count of word)</span>
 
-Plus V only works if real counts are large enough to outweigh the plus one. Otherwise the probability of missing word will be too high，比如就vocubary size = 2, $$ P\left(UNK \mid known word \right) =  \frac{C\left(w_{n-1}, w_n\right) + 1}{C\left(w_{n-1}\right) + V} = \frac{1}{1 + 2} = \frac{1}{3}$$
+Plus V only works if real counts are large enough to outweigh the plus one. Otherwise the probability of missing word will be too high，比如就vocubary size = 2, $$ P\left(\text{unk} \mid \text{known word} \right) =  \frac{C\left(w_{n-1}, w_n\right) + 1}{C\left(w_{n-1}\right) + V} = \frac{1}{1 + 2} = \frac{1}{3}$$
 
 
 
@@ -1109,7 +1135,7 @@ e.g. each vector has 1000 elements,
 
 - If you want to generate word embedding based on Shakespeare, corpus should be full and original text of Shakespeare, not study notes, slide presentation or keywords from Shakespeare. 
 - <span style="background-color:#FFFF00">Context(combination of words to occur around that particular word) is important, give meaning to each word embedding</span>. a simple vocabulary list of Shakespeare's most common words not enough to create embedding. 
-- Objective of word embedding is to predict missing word given context words
+- Objective of word embedding: predict missing word given context words
 - Embedding method, machine learning models which are set to learn word embeddings. <span style="color:red">The meaning of words, as carred by word embeddings depends on the embedding approach</span>
   - <span style="background-color:#FFFF00">**Self-supervised learning**: Both unsupervised (input data are unlabeled) and supervised(text provide necessary context which would ordinarily make up the label)</span>
 - Word embedding can be tuned by a number of hyperparameters. 其中一个是 dimension of word embedding vectors. In practice, could from a few hundred to low thousand
@@ -1121,12 +1147,12 @@ e.g. each vector has 1000 elements,
 
 - **word2vec**: (Google, 2013). use a shallowed neural network to learn word embedding. propose two model architectures: 
   - Continuous bag-of-words(CBOW): predict a missing word given the surrounding words
-  - Continuous skip-gram also know as  Skip-gram with negative sampling (SGNS): did the reverse of Continuous bag-of-words:  model predict surrounding given a input word
-- **Global Vectors(GloVe)** (Standford 2014): Involves factorizing the logarithm of the corpuses word co-occurrence matrix.(Similar to Count Matrix as above)
+  - Continuous skip-gram also know as  [Skip-gram](http://127.0.0.1:4000/2018/10/12/deep-learning-rnn-note.html#word2vec-skip-grams) with [negative sampling](http://127.0.0.1:4000/2018/10/12/deep-learning-rnn-note.html#negative-sampling) (SGNS): did the reverse of Continuous bag-of-words:  model predict surrounding given a input word
+- [**Global Vectors(GloVe)**](http://127.0.0.1:4000/2018/10/12/deep-learning-rnn-note.html#glove) (Standford 2014): Involves factorizing the logarithm of the corpuses word co-occurrence matrix.(Similar to Count Matrix as above)
 - **fastText** (Facebook 2016): based on skip-gram model and take into account the structure of words by representing words an n-gram of character
-  - support out-of-vocabulary(OOV) words: infer embedding from the sequence of chracters they are made of and corresponding sequence that it was intially trained on. E.g. create similar embedding for kitty and kitten even kitty never seen before(因为 kitty and kitten has similar sequences of characters)
-  - another benefit: embedding vectors can be averaged together to make vector representations of phrases and sentences
-- Advanced work embedding methods: use advanced deep neural network to refine word meanings according  to their contexts. 一词多义(polysemy or words with similar meanings), 之前model  always has the same embedding e.g. plants. 可以是 organism like a flower, a factory or adverb. below are Tunable pre-trained model available
+  - support out-of-vocabulary(OOV) words: <span style="color:red">infer embedding from the sequence of characters they are made of and corresponding sequence that it was intially trained on</span>. E.g. create similar embedding for kitty and kitten even kitty never seen before(因为 kitty and kitten has similar sequences of characters)
+  - another benefit: <span style="background-color:#FFFF00">embedding vectors can be averaged together to make vector representations of phrases and sentences</span>
+- Advanced work embedding methods: use advanced deep neural network to refine word meanings according  to their contexts. 一词多义(polysemy or words with similar meanings), 之前model  always has the same embedding. In these advanced models, <span style="background-color:#FFFF00">words can have different embeddings depending on their contexts</span>. e.g. plants. 可以是 organism like a flower, a factory or adverb. below are Tunable pre-trained model available
   - BERT (Google, 2018): Bidirectional representations from transformers by Google
   - ELMo (Allen Institute for AI, 2018)P embeddings from language models
   - GPT-2 (OpenAI,2018): generative pre-training 2
@@ -1143,7 +1169,9 @@ e.g. each vector has 1000 elements,
 - Window: center word + context words
 - Architecture: context words as input and center words as output
 
-![](/img/post/Natural-Language-Processing/course2/week4pic7.gif)
+![](/img/post/Natural-Language-Processing/course2/week4pic7_1.png)
+![](/img/post/Natural-Language-Processing/course2/week4pic7_2.png)
+![](/img/post/Natural-Language-Processing/course2/week4pic7_3.png)
 
 
 #### Tokenization
@@ -1177,11 +1205,54 @@ nltk.download('punkt') #download pre-trained Punkt tokenizer for English
 ```
 下面例子, question marks and exclamation convert to a single full stop, last step get rid of number but keep alphabetical, full stops(previously an interrupting punctuation mark), emoji
 
-![](/img/post/Natural-Language-Processing/course2/week4pic8.gif)
+
+```python
+corpus = 'Who ❤️ "word embeddings" in 2020? I do!!!'
+import nltk
+from nltk.tokenize import word_tokenize
+import emoji
+
+nltk.download('punkt')  # download pre-trained Punkt tokenizer for English
+
+data = re.sub(r'[,!?;-]+', '.', corpus)
+print(f'After cleaning punctuation:  {data}')
+# After cleaning punctuation:  Who ❤️ "word embeddings" in 2020. I do.
+
+data = nltk.word_tokenize(data)
+print(f'After tokenization:  {data}')
+# After tokenization:  ['Who', '❤️', '``', 'word', 'embeddings', "''", 'in', '2020', '.', 'I', 'do', '.']
+
+data = [ ch.lower() for ch in data
+         if ch.isalpha()
+         or ch == '.'
+         or emoji.get_emoji_regexp().search(ch)
+       ]
+print(f'After cleaning:  {data}')
+# After cleaning:  ['who', '❤️', 'word', 'embeddings', 'in', '.', 'i', 'do', '.']
+
+```
 
 
-![](/img/post/Natural-Language-Processing/course2/week4pic9.gif)
+```python
+def get_windows(words, C):
+    i = C
+    while i < len(words) - C:
+        center_word = words[i]
+        context_words = words[(i - C):i] + words[(i+1):(i+C+1)]
+        yield context_words, center_word
+        i += 1
+for x, y in get_windows(
+            ['i', 'am', 'happy', 'because', 'i', 'am', 'learning'],
+            2
+        ):
+    print(f'{x}\t{y}')
+# ['i', 'am', 'because', 'i']	happy
 
+# ['am', 'happy', 'i', 'am']	because
+
+# ['happy', 'because', 'am', 'learning']	i
+
+```
 
 **Transforming Words Into Vectors**
 
@@ -1192,9 +1263,34 @@ Vocabulary: am, because, happy, I, learning  (vocabulary is the set of unique se
 - Center word:  One-hot vector: 下面例子order by alphabetic order，实际中可以是arbitrary 
 - Context word: take the average of one-hot vectors of each context word (average 除以的是 2C, C is half size of context words )
 
-![](/img/post/Natural-Language-Processing/course2/week4pic10.gif)
+![](/img/post/Natural-Language-Processing/course2/week4pic10_1.png)
+![](/img/post/Natural-Language-Processing/course2/week4pic10_2.png)
 
-[Python- Create One hot vector for center /context word ](https://github.com/beckswu/Natural-Language-Processing/blob/master/Coursera/Course2-Natural%20Language%20Processing%20with%20Probabilistic%20Models/week4-data_prep.ipynb)
+
+```python
+def word_to_one_hot_vector(word, word2Ind, V): 
+  #word2Ind, word is key, index is value
+
+    one_hot_vector = np.zeros(V)
+    one_hot_vector[word2Ind[word]] = 1
+    return one_hot_vector
+
+context_words = ['i', 'am', 'because', 'i']
+context_words_vectors = [word_to_one_hot_vector(w, word2Ind, V) for w in context_words]
+# [array([0., 0., 0., 1., 0.]),
+
+# array([1., 0., 0., 0., 0.]),
+
+# array([0., 1., 0., 0., 0.]),
+
+# array([0., 0., 0., 1., 0.])]
+
+np.mean(context_words_vectors, axis=0)
+# array([0.25, 0.25, 0.  , 0.5 , 0.  ])
+
+```
+
+[Python- Create One hot vector for center /context word ](https://github.com/beckswu/Natural-Language-Processing/blob/master/Natural%20Language%20Processing%20with%20Probabilistic%20Models/week4-data_prep.ipynb)
 
 
 #### Architecture of Continuous bag-of-words
@@ -1211,7 +1307,8 @@ Vocabulary: am, because, happy, I, learning  (vocabulary is the set of unique se
 
 Dimension(single input):  $$W_1$$ : N (size of word embedding) rows and V (size of vocabulary ) columns
 
- ![](/img/post/Natural-Language-Processing/course2/week4pic12.gif)
+ ![](/img/post/Natural-Language-Processing/course2/week4pic12_1.png)
+ ![](/img/post/Natural-Language-Processing/course2/week4pic12_2.png)
 
 
 Dimension(Batch input):  <span style="color:red"> m: batch size</span>: hyperparameter model defined at training time
@@ -1219,18 +1316,19 @@ Dimension(Batch input):  <span style="color:red"> m: batch size</span>: hyperpar
 note: $$b_1$$ size is Nx1 broadcasting to NxM
 
 
-![](/img/post/Natural-Language-Processing/course2/week4pic13.gif)
+![](/img/post/Natural-Language-Processing/course2/week4pic13_1.png)
+![](/img/post/Natural-Language-Processing/course2/week4pic13_2.png)
 
 **Activation Function**
 
-![](/img/post/Natural-Language-Processing/course2/week4pic14.gif)
+![](/img/post/Natural-Language-Processing/course2/week4pic14.png)
 
 <span style="background-color:#FFFF00">**Softmax**</span>: input is a vector of real numbers. Output is a vector of real number in the interval 0 to 1 which <span style="background-color:#FFFF00">sum up to 1</span>, 可以被解释为 probabilities of exclusive events. <span style="background-color:#FFFF00">Each row correspond to a word of the vocabulary: probability of being center word</span>
 
-$$$$$$\hat y_i = \frac{e^{z_i}}{\sum_{j=1}^{V}e^{z_j}}, \text{exponential form transform inputs to all positive }$$
+$$\hat y_i = \frac{e^{z_i}}{\sum_{j=1}^{V}e^{z_j}}, \text{exponential form transform inputs to all positive }$$
 
-![](/img/post/Natural-Language-Processing/course2/week4pic15.gif)
-
+![](/img/post/Natural-Language-Processing/course2/week4pic15_1.png)
+![](/img/post/Natural-Language-Processing/course2/week4pic15_2.png)
 
 
 **Cost Function**
@@ -1243,11 +1341,14 @@ $$$$$$\hat y_i = \frac{e^{z_i}}{\sum_{j=1}^{V}e^{z_j}}, \text{exponential form t
 
 $$J_{bactch} = -\frac{1}{m} \sum_{i=1}^m J^{\left(i\right)} = -\frac{1}{m} \sum_{i=1}^m \sum_{j=1}^V y_j^{\left(i\right)} log \hat y_j^{\left(i\right)}$$
 
-![](/img/post/Natural-Language-Processing/course2/week4pic16.gif)
+![](/img/post/Natural-Language-Processing/course2/week4pic16_1.png)
+![](/img/post/Natural-Language-Processing/course2/week4pic16_2.png)
+![](/img/post/Natural-Language-Processing/course2/week4pic16_3.png)
 
 **Forward prop**
 
-![](/img/post/Natural-Language-Processing/course2/week4pic17.gif)
+![](/img/post/Natural-Language-Processing/course2/week4pic17_1.png)
+![](/img/post/Natural-Language-Processing/course2/week4pic17_2.png)
 
 **Backward prop**
 
@@ -1337,9 +1438,10 @@ After iterate training data serval times,
     - <span style="color:red"> time-consuming than intrinsic evaluation.</span>
     -  <span style="color:red"> More diffcult to trouble shoot. If performance is poor, performance metrics provide no information 哪里出错了 because word embedding are external test used to test them</span>
 
-下面Intrinsic evaluation axample are from original Word2vec research publication with word embeddings created from huge training set. Created by continuous skip-gram model not continuous bag of words model. But evaluation principle is the same. Note: analogies are not perfect. 比如 uranium 的化学符号是 U, but word2vec outputs plutonium
+下面Intrinsic evaluation axample are from original **Word2vec** research publication with word embeddings created from huge training set. Created by **continuous skip-gram model** not continuous bag of words model. But evaluation principle is the same. Note: analogies are not perfect. 比如 uranium 的化学符号是 U, but word2vec outputs plutonium
 
-![](/img/post/Natural-Language-Processing/course2/week4pic22.gif)
+![](/img/post/Natural-Language-Processing/course2/week4pic22_1.png)
+![](/img/post/Natural-Language-Processing/course2/week4pic22_2.png)
 
 #### Python Lib
 
@@ -1354,1324 +1456,3 @@ embed_layer = Embedding(10000,400)
 
 embed_layer = nn.Embedding(10000,400)
 ```
-
-
-## 3.1 Trax: Neural Networks
-
-
-Neural Network predict positive/negative tweets, structure:
-
-- has a embedding layer that transform the representation 
-- has another hidden layer with a ReLU activation function 
-- output layer with softmax function that give probabilities for whether a tweet is positive or negative sentiment
-- This structure allow to predict complex tweets: 比如 "This moive was almost good". 不能 classify correctly using simpler method 比如 Naive Bayes
-- Initial Representation for neural network is a vector of Integers, <span style="background-color:#FFFF00">List all word from vocabulary then assign integer index to each of word. Then need to 知道 maximum vector size then fill zeros to match that size (called **padding**: ensures that all vector have the same size even if your tweets don't)</span>
-
-![](/img/post/Natural-Language-Processing/course3/week1pic1.png)
-
-![](/img/post/Natural-Language-Processing/course3/week1pic2.png)
-
-#### Trax
-
-List the layer from left to right. Note Dense layer(fully-connected layer): A maps collections of R^m vectors to R^n, where n (= n_units) is fixed at layer creation time,. Fully computation is ```y = Wx + b```. Generally followed by a non-linear activation function. 
-
-![](/img/post/Natural-Language-Processing/course3/week1pic3.png)
-
-
-
-Advantage: (Trax is based on Tensorflow, use Tensorflow as a backend, also use **JAX** library to speed up computation)
-
-- Run fast on CPUs, GPUs and TPUs(perform computations efficiently), don't need to change a single line of code for running on CPU, GPU, TPU
-- allow parallel computing: allow model running on multiple machines or courses simultaneously
-- Record algebraic computations for gradient evaluation, so they compute gradient automatically. 
-
-
-Trax Development History: TensorFlow (2014-2015) -> Translate(2016, long time to train, not practical for anyone else other than Google) -> Tensor2Tensor(2017, userd by many large companies in the word. Complicated but not nice to learn, hard for new researchers) -> Trax
-
-Trax： Deep Learning library with Clear Code and Speed
-
-What do you want from a deep learning library? 
-
-- Makes programmers efficient: Easy to Debug and understand 
-- Run code fast: Trax can run on-demand or preemptible Cloud without changing a single line of code 
-
-
-Some Resource
-
-- [Official Trax documentation maintained by the Google Brain team](https://trax-ml.readthedocs.io/en/latest/)
-- [Trax source code on GitHub](https://github.com/google/trax)
-- [JAX library](https://jax.readthedocs.io/en/latest/index.html)
-
-Python Class & Subclass(subclass can override method in super class )
-
-![](/img/post/Natural-Language-Processing/course3/week1pic4.gif)
-
-#### Trax Layers
-
-**Dense Layer**: The single computation( compute inner product between trainable wights and input vector) is called Dense layer
-
-shape is a tuple with the desired shape of the weight matrix. ```y = np.dot(x, w)```
-- The number of rows in the weight matrix should equal the number of columns in the variable x. Since x may have 2 dimensions if it reprsents a single training example (row, col), or three dimensions (batch_size, row, col), get the last dimension from the tuple that holds the dimensions of x. (X的feature)
-- The number of columns in the weight matrix is the number of units chosen for that dense layer. (output 的unit)
-
-![](/img/post/Natural-Language-Processing/course3/week1pic5.png)
-
-**ReLU Layer**: activation layer that follows a dense fully connected layer, and transforms any negative values to zero.
-
-![](/img/post/Natural-Language-Processing/course3/week1pic6.png)
-
-**Serial Layer**: a composition of sublayers layers that operates sequentially to perform the forward computation of entire model. Can think of serial layer as whole neural network model in one layer
-
-![](/img/post/Natural-Language-Processing/course3/week1pic7.gif)
-
-**Embedding Layer**: map words from vocabulary to representation of that word with determined dimension, 下面例子 embedding size = 2,
-
-![](/img/post/Natural-Language-Processing/course3/week1pic8.png)
-
-**Mean Layer**: Take means of each features from embedding. After mean leary, will have the same number of featurres as embedding size. Note: <span style="color:red">这个layer 没有任何trainable parameters because it's only computing the mean of word embeddings</span>
-    - ```trax.layers.tl.Mean```: Calculates means across an axis. In this case, please choose axis = 1 to get an average embedding vector (an embedding vector that is an average of all words in the vocabulary).
-    - For example, if the embedding matrix is 300 elements and vocab size is 10,000 words, taking the mean of the embedding matrix along axis=1 will yield a vector of 300 elements.
-
-```python
-# Pretend the embedding matrix uses  2 elements for embedding the meaning of a word
-
-# and has a vocabulary size of 3, So it has shape (2,3)
-
-tmp_embed = np.array([[1,2,3,],
-                    [4,5,6]
-                   ])
-print("The mean along axis 0 creates a vector whose length equals the vocabulary size")
-display(np.mean(tmp_embed,axis=0)) # DeviceArray([2.5, 3.5, 4.5], dtype=float32)
-
-print("The mean along axis 1 creates a vector whose length equals the number of elements in a word embedding")
-display(np.mean(tmp_embed,axis=1)) # DeviceArray([2., 5.], dtype=float32)
-
-```
-
-![](/img/post/Natural-Language-Processing/course3/week1pic9.png)
-
-
-- TrainTask: ```trax.supervised.training.TrainTask(labeled_data, loss_layer, optimizer, lr_schedule=None, n_steps_per_checkpoint=100)```:  A supervised task (labeled data + feedback mechanism) for training. ```init``` parameter 有
-  - labeled_data: Iterator of batches of labeled data tuples. Each tuple has 1+ data (input value) tensors followed by 1 label (target value) tensor.  All tensors are NumPy ndarrays or their JAX counterparts.
-  - loss_layer: Layer that computes a scalar value (the "loss") by comparing model output :math:`\hat{y}=f(x)` to the target :math:`y`. e.g. ```tl.CrossEntropyLoss```
-  - optimizer: Optimizer object that computes model weight updates from loss-function gradients. e.g.```trax.optimizers.Adam(0.01)```
-  - lr_schedule: Learning rate schedule, a function step -> learning_rate.
-  - n_steps_per_checkpoint: How many steps to run between checkpoints. <span style="color:red">每run n_steps_per_checkpoint 会print出loss_layer，如果有eval_task, 同样也会run eval_task，然后print eval task metrics</span>
-   
-- EvalTask, ```EvalTask(labeled_data, metrics, metric_names=None, n_eval_batches=1)``` Labeled data plus scalar functions for (periodically) measuring a model. An eval task specifies how (`labeled_data` + `metrics`) and with what precision (`n_eval_batches`) to measure a model as it is training. The variance of each scalar output is reduced by measuring over multiple (`n_eval_batches`) batches and reporting the average from those measurements.
-  - labeled_data: Iterator of batches of labeled data tuples. Each tuple has 1+ data tensors (NumPy ndarrays) followed by 1 label (target value) tensor. ```[tl.CrossEntropyLoss]```
-  - metrics: List of layers; each computes a scalar value per batch by comparing model output :math:`\hat{y}=f(x)` to the target :math:`y`.
-  - metric_names: List of names, one for each item in `metrics`, in matching order, to be used when recording/reporting eval output. If None, generate default names using layer names from metrics.
-  - n_eval_batches: Integer N that specifies how many eval batches to run; the output is then the average of the outputs from the N batches.
-
-- Training.Loop: ``Loop(model, task, eval_model=None, eval_task=None, output_dir=None, checkpoint_at=None, eval_at=None)`` Loop that can run for a given number of steps to train a supervised model. The typical supervised training process randomly initializes a model and updates its weights via feedback (loss-derived gradients) from a training task, by looping through batches of labeled data. A training loop can also be configured to run periodic evals and save intermediate checkpoints. For speed, the implementation takes advantage of JAX's composable function transformations (specifically, `jit` and `grad`).
-  - model: Trax layer, representing the core model to be trained. Loss functions and eval functions (a.k.a. metrics) are considered to be outside the core model, taking core model output and data labels as their two inputs.
-  - task: TrainTask instance, which defines the training data, loss function, and optimizer to be used in this training loop.
-  - eval_model: Optional Trax layer, representing model used for evaluation, e.g., with dropout turned off. If None, the training model (model) will be used.
-  - eval_task: EvalTask instance or None. If None, don't do any evals.
-  - output_dir: Path telling where to save outputs (evals and checkpoints). Can be None if both `eval_task` and `checkpoint_at` are None.
-  - checkpoint_at: Function (integer --> boolean) telling, for step n, whether that step should have its checkpoint saved. If None, the default is periodic checkpointing at `task.n_steps_per_checkpoint`.
-  - eval_at: Function (integer --> boolean) that says, for training step n, whether that step should run evals. If None, run when checkpointing.
-
-#### Gradient in Trax
-
-- function ```grad``` return a function that computes the gradients of f
-  - allows much easier training
-- forward and backward in a single line 
-  - Notice the double parentheses, 第一个是 passes the arguments for the grad function, 第二个是arguments for function returned by grad
-
-![](/img/post/Natural-Language-Processing/course3/week1pic10.png)
-
-![](/img/post/Natural-Language-Processing/course3/week1pic11.png)
-
-
-## 3.2 RNN for Language Modeling
-
-**Problem with N-grams**: for N grams, model have to account for conditional probabilites for long sequences, difficult to estimate for long corpora: Need a lot of space and RAM. e.g. if user download app, may not have enough space. 
-
-![](/img/post/Natural-Language-Processing/course3/week2pic1.gif)
-
-#### RNN 
-
-**RNN**: Looks at previous N words, propagate the information from the beginning to the end
-
-e.g. 下面例子，trigram probabable choose "have": because highly probable to see that sequence of three words in text corpus. 但是如果用 have, sentence not make sense. 如果want to have a n-gram, have to account 6-grams, impractical
-
-![](/img/post/Natural-Language-Processing/course3/week2pic2.gif)
-
-Each box represent the computation made at each steps and colors represent the information used for every computation/ Every word in the sequence is multiplied by the same weight, $$W_x$$, the informatin propagate from the beginning to the end is multiplied by $$W_h$$. The block is repeated for every word in the sequence. The only learning parameters are $$W_x, W_h$$. They compute values that are fed over and over again until the prediction is made.
-
-Note:An RNN would have the same number of parameters for word sequences of different lengths. (Computations share parameters)
-
-![](/img/post/Natural-Language-Processing/course3/week2pic3.gif)
-
-
-Many to Many architecture, at each time step, <span style="background-color:#FFFF00">two inputs, x, hidden state h</span>. Make a prediction $$\hat y$$. Additionally, it propagate a new hidden state to the next time-step. The hidden state at every time t is computed with an activation function g
-
- $$ h^{<{t}>} = g\left(W_h \left[  h^{<{t-1}>},  x^{<{t}>} \right] + b_h \right)$$
-
- $$ h^{<{t}>} = g\left(W_{hh} h^{<{t-1}>} \oplus  W_{hx} x^{<{t}>} + b_h \right) \quad  \oplus \text{sum up element-wise}$$
-
-$$ W_h = \left[W_{hh} \mid W_{hx} \right] \quad \color{red}{\text{Horiztonal Stack}}$$
-
-$$\left[  h^{<{t-1}>},  x^{<{t}>} \right]= \left[ \frac{h^{<{t-1}>}}{x^{<{t}>}} \right] $$
-
-
-
-- 𝑊ℎ  in the first formula is denotes the horizontal concatenation of 𝑊ℎℎ and 𝑊ℎ𝑥 from the second formula.
-
-- 𝑊ℎ in the first formula is then multiplied by  $$\left[  h^{<{t-1}>},  x^{<{t}>} \right] $$, another concatenation of parameters from the second formula but this time in a different direction, i.e vertical!
-
-![](/img/post/Natural-Language-Processing/course3/week2pic5.png)
-
-First cell for RNN, take inputs the previous hidden state and current variable x, to get the current hidden state, get the product of x and $$h^{<{0}>$$ with their respective parameters, then sum the vectors element-wise. Then pass to activation function. With resulting value, compute current $$\hat h$$ by going through another activation function
-
-![](/img/post/Natural-Language-Processing/course3/week2pic6.gif)
-
-e.g. if $$ h^{<{t}>}$$ size is 4 x 1, $$ x^{<{t}>}$$ size is 10 x 1, what is the size of $$W_h$$, given  $$ h^{<{t}>} = g\left(W_h \left[  h^{<{t-1}>},  x^{<{t}>} \right] + b_h \right)$$
-
-Q: 14 x 4
-
-
-
-#### Application
-
-- One to One:  比如给出lists of score from favorite team to predict the position of your team on the leaderboard
-- One to Many: 给图片 predict caption
-- Many to One: Sentiment Analysis: RNN take every word from the sequence as inputs, propagate information from the beginning to the end, and output the sentiment
-- Many to Many: machine translation: encode and decoder architecture is popular for machine translation. First half doesn't return output is called encode, because it encodes the sequences of words in a single representation that caputres the overall meaning of the sentence. Decoder generate a sequence of words in other language.
-
-
-![](/img/post/Natural-Language-Processing/course3/week2pic4.gif)
-
-
-#### Cost Function
-
-
-k: the number of category/class, $$y_j = 0 or 1$$ 对于每个class, 比如下图output 是3个class
-
-![](/img/post/Natural-Language-Processing/course3/week2pic7.png)
-
-For RNN: 
-
-$$ J = -\frac{1}{T} \sum_{t=1}^T \sum_{j=1}^K y_j^{<{t}>} log \hat y_j^{<{t}>} $$, 与上面普通neural network cost function difference is summation over time T and division by the total number of steps T: is the <span style="background-color:#FFFF00">average of the cross entropy loss function over time</span>
-
-![](/img/post/Natural-Language-Processing/course3/week2pic8.png)
-
-#### Scan Function
-
-- Scan function is to take a function fn( equivalent to 下图中的 $$f_w$$), and apply to all the elements from beginning to end in the list ```elems``` ($$x{<{t_1}>}, x{<{t_2}>} ... x{<{T}>}$$))
-- Initializer (the hidden state $$h^{<{t_0}>}$$) is an optimal variable that could be used in the first computation of fn
-- Function first initialize hidden states $$h^{<{t_0}>}$$, set ys as an empty list  
-- For every x in the lis of elements, fn is called with x and the last hidden state as arguments, 
-- For loop computes every time step for RNN, stores prediction value and hidden states
-- Finally, function <span style="color:red">returns a list of predictions, and last hidden state</span>
-- <span style="color:red">Framework like Tensorflow need this type of abstraction in order to perform parallel computions and run on GPUs.</span>
-
-![](/img/post/Natural-Language-Processing/course3/week2pic9.gif)
-
-## Gated Recurrent Units
-
-- control how much information forget from the past and how much information to extract from current input. 
-- allow relevant information to be kept in the hidden states, even over long sequences. 比如下面例子，Ants learn Plural. GRU complete it by computing irrelevance and update gates. Can GRUS as Vanilla RNN with additional computations
-
-$$\Gamma_r = \sigma \left(W_r \left[  h^{<{t-1}>},  x^{<{t}>} \right] + b_r \right)  $$
-
-$$\Gamma_u = \sigma \left(W_u \left[  h^{<{t-1}>},  x^{<{t}>} \right] + b_u \right)  $$
-
-$$h^{'<{t-1}>} = tanh\left(W_h \left[ \Gamma_r *  h^{<{t-1}>},  x^{<{t}>} \right] + b_h \right)  $$
-
-$$h^{'<{t}>} = \Gamma_u *  h^{<{t-1}>} + \left( 1- \Gamma_u\right) * h^{'<{t-1}>} $$
-
-$$y^{<{t}>} = g\left(W_y  h^{<{t}>} + b_y \right)$$
-
-
-1. The first two computation in GRU are <span style="background-color:#FFFF00">**relevance gates**</span>. $$\Gamma_r, \Gamma_u $$ computed from sigmoid function. <span style="color:red">The output help determine which information from the previous hidden state is relevant and which values should be updated with current informations</span>
-2. After relevante gates is computed, the candidate h' for the hidden state is found: the value store all the candiates for information that overwrites in previous hidden states.  
-3. A new value for the current hidden state is calculated using the information from the previous hidden state, candidate hidden state and update gate and update some information from the last hidden states. <span style="background-color:#FFFF00">Updte date determnnes how much of information from the previous hidden state will be overwrited</span>. 
-4. a prediction $$\hat y$$ is computed using current hidden state
-
-![](/img/post/Natural-Language-Processing/course3/week2pic10.png)
-
-Vanilla RNN vs GRUS: 
-
-- **Problem with Vanilla**: update the hidden state at every time step, for a long sequences, information tends to vanish. So called <span style="background-color:#FFFF00">**vanishing gradients problem**</span>(开始的信息可能丢失了)
-- GRUs compute significantly more operations, can cuase lnger processing times and memory usage. GRUS help preserve important information for longer sequences. 
-
-![](/img/post/Natural-Language-Processing/course3/week2pic11.gif)
-
-
-
-#### Deep Bidiretion RNN
-
-e.g. 比如下面例子blank 来自于后下文
-
-![](/img/post/Natural-Language-Processing/course3/week2pic12.png)
-
-Could have another architecture where the information flow from end to beginning. 
-
-- <span style="background-color:#FFFF00">Information flows from the past(from left to right) and from the future(from right to left) independently</span>
-- Get prediction $$\hat y$$, <span style="color:red">have to start propagate information from both directions</span>
-- After compution all the hidden states for both directions, can get all of remaining predictions. 
-
-$$y^{<{t}>} = g\left(W_y  \left[ \vec h^{<{t}>}, \overleftarrow h^{<{t}>} \right]  + b_y \right)$$
-
-![](/img/post/Natural-Language-Processing/course3/week2pic13.gif)
-
-Deep RNNs are similar to deep neural networks. Deep RNN have a layer which takes input sequence x and multiple additional hidden layers. Like RNN stack together
-
-$$h^{\left[l \right]<{t}>} = f^{\left[l \right]} \left(W_h^{\left[l \right]}  \left[ h^{\left[l \right]<{t-1}>} , a^{\left[l-1 \right]<{t}>}  \right]  + b_h^{\left[l \right]}  \right)$$
-
-$$a^{\left[l \right]<{t}>} = f^{\left[l \right]} \left(W_a^{\left[l \right]} h^{\left[l \right]<{t}>}   + b_a^{\left[l \right]}  \right)$$
-
-1. Get hidden states for current layer: Af first progragate information through time. 
-2. pass the activations to next layer. Go deeper in the network and repeat the process for each layer until get prediction
-  
-
-![](/img/post/Natural-Language-Processing/course3/week2pic14.gif)
-
-
-## 3.3 LSTMs and Named Entity Recognition
-
-**RNN Advantages**:
-
-- Capture dependecies within a short range
-- Takes up less RAM and space(lightweight) than other n-gram models
-
-**RNN Disadvantages**:
-
-- Struggles with longer sequence
-- Prone to vanishing or exploding gradients: 
-  - This can arise due to the fact that RNN progagates information from the beginning of the sequence to the end. Starting with first words, the first values are computed(下图橙色框). Then it propagates some computed information takes the second word in the sequence, an gets new value(下图绿色框). Final steps, computattions contain information from all the words in the sequence, then RNN predict next word. <span style="color:red">Notice: the information from first step doesn't have much influence on the output.</span>. Can see Orange portion from the first step decrease with each new step. 因为computation at the first steps don't have much influence on the cost function. 
-
-![](/img/post/Natural-Language-Processing/course3/week3pic1.png)
-
-#### Vanishing/Exploding Gradient 
-
-Backprop:  The derivatives from each layer are multiplied from back to front in order to compute the derivative of initial layer.  The weights receive an update is proportional to the gradients with respect to the current weights of that time step. But in the network with<span style="color:red"> many time steps or layers, gradient arrived back at early layers as the product of all the terms from the later layer -> make unstable situation. Especially if the values become so small -> no longer updates properly</span>. For exploding gradients, work in opposite direction <span style="color:red">as updated weights become so large causing network to become unstable.</span>(numerical overflow)
-
-![](/img/post/Natural-Language-Processing/course3/week3pic2.png)
-
-Solution: 
-
-- **Identity RNN with ReLU activation**: Initialize weights as indentity matrix: what it does, copy previous hidden state, add information from current inputs and replace any negative values with 0. Has effects of your network to stay close to the values in the indentity matrix which act like 1s during matrix multiplication
-  - <span style="background-color:#FFFF00">**only works for vanishing gradients**</span>, as derivates of ReLu = 1 for all values greater than 0
-- **Gradient clippings**: simply choose a relevant value that clip the gradients e.g. 25. Using this technique, any value grater than 25 will be clipped to 25
-  - <span style="background-color:#FFFF00">**works for exploding gradients**</span>. serves to limit the magnitute of gradients. 
-- **Skip connections**: provide a direct connection to earlier layers, effectively skips over activation functions, add values from initial inputs x to outputs, e.g. F(x) + x. so <span style="background-color:#FFFF00">activations from eariler layers have more influence over the cost function</span>
-
-
-![](/img/post/Natural-Language-Processing/course3/week3pic3.png)
-
-下图可能有vanishing gradient problem, because for a good model, performance should improve accuracy through time
-
-![](/img/post/Natural-Language-Processing/course3/week3pic4.png)
-
-
-
-#### LSTM
-
-**Application for LSTM**
-
-- Next-character prediction for email
-- chatbots capable of remembering longer conversations
-- musice composition: consider music is built using long sequences of notes, much like text uses long sequences of words
-- image caption
-- speech recognition
-
-LSTM: special variety of RNN handle entire sequences of data by learning when to remember and when to forget, similar to GRU
-
-- A cell state: can think of as memory
-- A hidden state with three gates(<span style="color:red">flow 顺序是forget gate, input gate, output gate</span>): computation perform during training to decide what changes to make. has three gates to pass though before the entire operation is performed again. Any loop would update the weights. These cell state travels through these three gates that track inputs as it arrives,.Each one plays a part deciding how much information to pass and how much to leave behind. The series of gates allows gradients to flow unchanged. -> so vanishing/exploding gradient is mitigated
-  - Forget gate decides what to keep
-  - Input gate decides what ot add
-  - Output gate decides what the next hidden state will be
-- Loop back again at the end of each time step. 
-
-Structure:
-
-
-
-1. cell state $$c^{<{t_0}>}$$: can think of cell as memory of your network, carrying all the relevant information down the sequence. 
-  - As cell travels, each gate adds or removes information from cell state
-2. 最左边是forget gate, typically sigmoid layer, looks at all the information from previous cell state and decides what to throw away. Sequeeze each value from the cell states between zero and one
-  - <span style="background-color:#FFFF00">If value close to zero -> indicates it should be thrown away. Value close to one -> indicates should be kept</span>
-  - take the value from the forget states and multiply them element-wise by cell states
-3. Input gate: decide what new information to store/update in the cell, has two parts: 
-  1. sigmoid layer take the previous hidden state  $$h^{<{t_0}>}$$ and current input  to choose which values to update by assigning zero or one to each value. The closer to one, the higher the importance
-  2. tanh layer to slect candidates for new values to be added. take the previous hidden state  $$h^{<{t_0}>}$$ and current input to sequeezes the values between -1 and 1
-  3. Then the output of sigmoid and tanh are multiplied, model has what to need to calculate new cell state
-4. Then calculate new cell state.  $$c^{<{t_1}>}$$
-5. Finally output gate ($$y^{<{t}>}$$) takes the previus hidden state along with the current inputs and process them through another sigmoid and tanh layer. The outputs from sigmoid layer are multiplied by te tanh layer's output. The product decides how much write to next hidden state. 
-
-![](/img/post/Natural-Language-Processing/course3/week3pic5.gif)
-
-
-Note: The tanh layer’s output (between -1 and 1) is multiplied element-wise by the sigmoid layer’s output in both the input and output gates, ensuring an even flow through the LSTM unit.  This prevents any of the values from the current inputs from becoming so large that they make the other values insignificant. Ensures the values in your network stay numerically stable,
-
-
-#### NER
-
-NER: Named Entity Recognition: fast and efficient way to scan text for certain kinds of information. NERs sytems locate and extract named entities from text. Name entities can be a place, an organization or a person's name, can even be tiems and dates.  
-
-
-![](/img/post/Natural-Language-Processing/course3/week3pic6.gif)
-
-
-- B dashes denotes entity 
-- All other words are classified O
-
-![](/img/post/Natural-Language-Processing/course3/week3pic7.png)
-
-Application:
-
-- Search engine efficiency: NER models scan millions of websites once and stores the entities as indentified in the process. Then tag from your search query simply match against website tags. 
-- recommendation engines: tags extracted from your history and compared to similar user hitories then recommend things you might want to check out
-- Customer service: match customer to an appropriate customer service agents. works similarly to a phone tree where prompted to provide some information about your request. e.g. use an app to communicate with your car insurance company, 需要provide some spoken information. then match to appropriate agents
-- Automatic trading: build a web scraper to get the articles of the names of certain CEOs, Ssocks, or cryptocurrencies. Then feed those article into a sentiment classification system and make your trade accordingly
-
-**Training NERS: Data Processing**
-
-1. Assign each entity class to a unique number. e.g. person name = 1, geographical location = 2, time indicator = 3
-2. Assign each word a number that corresponds to its assigned entity class. O 表示 a failure or unrecognized word. <span style="color:red">Numbers are random and assigned when you process your data</span>. Each sequence is transformed into an array of numbers where each number 表示 index of the labeled word
-3. apdding: LSTM require all sequences are the same length. Can set length of sequnces to a certain number and add generic ```<PAD>``` token to fill all empty spaces.
-
-
-![](/img/post/Natural-Language-Processing/course3/week3pic8.png)
-
-**Traing the NER**:
-
-1. Create a tensor for each input and corresponding number 
-2. Put them in a batch, batch size normally power of 2, <span style="color:red">speed up processing time considerably</span> -> 64, 128, 256, 512...
-3. Feed it into an LSTM unit
-4. Run the output through a dense layer (Linear operation on the input vectors) or fully connected layer
-5. Predict using a <span style="background-color:#FFFF00">**log softmax**</span> over K classes (K: the number of possible output), <span style="color:red">log softmax gets better numerical performance and gradients optimization than softmax</span>
-
-![](/img/post/Natural-Language-Processing/course3/week3pic9.png)
-
-
-**Evaluateig the model**
-
-1. Pass test set through the model
-2. Get arg max across the prediction array, 下面```np.argmax``` takes an axis parameter. need to consider the dimension of array
-3. make sure arrays are padded using ```<PAD>``` token, which makes arrays the same length
-4. Compare outputs against test labels to see how accurate model is
-
-
-下面code, mask variable is where you identify any token IDs you need to skip over during evaluation. One token need to skip is ```<PAD>``` token
-
-![](/img/post/Natural-Language-Processing/course3/week3pic10.png)
-
-**Some Useful Link**
-
-
-
-[**Intro to optimization in deep learning: Gradient Descent**](https://blog.paperspace.com/intro-to-optimization-in-deep-learning-gradient-descent/)
-
-[**Understanding LSTMs**](https://colah.github.io/posts/2015-08-Understanding-LSTMs/)
-
-## 3.4 Siamese Network
-
-It's made up two identical neural networks which are merged at the end.  <span style="background-color:#FFFF00">Used as Indenify similarity between things</span>
-
-e.g. Comparing meaning not the same as compare words
-
-- How old are you = what is your age
-- Where are you from $$/neq$$ where are you going 尽管前三个字一样，但是不等
-
-Application:
-
-- Question duplicates: Stackoverflow, Quera check your questions if exist before post
-- Handwritten checks: determine if two signatures are the same or not
-- Search engine queries: to predict whether a new query is similar to the one that was already executed
-
-#### Architecture
-
-- <span style="background-color:#FFFF00">Both network have a identical sub network.</span>  <span style="color:red">并且sub networks share identical parameters</span>. Learned parameters of each sub-network are exactly the same. 
-- Each network output a vector, one for each questions.
-- Cosine similarity tells how similar they are, $$\hat y$$ a value between -1 and 1
-  - <span style="background-color:#FFFF00">if $$\hat y \leq \tau $$ -> input questions are different. if $$\hat y > \tau $$ -> input questions are the same</span>. $$\tau$$ is a parameter that chose how often want to interpret cosine similarity to indicate two questions are similar. Higher threshold means only very similar sentences is considered similar
-
-
-下面是一个example, not all Siamese network contain LSTM. 
-
-![](/img/post/Natural-Language-Processing/course3/week4pic1.png)
-
-
-#### Cost Function
-
-- Anchor: the first question e.g. "How old are you"
-- positive questions: have the same meaning as anchor, cosine similarity close to 1
-- negative questions: not have the same meaning as anchor, cosine similarity close to -1
-
-![](/img/post/Natural-Language-Processing/course3/week4pic2.png)
-
-$$ diff = s\left(A,N \right) - \left(A, P \right) = \frac{A \cdot N}{\Vert A \Vert \Vert N \Vert}- \frac{A \cdot P}{\Vert A \Vert \Vert P \Vert}$$
-
-<span style="color:red">s(v1, v2) is similarity metric(cosine similarity), could be distance metrics d(v1, v2) such as ecludian distance </span>
-
-loss function allow whether model do well. 当difference igger or smaller along x-axis, loss bigger or smaller along the y-axis. Minimizing loss in training-> minimize this difference
-
-
-![](/img/post/Natural-Language-Processing/course3/week4pic3.png)
-
-Notice, when difference less than zero, want loss < 0? give model positive value, model update and improve. give model negative value, like telling: Good job. Please update weight to the worst next time. When loss = 0, not asking model to update weights, because performing as expected for that training example. Need to update loss function as below. 
-
-如果difference is just less than zero, want model to still learn and <span style="background-color:#FFFF00">ask to predict a wider difference, can shift the loss function a little to the left. margin refer as *Alpha*.</span> Loss function shift to right by $$\alpha$$. So if difference less than 0 but small in magnitute, loss greater than 0.
-
-![](/img/post/Natural-Language-Processing/course3/week4pic4.png)
-
-
-**Triplet Loss**
-
-$$L = \begin{cases}0; \quad \text{if diff } + \alpha \leq 0 \\[2ex] diff; \, \text{if diff } + \alpha > 0 \\ \end{cases} $$
-
-$$L\left(A, P, N \right) = max\left(diff + \alpha, 0 \right) $$
-
-
-
-
-#### Triplet Selection
-
-  
-- Firstly, select pair of duplicate questions as anchor and positive 
-- Secondly, select a question is difference meaning from the anchor, to form anchor and negative pair
-- 错误的方式是: select triplet random: <span style="color:red">很可能select non-duplicative pair A and N, where loss 0. Loss is zero whenever model correctly predict A and P more similar to A and N. When loss is zero, network little to learn from triplet.</span>
-- **Hard Triplet**: <span style="background-color:#FFFF00">are more difficult to train. Hard triplets 是similarity between anchor and negative very close to, but still smaller than similarity between anchor and positive.</span> When model encounter hard triplet, algorithm need to adjust its weight so that yield similairty line up with labels
-  - By selecting hard triplets, trainning focus are doing better on difficult caes which 也许会predict incorrectly
-
-![](/img/post/Natural-Language-Processing/course3/week4pic5.png)
-
-
-Use ```b``` as batch size, 如下图<span style="color:red">每一行，是duplicate, 每一个column 没有duplicate</span>
-
-![](/img/post/Natural-Language-Processing/course3/week4pic6.png)
-
-vector v1, #row = batch sizes,  #columns is the number of embedding layer(```d_model```). Note dimension of embedding ```d_model``` is a parameter that determins the dimensions of weights through each layer in the model, determine the size of output layer. $$v_{1,1}$$ is a duplicateo of $$v_{2,1}$$, but $$v_{1,1,}$$ is not a duplicates of any other row in $$v_{1}$$
-
-![](/img/post/Natural-Language-Processing/course3/week4pic7.png)
-
-may get similarity as 下图左侧的matrix
-
-- Digonal is the key features, <span style="background-color:#FFFF00">These values are the similarities for positive examples, question duplicates. 通常diagonal 数比不是在diagonal的数要大, because expect duplicates have higher similarity than non-duplicates. </span>
-- upper right, lower left -> similarity for all negative examples. most number are lower than similarities along the diagonal
-- 注意 negative example question pairs still have similarity 大于0, 虽然similarity range 从-1 到1，但不意味着大于0 表示duplicates 或小于表示non-duplicated. <span style="background-color:#FFFF00">Really mater 是find duplicates have a higher similarity relative to non-duplicated.</span>
-- <span style="color:red">Creating pairs like this remove the need for additional  non-duplicate example and input data</span>. Insteading of sets up specific bathchs with negative examples, model can learn from existing questions duplicates batches.
-
-Overall Cost Function 
-
-$$\begin{align}J &= \sum_{i=1}^{m} L\left(A^{\left(i\right)}, P^{\left(i\right)}, N^{\left(i\right)} \right) =\sum_{i=1}^{m}  max\left(diff + \alpha, 0 \right) \\ &= \sum_{i=1}^{m}  max\left(s\left(A^{\left(i\right)}, N^{\left(i\right)} \right) - s\left(A^{\left(i\right)}, P^{\left(i\right)}\right) + \alpha, 0 \right) \\&  \color{blue}{\text{i refer to a specific training example and there are m observations}}\end{align}$$
-
-![](/img/post/Natural-Language-Processing/course3/week4pic8.png)
-
-- **Mean negative**: mean of off-diagonal values in each row(<span style="color:red">mean of the similarity of negative examples, not mean of negative number in a row</span>). 比如第一行 (-0.8 + 0.3 - 0.5)/3
-  **Closest negative**: off diagonal value cloest to(but less than) the value on diagonal in each row. By choosing this, force model to learn what diffferentiates these examples and drive those similarity values further apart through training. 比如第一行选取0.3: meaning a similarity of 0.3 has the most to offer model in terms of learning opportunity
-
-$$L_{Original} = max \left(\underbrace{s\left(A,N \right)-s\left(A,P \right)}_{diff} + \alpha, 0 \right)$$
-
-$$L_{1} = max \left(mean\_neg+ \alpha, 0 \right)$$
-
-$$L_{2} = max \left(closest\_neg+ \alpha, 0 \right)$$
-
-$$L_{Full}\left(A, P, N \right) = L_{1} + L_{2} $$
-
-$$J = \sum_{i=1}^m L_{Full}\left(A^{\left( i \right)}, P^{\left( i \right)}, N^{\left( i \right)} \right) $$
-
-
-In order to minimize the loss, you want $$diff + \alpha \leq 0$$, 
-
-- **Loss 1**: <span style="background-color:#FFFF00">using mean negative replace similarity of A and N, help model converge faster during training by reducing noice</span>. Reduce noice by trainning on average of several observations rather than training model on each of these off-diagonal examples. 
-  - Why Reduce noise? We define noise to be a small value that from a distribution that is centered arund 0. So the average of several noise is centered around 0.(Cancel oout individual noise from those observations)
-- **Loss 2**: create a slightly large penalty by diminishing the effects of more negative similarity of A and N. <span style="color:red">can think of closest negative as finding negative example that results in smallest difference between two similarity</span>. Then add small difference to alpha, able to generate the largest loss among all of other examples in that row -> make the model update weights more
-
-
-#### One Shot Learning
-
-Classification vs One Shot Learning
-
-- Classification: classify as 1 of K classes, probably use softmax function at the end to find maximum prabability. 比如k=10, 如果k增加一个, expensive to retrain the model. Besides unless you have many examples for the class. model training won't work well
-- One Shot Learning: one shot learning is to be able to classify new classes without retraining any models. You only need to learn the similarity function once. Then can test similarity score against some threshold to see if they are the same. Problem changes to determine which class to measure similarity between classes
-  - 比如下面的例子，比如银行签字，每次有新的签名, can't retrain entire system. Instead, just learn a similarity  -> identify whether two signature are the same or not
-
-![](/img/post/Natural-Language-Processing/course3/week4pic9.gif)
-
-
-#### Training / Testing
-
-1. prepare batches with batch size = b. Corresponding questions from each batch are duplicate(batch 1 和 batch 2第一行是duplicate). No duplicates within an indiivual batch(比如batch 1  第一行和第二行不是duplicate).
-2. Use these inputs t get outputs vectors for each batch (Embedding -> LSTM -> Vectors -> Cosine Similarity). <span style="color:red">Note two subnetworks have identical parameters so only train one set, then shared by both</span>
-   - Note: <span style="background-color:#FFFF00">$$\tau$$ and margin $$\alpha$$ from loss function are tunable hyperparameter</span>
-3. When testing model, perform one-shot learning. 
-  1. Convert each input an an array of numbers 
-  2. Feed arrays into model 
-  3. Compare $$v_1, v_2$$ using cosine similarity
-  4. Test against a threshold $$\tau$$. If similarity greater than $$\tau$$, questions are classified as duplicates
-
-![](/img/post/Natural-Language-Processing/course3/week4pic10.gif)
-
-<br/><br/><br/>
-
-## 4.1 Neural Machine Translation
-
-#### Seq2Seq
-
-- take one sequence of items such as words, and output another sequence. 
-- Map variable-length of sequence to a fixed-length memory. The inputs and outputs don't have the matching lengths
-- LSTMs and GRUs are typically used to overcome the vanishing gradient problem
-- **Encode-Decoder**: takes in a hidden states and a string of words 比如single sentence. (如下图)
-  - Encoder takes the input one step at a time, collects information for inputs then move it fowward
-  - 橘色框biaoshi encoders final hidden states, which try to capture all the information collected from each input step before feeding into the decoder. The final hidden states provide initial sates for decoder to begin predicting the sequence. 
-- <span style="background-color:#FFFF00">**Shortcomings**</span>: 
-  - 因为是<span style="color:red">encoder hidden states is fixed length memory</span> -> lower performance
-  - <span style="color:red">Later input steps in the sequence are given more importance</span>. 比如下图中的today
--  longer sequence become problematic. As ndividual inputs begin stacking up inside the encoders final hidden sates, 因为Seq2seq uses a fixed length memory  
-
-![](/img/post/Natural-Language-Processing/course4/week1pic1.png)
-
-![](/img/post/Natural-Language-Processing/course4/week1pic2.png)
-
-**One Vector per word**L give each word a vector for individual information instead of smash it all into one big vector. Also has flaw: How build a time/memory efficient model that predicts accurately from a long sequence. 
-
-![](/img/post/Natural-Language-Processing/course4/week1pic3.png)
-
-Solution: Focus attention in the right place:  Prevent sequence overload by giving the model a way to focus on the <span style="color:red">likeliest</span> words at each step. can think of a new layer to process this information. Do this by providing the information specific to each input word
-
-![](/img/post/Natural-Language-Processing/course4/week1pic4.png)
-
-Recurrent models typically take in a sequence in the order it is written and use that to output a sequence. Each element in the sequence is associated with its step in computation time t. (i.e. if a word is in the third element, it will be computed at $$t_3$$). These models generate a sequence of hidden states $$h_t$$, as a function of the previous hidden state $$h_{t−1}$$ and the input for position t. 
-
-The sequential nature of models <span style="color:red">(RNNs, LSTMs, GRUs) does not allow for parallelization within training examples</span>, which becomes critical at longer sequence lengths, as memory constraints limit batching across examples. In other words, if you rely on sequences and you need to know the beginning of a text before being able to compute something about the ending of it, then you can not use parallel computing. You would have to wait until the initial computations are complete. This is not good, because if your text is too long, then 1) it will take a long time for you to process it and 2) you will lose a good amount of information mentioned earlier in the text as you approach the end.  
-
-#### Alignment
-
-Motivation for alignment(used to be critical important for statistical translation)
-
-- Translating from one language to another 
-- Word sense discovery and disambiguation e.g.  Bank 可以指代 financial instituion 或者 riverbank
-
-Word Alignment: 比如德语 Berliner 可以指柏林人，也可以值一种donut 甜甜圈. 比如下面English word 多于German word. When performing alignment, model needs to identify relationships among the words in order to make accurate predictions in case the words are out of order or not exact translation.
-
-![](/img/post/Natural-Language-Processing/course4/week1pic5.png)
-
-[The Real Meaning of Ich Bin ein Berliner](https://www.theatlantic.com/magazine/archive/2013/08/the-real-meaning-of-ich-bin-ein-berliner/309500/)
-
-
-To align words correctly, need to add a attention layer to help the decoder understand  which inputs are more important. <span style="background-color:#FFFF00">The attention mechanism solves for longer input sequences by giving more weight to more important words.</span>.  比如下图hidden state in orange given higher attention score -> <span style="background-color:#FFFF00">next word in the decoder output will be strongly influenced by this encoder hidden state.</span>
-
-
-![](/img/post/Natural-Language-Processing/course4/week1pic6.png)
-
-1. Get available hidden states ready for encoder and first hidden states for decoder. 比如下面例子，encoder 两个hidden states, decoder一个
-2. **Calculate Alignment Score**: score  each of encoder hidden sattes by 计算 dot product between encoder state and decoder hidden state. <span style="color:red">higher score->more influence.</span>
-3. Run scores through <span style="background-color:#FFFF00">softmax</span>, each score is between 0 and 1, then <span style="color:red">give attention distribution</span>.
-4. Take each encoder hidden state, <span style="color:red">multiply by its softmax score,</span> -> <span style="background-color:#FFFF00">**alignment vector**</span>
-5. adding up everything alignment vector to <span style="background-color:#FFFF00">**context vector**</span> -> <span style="background-color:#FFFF00">context vector is feeded into decoder</span>
-
-![](/img/post/Natural-Language-Processing/course4/week1pic7.gif)
-
-
-#### Attention Model
-
-- Attention is an added layer that lets a model focus on what's important
-- **Queries**, **Values**, and **keys** are used for information retrieval inside the Attention layer
-  - **Key** and **Value** pair: both dimension <span style="color:red">N(input sequence of length from encoder hidden states)</span>. Keys and values have their own respective matrices, but the matrices have the same shape and are often the same. 
-  - **Query**: <span style="color:red">from encoder hidden state</span>
-  - Both key-value pair and query <span style="background-color:#FFFF00">enter attention layer on the opposite ends of the model</span>
-
-
-**Scale dot product attention**
-
-1. <span style="color:red">**Dot product**</span> between query and key is calculated, <span style="background-color:#FFFF00">measure similarity. Similar vectors of dot product -> higher value.</span>
-2. **Weighted sum** given to each value is determined by the probability that key matches the query. Probabilities calculated by running attention weights through softmax. Value between 0 and 1
-3. the query is mapped to next key-value pair, so on so forth
-
-
-![](/img/post/Natural-Language-Processing/course4/week1pic8.png)
-
-- Query(Q) is as column and words of keys as row
-- value socre(V) assigned based on closeness of the match
-
-One way you can think of it is as follows. Imagine that you are translating English into German. You can represent the word embeddings in the English language as keys and values. The queries will then be the German equivalent. You can then calculate the dot product between the query and the key. Note that similar vectors have higher dot products and non-similar vectors will have lower dot products. The intuition here is that you want to identify the corresponding words in the queries that are similar to the keys. This would allow your model to "look" or focus on the right place when translating each word. We then run a softmax:
-
-$$softmax\left(QK^T\right)$$
-
-That allows us to get a distribution of numbers between 0 and 1.  One more step is required. We then would multiply the output by VV. Remember VV in this example was the same as our keys, corresponding to the English word embeddings. Hence the equation becomes
-
-$$softmax\left(QK^T\right)V$$
-
-This tells us how much of each word, or which combination of words we will be feeding into our decoder to predict the next German word. This is called scale dot product attention. Note we add a normalization constant to it later, but you do not have to worry about that right now
-
-
-
-- <span style="background-color:#FFFF00">Model should flexible enough to connect each English word with its relevant German word, even they do not appear in the same position in respective sentences</span>. In another word, It should flexible to handle differences in grammearand word ordering in different language. 
-- <span style="color:red">For languages with different grammar structures, attention still looks at the correct token between them</span> 
-  - 比如下面例子，法语到英语, 第五个法语词Zone -> attention knows to look further down at 第八个token
-
-In the matrix, the lighter square shows where the model is actually looking when making the translation of that word. This mapping should not necessarily be one to one. The lighting just tells you to what extent is each word contributing to the input that will be fed into the decoder. As you can see several words can contribute to translating another word, depending on the weights (output) of the softmax that will be used to create the new input. 
-
-![](/img/post/Natural-Language-Processing/course4/week1pic9.png)
-
-
-下面例子padded zero at the end of sentence, ```<EOS>``` is 1 then pad 0
-
-![](/img/post/Natural-Language-Processing/course4/week1pic10.gif)
-
-#### Teacher Forcing
-
-- Teacher forcing allow your allow to use the ground truth or the actual outputs from decoder to compare its predictions during training
-- <span style="background-color:#FFFF00">Teacher forcing yields faster, more accurate training</span>
-
-e.g. 比如下面例子 as the motivation why teacher forcing is necessary for Seq2Seq model. Model predict correctly at the start of sequence. 但是第二个prediction is wrong, 第三个even further off. 第四个都没有logical sense. <span style="color:red">In a sequence model, each wrong prediction make the following predictions even less likely to be correct.</span>. 需要make a way to check at each step. 
-
-
-![](/img/post/Natural-Language-Processing/course4/week1pic11.png)
-
-- t1 (Wie) is processed through attention in order to predict geht. During training, <span style="background-color:#FFFF00">predicted output is not usede for prediciting next predicted word(green rectangle). Instead, the actual outputs/ground truths is the input to the decoder for each time step until the end of sequence is reached(不用预测的，用right answers feed into next time step)</span>. 
-- Without teacher forcing, models can be slow to reach convergence.
-- teacher forcing is still in active research
-
-![](/img/post/Natural-Language-Processing/course4/week1pic12.gif)
-
-[Link: What is Teacher Forcing ](https://towardsdatascience.com/what-is-teacher-forcing-3da6217fed1c?gi=fe02fa9e9d0)
-
-
-#### NMT with Attension
-
-1. Initial select: two copies. Input tokens(English) represented by zero and the target tokens(German) represented by one.
-2. <span style="color:red">One copy of the input tokens</span> fed into -> the inputs encoder to be transformed into the <span style="color:red">key and value vectors</span>. <span style="color:red">A copy of the target</span> tokens goes into the <span style="color:red">pre-attention decoder</span>. 
-  - The pre-attention decoder is not the decoder which produces the decoded outputs. <span style="background-color:#FFFF00">The pre-attention decoder transform the prediction targets into a different vector space called the **query vector** Q vector</span>, so can calculate the relative weights to give each input word. 
-  - The pre-attention decoder <span style="color:red">shifts the target tokens one place to the right, assign the start of sentence ```<SOS>``` to beginning of each sequence </span>, where the teacher forcing takes place, That way when we predict, we can just feed in the correct target word (i.e. teacher forcing). 
-3. Inputs and targets are converted to embeddings(or initial representations of the words)
-4. Now have query key and value vectors, you can prepare them for the attention layer:
-   1.  Compute $$ QK^T$$
-   2.  apply a padding mask before computing the softmax. (在Assignment中,zero-padding tokens to negative one billion, which will become approximately zero when computing the softmax )
-5. Once, have queries, keys, and values, compute attention. 
-6. Residual block adds the queries generated in the pre-attention decoder to the results of the attention layer. Then activations go to the second phase, with the mask that was previously created.  
-7. Drop the mask(图中标注的mask(1)) before running everything through the decoder, which is what the second Select is doing. It takes the activations from the attention layer（图中标注的attention(0)), and the second copy of the target tokens(图中标注的target tokens(2). <span style="background-color:#FFFF00">They are true targets which the decoder needs to compare against the predictions.</span>
-8.  Run everything through a dense layer or a simple linear layer with targets vocab size -> gives output. 
-9.  Take the outputs and run it through LogSoftmax, which is what transforms the attention weights to a distribution between zero and one.
-10. Match the log probabilites against true target tokens
-
-Note: <span style="color:red">图中的 Select([0,2]) -> LSTM -> Dense -> LogSoftmax : 是decoder</span>
-
-![](/img/post/Natural-Language-Processing/course4/week1pic13.png)
-
-![](/img/post/Natural-Language-Processing/course4/week1pic19.png)
-
-![](/img/post/Natural-Language-Processing/course4/week1pic20.png)
-
-
-![](/img/post/Natural-Language-Processing/course4/NMTModel.png)
-
-
-#### BLEU Score
-
-BLEU: Bilingual Evaluation Understudy. 
-
-- evaluate the quality of machine-translated text by compaing a candidate texts translation to one or more reference translation.
-- <span style="color:red">Usually The closer the BLEU score to one, the better the model. The closer to zero, the worse it is.</span>
--  To get the BLEU score, the candidates and the references are usually based on an *average* of uni, bi, tri or even four-gram precision.  Unigrams account for adequacy while longer n-grams account for fluency of the translation. 
-- Problem
-   -  <span style="color:red">BLEU doesn't consider semantic meaning, so does not take into account the order of n-gram</span>
-   -  <span style="color:red">BLEU doesn't consider sentence structure</span> .e.g "Ate I was hungry beacause!" 如果reference is "I ate because I was hungry", will get a perfect BLEU score
-
-To calculate the blue score, count how many unique words(n-grams) appear in the reference. 比如下面unigram例子, I, am 都appear in referene 
-
-
-Bervity Penalty: The brevity penalty penalizes generated translations that are too short compared to the closest reference length with an exponential decay. The brevity penalty compensates for the fact that the BLEU score has no recall term.(recall: 是不是reference 中的正确都predict了，referenece length > candidate length, no penalty )
-
-$$BP = min \left(1, e^{1- \frac{\text{ref length}}{\text{candidate length}}} \right)$$
-
-![](/img/post/Natural-Language-Processing/course4/week1pic16.png)
-
-
-BLEU Score:
-
-
-$$BLUE = BP \left(\prod_{i=1}^4 precision_i \right)^{\frac{1}{4}}$$
-
-$$precision_i = \frac{\sum_{snt \in cand} \sum_{i \in snt} min\left(m_{cand}^i, m_{ref}^i \right)}{w_t^i}$$
-
-Where: 
-
-- $$m_{cand}^i$$ , is the count of i-gram in candidate matching the reference translation.
-- $$m_{ref}^i$$  , is the count of i-gram in the reference translation.
-- $$w_{t}^i$$  , is the total number of i-grams in candidate translation.
-- $$min\left(m_{cand}^i, m_{ref}^i \right)$$ 表示比如 bigram, (I,am) 在candidate中出现5次，但在reference中只出现3次，就取3次
-
-
-下面图中的score 是乘以100后的结果
-
-![](/img/post/Natural-Language-Processing/course4/week1pic17.png)
-
-
-#### ROUGE
-
-- Recall-Oriented Understudy for Gisting Evaluation:  
-- ROUGE was originally developed to evaluate the quality of machine summarized texts, but is useful for evaluating machine translation as well. 
-- Calculates precision and recall for machine texts by counting the n-gram overlap between the machine texts and a reference text.
-- Measures precision and recall between generated text and human-created text <span style="background-color:#FFFF00">where order matters</span>
-  - precision: How much of model text was relevant
-  - Recall: How much of the reference text is the system text captures?
-- Problem:
-  - <span style="background-color:#FFFF00">Doesn't take similar themes or concepts into consideration( low ROUGE score doesn't necessarily mean the the translation is bad)</span> 比如 model predict "I am a fruit-filled pastry" 跟 reference" I am a jelly donut" 意思一样但是score低
-
-The, cat, had, orange, fur 都appear。 如果model wants a high recall score, can guess hundred of words and have the chance the words in the true reference sentence. Then precision come in.
-![](/img/post/Natural-Language-Processing/course4/week1pic14.png)
-
-![](/img/post/Natural-Language-Processing/course4/week1pic15.png)
-
-
-#### Greedy Decoding
-
-- Select the <span style="color:red">most probable</span> word at each step(每步选取最大概率的)
-- For short sequence, it is fine
-- Limitiation: Best word at each time != best for long sequence, 比如model predict 出 I am, am, am, am...  
-
-
-#### Random Sampling
-
-- Often a little too random for accurate translation 
-- Solution: <span style="background-color:#FFFF00">assign more weight to more probable words, and less weight to less probable words</span>
-- <span style="color:red">**Temperature**</span>: <span style="background-color:#FFFF00">a parameter allowing for more or less randomness in predictions. measured on scale from 0 to 1, indicating low to high randomness</span>
-  - Lower temperatue setting = More confident, conservative network. More careful/safe decision for output
-  - Higher temperatue setting = More excited, random network(and more mistakes)
-
-#### Beam Search
-
-Greedy Decoding only select one best candidate as input sequence for each time step. Model encoded the input sequence and use previous time steps translation to calculate how much attention to give each of the input words. Now it's using the decoder to predict the next translated word. Now choosing just one best candidate may not be suitable for constructing a sentence.
-
-
-- A broader, more exploratory decoding alternative that use breath first search to build a search stream.
-  - Doesn't look only at next output, but instead apply a beam width parameter to select possible options
-- Istead of offering a best output like greedy decoding, beam seach select multiple options for the best input based on conditional probability
-- Beam width B: limit the number of branching paths. Select B number of best alternatives at each time step with the highest probabilities
-  - Once have B probability, can choose the one with highest probability
-  - <span style="background-color:#FFFF00">A larger beam width -> better model performance  but slower decoding speed.</span> 
-- Problem: 
-  - Since the model learns a distribution, that tends to carry more weight than single tokens
-  - Can cause translation problems, 比如 in a speech corpus that hasn't been cleaned. 比如if have filler word "Uhm" which appear as translation with lower probability . That single element can throw off entire translation. 比如 at time step, most probable word 是 "Uhm"
-
-下面例子: assign conditional probability to each of several options for the next word in the sequence. The highest probability is the one will be chosen for each time step. 比如 "am" 是most likely next token with probability 40%. Next step, find "hungry" as the most likely token
-
-![](/img/post/Natural-Language-Processing/course4/week1pic18.png)
-
-#### Minimum Bayes Risk (MBR)
-
-1. Generate several random samples 
-2. Compare each sample against all the others and assign a similarity score (such as ROUGE!)
-3. Select the sample with the highest similarity.
-
-
-Examples: MBR Sampling, generate the scores for 4 samples:
-
-1. Calculate similarity score between sample 1 and sample 2
-2. Calculate similarity score between sample 1 and sample 3
-3. Calculate similarity score between sample 1 and sample 4
-4. Calculate weighted average of first 3 steps 
-5. Repeat until all samples (2,3,4) have overall scores
-
-
-<br/><br/><br/>
-
-## 4.2 Transformer
-
-**Neural machine translation** use neural network artchitecture: take sequential steps to encode input, start fom beginning of input make computation at every until until reach the end. At that point, decode the information following a similar sequential precedure. <span style="color:red">No parallel computing</span>. The more for input, the more time process that sentence
-
-![](/img/post/Natural-Language-Processing/course4/week2pic1.png)
-
-**Seq2Seq Architecture**: 
-
-- go through T sequential steps(<span style="background-color:#FFFF00">T is number of time-steps that model go through to process one sentence</span> ): e.g. sentence 有5个词, model will take five time stpes to encode the sentence. 
-- For large sequences: information loss, <span style="color:red">vanishing gradients problem</span>. LSTM and GRUS help a little.
-
-![](/img/post/Natural-Language-Processing/course4/week2pic2.png)
-
-**Transformer**
-
-- specially designed for 
-- transformer are based on attention, not require sequential computation per layer, only one step is needed
-- gradient from last output to the first input in a transformer is 1
-- transformer don't suffer from vanishing gradient problem which related to the length of sequence
-- transformer use Multi-headed attention layer instead of recurrent layer
-
-![](/img/post/Natural-Language-Processing/course4/week2pic3.gif)
-
-
-**Self Attention -> Multiheaded attention**
-
-- Self Attention use query, key, value obtained from every sequential inputs, 
-- Self Attention  output a same length sequential output for each input
-- Self Attention  can be think of attention model that incorporates a dense layer for every queries, keys, and values
--  Multiheaded attention: can think of a set of parallel self-attention layers which are called heads. These heads are further concatenated to produce a single output, which emulates the recurrence sequence effect with attention
-- <span style="background-color:#FFFF00">Unlike recurrent layer, multi-headed attention computes the inputs in the sequence independently then allows us to paralleize the computation. But fail to model the sequential information for a given sequence, that's why need positional encoding stage into the transformer model</span>
-
-![](/img/post/Natural-Language-Processing/course4/week2pic4.png)
-
-![](/img/post/Natural-Language-Processing/course4/week2pic5.png)
-
-**Positional Encoding**
-
-encodes each input position in the sequence(since word order and position is important for language) to retain the positional information. The positional encoding output values to be added to the embeddings. So every word given to the model, have some of information about its order and position. 下面例子中 a positional encoding vector for each word ich, bin which will tell respective position. 
-
-
-#### Tranformer Application
-
-- Text summarization
-- Auto-complete(比如打字，comple, 输出complete)
-- Named entity recognition(NER)
-- Question answering 
-- Translation
-- Chat-bots
-- Other NLP tasks e.g. Sentiment Analysis, Market Intelligence, Text Classification, Character Recognition, Spell Checking. 
-
-
-#### Dot-Product Application
-
-- For a good embedding, vectors for English and German words that mean the same are similar. 
-- Query(German) looks for similar keys(English)
-- <span style="color:red">Each key has a probability of being a query a match for the query</span>
-- The queries by keys matrix is called **attention weights**, 表示how much each key similar to each query。 比如下面例子, I simialr to Ich, get 0.8 probability. 而 am 和 Ich不像，get 0.1 probability 
-- Return sum of the keys weighted by their probabilitys。 比如下面例子, query(Ich) get ```0.8 x vec("I") + 0.1 x vec("am") + 0.1 x vec("happy")```
-  
-比如input I am happy 和 translate "Ich bin gluklich", so want to look at English sentence to find similar words, that what attention does. In attention, <span style="color:red">German word vectors are called queries</span>, because it initiate the look up, a query is matched against all keys. 每个key 得到一个match for query的概率. 
-
-![](/img/post/Natural-Language-Processing/course4/week2pic6.png)
-
-feed embedding into three Linear Layer to get 3 different vectors for queries, keys and values.
-
-![](/img/post/Natural-Language-Processing/course4/week2pic7.gif)
-
-
-For matrix Q, K, attention model calculates <span style="background-color:#FFFF00">weights or scores 表示relative importance of keys for specific query from dot product</span>. Attention weights 可以被理解为alignments score. To <span style="background-color:#FFFF00">turn these weights to probability softmax matrix is needed</span>. Finally, <span style="color:red">multiply these probabilites with values, get weighted sequence</span>(attention result)
-
-![](/img/post/Natural-Language-Processing/course4/week2pic8.png)
-
-**Math**
-
-- Query: Shape: $$L_Q$$  by D
-  - think of queries as embedding of German words, D is the embedding of word embedding, $$L_K$$: the length of German sentence
-- Keys: Shape: $$L_K$$  by D
-  -  think of keys as embedding of English words), D is the embedding of word embedding, $$L_K$$: the length of English sentence
-- Query Q assign each key a probability,<span style="background-color:#FFFF00"> measure the similarity by taking those products of vectors</span>. if dot product large -> Q and K are similar. 
-  - However, <span style="color:red">similarity number not add up to 1, cannot be used as probabilities</span>. To make attention more focused on best matching keys, use softmax
-- <span style="background-color:#FFFF00">Attenion weights: $$W_A = softmax\left(QK^T\right)$$, shape is $$L_Q x L_K$$. 每个key-query pair gets a probability</span>
-- <span style="background-color:#FFFF00">To get weighted sum, multiply by value ( often same as keys ): weight each value $$v_i$$ by the probability that key $$k_i$$ matches the query.</span>
-- Attention mechansim calculates dynamic or alignments weights 表示 relative importance of the inputs in sequence which are keys for that particular ouputs which is query. A single contect vector can be calculated using the sum of weighted vectors.
-- GPUs and TPUs is used for speed-up matrix multiplications
-
-![](/img/post/Natural-Language-Processing/course4/week2pic9.png)
-
-![](/img/post/Natural-Language-Processing/course4/week2pic10.png)
-
-
-#### Causal Attention
-
-- **Encoder/decoder Attention**: One sentence(decoder) looks at another one(encoder)
-- **Causal (self) attention**: In one sentence, words look at previous words(used for generation text/summary). 比如 “I am happy" happy look at "I" 和 "am"
-- **Bi-directional self attention**: In one sentence, words look at both previous and future words
-
-**Causal attention**: 
-
-- <span style="color:red">Queries/Keys are words from the same sentence</span>. It is used in language models where try to generate sentences.
-  - <span style="background-color:#FFFF00">Query seach among past words only</span>
-- Causal attention allow words to attend to other words that are related in various ways <span style="color:red">but not words in future </span>. 因为future word还没有generated yet can attend any words to past
-
-
-![](/img/post/Natural-Language-Processing/course4/week2pic11.png)
-
-**Math**: 
-
-- <span style="background-color:#FFFF00">add mask(a constant triangular matrix, has 0 on diagonal and 下半区, minus inifinity on in upper right ) to weights $$QK^T$$</span>
-- $$ softmax\left( QK^T + M \right)$$ shape is $$L_Q$$ by $$L_K$$, 但是这个<span style="color:red">matrix allow model attend to words in future</span>. add M  $$L_Q$$ by $$L_K$$. 因为下半部分M 为0, 所以queries attending words in the past are untouched. 其他的值都是 minus inifinity. After softmax, all minus infinity become to 0(exponential of negative infinity equal 0) -> <span style="background-color:#FFFF00">prevent words from attending to future</span>
-
-![](/img/post/Natural-Language-Processing/course4/week2pic12.png)
-
-![](/img/post/Natural-Language-Processing/course4/week2pic13.png)
-
-
-#### Multi-headed Attention
-
-- Each head uses individually different linear transformations to represent word
-- Different heads can learn different relationships between words 比如下图 have N different heads and heads are being concatenated. Each one linear transformation results in one head
-
-
-![](/img/post/Natural-Language-Processing/course4/week2pic14.png)
-
-比如下图input of multi-headed attention is triple,
-
-1. Use fully connected layer dense layer on each query, key and value to create parallel attention heads, (3个合成一个head)
-2. Split these vectors into number of heads and perform attention on them as each head was different.
-3. Then result of attention will be concatenated back together.
-4. Put through a final fully connected layer to make different heads into a joint representation(Linear绿色框). The scale dot-product is used in dot-product attention model except scale factor $$\frac{1}{\sqrt{dk}}$$
-   - $$d_k$$ is the key and query dimenion. It is a normalization prevents the gradients from the function to be extremly small when large values of $$D_k$$ is used
-
-
-![](/img/post/Natural-Language-Processing/course4/week2pic15.png)
-
-
-d_head is dimensionality for each head, linear layer create n_heads vecotr each with each size d_head, separate head don't interact with each other
-
-
-![](/img/post/Natural-Language-Processing/course4/week2pic16.gif)
-
-1. create embedding for input words
-2. calculate keys and values matrices, packing all embedding into matrix for every head
-3. Then train weight matrices one per head to obtain new weighted queries, $$W_i^Q$$: ith head weighted matrix for Query
-4. with weighted query, key and value matrices, calculate result matrix $$Z_i$$: ith head by multiply ouput weight $$W^0$$
-
-
-![](/img/post/Natural-Language-Processing/course4/week2pic17.png)
-
-A multi-headed model jointly attends to information from different representation at different positions over the projected versions of queries, keys adn values. <span style="background-color:#FFFF00">Have to apply attention model parallel</span> reach different output values. Then these output values are then concatenated and weighted.
-
-
-![](/img/post/Natural-Language-Processing/course4/week2pic18.png)
-
-#### Transformer Decoder
-
-1. Input is tokenized sentence, a vector of integer, with shift right layer to add start token
-2. Sentence get embedded with word embeddings
-   - If input shape is batch by lengths, after embedding, shape is batch by lengths by d_models(size of embedding, usually 512,1024, nowadays up to 10k or more)
-3. position decoding: add embedding the information about position. The information is to learn vector representing 1,2,3 up to max lengths that put into the model
-   - The embedded first word will get added with vector representing one, The embedded second word will get added wit vector representing two, produce so called positional input embedding 
-4. multi-headed attention layer
-   - This model process each word, each position in the input sequence from positional input embedding . The attention itself searches other positions in the sequence to help identify relationships. Each word in the sequence is weighted
-   - Each layer of attention, there is a resuidual connection around it, followed by a layer normalization step to speed up training and significantly reduce overall processing time
-   - Then Each word is passed through a feed-forward layer, that's embeddings are fed into a neural network. Then add drop out at the end as regularization
-   - A layer normalization step is repeated N times.(下图2 N表示的位置)
-   - Finally the encoder layer output is obtained
-5. Feed-forward layer with ReLU:
-  - Some non-linear transformation are introducted by fully connected feed-forward layers with ReLu activation function for each input have shared parameters for efficiency 
-  - The feed forward neural network output vectors will replace the hidden states of original RNN encoder.
-6. After each attention and feed-forward layer, put a residual or skip connection. Add inputs of that layer to its output and perform layer normalization
-7. Step 4,5,6 重复 N times
-8. Final a dense(fully-connected) layer for outputs and a softmax layer, output batch by length by vocabulary size
-9.  calculate 记录 softmax for corss entropy loss
-
-![](/img/post/Natural-Language-Processing/course4/week2pic19.png)
-
-![](/img/post/Natural-Language-Processing/course4/week2pic20.png)
-
-![](/img/post/Natural-Language-Processing/course4/week2pic21.png)
-
-
-#### Transformer Summarizer
-
-Use Transformer model to produce the summary for article. Transformer predict next work and your inputs in news article. At test or inference time, input the ```article <EOS>``` token(first word of the summary) to the model ask for next word. Then ask for next work and next by random sampling until get ```<EOS>``` When run transformed model, generates a probability distrbution over all possible words. Will sample from this distribution. So each time get a different summary. 
-
-![](/img/post/Natural-Language-Processing/course4/week2pic23.png)
-
-- Input: tokenized as a sequence of integers. 0 表示 padding, 1 表示 EOS
-- Loss weights: 0s until the first ```<EOS>``` and then 1 on the start of the summary
-  - Don't want a huge loss because its not able to predict the correct one
-  - Instead of averaging the loss for every word in the whole sequence, weight the loss for the words within the article with 0s and ones within the summary with 1s. So model only focus on summary
-  - However, little data for summaries, actually helps to weight the article loss with nonzero number 比如 0.2, 0.5, or even 1. model able to learn word relationship that are common in the news
-
-```python
-#article, summary integer vector
-
-joint = np.array(list(article) + [EOS, SEP] + list(summary) + [EOS])
-mask = [0] * (len(list(article)) + 2) + [1] * (len(list(summary)) + 1) # Accounting for EOS and SEP
-
-```
-
-![](/img/post/Natural-Language-Processing/course4/week2pic22.png)
-
-Cost function: cross entropy function that ignores the words from the article to be summarized
-
-$$J = -\frac{1}{m} \sum_j^m \sum_i^K y_j^i log \hat y_j^i $$
-
-where j: over summary. i: batch elements
-
-<br/><br/><br/>
-
-
-
-## 4.3 Question Answering
-
-![](/img/post/Natural-Language-Processing/course4/week3pic2.png)
-
-
-#### Transfer Learning
-
-
-![](/img/post/Natural-Language-Processing/course4/week3pic1.gif)
-
-Transfer Learning:  e.g. use pretrain model (movie review) on course review. 
-
-- Reduce training time, faster convergence
-- Improve predictions
-- require a small datasets, because model learn a lot from other tasks
-
-
-![](/img/post/Natural-Language-Processing/course4/week3pic3.png)
-
-Two methods in Transfer learning
-
-- feature based method, word vectors(use pretrain CBOW(embedding) weights as word vectors)
-- fune tuning method , 
-  - take a exisitng weights as initialized weights and fine tune them on new task
-  - <span style="background-color:#FFFF00">Add a new layer and only fine tune new layer keep other layer frozen</span> 比如 movie review predict 3 ratings, course review provide 5 ratings, add a new layer to match new dimension(5)
-
-![](/img/post/Natural-Language-Processing/course4/week3pic4.png)
-
-![](/img/post/Natural-Language-Processing/course4/week3pic5.png)
-
-Generaly, a bigger data, a larger model -> better performance. 比如 unlabeled data 大于 label data.  
-
-- 对于unlabeled data 用于 pre-training. 比如CBOW, learn the word from the context(self-supervised learning)
-- labelled data 用于 downstream task using the model weights, 比如 what day is today, model predict March 14th
-
-![](/img/post/Natural-Language-Processing/course4/week3pic6.png)
-
-
-The model that is trained bidirectionally may have a deeper sense of context and language flow than unidirectional models.
-
-#### ELMo, GPT, BERT, T5
-
-**ELMo**: CBOW using C as windows size, ELMo use full context using RNN (<span style="color:red">Bi-directional</span> LSTM), suffer from long-term dependency 
-
-![](/img/post/Natural-Language-Processing/course4/week3pic7.png)
-
-**GPT**(Decoder): uni-directional. In transformer, using self-attention(Each word can peek at itself), but in GPT, only look at previous attention(No peeking)
-
-
-
-**BERT**: decoder, bi-drectional
-
-BERT Pre-training Tasks:
-
--  Multi-Mask Langauage modelling. 比如 mask 两个词在sentence中，让model 学会predict 这两个词
--  Next sentence Prediction. Given Sentence A, 然后给几个选项, predict which onesentence B
-
-**T5** using Encoder & Decoder
-
-![](/img/post/Natural-Language-Processing/course4/week3pic8.png)
-
-![](/img/post/Natural-Language-Processing/course4/week3pic9.png)
-
-
-#### BERT
-
-- A multi layer bidrectional transformer
-- Use positional embeddings
-- Famous model is BERT_base, has: (New model come out now has more parameters)
-    - 12 layers(12 transformer blocks)
-    - 12 attentions heads
-    - 110 million parameters
-
-1. Start with Embedding $$E_1, E_2 ... E_N$$
-2. Go to Transformer block(图中的蓝色圈)
-3. Get $$T_1, T_2 ... T_N$$
-
-![](/img/post/Natural-Language-Processing/course4/week3pic10.png)
-
-- Pretraining: use unlabelled data over different pretraining tasks
-  - Mask language modelling(MLM) : (mask 15% percent of words) , train data generator choose 15% of these positions at random for prediction. Mask them 80% of the time, replace them with a random token 10% of the time, then keep as is 10% of the time.  Note: could be multiple masked spans in a sentence. 
-    - Add a Dense layer after encoder outputs, multiply output vector by the embedding matrix then transform them into vocabulary dimension and add softmax at the end
-  - Next sentence prediction is also used when pre-training: Given two sentences, if true means two sentence follow one another.
-- Fine-tuning: initialized with pre-trained parameters and all of pararmeters are fine-tuned using labeled data from downstream tasks
-
-**Objective**
-
-1. start with positional embedding which indicate the position in the sentence of the word
-2. Then have segment embeddings: 表示if it is sentence A or setnence B
-3. Then have token embedding, have CLS token 表示beginning of sentence 和 SEP token 表示 end of sentence. 
-4. Take the sum of those embedding to get a new input
-
-![](/img/post/Natural-Language-Processing/course4/week3pic11.png)
-
-$$T_i$$ embedding are used to predict masked word using softmax. 绿色的C embedding are used for next sentence prediction
-
-![](/img/post/Natural-Language-Processing/course4/week3pic12.gif)
-
-![](/img/post/Natural-Language-Processing/course4/week3pic13.png)
-
-
-**Fine Tuning**
-
-![](/img/post/Natural-Language-Processing/course4/week3pic14.gif)
-
-
-#### T5
-
-T5 transformer known as Text to Text transformer. Can used for 
-
-- Classification
-- Question Answering
-- Machine Translation
-- Summarization
-- Sentiment
-
-Model Architecture: Use Encoder/decoder, 12 transformer blocks each, 220 million parameters
-
-- Sbasic encoder-encoder representation. Fully visible attention in encoder and causal attention in decoder
-- Language model with single transformer layer stack which are fed the concatenation of inputs and target, use causal attention
-- Prefix Language model allow fully visible masking over inputs and causal masking
-
-![](/img/post/Natural-Language-Processing/course4/week3pic15.png)
-
-
-- Examples-proportional mixing, 每个dataset 不管多大多小，都take 10%
-- Example mixing, regardless size of data, take equal sample
-- Temperature scaled mixing: play the parratmeters to get something between Examples-proportional mixing and Example mixing
-
-![](/img/post/Natural-Language-Processing/course4/week3pic16.png)
-
-**Graudal Unfreezing**: freeze one layer at a time.  比如下图 freeze last layer, fine-tuned using that keep other fixed. Then freeze 倒数第二个... gradual freezing each layer
-
-![](/img/post/Natural-Language-Processing/course4/week3pic17.gif)
-
-**Adapter layers**: add existing neural network or a neural network to each feed forward and each block of the transformer. Then these new feed forward networks designed that output dimension match input, allows them to be inserted without having ay structural change。 <span style="background-color:#FFFF00">When fine-tuning, only new adapter layers and layer normalization are updated</span>
-
-![](/img/post/Natural-Language-Processing/course4/week3pic18.png)
-
-A single model can simultaneously perform many tasks at once. Model most of parameters are shared across all of the tasks. Might train a single model on many tasks, but when reporting performance, can select different checkpoints for each task. Do the train at 2^18 steps
-
-![](/img/post/Natural-Language-Processing/course4/week3pic19.png)
-
-#### GLUE Benchmark
-
-GLUE: General Language Understanding Evaluation
-
-- A collection used to train, evaluate, analyze natural language understanding systems
-- has a lot of datasets. Each Dataset with different genres, and of different size and difficulties. 比如some are for coreference resolution, other used for simple sentiment analysis
-- Used with a **leaderboard**: people can use dataset, see how well models perform compared to others
-
-
-Tasks Evaluated on
-
-- Sentence grammatical or not? Sentence make sense or not?
-- Sentiment
-- Paraphrase
-- Similarity
-- Questions duplicates
-- Answerable: whether question can be answered or not?
-- Contradiction
-- Entailment
-- Winograd: try to identify whether a pronoun refer to a certain noun or another noun. 
-
-Evaluation / Application
-
-- researchers use GLUE as a benchmark
-- Model agnostic, doesn't matter which model you used 
-- allow use of transfer learning because have access to several datasets
-
-
-<br/><br/><br/>
-
-## 4.4 Chatbot
-
-Long Text Sequence: Chanllenges due to size in training.
-
-- Writing Books: 变得困难辨认 book written by human or AI
-- Chatbots: 变得困难辨认 conversation you have real or computer
-
-[AI Storytelling](https://play.aidungeon.io/main/landing): Dragon model for Dungeon is based on GPT-3. It generates an interactive story based on all previous turns as inputs. That makes for a task that uses very long sequences.
-
-Process long text sequence is core of chatbot. Chatbot use all previous pieces of converversation as inputs for next reply -> big context windows
-
-- Context-based question: need both a question and relevant text from where to retrieve answer
-- Close loop question. no need extra text with a question or prompt from human. All knowledge is stored in weights of model during training 
-  
-#### Transformer Issues
-
-- Attention on sequence of Length L takes $$L^2$$ time and memory. 比如attention on two sentences of length L, need to compare each word in first sentence to each word in second sentence. 比如 L = 10000, $$L^2$$ = 100 M, 如果每秒process 10M, take 10 sec to compute
-- N layers take N times as much memory. e.g. GPT-3 has 96 layers and new models will have more. Even modern GPU can struggle this dimensionality
-- **Attention Complexity**: Attention is $$softmax\left( QK^T \right)V$$, Q,K,V are all size L by $$d_model$$, Then $$QK^T$$ size is L by L. For long sequence, usually don't need consider all L positions, instead focus on area of interest. 比如translate a long text from English to German, don't need to consider every word at once. Instead focus on single word being translated and those immediately around it by using attention. 
-- <span style="background-color:#FFFF00">The more layer model has, the more memory need.</span> 这是因为需要store forward pass, acivation for backprop. Can overcome this memory requirements by recomputing activations, 但是需要done efficiently to minimize taking too much extra time. 比如GPT-3 has 96 layers 会take a very long time to recompute activations, and model will continue to get bigger.
-  - Compute vs memory tradeoff
-
-
-**Solve Dot product Attention Complexity**
-
-e.g. 比如下图，can see what attention is doing, 比如word it, attention focus on certain words to determine if it refers to the streets or to be animal. it 只能refer to noun not other words 可以ignore other word. A pronoun(it) is a word that substitutes for a noun. That's why only want to look up nearest neighbor to speed up attention
-
-
-![](/img/post/Natural-Language-Processing/course4/week4pic1.png)
-
-**Nearest Neighbors**: Compute the nearest neighbors to q among vectors {$$k_1, ...k_n$$}
-
-- Attention computes $$d\left(q,k_i \right)$$ for i from 1 to n which can be slow 
-- Faster approximate uses locality sensitive hashing(LSH)
-  - Locality sensitive: if q is close to $$k_i$$ -> hash(q) == hash($$k_i$$)
-  - <span style="background-color:#FFFF00">When choose hash, want to make buckets roughly the same size</span>
-  - only run attention on keys that are in the same hash buckets as the query (就像上边 noun 和 pronoun的例子)
-  - Achieve by randomly cutting space: hash(x) = sign(xR) where R: [d,n_hash_bins]. R is random, size 是 d(dimension) 乘以 number of hash bins. Sign tell which side of the plane hash will be on. The process is repeated depending on the number of hashes you have
-
-#### LSH Attention
-
-**Standard Attenion**:
-
-$$A\left(Q,K,V\right) = softmax\left(Qk^T\right)V$$
-
-**LSH Attention**: <span style="background-color:#FFFF00">Note LSH is a probabilistic, not deterministic model 因为inherent randomness within LSH algorithm. Meaning hash can change along with buckets that vector map to</span>
-
-1. First hash Q and K 
-2. perform standard attention but within same-hash bins. This reduces the search space for each K to the same LSH bucket as Q. Can repeat this process multiple time to increase the probability of finding Q and K in the same bin. 可以done efficiently by parallel computing
-
-Integrate LSH to attention layer:
-
-1. modify model so outputs a single vector at each position which serves both as a query and a key. Called QK attention and performs just as regular attention
-2. map each vector to a bucket with LSH. 
-3. Sort vectors by LSH bucket
-4. Do attention only in each bucket. Use batch(parallel) computation
-  1. split sorted sequence into fixed size chunks which allow parallel computation
-  2. Let each chunk attend within itself and adjacent chunks(比如图中 blue 相互计算, 黄色相互计算, 红色相互计算) 因为一个hash bucket may split more than one chunk
-
-
-### Reversible Layers:
-
-<span style="color:red">Memory grow linearly with the number of layers</span>
-
-比如 want to run transformer on entire text of book, 也许有 1 million token to process. each token has associated feature size 512 (比如embedding) -> model input就有 2 GB, 在16GB的GPU, 相当于1/8 not touch layer yet. 而layer 有transformer layer and feedforward layer. 比如model 有 12个attention, 12个feedforward. 每个layer input 和 output 也是2GB, do backprop, forward path需要store intermediate quantities in meomory. 比如只save activation from boundaries between each layers 不保存individual layer就已经50GB (任何device 都不能fit) 而modern transformer much deeper than 12 layers
-
-![](/img/post/Natural-Language-Processing/course4/week4pic3.gif)
-
-Transformer network precedes by adding residuals to hidden state. To run reverse, can substract residuals in oppsite order, start with outputs of model. Instead of store residuals, able to recompute quickly instead where residual connection come in.<span style="color:red"> Key idea is start with two copies of model inputs, then each layer only update one</span>. The activation don't update is the one to compute residuals. 
-
-Compute using one side of network plus feed foward from other side to compute $$y_2$$, similarly one side of network plus attention to computer other side to compute $$y_1$$
-
-![](/img/post/Natural-Language-Processing/course4/week4pic4.png)
-
-Foward layer for residual block: combine standard attention and feed forward residual layers from regular transformer to a single reversible residual block and nothing save in the memory except for $$y_1, y_2$$ for output layer instead of activiation for every individual layer  
-
-
-
-![](/img/post/Natural-Language-Processing/course4/week4pic5.png)
-
-#### Reformer
-
-Reformer is a transformer model designed to be memory efficient so it can handle very large context windows of upto 1 million words.
-
-- use LSH Attention: reduce complexity of attending over long sequences
-- use Reversible Residual Layers:  more efficienctly use memory available
-
-下面图from Reformer paper, highlight standard attention takes longer as sequence length increases. However, LSH attention takes roughly the same amount of time as sequence increase. The only difference is number of hashes. More hashes take slightly longer than fewer hashes, regardless of seqeunce sequence, 
-
-![](/img/post/Natural-Language-Processing/course4/week4pic6.png)
-
-
-## Resource
-
-[Jukebox - A neural network that generates music!](https://openai.com/blog/jukebox/)
-
-[GPT-3 Can also help with auto-programming!](https://beta.openai.com/?app=productivity&example=4_2_0)
-
-
-[Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer (Raffel et al, 2019)](https://arxiv.org/abs/1910.10683)
-
-[Reformer: The Efficient Transformer (Kitaev et al, 2020)](https://arxiv.org/abs/2001.04451)
-
-[Attention Is All You Need (Vaswani et al, 2017)](https://arxiv.org/abs/1706.03762)
-
-[Deep contextualized word representations (Peters et al, 2018)](https://arxiv.org/pdf/1802.05365.pdf)
-
-[The Illustrated Transformer (Alammar, 2018)](http://jalammar.github.io/illustrated-transformer/)
-
-[The Illustrated GPT-2 (Visualizing Transformer Language Models) (Alammar, 2019)](http://jalammar.github.io/illustrated-gpt2/)
-
-[BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding (Devlin et al, 2018)](https://arxiv.org/abs/1810.04805)
-
-[How GPT3 Works - Visualizations and Animations (Alammar, 2020)](http://jalammar.github.io/how-gpt3-works-visualizations-animations/)
