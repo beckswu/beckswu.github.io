@@ -1023,7 +1023,7 @@ Faster Algorithms:
 
 #### One Shot Learning
 
-One Shot Learning problem: for most face recognition applications, you need to be able to recognize a person given just one single image. Historically, deep learning don't work well if have only one training example.
+<span style="background-color:#FFFF00">**One Shot Learning problem**: for most face recognition applications, you need to be able to recognize a person given just one single image. </span>Historically, deep learning don't work well if have only one training example.
 
 Instead to train softmax to learn 100 people in database, use **similarity function**
 

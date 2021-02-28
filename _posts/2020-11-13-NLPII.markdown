@@ -19,11 +19,11 @@ tags:
 ## 3.1 Trax: Neural Networks
 
 
-Neural Network predict positive/negative tweets, structure:
+Neural Network predict tweets sentiment, structure:
 
-- Initial Representation for neural network is a vector of Integers, <span style="background-color:#FFFF00">List all word from vocabulary then assign integer index to each of word. Then need to 知道 maximum vector size then fill zeros to match that size (called **padding**: ensures that all vector have the same size even if your tweets don't)</span>
-- has a embedding layer that transform the representation 
-- has another hidden layer with a ReLU activation function 
+- Input is a vector of Integers, assign each word based on index from vocabulay and apply padding set length as maxlen of sentence of the tweet
+- Embedding layer: transform the representation 
+- Hidden layer with a ReLU activation function 
 - output layer with softmax function that give probabilities for whether a tweet is positive or negative sentiment
 
 This structure allow to predict complex tweets: 比如 "This movie was almost good". 不能 classify correctly using simpler method 比如 Naive Bayes
@@ -44,18 +44,14 @@ List the layer from left to right. Note Dense layer(fully-connected layer): A ma
 **Advantage: (Trax is based on Tensorflow, use Tensorflow as a backend, also use JAX library to speed up computation)**
 
 - <span style="background-color:#FFFF00">Run fast on CPUs, GPUs and TPUs</span>(perform computations efficiently), don't need to change a single line of code for running on CPU, GPU, TPU
-- <span style="background-color:#FFFF00">allow parallel computing</span>: allow model running on multiple machines or courses simultaneously
-- Record algebraic computations for gradient evaluation, so they <span style="background-color:#FFFF00">compute gradient automatically</span>. 
-
+  - Run code fast (than tensorflow / PyTorch): Trax can run on-demand or preemptible Cloud without changing a single line of code 
+- <span style="background-color:#FFFF00">allow parallel computing</span>: allow model running on multiple machines or cores simultaneously
+- Record algebraic computations for gradient evaluation, so they <span style="background-color:#FFFF00">compute gradient automatically</span>.
+- Makes programmers efficient: Easy to Debug and understand (code structure like original paper)
 
 Trax Development History: TensorFlow (2014-2015) -> Translate(2016, long time to train, not practical for anyone else other than Google) -> Tensor2Tensor(2017, userd by many large companies in the word. Complicated but not nice to learn, hard for new researchers) -> Trax
 
 Trax： Deep Learning library with Clear Code and Speed
-
-What do you want from a deep learning library? 
-
-- Makes programmers efficient: Easy to Debug and understand 
-- Run code fast: Trax can run on-demand or preemptible Cloud without changing a single line of code 
 
 
 Some Resource
@@ -145,7 +141,11 @@ print(e2[0].shape) # (3, 4)
 
 ![](/img/post/Natural-Language-Processing/course3/week1pic7.png)
 
-**Embedding Layer**: map words from vocabulary to representation of that word with determined dimension, 下面例子 embedding size = 2,
+**Embedding Layer**: map words from vocabulary to representation of that word with determined dimension, 下面例子 embedding size = 2.
+
+- In Trax, model learn representation of embedding that give the best performance. 
+- Size of weight = `Vocabulary size x # Embedding`
+- <span style="background-color:#FFFF00">size of embedding is **hyperparameter**</span> in the model
 
 ![](/img/post/Natural-Language-Processing/course3/week1pic8.png)
 
@@ -186,7 +186,7 @@ display(np.mean(tmp_embed,axis=1)) # DeviceArray([2., 5.], dtype=float32)
 - function ```grad``` return a function that computes the gradients of f
   - allows much easier training
 - forward and backward in a single line 
-  - Notice the double parentheses, 第一个是 passes the arguments for the grad function, 第二个是arguments for function returned by grad
+  - Notice the double parentheses, 第一个是 pass grad function, 第二个pass是arguments returned by grad
 
 ![](/img/post/Natural-Language-Processing/course3/week1pic10.png)
 
@@ -195,7 +195,7 @@ display(np.mean(tmp_embed,axis=1)) # DeviceArray([2., 5.], dtype=float32)
 
 ## 3.2 RNN for Language Modeling
 
-**Problem with N-grams**: for N grams, model have to account for conditional probabilites for long sequences, difficult to estimate for long corpora: Need a lot of space and RAM. e.g. if user download app, may not have enough space. 
+**Problem with N-grams**: for N grams, model <span style="background-color:#FFFF00">have to account for conditional probabilites for long sequences, difficult to estimate for long corpora</span>: Need a lot of space and RAM. e.g. if user download app, may not have enough space to store n-grams. 
 
 ![](/img/post/Natural-Language-Processing/course3/week2pic1_1.png)
 ![](/img/post/Natural-Language-Processing/course3/week2pic1_2.png)
@@ -209,15 +209,18 @@ e.g. 下面例子，tri-gram probabable choose "have": because "*did not have*" 
 ![](/img/post/Natural-Language-Processing/course3/week2pic2_1.png)
 ![](/img/post/Natural-Language-Processing/course3/week2pic2_2.png)
 
-- Each box represent the computation made at each steps and colors represent the information used for every computation. 
-- Every word in the sequence is multiplied by the same weight $$W_x$$, the informatin propagate from the beginning to the end is multiplied by $$W_h$$. 
+- Each box represent the computation made at each steps and colors represent the information used for every computation. The computation at the last step have the information from all the words in the sentence 
+- Every word in the sequence is multiplied by the same weight $$W_x$$, the information propagate from the beginning to the end is multiplied by $$W_h$$. 
 - The block is repeated for every word in the sequence. The only learning parameters are $$W_x, W_h$$. They compute values that are fed over and over again until the prediction is made.
+
+<span style="background-color:#FFFF00">Advantage of RNN</span>
+- RNN model relationships among distant word
 - Note:An RNN would have the same number of parameters for word sequences of different lengths. (<span style="color:red">**Computations share parameters**</span>)
 
 ![](/img/post/Natural-Language-Processing/course3/week2pic3.gif)
 
 
-Many to Many architecture, at each time step, <span style="background-color:#FFFF00">two inputs, x, hidden state h</span>. Make a prediction $$\hat y$$. Additionally, it propagate a new hidden state to the next time-step. The hidden state at every time t is computed with an activation function g
+Many to Many architecture, at each time step, <span style="background-color:#FFFF00">two inputs, x, hidden state h</span>. Make a prediction $$\hat y$$. Additionally, it propagate a new hidden state to the next time-step. The hidden state at every time t is computed with an activation function g. After computing the hidden state at time t, possible to get the prediction $$\hat y$$ by using an activation function g 
 
 
 $$ \begin{align}   h^{<{t}>}& = g\left(W_h \left[  h^{<{t-1}>},  x^{<{t}>} \right] + b_h \right) \\
@@ -230,16 +233,20 @@ $$ W_h = \left[W_{hh} \mid W_{hx} \right] \quad \color{red}{\text{Horiztonal Sta
 
 $$\left[  h^{<{t-1}>},  x^{<{t}>} \right]= \left[ \frac{h^{<{t-1}>}}{x^{<{t}>}} \right] $$
 
+$$ \hat y^{<{t}>} = g \left( W_{y_h} h^{<{t}>} + b_h \right)$$
+
+Many-to-many architecture 
 
 ![](/img/post/Natural-Language-Processing/course3/week2pic5.png)
 
+First step of the RNN
 
 ![](/img/post/Natural-Language-Processing/course3/week2pic6_1.png)
 ![](/img/post/Natural-Language-Processing/course3/week2pic6_2.png)
 
 e.g. if $$ h^{<{t}>}$$ size is 4 x 1, $$ x^{<{t}>}$$ size is 10 x 1, what is the size of $$W_h$$, given  $$ h^{<{t}>} = g\left(W_h \left[  h^{<{t-1}>},  x^{<{t}>} \right] + b_h \right)$$
 
-Q: 4 x 14
+Q: `4 x 14`. In deep learning framework, it is `14 x 4`
 
 
 
@@ -278,13 +285,19 @@ $$ J = -\frac{1}{T} \sum_{t=1}^T \sum_{j=1}^K y_j^{<{t}>} log \hat y_j^{<{t}>} $
 
 #### Scan Function
 
-- Scan function is to take a function fn( equivalent to 下图中的 $$f_w$$), and apply to all the elements from beginning to end in the list ```elems``` ($$x^{<{t_1}>}, x^{<{t_2}>} ... x^{<{T}>}$$))
-- Initializer (the hidden state $$h^{<{t_0}>}$$) is an optimal variable that could be used in the first computation of fn
+- Scan function is to take a function `fn`( equivalent to 下图中的 $$f_w$$), and apply to all the elements from beginning to end in the list ```elems``` ($$x^{<{t_1}>}, x^{<{t_2}>} ... x^{<{T}>}$$))
+- ```elems``` is all the input through the time
+- Initializer (the hidden state $$h^{<{t_0}>}$$) is an optimal variable that could be used in the first computation of `fn` （下图的中fn 是 $$f_W$$)
 - Function first initialize hidden states $$h^{<{t_0}>}$$, set ys as an empty list  
-- For every x in the list of elements, fn is called with x and the last hidden state as arguments, 
+- For every x in the list of elements, `fn` is called with x and the last hidden state as arguments, 
 - For loop computes every time step for RNN, stores prediction value and hidden states
 - Finally, function <span style="color:red">returns a list of predictions, and last hidden state</span>
-- <span style="color:red">Framework like Tensorflow need this type of abstraction in order to perform **parallel computing** and run on GPUs.</span>
+- <span style="color:red">Framework like Tensorflow need this type of **abstraction** in order to perform **parallel computing** and run on GPUs.</span>
+
+<span style="background-color:#FFFF00">**Advangtage of Scan function**</span>:
+
+- <span style="background-color:#FFFF00">Faster training</span>
+- <span style="background-color:#FFFF00">Allow parallel computing</span>
 
 ![](/img/post/Natural-Language-Processing/course3/week2pic9.png)
 
@@ -304,21 +317,74 @@ $$h^{<{t}>} = \Gamma_u *  h^{<{t}>} + \left( 1- \Gamma_u\right) * h^{<{t-1}>} $$
 $$y^{<{t}>} = g\left(W_y  h^{<{t}>} + b_y \right)$$
 
 
-1. The first two computation in GRU are <span style="background-color:#FFFF00">**relevance gates**</span>. $$\Gamma_r, \Gamma_u $$ computed from sigmoid function. <span style="color:red">The output help determine which information from the previous hidden state is relevant and which values should be updated with current informations</span>
+1. The first two computation in GRU are <span style="background-color:#FFFF00">**relevance gate**</span> $$\Gamma_r$$,  <span style="background-color:#FFFF00">**update gate**</span> $$\Gamma_u $$ computed from sigmoid function. The output vectors of value are between 0 and 1. <span style="color:red">The output help determine which information from the previous hidden state is relevant and which values should be updated with current informations</span>
 2. <span style="background-color:#FFFF00">Update gate determines how much of information from the previous hidden state will be overwrited</span>. 
-3. a prediction $$\hat y$$ is computed using current hidden state
+3. $$h^{'<{t}>} $$ is a hidden state candidate that could overwrite previus hidden state
+4. a prediction $$\hat y$$ is computed using current hidden state
 
 ![](/img/post/Natural-Language-Processing/course3/week2pic10.png)
 
-Vanilla RNN vs GRUS: 
+**Vanilla RNN vs GRUs**: 
 
 - **Problem with Vanilla**: update the hidden state at every time step, for a long sequences, information tends to vanish. So called <span style="background-color:#FFFF00">**vanishing gradients problem**</span>
-- GRUs compute significantly more operations, can cause longer processing times and memory usage. <span style="background-color:#FFFF00">GRUS help preserve important information for longer sequences</span>. 
+- GRUs compute significantly more operations, can cause longer processing times and memory usage. <span style="background-color:#FFFF00">GRUS help preserve important information for longer sequences</span> by deciding how to update the hidden state. 
 
 ![](/img/post/Natural-Language-Processing/course3/week2pic11_1.png)
 
 ![](/img/post/Natural-Language-Processing/course3/week2pic11_2.png)
 
+
+```python
+mode = 'train'
+vocab_size = 256
+model_dimension = 512
+n_layers = 2
+
+GRU = tl.Serial(
+      tl.ShiftRight(mode=mode), # Do remember to pass the mode parameter if you are using it for interence/test as default is train 
+
+      tl.Embedding(vocab_size=vocab_size, d_feature=model_dimension),
+
+      [tl.GRU(n_units=model_dimension) for _ in range(n_layers)], # You can play around n_layers if you want to stack more GRU layers together
+
+      tl.Dense(n_units=vocab_size),
+      tl.LogSoftmax()
+    )
+
+
+def show_layers(model, layer_prefix="Serial.sublayers"):
+    print(f"Total layers: {len(model.sublayers)}\n")
+    for i in range(len(model.sublayers)):
+        print('========')
+        print(f'{layer_prefix}_{i}: {model.sublayers[i]}\n')
+        
+#show_layers(GRU)
+
+#Total layers: 6
+
+# ========
+
+#  Serial.sublayers_0: ShiftRight(1)
+
+# ========
+
+# Serial.sublayers_1: Embedding_256_512
+
+# ========
+
+# Serial.sublayers_2: GRU_512
+
+# ========
+
+# Serial.sublayers_3: GRU_512
+
+# ========
+
+# Serial.sublayers_4: Dense_256
+
+# ========
+
+```
 
 #### Deep Bidiretion RNN
 
@@ -328,27 +394,28 @@ e.g. 比如下面例子blank 来自于后下文
 
 Could have another architecture where the information flow from end to beginning. 
 
-- <span style="background-color:#FFFF00">Information flows from the past(from left to right) and from the future(from right to left) independently</span>
+- <span style="background-color:#FFFF00">Information flows from the past(from left to right) and from the future(from right to left) independently</span> (acyclical graph)
 - Get prediction $$\hat y$$, <span style="color:red">have to start propagate information from both directions</span>
-- After compution all the hidden states for both directions, can get all of remaining predictions. 
+  - After compution all the hidden states for both directions, can get all of remaining predictions. 
 
 $$y^{<{t}>} = g\left(W_y  \left[ \vec h^{<{t}>}, \overleftarrow h^{<{t}>} \right]  + b_y \right)$$
 
 ![](/img/post/Natural-Language-Processing/course3/week2pic13.gif)
 
-Deep RNNs are similar to deep neural networks. Deep RNN have a layer which takes input sequence x and multiple additional hidden layers. Like RNN **stack** together
+**Deep RNNs** are similar to deep neural networks. Deep RNN have a layer which takes input sequence x and multiple additional hidden layers. Like RNN **stack** together. 
+
+- Deep RNNs have more than one layer, which helps in complex tasks
 
 $$h^{\left[l \right]<{t}>} = f^{\left[l \right]} \left(W_h^{\left[l \right]}  \left[ h^{\left[l \right]<{t-1}>} , a^{\left[l-1 \right]<{t}>}  \right]  + b_h^{\left[l \right]}  \right)$$
 
 $$a^{\left[l \right]<{t}>} = f^{\left[l \right]} \left(W_a^{\left[l \right]} h^{\left[l \right]<{t}>}   + b_a^{\left[l \right]}  \right)$$
 
-1. Get hidden states for current layer: Af first progragate information through time. 
+1. Get hidden states for current layer: At first progragate information through time. 
 2. pass the activations to next layer. Go deeper in the network and repeat the process for each layer until get prediction
   
 
 ![](/img/post/Natural-Language-Processing/course3/week2pic14_1.png)
 ![](/img/post/Natural-Language-Processing/course3/week2pic14_2.png)
-
 
 ## 3.3 LSTMs and Named Entity Recognition
 
@@ -362,7 +429,7 @@ $$a^{\left[l \right]<{t}>} = f^{\left[l \right]} \left(W_a^{\left[l \right]} h^{
 - Struggles with longer sequence
 - Prone to vanishing or exploding gradients: This can arise <span style="color:red">due to the fact that RNN progagates information from the beginning of the sequence to the end</span>. 
   - Starting with first words, the first values are computed(下图橙色框). Then it propagates some computed information takes the second word in the sequence, an gets new value(下图绿色框). Final steps, computations contain information from all the words in the sequence, then RNN predict next word. 
-  - <span style="color:red">Notice: the information from first step doesn't have much influence on the output.</span>. Can see Orange portion from the first step decrease with each new step. Because computation at the first steps don't have much influence on the cost function. 
+  - <span style="color:red">Notice: the information from first step doesn't have much influence on the output.</span>  Orange portion from the first step decrease with each new step, and <span style="background-color:#FFFF00">**the computation at the first steps don't have much influence on the cost function**</span>. 
 
 ![](/img/post/Natural-Language-Processing/course3/week3pic1.png)
 
@@ -374,11 +441,11 @@ Backprop:  The derivatives from each layer are multiplied from back to front in 
 
 Solution: 
 
-- **Identity RNN with ReLU activation**: Initialize weights as indentity matrix: what it does, copy previous hidden state, add information from current inputs and replace any negative values with 0. Has effects of your network to stay close to the values in the indentity matrix which act like 1s during matrix multiplication
+- **Identity RNN with ReLU activation**: Initialize weights as indentity matrix: what it does, copy previous hidden state, add information from current inputs and replace any negative values with 0. Has effects of your network to stay close to the values in the **indentity matrix** which act like 1s during matrix multiplication
   - <span style="background-color:#FFFF00">**only works for vanishing gradients**</span>, as derivatives of ReLu = 1 for all values greater than 0
 - **Gradient clippings**: simply choose a relevant value that clip the gradients e.g. 25. Using this technique, any value grater than 25 will be clipped to 25
   - <span style="background-color:#FFFF00">**works for exploding gradients**</span>. serves to limit the magnitute of gradients. 
-- **Skip connections**: provide a direct connection to earlier layers, effectively skips over activation functions, add values from initial inputs x to outputs, e.g. F(x) + x. so <span style="background-color:#FFFF00">activations from eariler layers have more influence over the cost function</span>
+- **Skip connections**: provide a direct connection to earlier layers, effectively skips over activation functions, add values from initial inputs x to outputs, e.g. F(x) + x. so <span style="background-color:#FFFF00">activations from eariler layers have more influence over the **cost function**</span>
 
 
 ![](/img/post/Natural-Language-Processing/course3/week3pic3.png)
@@ -403,9 +470,9 @@ LSTM: special variety of RNN handle entire sequences of data by learning when to
 
 -  cell state $$c^{<{t_0}>}$$: can think of cell as memory of your network, carrying all the relevant information down the sequence. 
   - As cell travels, each gate adds or removes information from cell state
-- The series of gates allows gradients to flow unchanged. -> so <span style="background-color:#FFFF00">vanishing/exploding gradient is mitigated</span>
+- Three hidden states gates. Gates allows gradients to flow unchanged. -> so <span style="background-color:#FFFF00">vanishing/exploding gradient is mitigated</span>
   - Forget gate decides what to keep
-  - Input gate decides what ot add
+  - Input gate decides what to add
   - Output gate decides what the next hidden state will be
 
 Structure:
@@ -436,15 +503,15 @@ NER: Named Entity Recognition: fast and efficient way to scan text for certain k
 Application:
 
 - **Search engine efficiency**: NER models scan millions of websites once and stores the entities as indentified in the process. Then tag from your search query simply match against website tags. 
-- **Recommendation engines**: tags extracted from your history and compared to similar user hitories then recommend things you might want to check out
+- **Recommendation engines**: tags extracted from your history and compared to similar user histories then recommend things you might want to check out
 - **Customer service**: match customer to an appropriate customer service agents. works similarly to a phone tree where prompted to provide some information about your request. e.g. use an app to communicate with your car insurance company, 需要provide some spoken information. then match to appropriate agents
 - **Automatic trading**: build a web scraper to get the articles of the names of certain CEOs, Stocks, or cryptocurrencies. Then feed those article into a sentiment classification system and make your trade accordingly
 
 **Training NERS: Data Processing**
 
 1. Assign each entity class to a unique number. e.g. person name = 1, geographical location = 2, time indicator = 3
-2. Assign each word a number that corresponds to its assigned entity class. O 表示 a failure or unrecognized word. <span style="color:red">Numbers are random and assigned when you process your data</span>. Each sequence is transformed into an array of numbers where each number 表示 index of the labeled word
-3. apdding: LSTM require all sequences <span style="background-color:#FFFF00">are the same length</span>. Can set length of sequnces to a certain number and add generic ```<PAD>``` token to fill all empty spaces.
+2. **Assign each word a number** that corresponds to its assigned entity class. O 表示 a failure or unrecognized word. <span style="color:red">Numbers are random and assigned when you process your data</span>. Each sequence is transformed into an array of numbers where each number 表示 index of the labeled word
+3. **papdding**: LSTM require all sequences <span style="background-color:#FFFF00">are the same length</span>. Can set length of sequnces to a certain number and add generic ```<PAD>``` token to fill all empty spaces.
 
 
 ![](/img/post/Natural-Language-Processing/course3/week3pic8.png)
@@ -452,7 +519,7 @@ Application:
 **Traing the NER**:
 
 1. Create a tensor for each input and corresponding number 
-2. Put them in a batch, batch size normally power of 2, <span style="color:red">speed up processing time considerably</span> -> 64, 128, 256, 512...
+2. Create a data generator and put them in a batch, batch size normally power of 2, <span style="color:red">speed up processing time considerably</span> -> 64, 128, 256, 512...
 3. Feed it into an LSTM unit
 4. Run the output through a dense layer (Linear operation on the input vectors) or fully connected layer
 5. Predict using a <span style="background-color:#FFFF00">**log softmax**</span> over K classes (K: the number of possible output), <span style="color:red">log softmax gets better numerical performance and gradients optimization than softmax</span>
@@ -460,15 +527,29 @@ Application:
 ![](/img/post/Natural-Language-Processing/course3/week3pic9.png)
 
 
+
+```python
+tl.Serial(
+    tl.Embedding(),
+    tl.LSTM(),
+    tl.Dense(),
+    tl.LogSoftmax()
+)
+```
+
+
+
+
 **Evaluate the model**
 
 1. Pass test set through the model
-2. Get arg max across the prediction array, 下面```np.argmax``` takes an axis parameter. need to consider the dimension of array
+2. Get arg max across the prediction array, 下面```np.argmax``` takes an axis parameter. To implement it accurately, need to consider the dimension of array
 3. make sure arrays are padded using ```<PAD>``` token, which makes arrays the same length
 4. Compare outputs against test labels to see how accurate model is
 
+Note:  <span style="background-color:#FFFF00">When you pad your tokens, you should mask them before computing accuracy.</span>
 
-下面code, mask variable is where you identify any token IDs you need to skip over during evaluation. One token need to skip is ```<PAD>``` token
+下面code, mask variable is any token IDs that need to be skipped over during evaluation. One token need to skip is ```<PAD>``` token
 
 ![](/img/post/Natural-Language-Processing/course3/week3pic10.png)
 
@@ -482,12 +563,12 @@ Application:
 
 ## 3.4 Siamese Network
 
-<span style="background-color:#FFFF00">It's made up two identical neural networks which are merged at the end.  Used as Indenify similarity between things</span>
+<span style="background-color:#FFFF00">It's made up two identical neural networks which are merged at the end.  Used as Indentify similarity between things</span>
 
 e.g. Comparing meaning not the same as compare words
 
 - How old are you = what is your age
-- Where are you from $$ /neq $$ where are you going. Although first three words are the same
+- Where are you from $$ \neq $$ where are you going. Although first three words are the same
 
 Application:
 
@@ -497,7 +578,7 @@ Application:
 
 #### Architecture
 
-- <span style="background-color:#FFFF00">Both network have a identical sub network.</span>  <span style="color:red">并且sub networks **share identical parameters**</span>. Learned parameters of each sub-network are exactly the same. 
+- <span style="background-color:#FFFF00">Both network have a identical sub network.</span>  <span style="color:red">并且sub networks **share identical parameters**</span>. Learned parameters of each sub-network are exactly the same. Networks are merged together through a Dense layer to produce a final output or similarity score
 - Each network output a vector, one for each questions.
 - Cosine similarity tells how similar they are, $$\hat y$$ a value between -1 and 1
   - <span style="background-color:#FFFF00">if $$\hat y \leq \tau $$ means input questions are different. if $$\hat y > \tau $$ means input questions are the same</span>. $$\tau$$ is a parameter that choose how often want to interpret cosine similarity to indicate two questions are similar. Higher threshold means only very similar sentences is considered similar
@@ -507,6 +588,67 @@ Application:
 
 ![](/img/post/Natural-Language-Processing/course3/week4pic1.png)
 
+
+```python
+def normalize(x):
+    print("x square", np.sqrt(np.sum(x * x, axis=-1, keepdims=True)))
+    return x / np.sqrt(np.sum(x * x, axis=-1, keepdims=True))
+
+vocab_size = 500
+model_dimension = 128
+
+# Define the LSTM model
+LSTM = tl.Serial(
+        tl.Embedding(vocab_size=vocab_size, d_feature=model_dimension),
+        tl.LSTM(model_dimension),
+        tl.Mean(axis=1),
+        tl.Fn('Normalize', lambda x: normalize(x))
+    )
+
+# Use the Parallel combinator to create a Siamese model out of the LSTM 
+
+Siamese = tl.Parallel(LSTM, LSTM)
+def show_layers(model, layer_prefix):
+    print(f"Total layers: {len(model.sublayers)}\n")
+    for i in range(len(model.sublayers)):
+        print('========')
+        print(f'{layer_prefix}_{i}: {model.sublayers[i]}\n')
+
+print('Siamese model:\n')
+show_layers(Siamese, 'Parallel.sublayers')
+
+#Siamese model:
+
+# Total layers: 2
+
+# ========
+# Parallel.sublayers_0: Serial[
+
+#  Embedding_500_128
+
+#  LSTM_128
+
+#  Mean
+
+#  Normalize
+
+# ]
+
+# ========
+
+
+# Parallel.sublayers_1: Serial[
+
+#  Embedding_500_128
+
+#  LSTM_128
+
+#  Mean
+
+#  Normalize
+
+# ]
+```
 
 #### Cost Function
 
@@ -520,12 +662,19 @@ $$ diff = s\left(A,N \right) - \left(A, P \right) = \frac{A \cdot N}{\Vert A \Ve
 
 <span style="color:red">s(v1, v2) is similarity metric(cosine similarity), could be distance metrics d(v1, v2) such as ecludian distance </span>
 
-loss function allow whether model do well. When difference bigger or smaller along x-axis, loss bigger or smaller along the y-axis. Minimizing loss in training-> minimize this difference
-
+loss function allow whether model do well. When difference betwen s(A,N) and s(A,P) bigger or smaller along x-axis, loss bigger or smaller along the y-axis. Minimizing loss in training-> minimize this difference. <span style="color:red">But below loss function when `loss < 0`, still update maybe update to a worse weight which is not good</span>
 
 ![](/img/post/Natural-Language-Processing/course3/week4pic3.png)
 
-We want the loss to be negative for model performing well. 如果difference is just less than zero, want model to still learn and <span style="background-color:#FFFF00">ask to predict a wider difference, can shift the loss function a little to the left. margin refer as *Alpha*.</span> Loss function shift to right by $$ \alpha $$. So if difference less than 0 but small in magnitute, loss greater than 0.
+
+ To fix above problem, when model do a good job, no need to update the weight. Modify if loss < 0, then loss = 0. When the loss is zero, we are not asking model to update the weight. But if predict all s(A,N) and  s(A,P) pair as zero, loss function could not update
+
+![](/img/post/Natural-Language-Processing/course3/week4pic3_1.png)
+
+
+We want the loss to be negative for model performing well. 如果difference is just less than zero, want model to still learn and <span style="background-color:#FFFF00">ask to predict a wider difference, can shift the loss function a little to the left. margin refer as *Alpha*.</span> Loss function shift to left by $$ \alpha $$. So if difference less than 0 but small in magnitute, loss greater than 0 and still can learn to improve
+
+- s could be **similarity function** or **Distance Metric**(e.g. Euclidean distance) measurement. A distance metric is the mirror of a simlarity metric. A simlarity metric can be drived from a distance metric
 
 ![](/img/post/Natural-Language-Processing/course3/week4pic4.png)
 
@@ -544,19 +693,24 @@ $$L\left(A, P, N \right) = max\left(diff + \alpha, 0 \right) $$
   
 - Firstly, select pair of duplicate questions as anchor and positive 
 - Secondly, select a question is difference meaning from the anchor, to form anchor and negative pair
-- 错误的方式是: select triplet random: <span style="color:red">很可能select non-duplicative pair A and N, where loss 0. Loss is zero whenever model correctly predict A and P more similar to A and N. When loss is zero, network little to learn from triplet.</span>
+- 错误的方式是: select triplet random: <span style="color:red">很可能select non-duplicative pair A and N, where loss equal to 0. Loss is zero whenever model correctly predict A and P more similar to A and N. When `loss = 0`, network little to learn from triplet.</span>
 - **Hard Triplet**: <span style="background-color:#FFFF00">are more difficult to train. Hard triplets 是similarity between anchor and negative very close to, but still smaller than similarity between anchor and positive. $$S\left(A, N \right) \approx S\left(A, P \right)$$</span> When model encounter hard triplet, algorithm need to adjust its weight so that yield similairty line up with labels
   - By selecting hard triplets, trainning focus are doing better on difficult cases which 也许会predict incorrectly
 
 ![](/img/post/Natural-Language-Processing/course3/week4pic5.png)
 
 
+
+#### Compute Cost Function
+
 Use ```b``` as batch size, 如下图<span style="color:red">每一行，是duplicate, 每一个column 没有duplicate</span>
 
 ![](/img/post/Natural-Language-Processing/course3/week4pic6.png)
 
-vector v1, #row = batch sizes,  #columns is the number of embedding layer(```d_model```). Note dimension of embedding ```d_model``` is a parameter that determines the dimensions of weights through each layer in the model, determine the size of output layer. $$v_{1,1}$$ is a duplicate of $$v_{2,1}$$, but $$v_{1,1,}$$ is not a duplicates of any other row in $$v_{1}$$
-
+- vector $$v_{1}$$, #row = batch sizes
+-  $$v_{1}$$ #columns is the number of embedding layer(```d_model```).
+-   $$v_{1,1}$$ is a duplicate of $$v_{2_1}$$, but $$v_{1_1,}$$ is not a duplicates of any other row in $$v_{1}$$ e,g, $$ v_{1_2}, v_{1_3}$$
+ 
 ![](/img/post/Natural-Language-Processing/course3/week4pic7.png)
 
 may get similarity as 下图左侧的matrix
@@ -577,9 +731,9 @@ $$\begin{align}J &= \sum_{i=1}^{m} L\left(A^{\left(i\right)}, P^{\left(i\right)}
 
 $$L_{Original} = max \left(\underbrace{s\left(A,N \right)-s\left(A,P \right)}_{diff} + \alpha, 0 \right)$$
 
-$$L_{1} = max \left(mean\_neg+ \alpha, 0 \right)$$
+$$L_{1} = max \left(mean\_neg - S\left( A, P \right) +  \alpha, 0 \right)$$
 
-$$L_{2} = max \left(closest\_neg+ \alpha, 0 \right)$$
+$$L_{2} = max \left(closest\_neg - S\left( A, P \right)+ \alpha, 0 \right)$$
 
 $$L_{Full}\left(A, P, N \right) = L_{1} + L_{2} $$
 
@@ -588,18 +742,20 @@ $$J = \sum_{i=1}^m L_{Full}\left(A^{\left( i \right)}, P^{\left( i \right)}, N^{
 
 In order to minimize the loss, you want $$diff + \alpha \leq 0$$, 
 
-- **Loss 1**: <span style="background-color:#FFFF00">using mean negative replace similarity of A and N, help model converge faster during training by reducing noice</span>. Reduce noice by trainning on average of several observations rather than training model on each of these off-diagonal examples. 
-  - Why Reduce noise? We define noise to be a small value that from a distribution that is centered arund 0. So the average of several noise is centered around 0.(Cancel out individual noise from those observations)
-- **Loss 2**: create a slightly large penalty by diminishing the effects of more negative similarity of A and N. <span style="color:red">can think of closest negative as finding negative example that results in smallest difference between two similarity</span>. Then add small difference to alpha, able to generate the largest loss among all of other examples in that row -> make the model update weights more
+- **Loss 1**: <span style="background-color:#FFFF00">using mean negative replace similarity of A and N, help model converge faster during training by reducing noise</span>. Reduce noise by trainning on average of several observations rather than training model on each of these off-diagonal examples. 
+  - Why reduce noise? We define noise to be a small value that from a distribution that is centered arund 0. So the average of several noise is centered around 0.(Cancel out individual noise from those observations)
+- **Loss 2**: create a slightly large penalty by diminishing the effects of more negative similarity of A and N. <span style="color:red">can think of closest negative as finding negative example that results in smallest difference between two cosine similarity(Positive, Negative)</span>. Then add small difference to alpha, able to generate the largest loss among all of other examples in that row -> <span style="background-color:#FFFF00">make the model update weights more</span>
 
 
 #### One Shot Learning
 
 Classification vs One Shot Learning
 
-- Classification: classify as 1 of K classes, probably use softmax function at the end to find maximum prabability. 比如k=10, 如果k增加一个, expensive to retrain the model. Besides unless you have many examples for the class. model training won't work well
-- One Shot Learning: one shot learning is to be able to classify new classes without retraining any models. You only need to learn the similarity function once. Then can test similarity score against some threshold to see if they are the same. Problem changes to determine which class to measure similarity between classes
-  - 比如下面的例子，比如银行签字，每次有新的签名, can't retrain entire system. Instead, just learn a similarity  -> identify whether two signature are the same or not
+- Classification: classify as 1 of K classes, probably use softmax function at the end to find maximum prabability. <span style="color:red">比如k=10, 如果k增加一个类别, expensive to retrain the model. Besides unless you have many examples for the class. model training won't work well</span>
+- <span style="background-color:#FFFF00">**One Shot Learning**: one shot learning is to be able to classify new classes **without retraining any models**</span>. You only need to learn the similarity function once. Then can test similarity score against some threshold to see if they are the same. Problem changes to determine which class to measure similarity between two classes
+  - 比如下面的例子，比如银行签字，每次有新的签名, can't retrain entire system. Instead, just learn a similarity  -> identify whether two signature are the same or not. 
+  - If $$\text{similarity score} > \tau $$ indicates the same 
+  - If $$\text{similarity score} \leq \tau$$ indicates the same 
 
 ![](/img/post/Natural-Language-Processing/course3/week4pic9.gif)
 
