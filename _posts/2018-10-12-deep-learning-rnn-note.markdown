@@ -429,7 +429,7 @@ Exploding Gradient: aslo happen for RNN. When doing backprop, the gradient(slop)
 
 #### GRU && LSTM
 
-**GRU**: Gated Recurrent Unit, <span style="background-color:#FFFF00">**capture long range connection and solve Vanishing Gradient**</span>. 
+**GRU**: Gated Recurrent Unit, <span style="background-color:#FFFF00">**capture long range connection and solve Vanishing Gradient Problem**</span>. 
 - There are many different possible versions of how to desgin these units to try to have longer range connections, to have longer range effects, and aggress vandishing gradient problem. GRU is one of the most commonly used versions that researchers found **robust and useful** for many different problems
 
 
