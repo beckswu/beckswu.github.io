@@ -780,66 +780,57 @@ Classification vs One Shot Learning
 #### Seq2Seq
 
 - take one sequence of items such as words, and output another sequence. 
-- Map variable-length of sequence to a fixed-length memory. The inputs and outputs don't have the matching lengths
-- LSTMs and GRUs are typically used to overcome the vanishing gradient problem
-- **Encode-Decoder**: takes in a hidden states and a string of words 比如single sentence. (如下图)
-  - Encoder takes the input one step at a time, collects information for inputs then move it fowward
-  - 橘色框biaoshi encoders final hidden states, which try to capture all the information collected from each input step before feeding into the decoder. The final hidden states provide initial sates for decoder to begin predicting the sequence. 
-- <span style="background-color:#FFFF00">**Shortcomings**</span>: 
-  - 因为是<span style="color:red">encoder hidden states is fixed length memory</span> -> lower performance
+- Map variable-length of sequence to a fixed-length memory. The inputs and outputs length 不一定一样
+- In Seq2Seq model, LSTMs and GRUs are typically used to overcome the **vanishing gradient problem**
+- **Encode-Decoder**:
+  - Encoder takes the input one step at a time, collects information for inputs then move it fowward by hidden state
+  - 橘色框 encoders final hidden states, all the information collected from each input step before feeding into the decoder. <span style="background-color:#FFFF00">The final hidden states provide **initial states** </span>for decoder to begin predicting the sequence. 
+- <span style="background-color:#FFFF00">**Shortcomings of traditional Seq2Seq** with LSTM</span>: Information bottleneck
+  - 因为是<span style="color:red">Seq2seq (Encoder hidden states) uses a fixed length memory</span>. longer sequence become problematic -> lower performance
   - <span style="color:red">Later input steps in the sequence are given more importance</span>. 比如下图中的today
--  longer sequence become problematic. As ndividual inputs begin stacking up inside the encoders final hidden sates, 因为Seq2seq uses a fixed length memory  
-
-![](/img/post/Natural-Language-Processing/course4/week1pic1.png)
 
 ![](/img/post/Natural-Language-Processing/course4/week1pic2.png)
 
-**One Vector per word**L give each word a vector for individual information instead of smash it all into one big vector. Also has flaw: How build a time/memory efficient model that predicts accurately from a long sequence. 
+**One Vector per word**: give each word a vector for individual information instead of smash all into one big vector.  **Flaw**: How build a time/memory efficient model that predicts accurately from a long sequence. 
 
 ![](/img/post/Natural-Language-Processing/course4/week1pic3.png)
 
-Solution: Focus attention in the right place:  Prevent sequence overload by giving the model a way to focus on the <span style="color:red">likeliest</span> words at each step. can think of a new layer to process this information. Do this by providing the information specific to each input word
+Solution: **Focus attention** in the right place:  
+
+- Prevent sequence overload by giving the model a way to focus on the <span style="color:red">likeliest</span> words at each step. can think of a new layer to process this information. 
+- Do this by providing the information specific to each input word
 
 ![](/img/post/Natural-Language-Processing/course4/week1pic4.png)
 
-Recurrent models typically take in a sequence in the order it is written and use that to output a sequence. Each element in the sequence is associated with its step in computation time t. (i.e. if a word is in the third element, it will be computed at $$t_3$$). These models generate a sequence of hidden states $$h_t$$, as a function of the previous hidden state $$h_{t−1}$$ and the input for position t. 
 
-The sequential nature of models <span style="color:red">(RNNs, LSTMs, GRUs) does not allow for parallelization within training examples</span>, which becomes critical at longer sequence lengths, as memory constraints limit batching across examples. In other words, if you rely on sequences and you need to know the beginning of a text before being able to compute something about the ending of it, then you can not use parallel computing. You would have to wait until the initial computations are complete. This is not good, because if your text is too long, then 1) it will take a long time for you to process it and 2) you will lose a good amount of information mentioned earlier in the text as you approach the end.  
+The sequential nature of models <span style="color:red">(RNNs, LSTMs, GRUs) does not allow for parallelization within training examples</span>, which becomes critical at longer sequence lengths, as memory constraints limit batching across examples. Have to wait until the initial computations are complete. This is not good 
+- it will take a long time for you to process it 
+- you will lose a good amount of information mentioned earlier in the text as you approach the end.  
+
+Therefore, attention mechanisms have become critical  for sequence modeling in various tasks, allowing modeling of dependencies without caring too much about their distance in the input or output sequences. 
 
 #### Alignment
 
-Motivation for alignment(used to be critical important for statistical translation)
-
-- Translating from one language to another 
-- Word sense discovery and disambiguation e.g.  Bank 可以指代 financial instituion 或者 riverbank
-
-Word Alignment: 比如德语 Berliner 可以指柏林人，也可以值一种donut 甜甜圈. 比如下面English word 多于German word. When performing alignment, model needs to identify relationships among the words in order to make accurate predictions in case the words are out of order or not exact translation.
-
-![](/img/post/Natural-Language-Processing/course4/week1pic5.png)
-
-[The Real Meaning of Ich Bin ein Berliner](https://www.theatlantic.com/magazine/archive/2013/08/the-real-meaning-of-ich-bin-ein-berliner/309500/)
-
-
-To align words correctly, need to add a attention layer to help the decoder understand  which inputs are more important. <span style="background-color:#FFFF00">The attention mechanism solves for longer input sequences by giving more weight to more important words.</span>.  比如下图hidden state in orange given higher attention score -> <span style="background-color:#FFFF00">next word in the decoder output will be strongly influenced by this encoder hidden state.</span>
-
+- Many lanuage don't translate exactly into another language. To align words correctly, need to add a attention layer <span style="color:red">to help the decoder understand  which inputs are more important</span>.
+-  <span style="background-color:#FFFF00">The attention mechanism solves for longer input sequences by giving **more weight** to more important words.</span>.  More weight -> More influence for decoder output 
 
 ![](/img/post/Natural-Language-Processing/course4/week1pic6.png)
 
-1. Get available hidden states ready for encoder and first hidden states for decoder. 比如下面例子，encoder 两个hidden states, decoder一个
-2. **Calculate Alignment Score**: score  each of encoder hidden sattes by 计算 dot product between encoder state and decoder hidden state. <span style="color:red">higher score->more influence.</span>
+1. Get all hidden states ready for encoder and first hidden states for decoder. 比如下面例子，encoder 两个hidden states, decoder一个
+2. **Calculate Alignment Score**: score  each of encoder hidden sattes by 计算 <span style="background-color:#FFFF00">**compute dot product between encoder state and decoder hidden state**</span>. <span style="color:red">higher score->more influence of this hidden state activation for output.</span>
 3. Run scores through <span style="background-color:#FFFF00">softmax</span>, each score is between 0 and 1, then <span style="color:red">give attention distribution</span>.
 4. Take each encoder hidden state, <span style="color:red">multiply by its softmax score,</span> -> <span style="background-color:#FFFF00">**alignment vector**</span>
 5. adding up everything alignment vector to <span style="background-color:#FFFF00">**context vector**</span> -> <span style="background-color:#FFFF00">context vector is feeded into decoder</span>
 
-![](/img/post/Natural-Language-Processing/course4/week1pic7.gif)
+![](/img/post/Natural-Language-Processing/course4/week1pic7.png)
 
 
 #### Attention Model
 
 - Attention is an added layer that lets a model focus on what's important
 - **Queries**, **Values**, and **keys** are used for information retrieval inside the Attention layer
-  - **Key** and **Value** pair: both dimension <span style="color:red">N(input sequence of length from encoder hidden states)</span>. Keys and values have their own respective matrices, but the matrices have the same shape and are often the same. 
-  - **Query**: <span style="color:red">from encoder hidden state</span>
+  - **Key** and **Value** pair(key & value are activation from hidden state $$a^{<{t}>}$$): both dimension <span style="color:red">N(input sequence of length from encoder hidden states)</span>. Keys and values have their own respective matrices, but the matrices have the same shape and are often the same. 
+  - **Query**: <span style="color:red">from decoder hidden state $$s^{<{t-1}>}$$</span>
   - Both key-value pair and query <span style="background-color:#FFFF00">enter attention layer on the opposite ends of the model</span>
 
 
@@ -855,68 +846,82 @@ To align words correctly, need to add a attention layer to help the decoder unde
 - Query(Q) is as column and words of keys as row
 - value socre(V) assigned based on closeness of the match
 
-One way you can think of it is as follows. Imagine that you are translating English into German. You can represent the word embeddings in the English language as keys and values. The queries will then be the German equivalent. You can then calculate the dot product between the query and the key. Note that similar vectors have higher dot products and non-similar vectors will have lower dot products. The intuition here is that you want to identify the corresponding words in the queries that are similar to the keys. This would allow your model to "look" or focus on the right place when translating each word. We then run a softmax:
-
-$$softmax\left(QK^T\right)$$
-
-That allows us to get a distribution of numbers between 0 and 1.  One more step is required. We then would multiply the output by VV. Remember VV in this example was the same as our keys, corresponding to the English word embeddings. Hence the equation becomes
-
-$$softmax\left(QK^T\right)V$$
-
-This tells us how much of each word, or which combination of words we will be feeding into our decoder to predict the next German word. This is called scale dot product attention. Note we add a normalization constant to it later, but you do not have to worry about that right now
 
 
-
-- <span style="background-color:#FFFF00">Model should flexible enough to connect each English word with its relevant German word, even they do not appear in the same position in respective sentences</span>. In another word, It should flexible to handle differences in grammearand word ordering in different language. 
-- <span style="color:red">For languages with different grammar structures, attention still looks at the correct token between them</span> 
+- <span style="background-color:#FFFF00">Model should be flexible to handle differences in grammear and word ordering in different language. </span>.
   - 比如下面例子，法语到英语, 第五个法语词Zone -> attention knows to look further down at 第八个token
 
-In the matrix, the lighter square shows where the model is actually looking when making the translation of that word. This mapping should not necessarily be one to one. The lighting just tells you to what extent is each word contributing to the input that will be fed into the decoder. As you can see several words can contribute to translating another word, depending on the weights (output) of the softmax that will be used to create the new input. 
+
+In the matrix, the lighter square shows where the model is actually looking when making the translation of that word. 
+- This mapping should not necessarily be one to one. As you can see several words can contribute to translating a  word, depending on the weights (output) of the softmax
+- The lighting just tells each word contributing to the input that will be fed into the decoder. 
 
 ![](/img/post/Natural-Language-Processing/course4/week1pic9.png)
 
 
-下面例子padded zero at the end of sentence, ```<EOS>``` is 1 then pad 0
+**Machine Translation Setup**
 
-![](/img/post/Natural-Language-Processing/course4/week1pic10.gif)
+- keep track of index mappings with word2ind and ind2word dictionaryie
+- use start-of ```<SOS>``` and end-of ```<EOS>```(1) sequence tokens
+
+![](/img/post/Natural-Language-Processing/course4/week1pic10_1.png)
+![](/img/post/Natural-Language-Processing/course4/week1pic10_2.png)
 
 #### Teacher Forcing
 
-- Teacher forcing allow your allow to use the ground truth or the actual outputs from decoder to compare its predictions during training
-- <span style="background-color:#FFFF00">Teacher forcing yields faster, more accurate training</span>
+- Teacher forcing use the **ground truth** or the **actual outputs** from decoder feed to next decoder layer as input instead of predicted value **during training**
+- <span style="background-color:#FFFF00">Teacher forcing yields faster, faster convergerence, more accurate training</span>
 
-e.g. 比如下面例子 as the motivation why teacher forcing is necessary for Seq2Seq model. Model predict correctly at the start of sequence. 但是第二个prediction is wrong, 第三个even further off. 第四个都没有logical sense. <span style="color:red">In a sequence model, each wrong prediction make the following predictions even less likely to be correct.</span>. 需要make a way to check at each step. 
+e.g. <span style="color:red">In a sequence model, each wrong prediction make the following predictions even less likely to be correct.</span>.
 
 
 ![](/img/post/Natural-Language-Processing/course4/week1pic11.png)
 
-- t1 (Wie) is processed through attention in order to predict geht. During training, <span style="background-color:#FFFF00">predicted output is not usede for prediciting next predicted word(green rectangle). Instead, the actual outputs/ground truths is the input to the decoder for each time step until the end of sequence is reached(不用预测的，用right answers feed into next time step)</span>. 
-- Without teacher forcing, models can be slow to reach convergence.
-- teacher forcing is still in active research
 
-![](/img/post/Natural-Language-Processing/course4/week1pic12.gif)
+![](/img/post/Natural-Language-Processing/course4/week1pic12.png)
 
 [Link: What is Teacher Forcing ](https://towardsdatascience.com/what-is-teacher-forcing-3da6217fed1c?gi=fe02fa9e9d0)
 
 
 #### NMT with Attension
 
-1. Initial select: two copies. Input tokens(English) represented by zero and the target tokens(German) represented by one.
-2. <span style="color:red">One copy of the input tokens</span> fed into -> the inputs encoder to be transformed into the <span style="color:red">key and value vectors</span>. <span style="color:red">A copy of the target</span> tokens goes into the <span style="color:red">pre-attention decoder</span>. 
-  - The pre-attention decoder is not the decoder which produces the decoded outputs. <span style="background-color:#FFFF00">The pre-attention decoder transform the prediction targets into a different vector space called the **query vector** Q vector</span>, so can calculate the relative weights to give each input word. 
-  - The pre-attention decoder <span style="color:red">shifts the target tokens one place to the right, assign the start of sentence ```<SOS>``` to beginning of each sequence </span>, where the teacher forcing takes place, That way when we predict, we can just feed in the correct target word (i.e. teacher forcing). 
-3. Inputs and targets are converted to embeddings(or initial representations of the words)
-4. Now have query key and value vectors, you can prepare them for the attention layer:
+1- Initial select: two copies. Input tokens represented by `0` and the target tokens represented by `1`.
+
+![](/img/post/Natural-Language-Processing/course4/week1pic13_1.png)
+
+2- <span style="color:red">One copy of the input </span> fed into as input encoder to be transformed into the <span style="color:red">key and value vectors</span>. <span style="color:red">A copy of the target</span> tokens goes into the <span style="color:red">pre-attention decoder</span>. 
+  - <span style="background-color:#FFFF00">The pre-attention decoder(not  decoder produces the decoded outputs) transform the prediction targets into a different vector space called the **query vector** Q vector</span>, so can calculate the relative weights to give each input word. 
+  - `ShiftRight` in pre-attention decoder shifts the target tokens one place to the right, assign the start of sentence ```<SOS>``` to beginning of each sequence, where the <span style="color:red">**teacher forcing**</span> takes place. 
+  
+3- Inputs and targets are converted to embeddings
+
+![](/img/post/Natural-Language-Processing/course4/week1pic13_2.png)
+
+
+4- Now have query key and value vectors, you can prepare them for the attention layer:
    1.  Compute $$ QK^T$$
-   2.  apply a padding mask before computing the softmax. (在Assignment中,zero-padding tokens to negative one billion, which will become approximately zero when computing the softmax )
-5. Once, have queries, keys, and values, compute attention. 
-6. Residual block adds the queries generated in the pre-attention decoder to the results of the attention layer. Then activations go to the second phase, with the mask that was previously created.  
-7. Drop the mask(图中标注的mask(1)) before running everything through the decoder, which is what the second Select is doing. It takes the activations from the attention layer（图中标注的attention(0)), and the second copy of the target tokens(图中标注的target tokens(2). <span style="background-color:#FFFF00">They are true targets which the decoder needs to compare against the predictions.</span>
-8.  Run everything through a dense layer or a simple linear layer with targets vocab size -> gives output. 
-9.  Take the outputs and run it through LogSoftmax, which is what transforms the attention weights to a distribution between zero and one.
-10. Match the log probabilites against true target tokens
+   2.  apply a padding mask before computing the softmax.
+
+![](/img/post/Natural-Language-Processing/course4/week1pic13_3.png)
+
+5- Once, have queries, keys, and values, compute attention. 
+
+6- Residual block adds the queries generated in the pre-attention decoder to the results of the attention layer. Then attention output its activation along with the mask that was previously created.  
+
+![](/img/post/Natural-Language-Processing/course4/week1pic13_4.png)
+
+7- Drop the mask(图中标注的mask(1)) before running everything through the decoder, which is what the second Select is doing. `Select([0,2])` takes the activations from the attention layer（图中标注的attention(0)), and the second copy of the target tokens(图中标注的target tokens(2). <span style="background-color:#FFFF00">They are true targets which the decoder needs to compare against the predictions.</span>
+
+8-  Run through a dense layer with targets vocab size -> gives output. 
+
+9-  Take the outputs through LogSoftmax, which is what transforms the attention weights to a distribution between zero and one.
+
+10- Match the log probabilites against true target tokens (t<span style="color:red">rue target token is outside decoder</span> and pass down to the logsoftmax)
 
 Note: <span style="color:red">图中的 Select([0,2]) -> LSTM -> Dense -> LogSoftmax : 是decoder</span>
+
+
+
 
 ![](/img/post/Natural-Language-Processing/course4/week1pic13.png)
 
@@ -930,19 +935,17 @@ Note: <span style="color:red">图中的 Select([0,2]) -> LSTM -> Dense -> LogSof
 
 #### BLEU Score
 
-BLEU: Bilingual Evaluation Understudy. 
+BLEU: Bilingual Evaluation Understudy. 缺点: 同义词但n-gram 不一样，low score, 但是good translation. And no consideration of recall
 
 - evaluate the quality of machine-translated text by compaing a candidate texts translation to one or more reference translation.
 - <span style="color:red">Usually The closer the BLEU score to one, the better the model. The closer to zero, the worse it is.</span>
--  To get the BLEU score, the candidates and the references are usually based on an *average* of uni, bi, tri or even four-gram precision.  Unigrams account for adequacy while longer n-grams account for fluency of the translation. 
+-  To get the BLEU score, the candidates and the references are usually based on an *average* of unigram, bigram, trigram or even four-gram.  
+   - <span style="background-color:#FFFF00">Unigrams account for adequacy while longer n-grams account for fluency of the translation</span>. 
 - Problem
-   -  <span style="color:red">BLEU doesn't consider semantic meaning, so does not take into account the order of n-gram</span>
-   -  <span style="color:red">BLEU doesn't consider sentence structure</span> .e.g "Ate I was hungry beacause!" 如果reference is "I ate because I was hungry", will get a perfect BLEU score
+   -  BLEU doesn't consider semantic meaning, so does not take into account the order of n-gram
+   -  BLEU doesn't consider sentence structure.e.g "Ate I was hungry beacause!" 如果reference is "I ate because I was hungry", will get a perfect BLEU score
 
-To calculate the blue score, count how many unique words(n-grams) appear in the reference. 比如下面unigram例子, I, am 都appear in referene 
-
-
-Bervity Penalty: The brevity penalty penalizes generated translations that are too short compared to the closest reference length with an exponential decay. The brevity penalty compensates for the fact that the BLEU score has no recall term.(recall: 是不是reference 中的正确都predict了，referenece length > candidate length, no penalty )
+Bervity Penalty: The brevity penalty penalizes generated translations that are too short compared to the closest reference length with an exponential decay. The brevity penalty compensates for the fact that the BLEU score <span style="background-color:#FFFF00">has no recall term.(recall: 是不是reference 中的正确都predict了</span>，referenece length > candidate length, no penalty )
 
 $$BP = min \left(1, e^{1- \frac{\text{ref length}}{\text{candidate length}}} \right)$$
 
@@ -971,19 +974,53 @@ Where:
 
 #### ROUGE
 
-- Recall-Oriented Understudy for Gisting Evaluation:  
-- ROUGE was originally developed to evaluate the quality of machine summarized texts, but is useful for evaluating machine translation as well. 
+F1 score
+
+$$score = 2 \frac{ precision * recall}{precision + recall}$$
+
+recall-Oriented Understudy for Gisting Evaluation:  
+
 - Calculates precision and recall for machine texts by counting the n-gram overlap between the machine texts and a reference text.
 - Measures precision and recall between generated text and human-created text <span style="background-color:#FFFF00">where order matters</span>
   - precision: How much of model text was relevant
   - Recall: How much of the reference text is the system text captures?
 - Problem:
-  - <span style="background-color:#FFFF00">Doesn't take similar themes or concepts into consideration( low ROUGE score doesn't necessarily mean the the translation is bad)</span> 比如 model predict "I am a fruit-filled pastry" 跟 reference" I am a jelly donut" 意思一样但是score低
+  - <span style="background-color:#FFFF00">Doesn't take **similar themes or concepts**(同义词) into consideration( low ROUGE score doesn't necessarily mean the the translation is bad)</span> 比如 model predict "I am a fruit-filled pastry" 跟 reference" I am a jelly donut" 意思一样但是score低
 
-The, cat, had, orange, fur 都appear。 如果model wants a high recall score, can guess hundred of words and have the chance the words in the true reference sentence. Then precision come in.
+
 ![](/img/post/Natural-Language-Processing/course4/week1pic14.png)
 
+*The, cat, had, orange, fur* 都appear。 如果model wants a high recall score, can guess hundred of words and have the chance the words in the true reference sentence. Then use precision
+
+
 ![](/img/post/Natural-Language-Processing/course4/week1pic15.png)
+
+
+```python
+def rouge1_similarity(system, reference):
+# system (list of int): tokenized version of the system translation
+        
+#reference (list of int): tokenized version of the reference translation
+
+    sys_counter = collections.Counter(system)
+    ref_counter =  collections.Counter(reference)
+    
+    overlap = 0
+    for token in sys_counter:
+        token_count_sys = sys_counter.get(token,0)
+        token_count_ref = ref_counter.get(token,0)
+        overlap += min(token_count_sys,token_count_ref)
+
+    precision = overlap/sum(sys_counter.values())
+    recall = overlap/sum(ref_counter.values())
+    if precision + recall != 0:
+        # compute the f1-score
+
+        rouge1_score = 2*(precision*recall)/(precision+recall)
+    else:
+        rouge1_score = 0 
+    return rouge1_score
+```
 
 
 #### Greedy Decoding
@@ -995,44 +1032,60 @@ The, cat, had, orange, fur 都appear。 如果model wants a high recall score, c
 
 #### Random Sampling
 
-- Often a little too random for accurate translation 
+- Problem of Random Sampling: Often a little too random for accurate translation 
 - Solution: <span style="background-color:#FFFF00">assign more weight to more probable words, and less weight to less probable words</span>
 - <span style="color:red">**Temperature**</span>: <span style="background-color:#FFFF00">a parameter allowing for more or less randomness in predictions. measured on scale from 0 to 1, indicating low to high randomness</span>
   - Lower temperatue setting = More confident, conservative network. More careful/safe decision for output
   - Higher temperatue setting = More excited, random network(and more mistakes)
 
+
+Below codeis to generate random samplying from log-softmax output.  the amount of "noise" added to the input by these random samples is scaled by a <span style="background-color:#FFFF00">**temperature**</span> setting. If temperature equal to 0 will return the argmax of log_probs(greedy decoding)
+
+```python
+def logsoftmax_sample(log_probs, temperature=1.0):  
+#Returns a sample from a log-softmax output, with temperature.
+
+# log_probs: Logarithms of probabilities (often coming from LogSofmax)
+    
+# temperature: For scaling before sampling (1.0 = default, 0.0 = pick argmax)
+
+
+  # This is equivalent to sampling from a softmax with temperature.
+
+  u = np.random.uniform(low=1e-6, high=1.0 - 1e-6, size=log_probs.shape)
+  g = -np.log(-np.log(u))
+  return np.argmax(log_probs + g * temperature, axis=-1)
+```
+
 #### Beam Search
 
-Greedy Decoding only select one best candidate as input sequence for each time step. Model encoded the input sequence and use previous time steps translation to calculate how much attention to give each of the input words. Now it's using the decoder to predict the next translated word. Now choosing just one best candidate may not be suitable for constructing a sentence.
 
-
-- A broader, more exploratory decoding alternative that use breath first search to build a search stream.
-  - Doesn't look only at next output, but instead apply a beam width parameter to select possible options
+- A broader, more exploratory decoding alternative
 - Istead of offering a best output like greedy decoding, beam seach select multiple options for the best input based on conditional probability
-- Beam width B: limit the number of branching paths. Select B number of best alternatives at each time step with the highest probabilities
-  - Once have B probability, can choose the one with highest probability
+- **Beam width B**: limit the number of branching paths. Select B number of best alternatives at each time step with the highest probabilities
   - <span style="background-color:#FFFF00">A larger beam width -> better model performance  but slower decoding speed.</span> 
 - Problem: 
-  - Since the model learns a distribution, that tends to carry more weight than single tokens
-  - Can cause translation problems, 比如 in a speech corpus that hasn't been cleaned. 比如if have filler word "Uhm" which appear as translation with lower probability . That single element can throw off entire translation. 比如 at time step, most probable word 是 "Uhm"
+  - Since the model learns a distribution, that <span style="color:red">**tends to carry more weight**</span> than single tokens
+  - Can cause translation problems, 比如 in a speech corpus that hasn't been cleaned. If have filler word "Uhm" which appear as translation with lower probability. at time step, most probable word 是 "Uhm"
 
-下面例子: assign conditional probability to each of several options for the next word in the sequence. The highest probability is the one will be chosen for each time step. 比如 "am" 是most likely next token with probability 40%. Next step, find "hungry" as the most likely token
 
 ![](/img/post/Natural-Language-Processing/course4/week1pic18.png)
 
 #### Minimum Bayes Risk (MBR)
 
-1. Generate several random samples 
+Alternative of Beam Search
+
+1. Generate several random samples using random sampling for outputs
 2. Compare each sample against all the others and assign a similarity score (such as ROUGE!)
 3. Select the sample with the highest similarity.
 
 
-Examples: MBR Sampling, generate the scores for 4 samples:
+Examples: MBR Sampling, generate the scores for 4 samples: (<span style="background-color:#FFFF00">注是 prediction 和prediction 之间算similarity 不是prediction 和 reference 比</span>)
 
 1. Calculate similarity score between sample 1 and sample 2
 2. Calculate similarity score between sample 1 and sample 3
 3. Calculate similarity score between sample 1 and sample 4
-4. Calculate weighted average of first 3 steps 
+4. Calculate weighted average of first 3 steps (usually a weighted average)
 5. Repeat until all samples (2,3,4) have overall scores
 
 
@@ -1040,43 +1093,61 @@ Examples: MBR Sampling, generate the scores for 4 samples:
 
 ## 4.2 Transformer
 
-**Neural machine translation** use neural network artchitecture: take sequential steps to encode input, start fom beginning of input make computation at every until until reach the end. At that point, decode the information following a similar sequential precedure. <span style="color:red">No parallel computing</span>. The more for input, the more time process that sentence
+### RNN Disadvantage:
+
+- RNN parallel computing diffcult to implement <span style="color:red">**No parallel computing**</span>.
+  -  The more for input, the more time process that sentence
+- For long sequence in RNNs there is <span style="background-color:#FFFF00">**loss of information**</span>. LSTM and GRUS help a little(stop working well when process long sequence)
+- In RNNs, problem of <span style="background-color:#FFFF00">**vanishing gradients**</span>
+
+Transformers help with all of the above 
+
+**Neural machine translation** use neural network artchitecture: Both Encoder and Decoder take sequential steps. 
 
 ![](/img/post/Natural-Language-Processing/course4/week2pic1.png)
 
+
 **Seq2Seq Architecture**: 
 
-- go through T sequential steps(<span style="background-color:#FFFF00">T is number of time-steps that model go through to process one sentence</span> ): e.g. sentence 有5个词, model will take five time stpes to encode the sentence. 
-- For large sequences: information loss, <span style="color:red">vanishing gradients problem</span>. LSTM and GRUS help a little.
+- For large sequences: information tend to loss within the network, <span style="color:red">vanishing gradients problem</span>. 
 
 ![](/img/post/Natural-Language-Processing/course4/week2pic2.png)
 
-**Transformer**
+**Conventional Encoder - Decoder Architecture**
 
-- specially designed for 
-- transformer are based on attention, not require sequential computation per layer, only one step is needed
-- gradient from last output to the first input in a transformer is 1
-- transformer don't suffer from vanishing gradient problem which related to the length of sequence
-- transformer use Multi-headed attention layer instead of recurrent layer
+![](/img/post/Natural-Language-Processing/course4/week2pic3_1.png)
 
-![](/img/post/Natural-Language-Processing/course4/week2pic3.gif)
+#### Transformer
+
+ - transformer are based on attention, not require sequential computation per layer, only one step is needed
+- Gradient steps from last output to the first input in a transformer is 1 step. For RNN, the number of steps equal to T
+- <span style="background-color:#FFFF00">Transformer don't suffer from vanishing gradient problem </span>which related to the length of sequence
+- Transformer differ to Seq2Seq, <span style="color:red">use **Multi-headed attention** layer</span> instead of recurrent layer
+
+![](/img/post/Natural-Language-Processing/course4/week2pic3_2.png)
 
 
 **Self Attention -> Multiheaded attention**
 
-- Self Attention use query, key, value obtained from every sequential inputs, 
-- Self Attention  output a same length sequential output for each input
-- Self Attention  can be think of attention model that incorporates a dense layer for every queries, keys, and values
--  Multiheaded attention: can think of a set of parallel self-attention layers which are called heads. These heads are further concatenated to produce a single output, which emulates the recurrence sequence effect with attention
-- <span style="background-color:#FFFF00">Unlike recurrent layer, multi-headed attention computes the inputs in the sequence independently then allows us to paralleize the computation. But fail to model the sequential information for a given sequence, that's why need positional encoding stage into the transformer model</span>
+- Self Attention: learn the dependencies between the words of the sentence.
+- Self Attention use query, key, value obtained from every sequential inputs, and output a same length sequential output for each input
+- Queries, Keys, and Values go through Dense Layer before Attention layer
+-  Multiheaded attention: **parallel** self-attention layers(called **heads**). These heads are further concatenated to produce a single output, which emulates the recurrence sequence effect with attention
+- <span style="background-color:#FFFF00">Unlike recurrent layer, multi-headed attention computes the inputs in the sequence **independently** then <span style="background-color:#FFFF00">allows to **parallelize** the computation</span>. But <span style="background-color:#FFFF00">fail to model the sequential information </span>for a given sequence, that's why need positional encoding stage into the transformer model</span>
+  - **Positional Encoding**: encodes each input position in the sequence(since word order and position is important for language) to <span style="color:red">retain the positional information</span>. The positional encoding output values to be added to the embeddings. So every word given to the model, have some of information about its order and position. 下面例子中 a positional encoding vector for each word ich, bin which will tell respective position. 
+
+Self Attention: 
 
 ![](/img/post/Natural-Language-Processing/course4/week2pic4.png)
 
+Multiheaded attention
+
 ![](/img/post/Natural-Language-Processing/course4/week2pic5.png)
 
-**Positional Encoding**
+Positional Encoding
 
-encodes each input position in the sequence(since word order and position is important for language) to retain the positional information. The positional encoding output values to be added to the embeddings. So every word given to the model, have some of information about its order and position. 下面例子中 a positional encoding vector for each word ich, bin which will tell respective position. 
+![](/img/post/Natural-Language-Processing/course4/week2pic5_1.png)
+
 
 
 #### Tranformer Application
@@ -1090,68 +1161,77 @@ encodes each input position in the sequence(since word order and position is imp
 - Other NLP tasks e.g. Sentiment Analysis, Market Intelligence, Text Classification, Character Recognition, Spell Checking. 
 
 
-#### Dot-Product Application
+#### Dot-Product Attention
 
-- For a good embedding, vectors for English and German words that mean the same are similar. 
-- Query(German) looks for similar keys(English)
-- <span style="color:red">Each key has a probability of being a query a match for the query</span>
-- The queries by keys matrix is called **attention weights**, 表示how much each key similar to each query。 比如下面例子, I simialr to Ich, get 0.8 probability. 而 am 和 Ich不像，get 0.1 probability 
-- Return sum of the keys weighted by their probabilitys。 比如下面例子, query(Ich) get ```0.8 x vec("I") + 0.1 x vec("am") + 0.1 x vec("happy")```
-  
-比如input I am happy 和 translate "Ich bin gluklich", so want to look at English sentence to find similar words, that what attention does. In attention, <span style="color:red">German word vectors are called queries</span>, because it initiate the look up, a query is matched against all keys. 每个key 得到一个match for query的概率. 
+Dot-product Attention is essential for Transformer
+
+- For a good embedding, vectors for English and German 同义词 are similar. 
+- Query looks for similar Keys. <span style="color:red">Each key has a probability of being a query a match for the query</span>
+- The queries by Keys matrix is called **attention weights**: how much each key similar to each query
+- Return sum of the keys weighted by their probabilitys
+
 
 ![](/img/post/Natural-Language-Processing/course4/week2pic6.png)
 
-feed embedding into three Linear Layer to get 3 different vectors for queries, keys and values.
+Feed all embedding vectors into different Linear Layer to get different vectors for queries, keys and values.
 
 ![](/img/post/Natural-Language-Processing/course4/week2pic7.gif)
 
 
-For matrix Q, K, attention model calculates <span style="background-color:#FFFF00">weights or scores 表示relative importance of keys for specific query from dot product</span>. Attention weights 可以被理解为alignments score. To <span style="background-color:#FFFF00">turn these weights to probability softmax matrix is needed</span>. Finally, <span style="color:red">multiply these probabilites with values, get weighted sequence</span>(attention result)
-
-![](/img/post/Natural-Language-Processing/course4/week2pic8.png)
-
 **Math**
 
-- Query: Shape: $$L_Q$$  by D
-  - think of queries as embedding of German words, D is the embedding of word embedding, $$L_K$$: the length of German sentence
-- Keys: Shape: $$L_K$$  by D
-  -  think of keys as embedding of English words), D is the embedding of word embedding, $$L_K$$: the length of English sentence
-- Query Q assign each key a probability,<span style="background-color:#FFFF00"> measure the similarity by taking those products of vectors</span>. if dot product large -> Q and K are similar. 
-  - However, <span style="color:red">similarity number not add up to 1, cannot be used as probabilities</span>. To make attention more focused on best matching keys, use softmax
-- <span style="background-color:#FFFF00">Attenion weights: $$W_A = softmax\left(QK^T\right)$$, shape is $$L_Q x L_K$$. 每个key-query pair gets a probability</span>
-- <span style="background-color:#FFFF00">To get weighted sum, multiply by value ( often same as keys ): weight each value $$v_i$$ by the probability that key $$k_i$$ matches the query.</span>
-- Attention mechansim calculates dynamic or alignments weights 表示 relative importance of the inputs in sequence which are keys for that particular ouputs which is query. A single contect vector can be calculated using the sum of weighted vectors.
+- <span style="color:red">Before performing dot product, Keys, Queries, and Values are passed through a Dense Layer</span>
+- **Query**: Shape: $$L_Q$$  by D
+  - think of D is the embedding dimension of word embedding, $$L_K$$: the length of German sentence
+- **Keys**: Shape: $$L_K$$  by D
+  -  think of keys  D is the embedding dimension of word embedding, $$L_K$$: the length of English sentence
+- **Query** assign each **Key** a probability using <span style="background-color:#FFFF00">dot product</span> if dot product large -> Q and K are similar. This allow the model to focus on the right place when translating each word
+  - <span style="background-color:#FFFF00">Attenion weights: $$W_A = softmax\left(QK^T\right)$$, shape is $$L_Q x L_K$$. 每个key-query pair gets a probability</span>
+  - Weights or Scores <span style="background-color:#FFFF00">表示relative importance of **Keys** for specific **Query**</span>. Attention weights can be understood as alignments score. 
+  - However, <span style="color:red">similarity number not add up to 1, cannot be used as probabilities</span>. Solution: use **softmax** turn these weights to probability
+- Finally, multiply these probabilites with **Values**, get weighted sum  of sequence(**attention result/context vector**). weight each **value** $$v_i$$ by the probability that key $$k_i$$ matches the query.
+- Attention mechansim calculates dynamic or alignments weights 表示 relative importance of the inputs(**Keys**) in sequence for particular output (**Queries**). Multiply dynamic weights or alignments with input sequences(**Values**) to get a single context vector
 - GPUs and TPUs is used for speed-up matrix multiplications
 
-![](/img/post/Natural-Language-Processing/course4/week2pic9.png)
+$$Z = attention\left( Q, K, V \right) = softmax\left( QK^T\right ) V = W_A V$$
 
-![](/img/post/Natural-Language-Processing/course4/week2pic10.png)
+![](/img/post/Natural-Language-Processing/course4/Attn_dot1.png)
+
+![](/img/post/Natural-Language-Processing/course4/Attn_dot2.png)
 
 
 #### Causal Attention
 
-- **Encoder/decoder Attention**: One sentence(decoder) looks at another one(encoder)
+Three ways of Attention
+
+- **Encoder/decoder Attention**: One sentence(decoder) looks at another one(encoder) Garman attends to English
 - **Causal (self) attention**: In one sentence, words look at previous words(used for generation text/summary). 比如 “I am happy" happy look at "I" 和 "am"
-- **Bi-directional self attention**: In one sentence, words look at both previous and future words
+- **Bi-directional self attention**: In one sentence, words look at both previous and future words (used in Bert/T5)
+
+![](/img/post/Natural-Language-Processing/course4/week2pic8.png)
 
 **Causal attention**: 
 
-- <span style="color:red">Queries/Keys are words from the same sentence</span>. It is used in language models where try to generate sentences.
+- <span style="color:red">Queries/Keys are words from the same sentence</span>(That's why called self-attention). It is used in language models where try to generate sentences.
+  - 比如下面例子，after generating "*my*", model may look at vector "*I*" to retrieve more information 
   - <span style="background-color:#FFFF00">Query seach among past words only</span>
-- Causal attention allow words to attend to other words that are related in various ways <span style="color:red">but not words in future </span>. 因为future word还没有generated yet can attend any words to past
+- <span style="color:red"> Causal attention cannot attend words in future </span>. 因为future word还没有generated yet
 
 
 ![](/img/post/Natural-Language-Processing/course4/week2pic11.png)
 
 **Math**: 
 
-- <span style="background-color:#FFFF00">add mask(a constant triangular matrix, has 0 on diagonal and 下半区, minus inifinity on in upper right ) to weights $$QK^T$$</span>
-- $$ softmax\left( QK^T + M \right)$$ shape is $$L_Q$$ by $$L_K$$, 但是这个<span style="color:red">matrix allow model attend to words in future</span>. add M  $$L_Q$$ by $$L_K$$. 因为下半部分M 为0, 所以queries attending words in the past are untouched. 其他的值都是 minus inifinity. After softmax, all minus infinity become to 0(exponential of negative infinity equal 0) -> <span style="background-color:#FFFF00">prevent words from attending to future</span>
+- $$ softmax\left( QK^T \right)$$ shape is $$L_Q$$ by $$L_K$$, <span style="color:red"> allow model attend words in future</span>
+- <span style="background-color:#FFFF00">add mask(a constant triangular matrix, has 0 on diagonal and below it, minus inifinity on other places ) to weights $$QK^T$$</span> 
+- $$ softmax\left( QK^T + M \right)$$. Adding M let queries attending words in the past  untouched. All other values become minus inifinity. After softmax, all minus infinity become to 0(exponential of negative infinity equal 0) -> prevent words from attending to future
 
 ![](/img/post/Natural-Language-Processing/course4/week2pic12.png)
 
-![](/img/post/Natural-Language-Processing/course4/week2pic13.png)
+
+![](/img/post/Natural-Language-Processing/course4/causalAttn_1.png)
+![](/img/post/Natural-Language-Processing/course4/causalAttn_2.png)
+
 
 
 #### Multi-headed Attention
@@ -1518,6 +1598,8 @@ Reformer is a transformer model designed to be memory efficient so it can handle
 
 
 ## Resource
+
+[The Real Meaning of Ich Bin ein Berliner](https://www.theatlantic.com/magazine/archive/2013/08/the-real-meaning-of-ich-bin-ein-berliner/309500/): Word Alignment: 比如德语 Berliner 可以指柏林人，也可以值一种donut 甜甜圈. 比如下面English word 多于German word.
 
 [Jukebox - A neural network that generates music!](https://openai.com/blog/jukebox/)
 
