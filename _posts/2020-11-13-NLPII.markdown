@@ -1807,6 +1807,11 @@ Transformer network precedes repeating by adding residuals to hidden state. To r
 
 ![](/img/post/Natural-Language-Processing/course4/week4pic5.png)
 
+Note: After each attention layer/Feed Forward layer, swap the elements to take into account the stack semantics in `Trax`
+
+![](/img/post/Natural-Language-Processing/course4/ReversibleDecoder.png)
+
+
 Roughly the same BLEU scores for regular and reversible transformers on machine translation and language modeling produce similar results. Reversible layer is a general techniques that can be applied anywhere in a transformer model. 
 
 #### Reformer
