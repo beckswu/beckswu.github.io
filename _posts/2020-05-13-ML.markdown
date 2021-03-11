@@ -1,0 +1,469 @@
+---
+layout:     post
+title:      "Machine Learning "
+subtitle:   "Key Concept"
+date:       2020-05-13 20:00:00
+author:     "Becks"
+header-img: "img/post-bg-os-metro.jpg"
+catalog:    true
+tags:
+    - Machine Learning
+    - 学习笔记
+---
+
+<style type="text/css">
+.image-left {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  float: left;
+}
+</style>
+
+<script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"> </script>
+
+
+## Decision Tree
+
+- **Advantage**: easy to use / train and easy to interpret. 
+- <span style="background-color:#FFFF00">**Disdvantage**: not flexible when comes to classifying new samples, often being overfit</span>
+
+
+**Entropy**: a measure of disorder or uncertainty. High Value means high disorder. 
+
+$$E\left(S \right) = -\sum_{i=1}^c P\left( x_i \right) log_2 P\left( x_i \right)$$
+
+
+![](/img/post/ML/entropy.png)
+
+**Information Gain**:  the higher the value, the more gains
+
+
+
+
+- **Decision Trees** algorithm will always tries to maximize **Information gain**.
+- An **attribute** with highest Information gain will tested/split first.
+
+$$
+\begin{align}
+IG \left(Y,X \right) &= E\left(  Y \right) - E \left( Y \mid X \right) \\
+& = E \left( Y \right) -\big( p\left( x_1 \right) E \left( Y \mid X = x_1 \right) + p\left( x_2 \right)E\left( Y \mid X= x_2 \right) \big)
+
+\end{align}
+$$
+
+
+e.g.  Use if height is bigger than 190 cm to predict if a person is a NBA player
+
+| Height >  190cm (X) | Is NBA player (Y) |
+| :-----: | :-----: |
+|  Yes   |  Yes     |
+|  No    |  Yes     |
+|  Yes   |  No     |
+|  No   |  No     |
+|  Yes   |  Yes     |
+
+$$E(Y) =  - \frac{2}{5} * log_2 \left( \frac{2}{5}  \right) -  \frac{3}{5} * log_2 \left( \frac{3}{5}  \right) = 0.971 $$
+
+$$E(Y | X = Yes) =  - \frac{1}{3} * log_2 \left( \frac{1}{3}  \right) -  \frac{2}{3} * log_2 \left( \frac{2}{3}  \right) = 0.918 $$
+
+$$E(Y | X = NO) =  - \frac{1}{2} * log_2 \left( \frac{1}{2}  \right) -  \frac{1}{2} * log_2 \left( \frac{1}{2}  \right) = 1 $$
+
+$$
+\begin{align}
+IG \left(Y,X \right) &= E\left(  Y \right) -  \big( p\left( X=YES \right) E \left( Y \mid X = YES \right) + p\left( X = No \right)E\left( Y \mid X= NO \right) \big) \\
+
+&= 0.971 - \left( \frac{3}{5} *0.918 +  \frac{2}{5}*1 \right) \\
+&= 0.02
+\end{align}
+$$
+
+
+For **Numerical Values**, Sort the value, calculate the <span style="background-color:#FFFF00">**average for all adjacent points**</span>, then use each average value as the threshold to compute information gain and find the best one
+
+![](/img/post/ML/dt1.png)
+
+When dealing with **rank values**. Try <span style="color:red">each rank as threshold and find the best one.</span> 
+e.g. only has 1 to 4 rank.  Note: 不用试 rank = 4 as threshold 因为所有rank 都小于4
+
+![](/img/post/ML/dt2.png)
+
+When dealing with **multiple categorical values**: Try each possible combination and find the best one 
+
+![](/img/post/ML/dt3.png)
+
+## Regression Tree
+
+The failure of Linear Regression:
+
+![](/img/post/ML/regressionTree1.png)
+
+- Regression Tree are a type of decision tree. 
+  - <span style="background-color:#FFFF00">In regression tree, each leaf represents a **numeric value**</span>
+  - Classification Trees have True or False or some discrete category in their leaves
+- Regression Tree easily accomodates additional predictors 
+- To find the **threshold** for each node: <span style="background-color:#FFFF00">split the data into two groups by finding the threshold that **gave the smallest sum of squared residuals**</span> $$\sum \left( predicted - observed \right)^2$$
+- When there are <span style="background-color:#FFFF00">**multiple features**, try different features with different threshold. Then use the feature with the threshold that has **the smallest sum of squared residuals** as the node and threshold</span>
+- <span style="color:red">The leaf values is the **average of observation values** ending within this leaf</span>
+- If each leaf end with only one observation, the accuracy of training is 100% but it will overfit the training data. <span style="background-color:#FFFF00">**To aviod overfitting**</span>:
+  1. <span style="color:red">Only split observations when there are more than some minimum number</span>. Typically the minimum number of observations to allow for a split is 20
+  2. Remove some of leaves and combine them into one leaf. The predicted value of the leaf is the average of all values
+
+
+E.g. Use employee's Income to predict car value
+
+![](/img/post/ML/regressionTree2.png)
+
+
+![](/img/post/ML/regressionTree3.png)
+
+
+#### Cost Complexity Prune Tree
+
+- How to prune the tree to avoid the overfitting on training data (not perform so well on training data )
+- **Tree Score**: based on **Sum of Squared Residuals** (SSR) for the tree or sub-tree and **Tree Complexity Penalty(T)** that is a function of the number of leaves, or Terminal nodes in the tree or sub-tree
+  - **Tree Complexity Penalty** compensates for the difference in the number of leaves
+  - $$\alpha$$ is a tuning parameter. Find the best $$\alpha$$ using **cross validation**
+
+$$\bf{\text{Tree Score } = SSR + \alpha \underbrace{T}_{\# Leaves}}$$
+
+e.g. tree has four leaves and $$\alpha = 10000$$
+
+$$\bf{\text{Tree Score }} = 543.8 + 10000 \times 4 $$
+
+
+**Step 1: <span style="background-color:#FFFF00">Tunning $$\alpha$$</span> using use all of the data (not just training)**
+  1. build the full-sized regression Tree (which do the best on training data). It has the lowest **Sum of Squared Residuals** among all the trees(**$$\alpha = 0$$**)
+  2. Increase $$\color{red}{\bf{\alpha}}$$ until pruning leaves(reducing number of leaves) give us a ower Tree score 
+  3. Repeat Step 2. then different values for $$\color{red}{\bf{\alpha}}$$ give a sequence of trees from full sized to just a leaf. (每个tree 对应一个 $$\alpha$$)
+
+ ![](/img/post/ML/regressionTree4.png)
+
+**Step 2: <span style="background-color:#FFFF00">Selecting the best $$\alpha$$. Divide data into training and testing. </span>**
+  1. Use the $$\alpha$$ found at the step 1 to build a full tree and a sequence of subtrees that minimize the Tree Score for each sub-tree
+  2. Repeat above step K times (**K-fold cross validation**), then pick the $$\alpha$$ which has <span style="background-color:#FFFF00">lowest average **Sum of Square Residuals** with **Testing Data**</span> (如果有N 个tree, 有N个$$\alpha$$对应，选择最小的average **Sum of Square Residuals**的 $$\alpha$$)
+
+
+
+**Step 3: pick the tree build at Step 1(with full data) that corresponds to the value for $$\alpha$$ selected at Step 2  as the final pruned tree**
+
+
+
+
+
+## Random Forest 
+
+Random Forest combine the simplicity of decision tress with flexibility resulting in a vast improvement in accuracy. 
+
+
+#### Build Random Forest
+
+**Step 1: Bootstrap** Create new dataset, <span style="background-color:#FFFF00">**same size as original**</span>, randomly select samples from original dataset and allows <span style="background-color:#FFFF00">**duplicate**</span>
+
+- **Bagging**:<span style="background-color:#FFFF00">combine classifiers by sampling/bootstrapping training set</span>
+- <span style="background-color:#FFFF00">**Out-of-bag dataset**</span>: Around 1/3 of original data doesnot end up in the bootstrap dataset
+
+![](/img/post/ML/rt1.png)
+
+**Step 2**: Create a decision tree using the bootstrapped dataset but only use a **random subset of variables** at each step 
+  - e.g. total features = 4 at first node, only **randomly select 2 out of 4** features to see which one of 2 is best for the first node. Then to select second nodes, **randomly select 2 out of 3** features to see wich is the best
+
+**Step 3**: Repeat step 1 and 2 N times, and generate a wide variety of trees. 
+  - The variety makes random forests more effective than individual decision trees.
+
+#### Evaluation 
+
+run all out-of-bag samples for all of trees and see if the predictions are correct or not.
+
+- For each evaluation sample, <span style="color:red">run through all N trees and use the most predicted class as output</span>
+  - e.g. total 100 trees, 80 of them predict a person is a NBA player and 20 of them predict not NBA player. Output = NBA player
+
+$$Accuracy = \frac{\text{correct labeled prediction for out-of-bag dataset}}{\text{total out-of-bag size}}$$
+
+$$\bf{\text{Error of out-of-bag samples}} = \frac{\bf{\text{incorrect}} \text{  classification for out-of-bag dataset}}{\text{total out-of-bag size}}$$
+
+e.g. total 100 out-of-bag size, 80 of them predict correct(<span style="color:red">running all trees, label is same as most predict classes</span>), Accuracy = 0.8
+
+#### Missing Values
+
+![](/img/post/ML/rt2.png)
+
+
+**Deal with missing data in original dataset**
+
+**Step 1: Make a initial guess**: 
+
+- <span style="background-color:#FFFF00">**For categorical value**</span>:  guess the <span style="background-color:#FFFF00">**common class**</span> among other samples that have the same label.  
+- <span style="background-color:#FFFF00">**For numeric value**</span>:  guess the <span style="background-color:#FFFF00">**median value**</span> among other samples that have the same label. 
+  - e.g. In above picture, label of missing row  *No Heart Disease*, then find for other No Heart Disease sample, the median of weight is (125 + 210)/2 = 167.5
+
+**Step 2: Build the random forest using all samples including guessed ones**: 
+
+
+**Step 3: Run all of data for all the tree and build <span style="background-color:#FFFF00">Proximity Matrix</span>**
+
+
+$$\text{Proximity value} = \frac{\color{fuchsia}{\text{the number of times two data end with the same leaf node}}}{\text{total random forest trees}}$$
+
+$$Distance = 1-  \text{Proximity value}$$
+
+<span style="background-color:#FFFF00">If Distance close to 0, means two data end with teh same leaf node for all trees </span>
+
+![](/img/post/ML/rt3.png)
+![](/img/post/ML/rt4.png)
+
+
+**Step 4: use the proximity values to make better guess about the missing data**
+
+![](/img/post/ML/rt5.png)
+
+Because  $$\frac{3}{5} > \frac{1}{30}$$, esitmated value is no 
+
+$$\begin{align} \text{Weight Guess} &= 125*\frac{0.1}{0.1+0.1+0.8}  \\
+& +180*\frac{0.1}{0.1+0.1+0.8} \\ & + 210*\frac{0.8}{0.1+0.1+0.8} = 198.5 \end{align}$$
+
+
+**Step 5: Repeat step 1 and 3 over and over again to build the tree, run the data through the tree, and recalculate the missing value <span style="background-color:#FFFF00">until missing value converge</span>. No longer change each time we recalculate**
+
+***
+
+**Deal with missing data in new sample that need to be predicted**
+
+
+**Step 1**: Create <span style="background-color:#FFFF00">**n (total n classes) copies of the data**</span>, one for each predicted class`
+  - e.g. data is missing for height > 190cm. Make 2 copies of data, and label the first is NBA player and another second not a NBA player
+
+**Step 2**: use above iterative methods to <span style="color:red">make a good prediction about the missing values for each copy of labeled class</span>
+  - e.g. guess height > 190cm for both copies 
+
+**Step 3**: Then run those n copies of data through the trees in the forest with filled estimation value, and see <span style="background-color:#FFFF00">**which one is correctly labeled by the random forest the most times**</span>
+  - e.g. total 100 trees, Predict 80 as NBA player for the one labeled as NBA player.  Predict 60 as not NBA player for the one labeled as not a NBA player. Finally output as NBA player
+
+
+## AdaBoost
+
+- Random Forest, make a full size tree and some tree may bigger than others
+- In a Forest of Trees made with **AdaBoost**, the trees are usually just <span style="background-color:#FFFF00">**a node and two leaves(called Stump)**</span>
+  - Stump are not great at making accurate classifications
+- AdaBoost combines a lot of **weak learners**(**stumps**) to make clasfication
+- <span style="color:red">Some Stumps get more say</span> in the classification than others
+- Each stump is made by <span style="color:red">**taking previous stump's mistakes into account**</span>
+- In	practice,	we	usually	<span style="background-color:#FFFF00">**stop boosting	after	certain	iterations	to	both save	time	and	prevent	overfitting**</span>
+
+
+![](/img/post/ML/ab1.png)
+
+In **Random Forest**, each tree has an **equal vote** on the final classification. However for AdaBoost in a **Forest of Stumps**, some stumps get more say in final classification than others
+
+![](/img/post/ML/ab2.png)
+
+In **Random Forests**, each decision tree is made <span style="background-color:#FFFF00">**independently**</span> of the others. In contrast, <span style="background-color:#FFFF00">**in a Forest of Stumps made with AdaBoost, order is important**</span>
+  - The error of first stump made influence how second stump made. Then error of second stump influence the third stump.
+
+
+#### Create a Forest of Stumps using AdaBoost
+
+**Step 1:** <span style="background-color:#FFFF00">**Give each sample a weight**</span> that indicates how important it is to be correctly classified. At start, all sample get a same weight. 
+
+$$weight = \frac{1}{\text{total number of samples }}$$
+
+**Step 2: Then choose the best feature as the node of stump**
+
+
+**Step 3: Calculate Total Error and Amount Say** for the stump. Total Error is always between 0 and 1. <span style="color:red">0 is perfect stump and 1 for horrible stump</span>
+  - when stump does a good job, **Total Error** is small and **Amount of Say** is large
+  - When stump like flipping a coin, **Total Error** = 0.5 and **Amount of Say** is 0
+  - When stump consistently gives the opposite classification, **Total Error** is close to 1 and **Amount of Say** is a large negative value
+
+$$\text{Total Error} = \frac{\text{total data being incorrectly classified}}{\text{total number of dataset}} $$
+
+$$\text{Amount of Say } \left( \alpha_t \right) = \frac{1}{2} log\left( \frac{1 - \text{Total Error}}{\text{Total Error }} \right)$$
+
+**Step 4: Use the amount of say to Adjust the weight**. The idea is to increase weight for incorrectly classified sample and decrease weight for correctly classified sample
+
+$$\text{Incorrectly classified Sample Weight} = \text{sample weight} \times \color{fuchsia}{e^{\text{amount of say}}}$$
+
+$$\text{correctly classified Sample Weight} = \text{sample weight} \times \color{fuchsia}{e^{-\text{amount of say}}}$$
+
+
+![](/img/post/ML/ab3.png)
+
+- For **incorrectly classfied** sample: 
+  - If **amount of say** is large (<span style="color:red">stump does a good job</span>), <span style="color:red">new Sample weight will be much larger than old one</span>
+  - If  **amount of say** is small (<span style="color:red">stump does not do a good job</span>), <span style="color:red">new Sample weight will be a little larger than old one</span>
+- For **correctly classfied** sample: 
+  - If **amount of say** is large, new sample weight will very small
+  - If **amount of say** is small, new sample weight will very a little smaller than the old one
+
+**Step 5: Normalize new weights to make them add to 1**
+
+Combine step 4 and step 5:
+
+$$
+\begin{align}
+  
+W_{t+1}\left( i \right) & = \frac{W_{t}\left( i \right)}{Z_t} \times 
+
+             \begin{cases} e^{-\alpha_t} & \text{if } h_t\left( x_i \right) = y_i \\
+                           e^{\alpha_t} & \text{if } h_t\left( x_i \right) \neq y_i
+
+              \end{cases} \\
+& =  \frac{W_{t}\left( i \right)  exp\left( -\alpha_t y_i h_t\left(x_i\right) \right)  }{Z_t}
+\end{align}
+$$
+
+
+where $$h_t\left( x_i \right)$$ is the prediction of stump, both  $$h_t\left( x_i \right)$$ and $$y_i$$ only take 1 or -1
+ 
+
+**Step 6: Gnerate sample based on the new noralized weight(<span style="background-color:#FFFF00">allow duplicate and the same size as before</span>)**: incorrect classified data will be drawn with a higher probability since the weight is higher
+
+**Step 7: Use new genereated sample as dataset and change the weight to equal weight**
+- Note: equal weight doesn't mean stump will not emphasize the need to correctly classify these samples. Because allow duplicate, in new generated sample there is more data of being incorrectly classfied before
+
+$$weight = \frac{1}{\text{total number of samples }}$$
+
+<span style="color:red">Or Substitution of Step 6 and 7: use new weight in Information gain/Weighted Gini Function mismatches without generating new dataset</span>
+
+**Step 8: Repeat step 1-7 N times to make N stumps**
+- So error of first tree influence second tree, then second tree error influence third tree
+
+**Evaluation**:
+
+Use the data to pass all the stump and calculate the **total amount of say(created during the training)** from each predicted class, <span style="background-color:#FFFF00">the class with total largest of amount of say is the prediction class</span>
+
+$$\hat y = sign \left( \sum_{t=1}^T \alpha_t h_t \left(x \right) \right), \text{ T is the number of total Stump}$$
+
+[Example](https://www.youtube.com/watch?v=LsK-xG1cLYA&list=PLblh5JKOoLUICTaGLRoHQDuF_7q2GfuJF&index=53)
+
+#### Bagging Vs Boosting
+
+- Both have final prediction as a <span style="color:red">linear combination of classifiers</span>
+- **Bagging** combination weights are uniform; **boosting** weights (amount of say $$\alpha_t$$) are a measure of performance for classifier at round
+-  **Bagging** has **independent** classifiers, **boosting** ones are **dependent** of each other
+- <span style="background-color:#FFFF00">**Bagging** randomly selects training sets; **boosting**
+focuses on most difficult points</span>
+
+## Gradient Boost
+
+#### Gradient Boost for Regression
+
+- Gradient Boost starts by making a single **leaf**, instead of a tree or stump. The leaf represents an initial guess for the **Weights** of all of the samples
+- **Like Adaboost, Gradient Boost builds fixed sized trees based on the previous tree's errors**
+- Like Adaboost, Graident Boost scale the trees, **However, Gradient Boost all the trees by the same amount** 
+  - <span style="background-color:#FFFF00">Gradient Boost use a **Learning Rate**(Value between 0 and 1) to scale the contribution from the tree instead of **Amount of Say**</span>
+- **Gradient Boost** usually uses trees larger than **stumps**, In practice, people often set the maximum number of leaves to between 8 and 32
+- Gradient Boost continues to build trees until it has made the number of trees you asked for or additional trees fail to improve the fit
+
+
+#### Build Gradient Boost Regression Trees
+
+<hr>
+
+$$
+
+\begin{align}
+
+Input: & Data \{ \left( x_i , y_i \right) \}_{i=1}^m, \text{and a differentiable Loss Function} L \left( y, F\left( x \right) \right) \\
+
+\text{Step 1: } & \text{Initialize model with a constant value } \color{Fuchsia}{F_0\left(x \right) = argmin_\gamma \sum_{i=1}^n L \left( y_i, \gamma \right)}\\
+
+\text{Step 2: } & \text{ for } t = \text{1 to T}: \color{Gray}{\text{( T is the number of Trees)}} \\
+
+& \left( A \right) \text{Compute } \color{Fuchsia}{r_{it} = - \left[ \frac{\partial L \left( y_i, F\left( x_i \right) \right)}{\partial F\left( x_i \right)} \right]_{F\left( x \right) = F_{t-1}\left( x \right)}} \text{ for i = 1...M} \color{Gray}{\text{( M is the number of data)}} \\
+
+& \left( B \right) \text{Fit a regression tree to pseudo-residuals, train it using  } \left( x_i , r_{it} \right) \}_{i=1}^m \\
+& \quad \text{and create Terminal regions } R_{jt} \color{grey}{\text{( j-th leaf in the t-th tree)}} \\
+
+& \left( C \right) \text{For j = 1 ... L compute } \color{Fuchsia}{r_{jt} =  argmin_\gamma \sum_{x_i \in R_{jt}} L \left( y_i, F_{t-1}\left( x_i \right) + \gamma \right)}  \\
+& \quad \color{grey}{\text{( L is total number of leaves in t-th  tree  )}} \\
+
+& \left( D \right) \text{update the model }, \nu \text{ is learning rate} \color{grey}{\text{ (value between 0 and 1)}}\\
+& \quad \color{Turquoise}{F_t\left( x \right) = F_{t-1}\left( x \right) +  \nu \sum_{j}^L r_{jt} I\left( x \in R_{jt} \right)} \\
+
+\end{align}
+$$
+
+<hr>
+
+**Explanation:**: $$\hat y_i = F_i \left( x \right)$$ : ith tree prediction value
+
+
+**Input**: Data $$\{ \left( x_i , y_i \right) \}_{i=1}^m$$, and a differentiable Loss Function $$L \left( y_i, F\left( x \right) \right)$$
+
+
+- $$\{ \left( x_i , y_i \right) \}_{i=1}^m$$ m is the number of training data, and $$x_i$$ is a vector represent input features. $$y_i$$ is the predicted value
+- Loss Function $$L \left( y, F\left( x \right) \right) = \frac{1}{2} \sum_{i=1}^m \left( y_i - F\left( x \right)\right)^2 $$, m is total number of data
+
+
+
+$$ F_0\left(x \right) = argmin_\gamma \sum_{i=1}^m L \left( y_i, \gamma \right) $$
+
+<span style="background-color:#FFFF00">means need to find a $$\gamma$$ value to minimize the sum of Loss function</span>. Can calculate the derivative of Loss function respect to $$F_0\left(x \right)$$. And set it equal to 0 to find the optimal value
+- It is <span style="color:red">**average of y**</span>. It means the prediction just the averge of y of training data. 
+
+
+$$ \frac{d }{d F_0\left(x \right)}\sum_{i=1}^m L \left( y_i,F_0\left(x \right) \right) = \frac{d }{d F_0\left(x \right)}\sum_{i=1}^m \frac{1}{2}  \left( y_i - F_0\left(x \right) \right)^2 = - \sum_{i=1}^m   \left( y_i - F_0\left(x \right) \right)  $$
+
+$$- \sum_{i=1}^m   \left( y_i - F_0\left(x \right) \right) = 0  \Rightarrow  F_0\left(x \right)= \frac{1}{m}\sum_{i=1}^m   y_i $$
+
+$$F_0\left(x \right)  = \frac{1}{m}\sum_{i=1}^m   y_i $$
+
+
+T is the number of Trees and usually set to 100 trees
+
+**(A)**: <span style="background-color:#FFFF00">**$$r_{it} $$: t-th tree's  i-th sample Pseudo Residuals**</span>
+
+- for i = 1, ... , m is to calculate residual for all the samples in the dataset
+
+$$r_{it} = - \underbrace{ \left[ \frac{\partial L \left( y_i, F\left( x_i \right) \right)}{\partial F\left( x_i \right)} \right]_{F\left( x \right) = F_{t-1}\left( x \right)}}_{\text{Plug last step } F\left(x \right) \text{  into equation after getting the derivative}} $$
+
+As we know, 
+
+$$- \frac{\partial L \left( y_i, F\left( x_i \right) \right)}{\partial F\left( x_i \right)}  = - \frac{d }{d \hat y}  L \left( y_i, F\left(x \right)\right) =  y_i - F\left(x \right) $$
+
+When t = 1, 
+
+$$ y_i - F_0\left(x \right)   =  y_i - \text{average of y}$$
+
+
+**(B): <span style="background-color:#FFFF00">means to build a regression tree to predict residuals instead of true y value</span>**
+
+![](/img/post/ML/gb1.png)
+
+![](/img/post/ML/gb2.png)
+
+
+**(C)**: if multiple training data end with the same leaf, use this equation to calculate output value. Calulate the derivate of Loss function respect to $$F_{t-1}$$, and set it to 0 to find the optimal value 
+
+- Each time add a tree to the Prediction, the residuals get smaller
+
+$$  \sum_{x_i \in R_{jt}} L \left( y_i, F_{t-1}\left( x_i \right) + \gamma \right) = \sum_{x_i \in R_{jt}} \frac{1}{2} \left( y_i - \left( F_{m-1}\left( x_i \right) + \gamma\right) \right)^2   $$
+
+$$\frac{d}{d \gamma} \sum_{x_i \in R_{jt}} \frac{1}{2} \left( y_i - \left( F_{m-1}\left( x_i \right) + \gamma\right) \right)^2 = $$
+
+$$\begin{align} 
+
+\frac{d}{d \gamma} \sum_{x_i \in R_{jt}} \frac{1}{2} \left( y_i - \left( F_{m-1}\left( x_i \right) + \gamma\right) \right)^2 & = -\sum_{x_i \in R_{jt}} \left( y_i -  F_{m-1}\left( x_i \right) - \gamma \right) \\
+
+&= -\sum_{x_i \in R_{jt}} \left( \text{pseudo residual} - \gamma\right)
+
+\end{align}$$
+
+$$ \gamma = \frac{1}{\text{number of sample end in } R_{jt}} \sum_{x_i \in R_{jt}}  \text{pseudo residual} 
+
+$$
+
+
+**(D)**: make a new prediction for each sample. Each new prediction is based on last prediction made and the tree just making
+  - <span style="background-color:#FFFF00">**A small learning rate reduces effect each tree has on the final prediction and this improves accuracy in the long run**</span>
+
+![](/img/post/ML/gb3.png)
+  
+
+<video src="https://www.youtube.com/embed/J4Wdy0Wc_xQ" controls></video>
+
+
+**References**
+
+[StatQuest](https://www.youtube.com/channel/UCtYLUTtgS3k1Fg4y5tAhLbw)
