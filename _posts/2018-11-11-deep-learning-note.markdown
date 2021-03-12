@@ -70,7 +70,7 @@ $$z^{\left[ i \right]} = W^{\left[ i \right]}a^{\left[ i-1 \right]} + b^{\left[ 
 
 $$\mathbf{\text{Loss function: }\mathscr{L} \left(\hat y, y \right) = \bbox[yellow]{ - ylog\left( \hat y \right) - \left( 1- y \right) log\left( 1 - \hat y \right)} }$$
 
-$$\mathbf{\text{Cost function: }} J \left(w, b\right) =  -\frac{1}{m} \sum_{i=1}^m \mathscr{L} \left(\hat y^{\left(i\right)}, y^{\left(i\right)} \right) = \frac{1}{m} \sum_{i=1}^m  \ y^{\left(i\right)} log\left( \hat y^{\left(i\right)}  \right) + \left( 1- y^{\left(i\right)} \right) log\left( 1 - \hat y^{\left(i\right)} \right) $$
+$$\mathbf{\text{Cost function: }} J \left(w, b\right) =  \frac{1}{m} \sum_{i=1}^m \mathscr{L} \left(\hat y^{\left(i\right)}, y^{\left(i\right)} \right) = -\frac{1}{m} \sum_{i=1}^m \left(  \ y^{\left(i\right)} log\left( \hat y^{\left(i\right)}  \right) + \left( 1- y^{\left(i\right)} \right) log\left( 1 - \hat y^{\left(i\right)} \right)  \right)$$
 
 
 **Loss function** measures how well your algorithm output $$\hat y^{\left(i \right)} $$ on each of the training examples or compares to the ground true label $$ y^{\left(i \right)}$$ on each of the training examples (loss function是对于一个 training example )

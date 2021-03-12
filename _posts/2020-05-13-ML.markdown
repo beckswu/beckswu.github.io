@@ -20,7 +20,42 @@ tags:
 }
 </style>
 
-<script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"> </script>
+
+## Logit Function 
+
+$$Odd = \frac{P }{1- P}, text{ where p is probability}$$
+
+$$\color{fuchsia}{\bf{odd} = \frac{\text{Something happening i.e. wining}}{ \text{Something not happening. i.e. losing }}}$$
+
+
+$$\color{blue}{\bf{probability} = \frac{\text{Something happening i.e. wining}}{ \text{everything could happen. i.e. losing + winning}}}$$
+
+
+P is the probability and odds is not probability. E.g. Winning a game probability is 0.7, Odds of winning is: $Odd = \frac{7}{3}$
+
+
+**Log of odds**: the asymmetry of odds make it diffcult to compare the odds for something happening or not happening.
+
+$$ - log \left( \frac{p}{1-p}   \right) =  log \left( \frac{1-p}{p}   \right)$$
+
+E.g. If the probability of winning is 0.9, the odds of winning is 9, the odds of losing $\frac{1}{9}$
+
+![](/img/post/ML/logit1.png)
+
+**Derived Sigmoid Function**
+
+$$
+\begin{aligned}
+log \left( \frac{p}{1-p}   \right) &= W X + b \\
+\frac{p}{1-p} &= e^{WX + b} \\
+p &= e^{WX + b} - p e^{WX + b} \\
+P &= \frac{e^{WX + b}}{ 1 + e^{WX + b}} \\
+   &=  \frac{1}{ 1 + e^{-\left(WX + b\right)}} \\
+\end{aligned}
+$$
+
+![](/img/post/ML/logit2.png)
+
 
 
 ## Decision Tree
@@ -45,11 +80,11 @@ $$E\left(S \right) = -\sum_{i=1}^c P\left( x_i \right) log_2 P\left( x_i \right)
 - An **attribute** with highest Information gain will tested/split first.
 
 $$
-\begin{align}
+\begin{aligned}
 IG \left(Y,X \right) &= E\left(  Y \right) - E \left( Y \mid X \right) \\
 & = E \left( Y \right) -\big( p\left( x_1 \right) E \left( Y \mid X = x_1 \right) + p\left( x_2 \right)E\left( Y \mid X= x_2 \right) \big)
 
-\end{align}
+\end{aligned}
 $$
 
 
@@ -70,12 +105,12 @@ $$E(Y | X = Yes) =  - \frac{1}{3} * log_2 \left( \frac{1}{3}  \right) -  \frac{2
 $$E(Y | X = NO) =  - \frac{1}{2} * log_2 \left( \frac{1}{2}  \right) -  \frac{1}{2} * log_2 \left( \frac{1}{2}  \right) = 1 $$
 
 $$
-\begin{align}
+\begin{aligned}
 IG \left(Y,X \right) &= E\left(  Y \right) -  \big( p\left( X=YES \right) E \left( Y \mid X = YES \right) + p\left( X = No \right)E\left( Y \mid X= NO \right) \big) \\
 
 &= 0.971 - \left( \frac{3}{5} *0.918 +  \frac{2}{5}*1 \right) \\
 &= 0.02
-\end{align}
+\end{aligned}
 $$
 
 
@@ -123,19 +158,19 @@ E.g. Use employee's Income to predict car value
 - How to prune the tree to avoid the overfitting on training data (not perform so well on training data )
 - **Tree Score**: based on **Sum of Squared Residuals** (SSR) for the tree or sub-tree and **Tree Complexity Penalty(T)** that is a function of the number of leaves, or Terminal nodes in the tree or sub-tree
   - **Tree Complexity Penalty** compensates for the difference in the number of leaves
-  - $$\alpha$$ is a tuning parameter. Find the best $$\alpha$$ using **cross validation**
+  - $\alpha$ is a tuning parameter. Find the best $\alpha$ using **cross validation**
 
 $$\bf{\text{Tree Score } = SSR + \alpha \underbrace{T}_{\# Leaves}}$$
 
-e.g. tree has four leaves and $$\alpha = 10000$$
+e.g. tree has four leaves and $\alpha = 10000$
 
 $$\bf{\text{Tree Score }} = 543.8 + 10000 \times 4 $$
 
 
-**Step 1: <span style="background-color:#FFFF00">Tunning $$\alpha$$</span> using use all of the data (not just training)**
-  1. build the full-sized regression Tree (which do the best on training data). It has the lowest **Sum of Squared Residuals** among all the trees(**$$\alpha = 0$$**)
-  2. Increase $$\color{red}{\bf{\alpha}}$$ until pruning leaves(reducing number of leaves) give us a ower Tree score 
-  3. Repeat Step 2. then different values for $$\color{red}{\bf{\alpha}}$$ give a sequence of trees from full sized to just a leaf. (每个tree 对应一个 $$\alpha$$)
+**Step 1: <span style="background-color:#FFFF00">Tunning $\alpha $</span> using use all of the data (not just training)**
+  1. build the full-sized regression Tree (which do the best on training data). It has the lowest **Sum of Squared Residuals** among all the trees(**$\alpha = 0$**)
+  2. Increase $\color{red}{\bf{\alpha}}$ until pruning leaves(reducing number of leaves) give us a ower Tree score 
+  3. Repeat Step 2. then different values for $\color{red}{\bf{\alpha}}$ give a sequence of trees from full sized to just a leaf. (每个tree 对应一个 $\alpha$)
 
  ![](/img/post/ML/regressionTree4.png)
 
@@ -219,8 +254,8 @@ $$Distance = 1-  \text{Proximity value}$$
 
 Because  $$\frac{3}{5} > \frac{1}{30}$$, esitmated value is no 
 
-$$\begin{align} \text{Weight Guess} &= 125*\frac{0.1}{0.1+0.1+0.8}  \\
-& +180*\frac{0.1}{0.1+0.1+0.8} \\ & + 210*\frac{0.8}{0.1+0.1+0.8} = 198.5 \end{align}$$
+$$\begin{aligned} \text{Weight Guess} &= 125*\frac{0.1}{0.1+0.1+0.8}  \\
+& +180*\frac{0.1}{0.1+0.1+0.8} \\ & + 210*\frac{0.8}{0.1+0.1+0.8} = 198.5 \end{aligned}$$
 
 
 **Step 5: Repeat step 1 and 3 over and over again to build the tree, run the data through the tree, and recalculate the missing value <span style="background-color:#FFFF00">until missing value converge</span>. No longer change each time we recalculate**
@@ -300,7 +335,7 @@ $$\text{correctly classified Sample Weight} = \text{sample weight} \times \color
 Combine step 4 and step 5:
 
 $$
-\begin{align}
+\begin{aligned}
   
 W_{t+1}\left( i \right) & = \frac{W_{t}\left( i \right)}{Z_t} \times 
 
@@ -309,7 +344,7 @@ W_{t+1}\left( i \right) & = \frac{W_{t}\left( i \right)}{Z_t} \times
 
               \end{cases} \\
 & =  \frac{W_{t}\left( i \right)  exp\left( -\alpha_t y_i h_t\left(x_i\right) \right)  }{Z_t}
-\end{align}
+\end{aligned}
 $$
 
 
@@ -346,6 +381,21 @@ focuses on most difficult points</span>
 
 ## Gradient Boost
 
+**Pros**:
+
+- Often best-off-shelf accuracy on many problems
+- Using modle for prediction requires only modest memory and is fast 
+- <span style="background-color:#FFFF00">**Doesn't requre careful normalization of features to perform well**</span>
+- Like decision trees, handles a mixture of feature types 
+
+**Cons**:
+
+- Like Random Forest, the model are difficult for humans to interpret
+- <span style="background-color:#FFFF00">**Requires careful tuning of the learning rate and other parameters**</span>
+- Training can require significant computation
+- Like Decision trees, <span style="color:red">not recommended for text classification and other problems with very high dimensional sparse features</span>, for accuracy and computational cost reasons
+
+
 #### Gradient Boost for Regression
 
 - Gradient Boost starts by making a single **leaf**, instead of a tree or stump. The leaf represents an initial guess for the **Weights** of all of the samples
@@ -356,13 +406,16 @@ focuses on most difficult points</span>
 - Gradient Boost continues to build trees until it has made the number of trees you asked for or additional trees fail to improve the fit
 
 
+
+
+
 #### Build Gradient Boost Regression Trees
 
 <hr>
 
 $$
 
-\begin{align}
+\begin{aligned}
 
 Input: & Data \{ \left( x_i , y_i \right) \}_{i=1}^m, \text{and a differentiable Loss Function} L \left( y, F\left( x \right) \right) \\
 
@@ -370,7 +423,8 @@ Input: & Data \{ \left( x_i , y_i \right) \}_{i=1}^m, \text{and a differentiable
 
 \text{Step 2: } & \text{ for } t = \text{1 to T}: \color{Gray}{\text{( T is the number of Trees)}} \\
 
-& \left( A \right) \text{Compute } \color{Fuchsia}{r_{it} = - \left[ \frac{\partial L \left( y_i, F\left( x_i \right) \right)}{\partial F\left( x_i \right)} \right]_{F\left( x \right) = F_{t-1}\left( x \right)}} \text{ for i = 1...M} \color{Gray}{\text{( M is the number of data)}} \\
+& \left( A \right) \text{Compute }  \text{ for i = 1...M} \color{Gray}{\text{( M is the number of data)}} \\ 
+& \quad \color{Fuchsia}{r_{it} = - \left[ \frac{\partial L \left( y_i, F\left( x_i \right) \right)}{\partial F\left( x_i \right)} \right]_{F\left( x \right) = F_{t-1}\left( x \right)}} \\
 
 & \left( B \right) \text{Fit a regression tree to pseudo-residuals, train it using  } \left( x_i , r_{it} \right) \}_{i=1}^m \\
 & \quad \text{and create Terminal regions } R_{jt} \color{grey}{\text{( j-th leaf in the t-th tree)}} \\
@@ -381,7 +435,7 @@ Input: & Data \{ \left( x_i , y_i \right) \}_{i=1}^m, \text{and a differentiable
 & \left( D \right) \text{update the model }, \nu \text{ is learning rate} \color{grey}{\text{ (value between 0 and 1)}}\\
 & \quad \color{Turquoise}{F_t\left( x \right) = F_{t-1}\left( x \right) +  \nu \sum_{j}^L r_{jt} I\left( x \in R_{jt} \right)} \\
 
-\end{align}
+\end{aligned}
 $$
 
 <hr>
@@ -395,13 +449,14 @@ $$
 - $$\{ \left( x_i , y_i \right) \}_{i=1}^m$$ m is the number of training data, and $$x_i$$ is a vector represent input features. $$y_i$$ is the predicted value
 - Loss Function $$L \left( y, F\left( x \right) \right) = \frac{1}{2} \sum_{i=1}^m \left( y_i - F\left( x \right)\right)^2 $$, m is total number of data
 
-
+**Step 1**
 
 $$ F_0\left(x \right) = argmin_\gamma \sum_{i=1}^m L \left( y_i, \gamma \right) $$
 
-<span style="background-color:#FFFF00">means need to find a $$\gamma$$ value to minimize the sum of Loss function</span>. Can calculate the derivative of Loss function respect to $$F_0\left(x \right)$$. And set it equal to 0 to find the optimal value
+<span style="background-color:#FFFF00">means need to find a $\gamma$ value to minimize the sum of Loss function</span>. Can calculate the derivative of Loss function respect to $F_0\left(x \right)$. And set it equal to 0 to find the optimal value
 - It is <span style="color:red">**average of y**</span>. It means the prediction just the averge of y of training data. 
-
+- <span style="background-color:#FFFF00">Only $F_0\left(x\right) $ is the same for all $x_i$. Once update the $F_t\left(x_i \right) $ using pseudo-residual, $F_t\left(x_i \right) $  will be different for differernt $x_i$
+</span>
 
 $$ \frac{d }{d F_0\left(x \right)}\sum_{i=1}^m L \left( y_i,F_0\left(x \right) \right) = \frac{d }{d F_0\left(x \right)}\sum_{i=1}^m \frac{1}{2}  \left( y_i - F_0\left(x \right) \right)^2 = - \sum_{i=1}^m   \left( y_i - F_0\left(x \right) \right)  $$
 
@@ -420,11 +475,11 @@ $$r_{it} = - \underbrace{ \left[ \frac{\partial L \left( y_i, F\left( x_i \right
 
 As we know, 
 
-$$- \frac{\partial L \left( y_i, F\left( x_i \right) \right)}{\partial F\left( x_i \right)}  = - \frac{d }{d \hat y}  L \left( y_i, F\left(x \right)\right) =  y_i - F\left(x \right) $$
+$$- \frac{\partial L \left( y_i, F\left( x_i \right) \right)}{\partial F\left( x_i \right)}  = - \frac{d }{d \hat y}  L \left( y_i, F\left(x_i \right)\right) =  y_i - F\left(x_i \right) $$
 
 When t = 1, 
 
-$$ y_i - F_0\left(x \right)   =  y_i - \text{average of y}$$
+$$ y_i - F_0\left(x_i \right)   =  y_i - \text{average of y}$$
 
 
 **(B): <span style="background-color:#FFFF00">means to build a regression tree to predict residuals instead of true y value</span>**
@@ -442,13 +497,13 @@ $$  \sum_{x_i \in R_{jt}} L \left( y_i, F_{t-1}\left( x_i \right) + \gamma \righ
 
 $$\frac{d}{d \gamma} \sum_{x_i \in R_{jt}} \frac{1}{2} \left( y_i - \left( F_{m-1}\left( x_i \right) + \gamma\right) \right)^2 = $$
 
-$$\begin{align} 
+$$\begin{aligned} 
 
 \frac{d}{d \gamma} \sum_{x_i \in R_{jt}} \frac{1}{2} \left( y_i - \left( F_{m-1}\left( x_i \right) + \gamma\right) \right)^2 & = -\sum_{x_i \in R_{jt}} \left( y_i -  F_{m-1}\left( x_i \right) - \gamma \right) \\
 
 &= -\sum_{x_i \in R_{jt}} \left( \text{pseudo residual} - \gamma\right)
 
-\end{align}$$
+\end{aligned}$$
 
 $$ \gamma = \frac{1}{\text{number of sample end in } R_{jt}} \sum_{x_i \in R_{jt}}  \text{pseudo residual} 
 
@@ -461,7 +516,144 @@ $$
 ![](/img/post/ML/gb3.png)
   
 
-<video src="https://www.youtube.com/embed/J4Wdy0Wc_xQ" controls></video>
+#### Gradient Boost for Classification
+
+<span style="color:red">Same algorithm as Regression but cost function changes</span>. Some detailed explanation below.
+- $F_0 \left( x \right)$ is the log odds
+- <span style="background-color:#FFFF00">**Each leaves prediction is probability** </span>. <span style="background-color:#FFFF00">**Whereas, in Gradient Boost for Regression, a leaf is the average of Residual**</span>
+- Each leaves prediction is probability, so need some transformation to log(odds)
+
+<span style="color:red">**Convert Log(odds) to probability**</span>
+
+$$P = \frac{e^{log\left(odd\right)}}{1+ e^{log\left(odd\right)}} = \frac{1}{1+ e^{-log\left(odd\right)}}$$
+
+<span style="color:red">**Convert probability to  Log(odds)**</span>
+
+$$Log\left( odds \right) = \frac{\sum_{\color{red}{leaf}} Residual_i}{\sum_{\color{red}{\text{leaf}}} \text{Previous Probability } \times \left( 1-\text{Previous Probability } \right) }$$
+
+<span style="background-color:#FFFF00">**Evaluation**</span>:
+
+$$Log\left( odds \right) = F_0 \left( x_i \right) + \nu F_1 \left( x_i \right) + \cdots + \nu F_T \left( x_i \right)$$
+
+Then Predict 
+
+$$
+y = 
+\begin{cases}
+1  &  \text{ if }  \frac{1}{1 + e^{Log\left( odds \right)}} > 0.5 \\
+0  &   \text{ if } \frac{1}{1 + e^{Log\left( odds \right)}} \leq 0.5 \\
+\end{cases}
+$$
+
+
+**Input**: Data $\{ \left( x_i , y_i \right) \}_{i=1}^m$, and a differentiable Loss Function $L \left( y_i, F\left( x \right) \right)$
+
+
+- $y_i$ is the categorical value
+- Loss Function of Binary classification :  $ F\left( x \right)$ refers as predicted probability. 
+- The goal is to <span style="color:red">**maximize the loglikehood function and minimize loss function**</span>. So if want to use loglikehood function as cost function,  multiply by -1
+
+
+$$L \left( y, F\left( x \right) \right) = - \sum_{i=1}^m \left( y_i log \left( \frac{1}{1+ e^{-F\left( x \right)}}  \right) + (1-y_i) log \left( 1-  \frac{1}{1+ e^{-F\left( x \right)}}   \right) \right) $$
+
+
+**Step 1**:
+
+$$ F_0\left(x \right) = argmin_\gamma \sum_{i=1}^m L \left( y_i, \gamma \right) $$
+
+<span style="background-color:#FFFF00">means need to find a $\gamma$ value to minimize the sum of Loss function</span>. Can calculate the derivative of Loss function respect to $F_0\left(x \right)$. And set it equal to 0 to find the optimal value 
+- It is <span style="color:red">**probability of predicted positive class**</span>.
+
+$$\begin{aligned} 
+
+\text{let } a &= \frac{1}{1 + e^{-F_0\left(x\right)}}  \\
+\frac{da}{dF_0\left( x \right)} &= \frac{e^{-F_0\left(x\right)}}{\left(1 + e^{-F_0\left(x\right)}\right)^2} \\
+
+& =  \left(1 - \frac{1}{1 + e^{-F_0\left(x\right)}}\right)  \frac{1}{1 + e^{-F_0\left(x\right)}} \\
+
+& = a * \left( 1- a \right)
+ \end{aligned}$$
+
+
+$$\begin{aligned} 
+
+ L\left( y, F_0\left( x \right) \right) &= - \sum_{i=1}^m \big( y_i log \left( a\right) + (1-y_i) log \left( 1-a  \right) \big) \\
+
+\frac{d L \left( y_i,F_0\left(x \right)\right)}{da} &=\sum_{i=1}^m\left( -\frac{ y_i}{a}+ \frac{ 1- y_i}{ 1- a} \right)\\
+
+\frac{d L \left( y_i,F_0\left(x \right)\right)}{dF_0\left( x\right)} &= \frac{d L \left( y_i,F_0\left(x \right)\right)}{da} \frac{da}{dF_0\left( x\right)} \\
+
+&=\sum_{i=1}^m\left( -\frac{ y_i}{a}+ \frac{ 1- y_i}{ 1- a} \right) *a * (1-a) \\
+
+&=\sum_{i=1}^m\left( -y_i(1-a)+ \left(1- y_i\right)a \right) \\
+
+&= \sum_{i=1}^m\left( a - y_i \right) = ma - \sum_{i=1}^m y_i  \\
+
+ \end{aligned}$$
+
+
+Set the derivative equal to zero and can get 
+
+
+$$   
+\begin{aligned}
+\color{fuchsia}{a} & = \color{fuchsia}{ \frac{1}{m} \sum_{i=1}^m  y_i } \\
+
+ &= {\frac{\text{Number of Positive Class}}{\text{Total Number of Sample}}} = \color{blue}{p} \text{ probability of predicted positive} 
+\end{aligned}$$
+
+
+$$F_0\left( x \right) = log\left( \frac{a}{1-a} \right) = \color{blue}{log \left(  \frac{p}{1-p} \right)}$$
+
+**(A)**: <span style="background-color:#FFFF00">**$$r_{it} $$: t-th tree's  i-th sample Pseudo Residuals**</span>
+
+- for i = 1, ... , m is to calculate residual for all the samples in the dataset
+
+$$r_{it} = - \underbrace{ \left[ \frac{\partial L \left( y_i, F\left( x_i \right) \right)}{\partial F\left( x_i \right)} \right]_{F\left( x \right) = F_{t-1}\left( x \right)}}_{\text{Plug last step } F\left(x \right) \text{  into equation after getting the derivative}} $$
+
+For above,  
+
+$$ 
+- \frac{\partial L \left( y_i, F\left( x_i \right) \right)}{\partial F\left( x_i \right)} = a - y_i = \frac{1}{1+e^{-F\left( x \right)} } - y_i\\$$
+
+
+
+When t = 1, $ F_0\left( x \right) = log \left(  \frac{p}{1-p} \right)  $
+
+$$ \begin{aligned} 
+
+- \frac{\partial L \left( y_i, F\left( x_i \right) \right)}{\partial F\left( x_i \right)} &= \frac{1}{1+e^{-F\left( x \right)} } - y_i\\
+
+&= \frac{1}{1+e^{-log \left(  \frac{p}{1-p} \right)  } } - y_i \\
+
+
+&= \frac{1}{1+ \frac{1-p}{p}   } - y_i \\ 
+
+& = p - y_i = \color{fuchsia}{pseudo-residual} \\ 
+\end{aligned}$$
+
+**(C)**
+
+
+$$  \sum_{x_i \in R_{jt}} L \left( y_i, F_{t-1}\left( x_i \right) + \gamma \right) = \sum_{x_i \in R_{jt}} \frac{1}{2} \left( y_i - \left( F_{m-1}\left( x_i \right) + \gamma\right) \right)^2   $$
+
+$$\frac{d}{d \gamma} \sum_{x_i \in R_{jt}} \frac{1}{2} \left( y_i - \left( F_{m-1}\left( x_i \right) + \gamma\right) \right)^2 = $$
+
+$$\begin{aligned} 
+
+\frac{d}{d \gamma} \sum_{x_i \in R_{jt}} \frac{1}{2} \left( y_i - \left( F_{m-1}\left( x_i \right) + \gamma\right) \right)^2 & = -\sum_{x_i \in R_{jt}} \left( y_i -  F_{m-1}\left( x_i \right) - \gamma \right) \\
+
+&= -\sum_{x_i \in R_{jt}} \left( \text{pseudo residual} - \gamma\right)
+
+\end{aligned}$$
+
+$$ \gamma = \frac{1}{\text{number of sample end in } R_{jt}} \sum_{x_i \in R_{jt}}  \text{pseudo residual} 
+
+$$
+
+
+
+<!---video src="https://www.youtube.com/embed/J4Wdy0Wc_xQ" controls></video-->
 
 
 **References**
