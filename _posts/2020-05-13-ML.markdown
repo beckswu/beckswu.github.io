@@ -486,7 +486,6 @@ $$ y_i - F_0\left(x_i \right)   =  y_i - \text{average of y}$$
 
 ![](/img/post/ML/gb1.png)
 
-![](/img/post/ML/gb2.png)
 
 
 **(C)**: if multiple training data end with the same leaf, use this equation to calculate output value. Calulate the derivate of Loss function respect to $$F_{t-1}$$, and set it to 0 to find the optimal value 
@@ -509,11 +508,16 @@ $$ \gamma = \frac{1}{\text{number of sample end in } R_{jt}} \sum_{x_i \in R_{jt
 
 $$
 
+![](/img/post/ML/gb2.png)
+
+
 
 **(D)**: make a new prediction for each sample. Each new prediction is based on last prediction made and the tree just making
   - <span style="background-color:#FFFF00">**A small learning rate reduces effect each tree has on the final prediction and this improves accuracy in the long run**</span>
 
 ![](/img/post/ML/gb3.png)
+![](/img/post/ML/gb3_1.png)
+  
   
 
 #### Gradient Boost for Classification
@@ -579,9 +583,9 @@ $$\begin{aligned}
 
  L\left( y, F_0\left( x \right) \right) &= - \sum_{i=1}^m \big( y_i log \left( a\right) + (1-y_i) log \left( 1-a  \right) \big) \\
 
-\frac{d L \left( y_i,F_0\left(x \right)\right)}{da} &=\sum_{i=1}^m\left( -\frac{ y_i}{a}+ \frac{ 1- y_i}{ 1- a} \right)\\
+\frac{d L \left( y,F_0\left(x \right)\right)}{da} &=\sum_{i=1}^m\left( -\frac{ y_i}{a}+ \frac{ 1- y_i}{ 1- a} \right)\\
 
-\frac{d L \left( y_i,F_0\left(x \right)\right)}{dF_0\left( x\right)} &= \frac{d L \left( y_i,F_0\left(x \right)\right)}{da} \frac{da}{dF_0\left( x\right)} \\
+\frac{d L \left( y,F_0\left(x \right)\right)}{dF_0\left( x\right)} &= \frac{d L \left( y,F_0\left(x \right)\right)}{da} \frac{da}{dF_0\left( x\right)} \\
 
 &=\sum_{i=1}^m\left( -\frac{ y_i}{a}+ \frac{ 1- y_i}{ 1- a} \right) *a * (1-a) \\
 
@@ -604,6 +608,8 @@ $$
 
 
 $$F_0\left( x \right) = log\left( \frac{a}{1-a} \right) = \color{blue}{log \left(  \frac{p}{1-p} \right)}$$
+
+<span style="background-color:#FFFF00">**Note: p is only the same for the first tree. It will change when build next tree**</span>
 
 **(A)**: <span style="background-color:#FFFF00">**$$r_{it} $$: t-th tree's  i-th sample Pseudo Residuals**</span>
 
@@ -632,28 +638,112 @@ $$ \begin{aligned}
 & = p - y_i = \color{fuchsia}{pseudo-residual} \\ 
 \end{aligned}$$
 
-**(C)**
+**(C)**: Use Talyer Series to approximate the formula, [check here](https://blog.paperspace.com/gradient-boosting-for-classification/)
+
+$$ \text{For j = 1 ... L compute } \color{Fuchsia}{r_{jt} =  argmin_\gamma \sum_{x_i \in R_{jt}} L \left( y_i, F_{t-1}\left( x_i \right) + \gamma \right)}  \\
+ \quad \color{grey}{\text{( L is total number of leaves in t-th  tree  )}} $$
+
+$$
+\sum_{x_i \in R_{jt}} L\left(y_i, F_{t-1}\left(x_i\right) + \gamma \right) \approx \sum_{x_i \in R_{jt}}L\left(y_i, F_{t-1}\left(x_i\right) \right) + \sum_{x_i \in R_{jt}}\frac{d}{d F_{t-1}\left(x_i \right)}L\left(y_i, F_{t-1}\left(x_i\right) \right)\gamma \\ + \sum_{x_i \in R_{jt}}\frac{1}{2}\frac{d^2}{d F_{t-1}\left(x_i \right)^2}L\left(y_i, F_{t-1}\left(x_i\right) \right)\gamma^2
+$$
+
+As we know,
 
 
-$$  \sum_{x_i \in R_{jt}} L \left( y_i, F_{t-1}\left( x_i \right) + \gamma \right) = \sum_{x_i \in R_{jt}} \frac{1}{2} \left( y_i - \left( F_{m-1}\left( x_i \right) + \gamma\right) \right)^2   $$
+$$
+\begin{aligned}
+\text{let } p &= \frac{1}{1 + e^{-F_t\left(x\right)}}  \\
 
-$$\frac{d}{d \gamma} \sum_{x_i \in R_{jt}} \frac{1}{2} \left( y_i - \left( F_{m-1}\left( x_i \right) + \gamma\right) \right)^2 = $$
+\frac{da}{dF_t\left( x \right)} &= p * \left( 1- p \right) \\
 
-$$\begin{aligned} 
+\frac{d L \left( y,F_t\left(x \right)\right)}{dF_t\left( x\right)} &= \ \sum_{i=1}^m\left( p - y_i \right) = -\sum_{i=1}^m \text{pseudo-residual} \\
 
-\frac{d}{d \gamma} \sum_{x_i \in R_{jt}} \frac{1}{2} \left( y_i - \left( F_{m-1}\left( x_i \right) + \gamma\right) \right)^2 & = -\sum_{x_i \in R_{jt}} \left( y_i -  F_{m-1}\left( x_i \right) - \gamma \right) \\
+& \quad \color{grey}{\text{ p is the probability of predict positive}}\\
 
-&= -\sum_{x_i \in R_{jt}} \left( \text{pseudo residual} - \gamma\right)
+\frac{d^2 L \left( y,F_t\left(x \right)\right)}{dF_t\left( x\right)^2} &= \frac{d}{dF_t\left( x\right)} \sum_{i=1}^m\left( p - y_i \right) = \frac{d}{dF_t\left( x\right)} \sum_{i=1}^m\left( \frac{1}{1+e^{-F_t\left( x\right)}} - y_i \right) \\
 
-\end{aligned}$$
+& = \sum_{i=1}^m\left( p*(1-p) \right)
 
-$$ \gamma = \frac{1}{\text{number of sample end in } R_{jt}} \sum_{x_i \in R_{jt}}  \text{pseudo residual} 
-
+\end{aligned}
 $$
 
 
+Take the derivative to $gamma$ on both side
+
+
+$$\begin{aligned}
+\sum_{x_i \in R_{jt}}\frac{d}{d\gamma}L\left(y_i, F_{t-1}\left(x_i\right) + \gamma \right) &\approx \sum_{x_i \in R_{jt}} \frac{d}{d\gamma} L\left(y_i, F_{t-1}\left(x_i\right) \right) + \sum_{x_i \in R_{jt}}\frac{d}{d\gamma} \frac{d}{d F_{t-1}\left(x_i \right)}L\left(y_i, F_{t-1}\left(x_i\right) \right)\gamma  \\
+
+& \quad \quad +\sum_{x_i \in R_{jt}} \frac{1}{2}\frac{d}{d\gamma} \frac{d^2}{d F_{t-1}\left(x_i \right)^2}L\left(y_i, F_{t-1}\left(x_i\right) \right)\gamma^2 \\
+
+&= 0 + \sum_{x_i \in R_{jt}}\frac{d}{d F_{t-1}\left(x_i \right)}L\left(y_i, F_{t-1}\left(x_i\right) \right)+  \sum_{x_i \in R_{jt}}\frac{d^2}{d F_{t-1}\left(x_i \right)^2}L\left(y_i, F_{t-1}\left(x_i\right) \right)\gamma \\
+
+&= - \sum_{x_i \in R_{jt}} \text{pesudo-residual} + \sum_{x_i \in R_{jt}} \left( p * （1-p) \right) \gamma
+\end{aligned}$$
+
+And set the derivative to Zero
+
+$$\gamma = \frac{\sum_{x_i \in R_{jt}} \text{pesudo-residual} }{\sum_{x_i \in R_{jt}} \left( p * （1-p) \right) }  = \frac{\sum_{\color{red}{leaf}} \text{residual} }{\sum_{\color{red}{leaf}} \left( p * （1-p) \right) }$$
+
+E.g. use people's income and age to predict if the person has car
+
+![](/img/post/ML/gb4.png)
+![](/img/post/ML/gb5.png)
+![](/img/post/ML/gb6.png)
 
 <!---video src="https://www.youtube.com/embed/J4Wdy0Wc_xQ" controls></video-->
+
+
+## XGBoost
+
+- Note: <span style="background-color:#FFFF00">**XGBoost is designed for large, complicated data sets**</span>
+- The default of level of trees is 6
+- <span style="color:red">**Regardless of classification or regression, default probability is 0.5**</span>at the first step
+- <span style="background-color:#FFFF00">**$\lambda$ is regularization parameter. it is intended to reduce the prediction's sensitivity to individual observation**</span>
+  - if $lambda > 0$, **similarity scores** are smaller. The amount of decrease is <span style="color:red">**inversely proportional**</span> to the number of <span style="color:red">**Residuals**</span> in the node
+    - e.g. only 1 residual in the leaf, $\lambda = 1$, reduce similarity by 50%
+    - e.g. only 4 residual in the leaf, $\lambda = 1$, reduce similarity by 20%
+  - <span style="background-color:#FFFF00">if $\lambda > 0$, it results in more pruning, by shrinking the **Similarity Scores**, smaller **Output Values** for leave, and **Gain** are smaller</span>
+  - <span style="background-color:#FFFF00">set $\lambda = 0$, doesn't prevent tree from pruning</span>, because **$Gain < 0$**, $Gain - \gamma  = Gain $ still negative number, so prune the branch and make it as leaf 
+  - setting $\lambda = 1$, prevent overfitting the Training Data
+- If **Gain** is less than $\gamma$, remove the branch. Done the pruning. Otherwise keep the branch and continue to prune
+- XGBoost learning rate $\eta$ default value is 0.3
+
+
+$$\text{Leaf Output Value} = \frac{\color{fuchsia}{\text{Sum of Residuals}}}{\text{Number of Residuals } + \lambda } $$
+
+$$\text{Similarity Score} = \frac{\color{fuchsia}{\text{Squared of Sum of Residuals }}}{\text{Number of Residuals } + \lambda } $$
+
+#### XGBoost for Regression
+
+<span style="background-color:#FFFF00">Calculate the **Similarity Score**:</span>
+
+$$\text{Similarity Score} = \frac{\color{fuchsia}{ \left(\sum Residual_i \right)^2 }}{\text{Number of Residuals } + \color{red}{\lambda} } $$
+
+<span style="background-color:#FFFF00">and the **Gain**:</span>
+
+$$Gain = Left_{Similarity} +  Right_{Similarity} -  \underbrace{Root_{Similarity}}_{\text{Similarity Score after prune }}$$
+
+<span style="background-color:#FFFF00">Prune the tree by calculating the differences betwen **Gain** values and predefined **Tree Complexity Parameter $\gamma$**</span>
+
+
+$$Gain - \gamma = \begin{cases} 
+> 0 & \text{do not prune} \\
+< 0 & \text{prune} \\
+\end{cases}$$
+
+**Then calculate the Output Values for the remaining leaves**
+
+$$\text{Leaf Output Value} = \frac{\color{fuchsia}{\text{Sum of Residuals}}}{\text{Number of Residuals } + \color{red}{\lambda }} $$
+
+#### XGBoost for Clasification
+
+<span style="background-color:#FFFF00">Calculate the **Similarity Score**:</span>
+
+
+$$\text{Similarity Score} = \frac{\color{fuchsia}{\left( \sum Residual_i \right)^2}}{ \sum \left[ \text{Previous Probability}_i \times \left(1 - \text{Previous Probability}_i \right) \right] + \color{red}{\lambda} } $$
+
+
 
 
 **References**
