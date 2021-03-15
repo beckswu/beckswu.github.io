@@ -526,8 +526,8 @@ $$
 
 <span style="color:red">Same algorithm as Regression but cost function changes</span>. Some detailed explanation below.
 - $F_0 \left( x \right)$ is the log odds
-- <span style="background-color:#FFFF00">**Each leaves prediction is probability** </span>. <span style="background-color:#FFFF00">**Whereas, in Gradient Boost for Regression, a leaf is the average of Residual**</span>
-- Each leaves prediction is probability, so need some transformation to log(odds)
+- <span style="background-color:#FFFF00">**Each leaves output is log odd** </span>. <span style="background-color:#FFFF00">**Whereas, in Gradient Boost for Regression, a leaf is the average of Residual**</span>
+
 
 <span style="color:red">**Convert Log(odds) to probability**</span>
 
@@ -546,8 +546,8 @@ Then Predict
 $$
 y = 
 \begin{cases}
-1  &  \text{ if }  \frac{1}{1 + e^{Log\left( odds \right)}} > 0.5 \\
-0  &   \text{ if } \frac{1}{1 + e^{Log\left( odds \right)}} \leq 0.5 \\
+1  &  \text{ if }  \frac{1}{1 + e^{-Log\left( odds \right)}} > 0.5 \\
+0  &   \text{ if } \frac{1}{1 + e^{-Log\left( odds \right)}} \leq 0.5 \\
 \end{cases}
 $$
 
@@ -710,7 +710,7 @@ E.g. use people's income and age to predict if the person has car
   - when $\lambda > 0$, it reduces the amount that single observatin adds to the new prediction
   - <span style="background-color:#FFFF00">set $\lambda = 0$, doesn't prevent tree from pruning</span>, because **$Gain < 0$**, $Gain - \gamma  = Gain $ still can be a negative number, so remove the branch and make it as leaf 
   - setting $\lambda = 1$, prevent overfitting the Training Data
-- XGBoost learning rate $\eta$ default value is 0.3
+- XGBoost learning rate $\eta$ (eta) default value is 0.3
 
 
 
@@ -784,9 +784,16 @@ For **classification**:
 
 $$Cover =  \sum \left[ \text{Previous Probability}_i \times \left(1 - \text{Previous Probability}_i \right) \right] $$
 
+![](/img/post/ML/XGBT6.png)
+
+- <span style="background-color:#FFFF00">**XGBoost** can speed up building trees by only looking at a random subset of data</span> (比如总共100 个observations, 只用60个 to build the tree)
+- <span style="background-color:#FFFF00">**XGBoost** can speed up building trees by only looking at a random subset of features</span> when deciding how to split the data (比如total 6 features, when select nodes, only look at 4 features)
+
+
 #### XGBoost for Regression
 
 <hr>
+
 **Algorithm**
 
 $$
@@ -909,6 +916,16 @@ $$\begin{aligned}
 \end{aligned}
 $$
 
+Example:
+
+
+![](/img/post/ML/XGBT2.png)
+![](/img/post/ML/XGBT3.png)
+![](/img/post/ML/XGBT4.png)
+![](/img/post/ML/XGBT5.png)
+
+
+
 
 
 #### XGBoost for Clasification
@@ -916,6 +933,7 @@ $$
 <hr>
 
 **Algorithm**
+
 $$
 \begin{aligned}
 
@@ -1045,6 +1063,76 @@ $$\begin{aligned}
 \end{aligned}
 $$
 
+![](/img/post/ML/XGBT7.png)
+![](/img/post/ML/XGBT8.png)
+![](/img/post/ML/XGBT9.png)
+![](/img/post/ML/XGBT10.png)
+
+
+#### Approximate Greedy Algorithm
+
+- XGBoost use Greedy algorithms to select threshold with the largest gain
+  - Note: use the theshold that gives largest **Gain** is made without worrying about how the leaves will be split later
+  - <span style="color:red">Use Greey Algorithm without look the absolute best choice in the long term</span>. So it can <span style="background-color:#FFFF00">build a tree relatively **quickly**</span>
+- For large dataset, it is slow because looking at every possible threshold for every single variable, e.g. 1M data with 6 variable, total check `(1M-1)*6`
+- **Approximate Greedy Algorithm**: instead of testing every single threshold, could divide data into **Quantiles** and <span style="background-color:#FFFF00">use the **Quantiles** as candidate threshold to split the observations</span>
+  - <span style="background-color:#FFFF00">**More Quantile -> More Accurate -> More time to test and build the tree**</span>
+  - Default for **Approximate Greedy Algorithm** use 33 **Quantiles**
+
+
+#### Weighted Sketch Algorithm  
+
+- can't fit all data into computer's memory at one time, and sorting number, finding quantile become really slow
+- Splitting data into different pieces on different computers on a network
+  - Using Parallel Learning so that multiple computers can work at the same time
+- Quantile Sketch Algorithm combines values from each computer to make an approximate histogram
+- Then approximate histogram is used to <span style="background-color:#FFFF00">calculate approximate quantiles and approximate Greedy Algorithm use approximate quantiles</span>
+- <span style="background-color:#FFFF00">**Each observation has a corresponding weight, and the sum of weight is equal in each quantile**</span>
+  - For **classification**: The weight is derived from **Cover Metrics** (2nd derivative of the **Loss function**, **Hessian**):  $P_{t-1}\left(x_i\right)* \left(1- P_{t-1}\left(x_i\right) \right) $
+  - For **Regression**, the weight is 1. It means weighted quantiles just like normal quantiles and contain an equal number of observations
+  - If don’t have much confidence if previously predicted probability close to 0.5, the weights are large
+- <span style="background-color:#FFFF00">**Treat each quantile as a unit, so sample within the same quantile will end up to same leaf together**</span>
+  - By dividing the observations into quantiles where sum of the weights are similar, <span style="color:red">put observations with low confidence predictions into quantitles with fewer observations</span>
+- <span style="color:red">XGBoost only use **Approximate Greedy Algorithm**, **Parallel Learning** and **Weighted Quantile Sketch** when the training Data is huge</span>
+  - if training data is small, just use  
+
+![](/img/post/ML/sketch.png)
+![](/img/post/ML/sketch1.png)
+
+#### Sparsity-Aware Split Finding
+
+- Have missing value for features for training data. Even if feature value is missing, can calculate the residual
+- Then split data into two groups. One with full data another is with missing data. 
+- Then use full data to build the tree, and when calculate **Gain** and **Similarity** <span style="color:red">then put missing data with residual on both left tree and right tree</span>
+- Then choose the threshold which give the largest **Gain**
+  - <span style="color:red">When at evaluation, if still have missing value, the default path of missing value is left tree at this selected threshold</span>
+
+![](/img/post/ML/SASF1.png)
+![](/img/post/ML/SASF2.png)
+
+
+
+
+
+#### Cache-Aware Access
+
+- CPU has a small amount **Cache memory**(can use this memory faster than any other memory)
+- CPU also is attached to a large amount of **Main Memory**. While the **Main Memory** is large than the **Cache**, it takes longer to use 
+- CPU also is attached  to the **Hard Drive**. The Hard Drive can store the most stuff and slowest to use
+- If want program to run fast, goal is to maximize the **Cache memory**
+- <span style="background-color:#FFFF00">**XGBoost** put the **Gradients** and **Hessians**(second derivatives) in the **Cache** so it can rapidly calculate **Similarity Scores** and **Output Values**</span>
+
+#### Blocks for Out-of-Core Computation
+
+- if dataset is too large for the **Cache** and **Main Memory**, some of it must stored on the **Hard Drive**
+- Because reading and writing data on **Hard Drive** is super slow, <span style="background-color:#FFFF00">**XGBoost** tries to minimize these actions by compressing the data</span>
+  - Even though CPU must spend some time decompressing the data that comes from the Hard Drive, it can do faster than that Hard Drive can read the data 
+  - In other words, by spending a little bit of **CPU** time uncompressing the data, can avoid spending a lot of time accessing the **Hard Drive**
+  - When there is more than one **Hard Drive** available for storage, **XGBoost** uses a database technique called **Sharding** to speed up disk access
+  - It is an optimizations that take computer hardware into account
+
+
+![](/img/post/ML/XGBT11.png)
 
 **References**
 
