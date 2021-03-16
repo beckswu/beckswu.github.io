@@ -1141,6 +1141,118 @@ Does it takes much memory by doing this, since each tree Gains need to calculate
 
 ![](/img/post/ML/XGBT11.png)
 
+
+
+
+## SVM
+
+**Large Margin Classifier**
+
+#### Cost Function
+
+Can think of $ C \approx \frac{1}{\lambda}$
+
+$$min_{\theta} C \sum_{i=1}^m \left[ y^{\left( i \right)} cost_1 \left( \theta^T x^{\left( i \right)}\right) + \left( 1 - y^{\left( i \right)} \right)cost_0 \left( \theta^T x^{\left( i \right)}\right)\right] + \frac{1}{2} \sum_{i=1}^n \theta_j^2$$
+
+<span style="background-color:#FFFF00">**SVM doesn't output probability, instead it directly predict if y is 1 or 0**</span>
+
+$$
+h_\theta \left( x \right) =
+\begin{cases}
+1 & \text{if } \theta^T x \geq 0 \\
+0  &  otherwise
+\end{cases}
+$$
+
+<span style="color:red">Support Vector Machine want to do more than that</span>. If predict to positive, not just a little larger than 0. Or if predict to negative, not just a little smaller than 0. Maybe want to positive to bigger than 1 and negative to smaller than -1 to make cost function as 0
+
+$$
+h_\theta \left( x \right) =
+\begin{cases}
+1 & \text{if } \theta^T x \geq 1 \\
+0  &  \text{if } x \leq -1
+\end{cases}
+$$
+
+![](/img/post/ML/SVM1.png)
+
+
+
+#### Decision Boundary
+
+![](/img/post/ML/SVM2.png)
+
+
+<span style="background-color:#FFFF00">**When regularization parameter C is large, SVM is very sensitive to outlier**</span>
+
+![](/img/post/ML/SVM3.png)
+
+After adding a positive example, then decision boundary will change 
+
+![](/img/post/ML/SVM4.png)
+
+<span style="background-color:#FFFF00">**But regularization parameter C is not too large**, SVM will still get the similar decision boundary to do the right thing even if data is not linearly separatable</span>(some positive data mix in negative class, some negative data mix in positive class)
+
+![](/img/post/ML/SVM5.png)
+
+#### Inner Product
+
+$$
+\begin{aligned}
+u^Tv & = u_1 v_1 + u_2 v_2 \text{ in two dimensional vector space}\\
+& = \| u \| \| v\| cos \left( u, v\right) \\
+& = Proj_u v \| u\| \text{ projection value can be positive or negative } 
+\end{aligned}
+$$
+
+$$min_{\theta} \underbrace{C \sum_{i=1}^m \left[ y^{\left( i \right)} cost_1 \left( \theta^T x^{\left( i \right)}\right) + \left( 1 - y^{\left( i \right)} \right)cost_0 \left( \theta^T x^{\left( i \right)}\right)\right]}_{\text{set equal to 0 for perfect classification} } + \frac{1}{2} \sum_{i=1}^n \theta_j^2$$
+
+The the cost function is
+
+$$min_{\theta} \frac{1}{2} \sum_{i=1}^n \theta_j$$
+
+$$
+\begin{aligned}
+s.t.  \quad \theta^T x^{\left( i \right)}  \geq 1  & \quad \text{ if } 
+x^{\left( i \right)} = 1 \\
+
+\theta^T x^{\left( i \right)}  \leq -1  & \quad  \text{ if } 
+x^{\left( i \right)} = 0 \\
+
+\end{aligned}
+$$
+
+assume in two dimensional space and $\theta_0 = 0$: is to minimize the square of norm/length of theta
+
+$$min_{\theta} \frac{1}{2} \sum_{i=1}^n \theta_j = min_{\theta}  \frac{1}{2}\left( \theta_1^2 + \theta_2^2 \right) = min_{\theta}  \frac{1}{2}\left( \underbrace{ \sqrt{ \theta_1^2 + \theta_2^2 }}_{ \color{red}{= \| \theta \|}} \right) ^2$$
+
+
+And and rewrite $\theta^T$ as projection where $ p^{\left(i \right)}$ is the **projection** of  $x^{\left( i \right)$ onto the vector $\theta$
+
+$$
+\begin{aligned}
+s.t.  \quad \theta^T x^{\left( i \right)} = \color{fuchsia}{ p^{\left(i \right)} \| \theta \| }  \geq 1  & \quad \text{ if } 
+x^{\left( i \right)} = 1 \\
+
+\theta^T x^{\left( i \right)} = \color{fuchsia}{ p^{\left(i \right)} \|\theta \| } \leq -1  & \quad  \text{ if } 
+x^{\left( i \right)} = 0 \\
+
+\end{aligned}
+$$
+
+
+<span style="background-color:#FFFF00">By making the margin large, can end up with smaller $\theta$ what is trying to do with the objective</span>
+
+
+
+![](/img/post/ML/SVM7.png)
+
+Make the whole derivation using $\theta_0 = 0$ (Decision boundary should pass the origin). When $\theta_0 \neq 0$, it also can be proved that SVM is trying to find large margin separater
+
+**Why weight is perpendicular to decision boundary?**
+
+![](/img/post/ML/SVM6.png)
+
 **References**
 
 [StatQuest](https://www.youtube.com/channel/UCtYLUTtgS3k1Fg4y5tAhLbw)
