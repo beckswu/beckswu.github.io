@@ -1099,16 +1099,23 @@ $$
 ![](/img/post/ML/sketch.png)
 ![](/img/post/ML/sketch1.png)
 
+
 #### Sparsity-Aware Split Finding
 
 - Have missing value for features for training data. Even if feature value is missing, can calculate the residual
 - Then split data into two groups. One with full data another is with missing data. 
-- Then use full data to build the tree, and when calculate **Gain** and **Similarity** <span style="color:red">then put missing data with residual on both left tree and right tree</span>
+- Then use full data to build the tree, and when calculate **Gain** and **Similarity**, <span style="color:red">then put the residual of missing data on left tree and right tree to calculate two **Gains**: $Gain_{left}$ and $Gain{right}$</span>
 - Then choose the threshold which give the largest **Gain**
-  - <span style="color:red">When at evaluation, if still have missing value, the default path of missing value is left tree at this selected threshold</span>
+  - <span style="color:red">When at evaluation, if still have missing value, the default path of missing value is the path which has the largest **Gains** for missing value</span>
 
 ![](/img/post/ML/SASF1.png)
 ![](/img/post/ML/SASF2.png)
+![](/img/post/ML/SASF3.png)
+
+Does it takes much memory by doing this, since each tree Gains need to calculate twice than before? 
+
+**XGBoost use Spare Matrices**, it only keep track of 1s for categorical data(One Hot Vector) and deoesn't allocate memory for zeros ([Check it 35:52](https://www.youtube.com/watch?v=GrJP9FLV3FE&list=PLblh5JKOoLUICTaGLRoHQDuF_7q2GfuJF&index=67))
+
 
 
 
