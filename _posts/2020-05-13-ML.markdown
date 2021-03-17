@@ -1227,7 +1227,7 @@ assume in two dimensional space and $\theta_0 = 0$: is to minimize the square of
 $$min_{\theta} \frac{1}{2} \sum_{i=1}^n \theta_j = min_{\theta}  \frac{1}{2}\left( \theta_1^2 + \theta_2^2 \right) = min_{\theta}  \frac{1}{2}\left( \underbrace{ \sqrt{ \theta_1^2 + \theta_2^2 }}_{ \color{red}{= \| \theta \|}} \right) ^2$$
 
 
-And and rewrite $\theta^T$ as projection where $ p^{\left(i \right)}$ is the **projection** of  $x^{\left( i \right)$ onto the vector $\theta$
+And and rewrite $\theta^T$ as projection where $ p^{\left(i \right)}$ is the **projection** of  $x^{\left( i \right)}$ onto the vector $\theta$
 
 $$
 \begin{aligned}
@@ -1247,12 +1247,149 @@ $$
 
 ![](/img/post/ML/SVM7.png)
 
-Make the whole derivation using $\theta_0 = 0$ (Decision boundary should pass the origin). When $\theta_0 \neq 0$, it also can be proved that SVM is trying to find large margin separater
+Make the whole derivation using $\theta_0 = 0$ (Decision boundary should pass the origin). When $\theta_0 \neq 0$, it also can be proved that SVM is trying to find large margin separater witht the same objective and correspond C is large 
 
 **Why weight is perpendicular to decision boundary?**
 
 ![](/img/post/ML/SVM6.png)
 
-**References**
 
+
+#### Gaussian Kernel
+
+To predict y = 1 if 
+
+$$\theta_0 + \theta_1 x_1 + \theta_2 x_2 + + \theta_3 x_1 x_2 \\ + \theta_4 x_1^2 + + \theta_5 x_2^2 \cdots \geq 0 $$
+
+Can write to another representation
+
+$$\theta_0 + \theta_1 \underbrace{f_1}_{= x_1} + \theta_2  \underbrace{f_2}_{= x_2} +  \theta_3  \underbrace{f_3}_{= x_1 x_2} \\ + \theta_4  \underbrace{f_4}_{= x_1^2} + \theta_5  \underbrace{f_5}_{= x_2^2} \cdots \geq 0 $$
+
+Is there a different / better choice of features $f_1, f_2, f_3$? because above polynomials are the not the one we want 
+
+**Gassian Kernel and Similarity**: measure how similar vector x is from landmark
+
+similarity between vector x and landmark  $ l^{\left( 1 \right)$ (n is the number of features)
+
+$$\color{fuchsia}{similarity\left( x, l^{\left( 1\right)}\right) = exp \left( -\frac{\| x - l^{\left( 1 \right)} \| }{2 \sigma^2}\right) = exp \left( -\frac{ \sum_{j=1}^n \| x - l_j^{\left( 1 \right)} \|}{2 \sigma^2}\right)} $$
+
+<span style="color:red">If $x \approx l^{\left( 1 \right)}$</span>
+
+$$similarity\left( x, l^{\left( 1\right)}\right) = exp \left( -\frac{ 0 }{2 \sigma^2}\right) = 1 $$
+
+
+<span style="color:red">If x far from $ l^{\left( 1 \right)}$</span>
+
+$$similarity\left( x, l^{\left( 1\right)}\right) = exp \left( -\frac{ \left( \text{large number} \right)^2 }{2 \sigma^2}\right) = 0 $$
+
+
+![](/img/post/ML/SVM8.png)
+
+- <span style="background-color:#FFFF00">when **$\sigma$** is **small**, the number inside exp is **large**, **similarity fall to zero rapidly** </span>
+- <span style="background-color:#FFFF00">when **$\sigma$ **is **large**, the number inside exp is **small**, **similarity fall to zero slowly** </span>
+
+![](/img/post/ML/SVM9.png)
+
+<hr>
+
+**Algorithm**
+
+
+$$
+\begin{aligned}
+\text{Step 1}. & Given \left( x_1, y_1 \right),\left( x_2, y_2 \right), \left( x_m, y_m \right) \\
+& \color{grey}{\text{suppose each x has n features ( n-dimensional)}} \\
+\text{Step 2}. & \text{ choose } \color{fuchsia}{l^{\left( 1 \right)} = x_1, l^{\left( 2 \right)} = x_2, \cdots, l^{\left( m \right)} = x_m} \\
+& \color{grey}{\text{(each landmark is n-dimensional )}} \\
+
+\text{Step 3}. & \text{ for each example } x_i \\
+
+& f^{\left( i \right)} = \begin{bmatrix}
+
+f_0^\left(i \right) \\ f_1^\left(i \right)\\ f_2^\left(i \right)\\ \vdots\\ f_m^\left(i \right)\\
+ \end{bmatrix} = \begin{bmatrix}
+
+\color{fuchsia}{1} \\ 
+\color{fuchsia}{similarity\left( x^\left(i \right), l^\left(1 \right) \right)}
+ \\ \color{fuchsia}{similarity\left( x^\left(i \right), l^\left(2 \right) \right)} 
+ \\ \color{fuchsia}{\vdots} \\ \color{fuchsia}{similarity\left( x^\left(i \right), l^\left(m \right) \right)}\\
+ \end{bmatrix}  \\
+
+& \color{blue}{f^{\left( i \right)}  \text{ is } \left(m+1\right) \times \text{ 1 matrix } }
+
+\end{aligned}
+$$
+
+
+<hr>
+
+Now, <span style="color:red">**Cost function**</span> becomes
+
+
+$$min_{\theta} C \sum_{i=1}^m \left[ y^{\left( i \right)} cost_1 \left( \theta^T \color{fuchsia}{f^{\left( i \right)}}\right) + \left( 1 - y^{\left( i \right)} \right)cost_0 \left( \theta^T \color{fuchsia}{f^{\left( i \right)}}\right)\right] + \frac{1}{2} \sum_{i=1}^n \theta_j^2$$
+
+
+Another way to write $ \sum_{i=1}^n \theta_j^2$ is $\theta^T \theta$ and ignore $\theta_0$
+
+
+Another way to write is $θ^T Mθ$ (M depends on the kernel you used) With the computational trick, Then computer run more efficiently for SVM using kernel, scale to much bigger training set. Logtistic regression can also use kernel function. But <span style="color:red">computational trick for **SVM** not work for **logistic regressio**n</span>, it will be very slow.
+
+
+
+
+
+
+#### Choose Parameter
+
+can think of C as $\frac{1}{\lambda}$
+
+- **Large C: low bias, high variance**
+- **Small C: high bias, low variance**
+- **Large $\sigma^2$: high bias, low variance**, features $f_i$ vary more smoothly
+- **Small $\sigma^2$: low bias, high variance**, features $f_i$ vary less smoothly
+
+
+
+#### Using SVM
+
+Need to specify
+
+- Need to choose C
+- Need to choose kernel function
+
+**1-** <span style="background-color:#FFFF00">**Linear Kernel is No Kernel**</span>: can think of special version of SVM that give <span style="background-color:#FFFF00">**standard linear classifier**</span>
+
+- <span style="background-color:#FFFF00">**use if n is big (large number of features), m is mall (small training set)**</span>. <span style="background-color:#FFFF00">You want to fit a linear decision boundardy instead to fit a complex function which may **overfit** because not having too much data</span>
+
+Predict y = 1 if $\theta^T x \geq 0$ ($\theta_0 + \theta_1 x_1 + \cdots + \theta_n x_n$)
+
+**2-**  **Gaussian Kernel**: use it when n (the number of feature) is small, m (training set) is large
+- Note: Do <span style="color:red">**Perform Feature Scaling**</span> before using Gaussian Kernel.
+  - e.g. to predict housing price, $x_1$ income, $x_2$ is number of bedroom. $x_1 - l_1 = 100,000 - 50,000$ and $x_2 - l_2 = 4-1$. So similarity is dominated by the income
+
+**3-** Other choice of Kernel (Kernel need to satisfy technical condition called “**Mercer’s Theorem**”to make sure SVM
+run correctly, do not diverge. Otherwise, not valid kernel). Mercer's Theorem: What it does to assure kernel can use optimization to solve $\theta$ quickly. There are some kernels which satisfy Mercer's Theorem <span style="color:red">but rarely to use</span>
+
+- . Polynomial Kernel: similarity(x,l) = $\left(x^T𝐿\right)^2 or \left(x^T L \right)^3., \left(x^T L+5\right)^3, or \left(x^T L+1\right)^4$( can change what number to add and what polynomial degree). <span style="color:red">Usually work for data which are strictly non-negative. so inner product is non-negative</span>
+  - <span style="color:red">**Usually perform worse than Gaussian Kernel**</span>
+- More esoteric: String Kernel(when input are strings), Chi-square kernel, histogram intersection kernel
+
+
+Many SVM packages already have <span style="color:red">built-in multi-class Classification</span>(**more than two categories**) functionality OR use one vs_all method(try K SVMs, one to distinguish y=i from the rest), pick class i with largest $\left(\theta^{\left( i \right)}\right)^T x$
+
+
+#### SVM vs Logistic Regression
+- <span style="background-color:#FFFF00">**Use logistic regression or SVM without a kernel**</span>,
+  - If n is large(feature) relative to m(training set), n>=m, e.g, n=10000, m = 10 to 1000 
+- <span style="background-color:#FFFF00">**Use SVM with Gaussian Kernel**</span>
+  - If n is small, m is intermediate (n = 1-1000, m = 10-10000)
+- <span style="background-color:#FFFF00">**Use logistic regression or SVM without a kernel, or add more features**</span> 
+  - If n is small, m is large (n = 1-1000, m=50000+) Gaussian kernel is slow
+- <span style="background-color:#FFFF00">**Logistic Regression & SVM usually give the same performance Neural Network likely work well for most of these settings, but may be slower to train**</span>. SVM is connex optimization problem.
+
+
+
+
+
+**References**
 [StatQuest](https://www.youtube.com/channel/UCtYLUTtgS3k1Fg4y5tAhLbw)
