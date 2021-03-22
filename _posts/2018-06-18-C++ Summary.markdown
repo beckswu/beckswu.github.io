@@ -1458,7 +1458,7 @@ decltype(*ptr) c; //error: c is int& and must be initialized
 
 ```
 
-当我们apply ```decltype``` wrap the variable's name in one ore more parentheses, compiler will evaluate the operand as an expression. A variable is an expression that can be the left-hand side of an assignment. As a result, ```decltype``` on such an expression yields a reference.
+当我们apply ```decltype``` <span style="background-color:#FFFF00">**wrap the variable's name in one ore more parentheses`((i))`**</span>, compiler will evaluate the operand as an expression. A variable is an expression that can be the left-hand side of an assignment. As a result, ```decltype``` on such an expression <span style="background-color:#FFFF00">**yields a reference**</span>.
 
 
 ```c++
@@ -1742,7 +1742,7 @@ a2 = a; // error: cannot assign one array to another
 
 **(2). Understanding complicated Array Declarations**
 
-因为an array is an object, we can define both pointers and references to arrays. Define arrays that hold pointer 比较直接, defining a pointer or reference to an array 稍微复杂. <span style="color:red">简单方法是从inside括号 from outside 再从右向左度，离变量近的类型对变量有直接影响</span>
+因为an array is an object, we can define both pointers and references to arrays. Define arrays that hold pointer 比较直接, defining a pointer or reference to an array 稍微复杂. <span style="color:red">简单方法是从inside括号 from outside 再从右向左读，离变量近的类型对变量有直接影响</span>
 
 - ```int *arrayPtr[10];```,  是array, size 为10, 有10个 pointer to int
 - ```int (*Parray)[10];```, 是pointer, 指向 size 为10 的 int array
@@ -2115,7 +2115,7 @@ last = *ia + 4; //0 + 4 = 4
 - Precedences specifies how the operands are grouped 但是 同一个expression <span style="background-color:#FFFF00">say nothing about order of operands evaluated.</span>  比如: ```int i = f1() * f2(); ``` 我们知道```f1``` and ```f2``` must be called before 乘法. 但是no way of knowing whether ```f1``` 先执行还是 ```f2``` 先执行
     -  **准侧**: 
         1. 当不确定时, 用括号,
-        2. if you change the value of an operand, don't use that operand elsewhere in the same expression. (Exception： 有优先级存在且只用一次, ```*++iter```,  ```++iter``` 更改了```iter```本身, 再用deference operator, no issue. 因为```++``` 先于 ```*``` 运算, 且```iter``就用了一次)
+        2. if you change the value of an operand, don't use that operand elsewhere in the same expression. (Exception： 有优先级存在且只用一次, ```*++iter```,  ```++iter``` 更改了```iter```本身, 再用deference operator, no issue. 因为```++``` 先于 ```*``` 运算, 且```iter```就用了一次)
 
 
 The precedence of postfix / prefix increment 高于deference
@@ -2758,7 +2758,7 @@ These 3 elements—return type, function name, and parameter types—describe th
 
 #### (b). Argument Passing
 
-**(1). Pointer Parameter**: nonreference type, <span style="background-color:#FFFF00">when we copy pointer, the value of the pointer is copied. After the copy, two pointers are distinct(pointer地址不同的, 但指向相同的对象, which means 如果更改function 内部的pointer 指代对象不会影响外面的pointer). </span>, 因为pointer give indirect access the object, 所以可以通过指针修改object的值
+**(1). Pointer Parameter**: nonreference type, <span style="background-color:#FFFF00">when we copy pointer, the value of the pointer is copied. After the copy, two pointers are distinct(pointer地址不同的, 但指向相同的对象, which means 如果更改function 内部的pointer 指代对象, 不会影响外面的pointer). </span>, 因为pointer give indirect access the object, 所以可以通过指针修改object的值
 
 ```c++
 //case 1: pointer is different 
@@ -2980,12 +2980,13 @@ An ellipsis parameter 只能出现在parameter最后一个, and may take either 
 void foo(parm_list, ...);
 void foo(...);
 ```
+[check it](https://www.geeksforgeeks.org/ellipsis-in-c-with-examples/)
 
 #### (c). Return Types 
 
 Failing to provide a return after a loop that contains a return is an error(for loop 中有if 然后return, 但是程序fail 进入那个if，所以程序最后到达end of function without return). <span style="color:red">However, many compilers will not detect such errors</span>.
 
-**(1). How Values Are Returned**: The return value is used to initialize a temporary at the call site(调用点), and that temporary is the result of the function call.
+**(1). How Values Are Returned**: The return value is used to initialize a temporary at the <span style="background-color:#FFFF00">**call site(调用点)**</span>, and that temporary is the result of the function call.
 - 如果return是value (<span style="background-color:#FFFF00">returns are **rvalue**</span>), return value is copied to the call site. The function returns a copy of he return value. 
 - 如果return是reference(<span style="background-color:#FFFF00">returns are **lvalue**</span>), reference is just another name for the object to which it refers
 
@@ -3293,7 +3294,7 @@ cout << (s1.size() < s2.size() ? s1 : s2 )<<endl;
 - <span style="background-color:#FFFF00">return type must be literal type</span> (int(reference, pointer), double, enum, char, char pointer, 但string 不是)
 - <span style="background-color:#FFFF00">函数主体有且只有一个return statement</span>(function body must contain exactly one return statement, 不能有通过if 判断的多个statement),C++ 14 allows more than one statements.
 - constexpr function can only call other constexpr function not simple function
-- constexpr function should not be viod type and some operator like prefix increment (++v) are not allowed in constexpr function. 
+- constexpr function should not be void type and some operator like prefix increment (++v) are not allowed in constexpr function. 
 - compiler will replace a call to constexpr funcion with its resulting value.(compiler 把constexpr 函数的调用换成其结果值)
 - <span style="color:red">constexpr functions are implicitly inline </span>
 - <span style="color:red">A constexpr function body 可以含有other statements 只要这个statement generate no actions at run time</span> (e.g. null statement, type aliases, and using declaractions)
@@ -3399,14 +3400,14 @@ f(5.6); // calls void f(double, double)
 ```
 
 **当有多个函数比配**: compiler以此检查argument by argument， 如果有一个function 满足下列条件，则比配成功: 
-- 每个argument的匹配不劣与其他可行函数需要的匹配 (The match for each argument is no worse than the match required by any ohter viable function)
+- 每个argument的匹配不劣于其他可行函数需要的匹配 (The match for each argument is no worse than the match required by any ohter viable function)
 - 至少有一个arugment的match 优于其他的viable functions的匹配(There is at least one argument for which the match is better than the match provided by any other viable function)
 - <span style="color:red">如果没有任何一个函数脱颖而出, 则call is error, the compiler will complain that the call is ambiguous</span>
     - 比如```f(42,2.56)```, ```f(int, int);``` 和 ```f(double, double);```是一样的, ambigous call. 
 - 如果需要cast 才能找到最匹配的call, 是poorly design. Casts should not be needed to call an overloaded function. The need for a cast suggests that the parameter sets are designed poorly.
 
 
-**compiler ranks the conversions thatconver each argument to the type of parameters**:
+**compiler ranks the conversions that convert each argument to the type of parameters**:
 
 1. 精准匹配(exact match). An exact match happens when:
     - argument and parameter types are identical
@@ -4569,7 +4570,7 @@ out2 = print(out2); // error: cannot copy stream objects
   - while 只告诉valid or not, not telling why invalid 
 - ```iostate``` used to convey information about the state of a stream. <span style="background-color:#FFFF00">This type used the collection of bits.</span> IO 定义了四个```constexpr```values of type ```iostate```
   - 一旦```badbit``` set, 不能再使用stream了,
-  - ```failbit``` set after recoverable error, 比如读了个char when nuemric expexted. Possible to correct problems and continue using the stream
+  - ```failbit``` set after recoverable error, 比如读了个char when numeric expected. Possible to correct problems and continue using the stream
   - ```goodbit``` guaranteed to have value 0, 表示no failures on stream.
   - 如果任何```badbit```, ```failbit```, or ```eofbit``` set, then condition that evaluates that stream fails.
   -  ```s.good()``` or ```s.fail()```(fail or bad) 是确定stream 总体状态的正确方法. 实际上, 把流当条件使用的代码等于```!fail()```, ```s.eof``` 和 ```s.bad``` 检查specific error
@@ -5292,6 +5293,7 @@ string operation
 | ```s.replace(range,args)``` | 删除range 内的字符, 替换成args指定的字符, range 可以是一个下标或者一个长度, or a pair of iterators into s. returns a reference to s |
 
 上表的arg 可以是如下的形式
+
 | Syntax | Description | 
 | --- | :--- | 
 | ```str``` | string str |
@@ -5627,7 +5629,7 @@ Capture Advise: 需要keep your lambda captures simple
 - A lambda capture stores information between the time the lambda is created (i.e., when the code that defines the lambda is executed) and the time (or times) the lambda itself is executed (捕获保存信息从定义到执行).
 - Capture ordinary variable 比如```int```, ```string```, or nonpointer type - by value is usually straightforward. 这种情况下, 只需关注在捕获时有我们需要的值就可以了
 - 如果捕获pointer, iterator, or capture by reference, 必须ensure pointer, iterator, or reference  <span style="background-color:#FFFF00">still exists whenever the lambda executes</span>. 还可能是, 在指针或引用被捕获时候, 绑定对象的值是我们期望的, 但在lambda执行时, 该对象的值可能完全不同了
-- if possible, avoid capturing pointers or references.
+- <span style="background-color:#FFFF00">**if possible, avoid capturing pointers or references.**</span>
 
 
 ```c++
@@ -7411,7 +7413,7 @@ delete[] p; // p 指向第一个数组, 记得用delete[] 来释放
 
 **Allocator**
 
-- define in ```memory``` header, let use separate allocation from construction. It <span style="background-color:#FFFF00">provides type-aware allocation of **raw**, **unconstructed**, memory<span>.
+- define in ```memory``` header, let user separate allocation from construction. It <span style="background-color:#FFFF00">provides type-aware allocation of **raw**, **unconstructed**, memory<span>.
 - define **allocator**, 需要specify type. 
 - When an allocator object allocates memory, it <span style="background-color:#FFFF00">**allocates memory**</span> that is <span style="background-color:#FFFF00">**appropriately sized**</span> and <span style="background-color:#FFFF00">**aligned to hold objects**</span> of the given type:
 - It is an <span style="color:red">**error** to use raw memory</span> in which an object has <span style="color:red">not been constructed</span>
@@ -8156,7 +8158,7 @@ HasPtr& HasPtr::operator=(HasPtr rhs)
 下面code
 - allocator allocate是raw/unconstructed memory, 必须call ```construct``` 去construct an object in that memory, ```construct``` 会用到```first_free``` 并递增```first_free```(递增得到next, unconstructed element)
 - ```uninitialized_copy``` <span style="background-color:#FFFF00">返回时一个指针 指向one element past the last constructed element</span>
-- ```allocate`` 返回 start of memory block
+- ```allocate``` 返回 start of memory block
 - Moving, Not Copying, Elements during Reallocation. function 应该做:
     1.  Allocate memory for a new, larger array of strings
     2. Construct the first part of that space to hold the existing elements by move
@@ -8906,7 +8908,7 @@ public:
     - 意味着我们不能改变built-in type operator 含义
 - 只能重载已有的operator, 不能加新的operator, 比如不可以overload ```**``` 去执行幂操作
 - 对于重载运算符, precedence and associativity (优先率 和 结合律) 应保持一致, 比如 ``` x == y + z; ``` 永远等价于 ``` x == (y + z)```
-- 有四个 ```+,-,*,&``` 既可以是一元也可以是二元运算，根据number of parameters 腿短定义是哪个
+- 有四个 ```+,-,*,&``` 既可以是一元也可以是二元运算，根据number of parameters 推断定义是哪个
 - call operator function 可以直接用 operator ```data1 + data2;``` 也可以像普通function 一样 call overloaded operator function.```operator+(data1, data2); data1.operator+=(data2);```. <span style="color:red">两种调用方法等价的</span>
 - <span style="background-color:#FFFF00">the comma, address-of, logical AND, and logical OR operators should not be overloaded</span>.
     - 因为运算符指定了运算顺序, 而operator overloading 是一个function call, 运算顺序可能会变了
@@ -8973,7 +8975,7 @@ ostream & operator << (ostream & os, const Sales_data & item){
 
 下面例子, 如果IO错误(比如输入不是数字, 或者hit end-of-file or some other error on input stream), 则运算符将非定对象重置为empty ```Sales_data```
 ```c++
-istream operator>>(istream & is, Sales_data & item){
+istream& operator>>(istream & is, Sales_data & item){
     double price; 
     is >> item.bookNo >> item.units_sold >> price;
     if (is) // check that the inputs succeeded 
@@ -11383,7 +11385,7 @@ cout << compare(data1, data2) << endl; // error: no < on Sales_data
     - member <span style="color:red">defined **inside** the template class body are **implicitly inline**</span>
     - 每个instantiation of class has its **own version** of each member. 因此template class function 跟他们的template class itself <span style="color:red">都有一样的**template parameters**</span>. 所以在class 外面定义function, <span style="color:red">需要用 keyword ```template``` followed by class' template parameter list</span>
     - By default, a <span style="color:red">**member**</span> of an instantiated class template is <span style="color:red">**instantiated** only if the member is **used**</span>. member 再被用的时候才被初始化. <span style="color:red">如果function 不被用到,, it is not instantiated</span>
-        - <span style="background-color:#FFFF00">这使得也许某一type 不 meet requirement for some template's operations. 我们也可以instatntiate a class with that type</span> (比如, template 有的function 需要这个type, 有```+``` overloading, 但是没有用到这个template function, 所以没关系)
+        - <span style="background-color:#FFFF00">这使得也许某一type 不 meet requirement for some template's operations. 我们也可以instantiate a class with that type</span> (比如, template 有的function 需要这个type, 有```+``` overloading, 但是没有用到这个template function, 所以没关系)
     - 一个例外是: Inside the <span style="color:red">**scope of a class**</span> template, we may <span style="color:red">refer to the template without specifying template argument(s)</span>., 比如return type (value or reference, or inside template class function). 因为在class scope, <span style="color:red">compiler treats **references** to the template itself 就像提供了template arguments 一样</span>. 
     - 但是<span style="color:red">在template 外面定义时候, 记得return type is **not in class scope**, 需要提供template argument</span>. we are not in the scope of the class until the class name is seen
 - template class 的声明 ```template<typename> class Blob``` 不用加T, 也可以加T ```template<typename T> class Blob``` 
@@ -11440,7 +11442,7 @@ Blob<double> prices;// different element type
 
 ```
 
-**定义template class member outside class**: 用keyword template +  template parameter, 因为每个template class instantiation 都有自己version of class. General form 如下
+**定义template class member outside class**: 用<span style="background-color:#FFFF00">**keyword template +  template parameter**</span>, 因为每个template class instantiation 都有自己version of class. General form 如下
 ```c++
 template <typename T>
 ret-type Blob<T>::member-name(parm-list)
@@ -11532,7 +11534,7 @@ BlobPtr& operator--();
 BlobPtr<T>& operator++(); 
 BlobPtr<T>& operator--();
 ```
-值得注意的是,return type 是outside scope of the class, 必须 specify that the return with the same type(template argument) as the class. 在function body, in scope of class and do not repeat template argument (当define ```ret```), <span style="color:red">compiler 会assumes we are using the same type as member's instantiation</span>. 
+值得注意的是,return type 是outside scope of the class, 必须 <span style="background-color:#FFFF00">**specify that the return with the same type**</span>(template argument) as the class. 在function body, in scope of class and do not repeat template argument (当define ```ret```), <span style="color:red">compiler 会assumes we are using the same type as member's instantiation</span>. 
 
 ```c++
 // postfix: increment/decrement the object but return the unchanged value 
@@ -12829,14 +12831,14 @@ debug(i); //print in lvalue
 2. **Pack Expansion**
 3. **Forwarding Parameter Packs**
 
-- variadic template is template function or class that can take <span style="background-color:#FFFF00">**verying number of parameters**</span>
+- variadic template is template function or class that can take <span style="background-color:#FFFF00">**varying number of parameters**</span>
    - varying parameter are known as <span style="background-color:#FFFF00">**parameter pack**</span>. There are two kinds of parameter pack
    	- A <span style="background-color:#FFFF00">**template parameter pack**</span> represents zero or more template parameters (pack 可以是不同类型)
 	- A <span style="background-color:#FFFF00">**function parameter pack**</span> represents zero or more function parameters (pack 可以是不同类型)
-- use ellipsis 表示template or function <span style="color:red">represents a pack</span>, In template parameter list, ```class...``` or ```typename...``` <span style="color:red">表示following prameter 是 a list of zero or more types</span>; <span style="color:red">the **name**</span> of a type followed by an ellipsis represents a list of zero or more nontype parameters of the given type.
+- use ellipsis 表示template or function <span style="color:red">represents a pack</span>, In template parameter list, ```class...``` or ```typename...``` <span style="color:red">表示following parameter 是 a list of zero or more types</span>; <span style="color:red">the **name**</span> of a type followed by an ellipsis represents a list of zero or more nontype parameters of the given type.
 - As usual, compiler deduces template parameter types from function's argument. For variadic template, <span style="color:red">compiler **deduces the number of parameters** in the pack</span>
-- ```sizeof...(pack)```, how many elements in a pack(either template or function), 用```sizeof...(pack)```, returns a constant expression and does not evaludate its argument
-- <span style="color:red">**initializer_list**</span> take a verying number of arguments with <span style="color:red">the **same type**</span>. <span style="color:red">**Variadic functions**</span> are used when <span style="color:red">不知道 number or types (可以是different types) of arguments</span> we want to process
+- ```sizeof...(pack)```, how many elements in a pack(either template or function), 用```sizeof...(pack)```, returns a constant expression and does not evaluate its argument
+- <span style="color:red">**initializer_list**</span> take a varying number of arguments with <span style="color:red">the **same type**</span>. <span style="color:red">**Variadic functions**</span> are used when <span style="color:red">不知道 number or types (可以是different types) of arguments</span> we want to process
 
 ```c++
 // Args is a template parameter pack; rest is a function parameter pack
