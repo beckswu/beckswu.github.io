@@ -3250,8 +3250,8 @@ $ sed -i '30d' passwd
 | 命令 |	说明 |
 | ```s``` | 替换 <br/> ```3s``` 只替换第三行  <br/> ```3,6s``` 替换3到6行  <br/>```sed '/fish/, +3s/This/#/g```: 替换fish后(包括fish 行)的连续3行, 一共四行的This 变成 #，如果这四行没有不替换  <br/>,  ```sed 's/s/S/1'``` 替换每一行第一个 <br/> ```sed 's/s/S/2' my.txt``` 只替换每行第二个match的 <br/> ```sed 's/s/S/3g' my.txt```只替换第一行的第3个以后的s： |
 | ```g``` | 替换所有行 | 
-| ```&``` | 做被匹配的变量, 在左右加东西, ```sed 's/my/[&]/g' my.txt``` 所有的```my``` 会变为 ```[`my]``` |
-| ```()``` | 括号内匹配的可以<span style="background-color:#FFFF00">当变量使用</span> <br/> ```sed 's/(my) is (good)/\1:\2/g‘``` 把```my``` 变成第一个变量, ```good``` 做为第二个变量 (```\1,\2...```), 结果是打印 ```my good``` |
+| ```&``` | 做被匹配的变量, 在左右加东西, ```sed 's/my/[&]/g' my.txt``` 所有的```my``` 会变为 ```[my]```, ```sed 's/my//&123/g' my.txt``` 所有的```my``` 会变为 `my123` |
+| ```()``` | 括号内匹配的可以<span style="background-color:#FFFF00">当变量使用</span> <br/> ```sed 's/(my) is (good)/\1:\2/g‘``` 把```my``` 变成第一个变量, ```good``` 做为第二个变量 (```\1,\2...```), 结果是打印 ```my:good``` |
 
 
 - ```^``` 表示一行的开头。如：```/^#/``` 以```#```开头的匹配。
@@ -3267,8 +3267,8 @@ $ sed -i '30d' passwd
 比如file 是:
 ```bash
 $ cat pets.txt
-This is my my cat
-  my cat's name
+# This is my my cat
+#  my cat's name
 ```
 
 ```/g``` <span style="background-color:#FFFF00">表示一行上的替换**所有**的匹配</span>：
@@ -3299,16 +3299,16 @@ sed -i "s/my/Becks's/g" pets.txt
 
 **E.g 2  remove tag**
 
-```
+
 
 去掉所有的file，比如有file
 
 ```
-<b>This</b> is what <span style="text-decoration: underline;">I</span> meant. Understand?
+<b>This</b> is what <span style=text-decoration: underline;>I</span> meant. Understand
 ```
 
 ```bash
-$ sed 's/<.*>//g' html.txt
+$ sed 's/<.*>//g' html.txt  #替换<.*> 为空字符
 # meant Understand? #会删除tag包含 内所有的内容
  
 # 其中的'[^>]' 指定了除了>的字符重复0次或多次。
@@ -3346,7 +3346,7 @@ $ sed '1,3s/my/your/g; 3,$s/This/That/g' my.txt
 #This is your dog, your dog's name is frank
 #That is your fish, your fish's name is george
 #That is my goat, my goat's name is adam
-
+```
 上面的命令等价于：（注：下面使用的是sed的-e命令行参数）
 
 ```bash
@@ -3371,7 +3371,7 @@ $ sed 's/my/[&]/g' my.txt
 
 ```shell
 
-$ sed 's/This is my \([^,&]*\),.*is \(.*\)/\1:\2/g' my.txt
+$ sed 's/This is my \([^,]*\),.*is \(.*\)/\1:\2/g' my.txt
 #cat:betty
 #dog:frank
 #fish:george
@@ -3588,7 +3588,7 @@ $ sed -n '1,/fish/p' my.txt
 
 可以使用相对位置, dog 行(包括dog 行) 后面连续三行的替换
 
-```
+```bash
 # 其中的+3表示后面连续3行
 $ sed '/dog/,+3s/^/# /g' pets.txt
 #This is my cat
@@ -3600,7 +3600,7 @@ $ sed '/dog/,+3s/^/# /g' pets.txt
 #This is my goat
 #  my goat's name is adam
  
- $ sed '/dog/,+3s/This/His /g' pets.txt
+ $ sed '/dog/,+3s/This/His/g' pets.txt
 This is my cat
 #  my cat's name is betty
 # His is my dog
@@ -3609,8 +3609,7 @@ This is my cat
 #   my fish's name is george
 #This is my goat
 #  my goat's name is adam
- 
- ```
+```
 
 
 #### 命令打包
