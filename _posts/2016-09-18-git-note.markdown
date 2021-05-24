@@ -73,22 +73,27 @@ git diff HEAD
 **reset** 
 ```shell
 
-#覆盖上次的commit的, amend 把stage 状态放在上个commit当中,  no edit是不更改上次commit的评论
-git commit --amend --no-edit  #改完之后发现message 没变，但是id是会变得
+#本次commit 不会新建commit log，会融进上次commit 的log
+#  amend 把stage 状态放在上个commit当中,  no edit是不更改上次commit的评论
+git commit --amend --no-edit  #改完之后发现message 没变，但是id是会变的
 
 #返回从stage的状态 到modified的状态
 git reset 1.py #把 1.py 返回unstaged的状态
 
-#把commit的过后的版本返回到上一个， 调整head 到上一个，上上一个; 
-git reset --hard HEAD #把head 移到了现在commit上面 #git status会显示没有任何修改了
-git reset --hard HEAD^ #把head 移到前一个commit, git reset --hard HEAD^^ 移到前两个commit
+#把commit的过后的版本返回到之前的状态， 调整head 到上一个，上上一个; 
+git reset --hard HEAD #把head 移到了移动到之前commit上面，remove所有本次的修改 
+                        #git status会显示没有任何修改了
+
+git reset --hard HEAD^ #把head 移到前一个commit, 
+git reset --hard HEAD^^ #移到前两个commit
+
 
 git reset --hard 7a7ecea #把head 移到 7a7ecea这个id上面去 (看id: git status --oneline)
-#再git status --oneline 就不能看现在head未来的commit的
+#再git status --oneline 就不能看7a7ecea之后的commit的
 
-#也可以吧head回到未来, 从上上个移动到现在的
+#也可以把head回到未来, 从上上个移动到现在的
 git reflog #看每一个的变化, 显示每一个head的移动
-git reset --hard 3f27543 #通过reflog 找到未来的head id，可以返回了
+git reset --hard 3f27543 #通过reflog 找到想返回之后的head id，可以返回了
 git reset --hard HEAD@{0} #也可以把之前复制过来
 ```
 ![](/img/post/git-note/gitpic2.PNG)
@@ -96,7 +101,8 @@ git reset --hard HEAD@{0} #也可以把之前复制过来
 **checkout** 
 ```shell
 #只让一个文件回到过去
-git checkout 7a7ecea -- 1.py  #7a7ecea是之前commit的id,  只恢复1.py; 2.py 还是现在的状态
+git checkout 7a7ecea -- 1.py   # -- 只有有空格
+#7a7ecea是之前commit的id,  只恢复1.py; 2.py 还是现在的状态
 #之后修改再commit, 会建立新的commit的，git log --oneline 显示这次在过去的commit上面，过去的commit不会像reset一样消失
 ```
 
@@ -104,17 +110,28 @@ git checkout 7a7ecea -- 1.py  #7a7ecea是之前commit的id,  只恢复1.py; 2.py
 
 比如master是client用的，要稳定版，自己要用一个开会的分支
 ```shell
-#比如master的分支, 都是
-git branch dev #建立一个名为dev的
+#方法一:
+git branch dev #建立一个名为dev的，head还在master
+git checkout dev #head切换 dev， 再git branch, dev分支上显示星号
+
+#方法二
 git checkout -b dev #建立一个名为dev的, 并把head移动到dev分支上
 
+#查看分支
 git branch #显示现在所有的分支, 星号表示现在的分支
-git checkout dev #从现在分支切换到dev上, 再git branch, dev分支上显示星号
+
+#删除分支
+git checkout master 
 git branch -d dev #删除dev的分支, 报错，因为现在就在dev分支上, 先切换别的分支，才能删除
 git branch -D dev #如果git branch -d dev, 大写的D表示强行删除
 
-#把dev merge到master上来, -m "keep merge in info"把信息记录在log, --no-ff, no faster forward, 默认是faster forward是不会留信息
-git merge --no-ff -m "keep merge in info" dev #要确定在master上面不能在dev branch上
+# Merge
+git checkout master #保证在master上，merge时候不能在dev branch上
+
+git merge --no-ff -m "keep merge in info" dev 
+#把dev merge到master上来, -m "keep merge in info"把信息记录在log
+# --no-ff, no faster forward, 默认是faster forward是不会留信息
+
 #merge 之后再看git log --oneline --graph #会有图像显示branch的分支产生，merge
 ```
 
@@ -122,14 +139,26 @@ git merge --no-ff -m "keep merge in info" dev #要确定在master上面不能在
 ## 分支冲突
 <span style="background-color: #FFFF00">**Merge** </span> 
 
-比如 两个分支master, dev各有修改, 当git merge dev 时候有conflict, 然后file里显示什么冲突了, 把冲突的部分删除掉，做修改，修改过后的状态是modified, stage (git add .) 再commit(git commit -m "solve conflict") (or 直接 git commit --am "solve conflict"), 再git log --oneline --graph 会显示两个分支合并了
+比如 两个分支master, dev各有修改, 当git merge dev 时候有conflict, 然后file里显示什么冲突了
+1. 把冲突的部分删除掉，做修改，修改过后的状态是modified, 
+    -   方法一: stage (git add .) 再commit(git commit -m "solve conflict") 
+    -   方法二: 直接 git commit --am "solve conflict"
+2.  再git log --oneline --graph 会显示两个分支合并了
 
 
-<span style="background-color: #FFFF00">**rebase** </span> 
+![](/img/post/git-note/merge.PNG)
 
-比如在branch A上工作 c3是基于c1的, branch B是主分支,然后有天有人提交了bug, 在主分支branch b的上进行了提交, 这时如果想把bug融合到c3上; 
+在master 和 dev上有改变，然后合并了两个分支
 
-方法是: 先把branch A的c3拿走，空出来, 把c2,c4合并到上面去, 再把c3放到合并以后的地方, <span style="background-color: #FFFF00">注:现在c3基于c4, 以前的c3不复存在了</span> 所以rebase是危险的方式, rebase 后c3的commit id和rebase前c3的id是不一样的
+
+<span style="background-color: #FFFF00">**rebase** </span>: 重新基于主分支的内容
+
+Branch B 为主分支,然后有天有人提交了bug的修改, 在主分支branch b的上进行了提交,
+
+比如我在branch A上工作，在c3,  这时如果想把bug融合到c3上; 
+
+
+方法是: 先把branch A的c3拿走，空出来, 把c2,c4合并到上面去, 再把c3放到合并以后的地方, <span style="background-color: #FFFF00">注:现在c3基于c4, 以前的c3不复存在了</span> 所以rebase是危险的方式, <span style="background-color: #FFFF00">rebase 后c3的commit id和rebase前c3的id是不一样的</span>
 
 
 ![](/img/post/git-note/gitpic3.PNG)
@@ -139,27 +168,47 @@ git merge --no-ff -m "keep merge in info" dev #要确定在master上面不能在
 git checkout master
 git rebase dev #(把master分支基于dev分支)
 #如果有conflict, 跟merge一样的, 去修改conflict
-#修改完conflict, git branch  发现不在任何一个分支上
+#修改完conflict, git branch  发现不在master 和dev的任何一个分支上, 在一个新的分支上rebasing master上
 
 #stage + commit 
+git add 1.py
 git rebase --continue #继续rebase
 #如果碰到conflict，想放弃rebase
 git rebase --abort
 
 git log --oneline --graph #会发现dev的commit插到master上面来了,
 ```
+
+![](/img/post/git-note/rebase1.png)
+
+最上面是master 的log, 下面的是dev的log
+
+![](/img/post/git-note/rebase2.png)
+
+rebase 和 merge 不一样，dev上commit 的内容被插进master的分支上, 而不是分成两个branch 再merge, c3重新基于刚修改的dev的分支，<span style="background-color: #FFFF00">注意change4 master的ID 和 之前的ID不一样的</span>
+
 ## 临时修复
 
-比如要改之前的程序, 而现在的改进程序还没有完成, 不想把改进的和要改的程序放在一起, 用stash可以改进的code暂存一下, 等改后之前的, 再继续工作, 有不同的commit, 不会有冲突
+比如要改之前的程序, 而现在的改进程序还没有完成, 不想把改进的和要改的程序放在一起, <span style="background-color: #FFFF00">用stash可以改进的code暂存一下而不用commit</span>。 等改后之前的, 再继续工作, 有不同的commit, 不会有冲突
 ```shell
 git checkout dev
 #git status -s 显示文件已经被更改
 git stash #把现在的文件放在缓存区
 git status -s #此时就没有任何的modified 文件了
+```
+
+![](/img/post/git-note/stash.png)
+
+stash之后，看status不会显示modified的内容
+
+
+
+```shell
+#此时接到电话，给老板写代码
 #此时再建一个新的branc: git checkout -b boss; 在这个branch中修改之前的code, stash缓存的更改不会建立在这个branch中
 
 #修改完boss分支后, 再checkout 回dev: 
-git checkout dev
+git checkout dev #回到dev，显示上次commit的内容，不会显示上次修改stash的内容
 git stash pop #就会把之前修改暂存的返回回来
 ```
 
