@@ -42,6 +42,45 @@ Disadvantage:
 2. Developers and operations team work in silos. It is difficult if two teams not work together
 
 
+#### Before Jenkins
+
+Different developers working at different locations and commit to repository different time. 
+
+1. Issue in integration
+2. Delay in Testing. Notify if there are bugs => delay
+
+Developers had to wait till the entire software code was built and tested to check for errors. There was no iterative improvement of code and software delivery process was slow  
+
+
+#### What is Jenkins
+
+Jenkins is a <span style="color:red">**continuous integration**</span> tool that allows continuous development, test and deployment of newly created codes.
+
+1. Nightly build and integration (Old & legacy approach)
+2. Continuous build and Integration: <span style="background-color:#FFFF00">put your test and verification services into the build environment. Always run in cycle to test your code </span>
+
+![](img/post/Jenkins/Jenkins1.png)
+
+
+#### Continuous Integration
+
+At anytime, able to commit into repo. Submit the code into the **Continous Integration server**. The goal of Continous Integration server is to pass any test that is created. If continous integration server test pass, then that code can sent back to developer. Then developer can make the changes.
+
+It allows developers to do:
+
+1. Allow developer not to break the build 
+2. Allow developer not to run all the test locally 
+
+
+![](img/post/Jenkins/Jenkins2.png)
+
+Running test costs a lot of time, Can put Continuous Integration server into another environment.It improves the productivity of developer
+
+The goal: let release and deploy faster and let customer to get the code faster. When they got code, it works
+
+
+
+
 
 
 #### File ICON THEME
@@ -50,7 +89,7 @@ Disadvantage:
 2. 然后Ctrl + Shift + P, Preference:File Icon Theme --> Ayu
 
 
-![](/img/post/VSCode/File_Icon_Theme.png)
+
 
 
 
