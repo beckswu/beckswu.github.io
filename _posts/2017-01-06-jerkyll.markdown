@@ -22,8 +22,9 @@ ruby --version #if version is lower than 2.2, install ruby as below
 
 [ruby](https://www.ruby-lang.org/en/)
 
+<span style="color:red">Even if have ruby installed, need to install below command. </span>
 ```
-brew install chruby ruby-install
+brew install chruby ruby-install 
 ruby-install ruby
 ```
 
@@ -48,7 +49,7 @@ gem install jekyll bundler
 
 ## Init Bundler
 
-creates a new Bundler project (by creating an empty Gemfile).
+creates a new Bundler project (by creating an empty Gemfile). <span style="background-color:#FFFF00">**If in your `username.github.io` has Gemfile and Gemfile.lock, remove both**</span>
 
 ```bash
 cd documents/github/username.github.io

@@ -407,15 +407,16 @@ venv
 
 ```js
 [{
-    "key": "Alt+R",
+    "key": "cmd+R",
     "command": "editor.action.insertSnippet",
-    "args": { "snippet": "<span style=\"color:red\"></span>" },
+    "args": { "snippet": "<span style=\"color:red\">$TM_SELECTED_TEXT</span>$0" },
     "when": "resourceLangId == markdown"
 },{
-    "key": "Alt+G",
+    "key": "cmd+G",
     "command": "editor.action.insertSnippet",
-    "args": { "snippet": "<span style=\"background-color:#FFFF00\"></span>" },
+    "args": { "snippet": "<span style=\"background-color:#FFFF00\">$TM_SELECTED_TEXT</span>$0" },
     "when": "resourceLangId == markdown"
 }
 ]
+
 ```
