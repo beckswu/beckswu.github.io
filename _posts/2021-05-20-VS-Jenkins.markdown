@@ -428,4 +428,3 @@ But it is hard to see the flow which without visualization
 
 ![](/img/post/Jenkins/Jenkins31.png)
 
-#### Pipelines
