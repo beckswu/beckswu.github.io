@@ -12,6 +12,21 @@ tags:
     - 学习笔记
 ---
 
+
+## Config in Mac
+
+use keyboard input `Command + Shift + P` then type `cmcon` to choose cmake c++ kits
+
+![](/img/post/cmake/cmake1.png)
+
+If Show Error to configuring project, 
+
+- Check if Cmake installed. Run `cmake --version` . If not install `brew install cmake`
+- Check if brew is in path; Check if `/etc/paths` has `/opt/homebrew/bin`, if not, add it at the end. 
+
+
+
+
 **aux_source_directory(. SRC_DIR)** 会查找指定目录下的所有源文件, 这里查找 . (current directory), 并查找结果存进SRC_DIR <br/>
 **file(glob variable_name file)**: Generate a list of files that match the globbing-expressions and store it into the variable.
 **option (USE_MATH "Use provided math implementation" ON)**: Provide an option for the user to select as ON or OFF. If no initial value is provided, OFF is used. "Use provided math implementation" 使用来help string describing option

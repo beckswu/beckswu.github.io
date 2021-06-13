@@ -11237,7 +11237,7 @@ QueryResult NotQuery::eval(const TextQuery& text)const {
 A template definition starts with the keyword <span style="background-color:#FFFF00">**template**</span> followed by a <span style="background-color:#FFFF00">**template parameter list**</span>, which is a <span style="background-color:#FFFF00">comma-separated list of one or more **template parameters**</span> bracketed by the less-than (<) and greater-than (>) tokens.
 
 - Compare function 是 <span style="color:red">**reference to const**</span>. 确保types 不能被copied. 许多types, 包括built-in types 除了 ```unique_ptr``` 和 ```IO``` types 都可以copies. 不allow copy, make is faster for large objects
-- 注: passing in 的 ypede只需要定义 ```<``` operator 既可以, 无需提供 ```>```, 如果concerned **type independence** and **portability**, 应该定义function using ```less``` , 原来版本缺陷是, 如果定义pointers. <span style="color:red">如果两个pointers not point to the array, code is undefined</span>
+- 注: passing in 的 type只需要定义 ```<``` operator 既可以, 无需提供 ```>```, 如果concerned **type independence** and **portability**, 应该定义function using ```less``` , 原来版本缺陷是, 如果定义pointers. <span style="color:red">如果两个pointers not point to the array, code is undefined</span>
 
 ```c++
 template<typename T>
@@ -11566,6 +11566,7 @@ BlobPtr<T> BlobPtr<T>::operator++(int)
     - <span style="background-color:#FFFF00">**一对一关系**</span>，每个实例 将<span style="color:red">**相同实例化**</span> 声明为friend: Template friend 需要 <span style="background-color:#FFFF00">**forward declaration**</span>. e.g. ```template <typename T> class Pal;``` 中声明 ``` friend class Pal2<T>;```
     - <span style="background-color:#FFFF00">**多对多关系**</span>, 所有的实例都是 友元class 实例的 friend, template class friend<span style="color:red">不需要foward declaration</span>, 比如  ```template <typename T> class C2;``` 中声明 ```template <typename X> friend class Pal2; ```
 
+Rule: 如果friend declare是 `template <typename X> friend` 无需forward declaration, 如果是`friend class C<T>` 需要forward declaration
 
 
 **One-to-One Friendship** (只能是同一个type 之间的friendship)
@@ -11575,7 +11576,7 @@ BlobPtr<T> BlobPtr<T>::operator++(int)
 下面例子, 
 - 需要先 声明 ```BlobPtr``` 和 ```Blob``` , 这些是 operator ```==``` 函数参数声明以及 ```Blob``` 友元声明需要的. 
 - <span style="background-color:#FFFF00">Blob **friend declaratons** use Blob's **template parameter** as their own template argument</span>. 
-- 因此friensdship 限定在相同type 实例化 的 Blob 和 BlobPtr 相等运算运算之前. members of ```BlobPtr<char>``` 可以access nonpublic parts of ```Blob<char>```, 但是 ```Blob<char>``` 对```Blob<int>``` 没有special access 或者 其他instantiation of ```Blob``` 
+- 因此friendship 限定在相同type 实例化 的 Blob 和 BlobPtr 相等运算运算之前. members of ```BlobPtr<char>``` 可以access nonpublic parts of ```Blob<char>```, 但是 ```Blob<char>``` 对```Blob<int>``` 没有special access 或者 其他instantiation of ```Blob``` 
 
 ```c++
 // forward declarations needed for friend declarations in Blob
@@ -11605,11 +11606,49 @@ Blob<int> ia; // BlobPtr<int> and operator==<int> are friends
 
 ```
 
+For non template class, no need forward declaration
+
+```
+class Blob {
+    // each instantiation of Blob grants access to the version of
+
+    // BlobPtr and the equality operator instantiated with the same type
+    
+   class BlobPtr; 
+   friend bool operator==
+    	(const Blob&, const Blob&); 
+    // other members as in § 12.1.1 
+
+};
+class BlobPtr{};
+```
+
+这是因为, `friend bool operator==(const Blob&, const Blob&)` is <span style="color:red">**declaration of function and a friend at the same time**</span>, but `friend bool operator==<T>(const Blob<T>&, const Blob<T>&)` is <span style="background-color:#FFFF00">**friend declaration to template instantiation**</span>. That's different. Instantiation doesn't declare template function.
+
+***
+
+if befriend whole  whole function template, and then forward declaration isn't needed: `BlobPtr<int>` and` BlobPtr<long>` (and generally `BlobPtr<Anything>`) are all friends of `Blob<int>`.
+
+
+```c++
+template <typename T> 
+class Blob {
+    template <typename U>
+    friend class BlobPtr;     
+
+    template <typename U>
+    friend bool operator==(const Blob<U>&, const Blob<U>&); 
+};
+```
+
+***
+
+
 **General and Specific Template Friendship**
 
 - 一个class 可以make <span style="background-color:#FFFF00">**every instantiation**</span> of another template <span style="background-color:#FFFF00">its friend</span>, or <span style="background-color:#FFFF00">limit friendship to a **specific instantiation**</span>
-  - <span style="color:red">**foward declaration**</span>: 将一个tempalte 的<span style="color:red">**specific instantiation**</span> 声明 成friend 是<span style="color:red">必须的</span>
-  - 对于 <span style="color:red">**all instantiation** of template 被声明成 class 的friend, 不需要forward declaration</span>.
+  - <span style="color:red">**foward declaration**</span>: 将一个template 的<span style="color:red">**specific instantiation**</span> 声明 成friend 是<span style="color:red">必须的</span>
+  - 对于 <span style="color:red">**all instantiation** of template</span> 被声明成 class 的friend, 不需要<span style="color:red">forward declaration</span>.
   - 对于 <span style="color:red">non-template class</span> 声明成 template(or non-template) class <span style="color:red">friend</span>, <span style="color:red">不需要 forward declaration</span>
   - 注意下面例子
 
@@ -11619,29 +11658,28 @@ Blob<int> ia; // BlobPtr<int> and operator==<int> are friends
 template<typename T>class Pal;
 class C{// 注意C就是个普通的class
 
-    friend class Pal<C>; //用class C 实例化 Pal 是 C的friend 
+    friend class Pal<C>; //用class C 实例化 Pal 是 C的friend, need forward declaration 
 
-    //所有instantiation of Pal2 都是 C的friends;
-    
-    //因为是all instantiation friend 不需要forward declaration 
+    //所有instantiation of Pal2 都是 C的friends; 不需要forward declaration 
     
     template<typename T> friend class Pal2;
 };
 
-template<typename T>
-class C2{ //C2 是 class template
+/*
+    Pal<char> -> access C2<char>
+    Pal<char> -> no access C2<int>
+*/
 
-    //each instatntiation of C2 has the same instance of Pal as friend 
+template<typename T>
+class C2{ 
     
-    // C2 的每个实例 将相同的实例化的Pal 声明成friend 
+    // C2 的每个实例 将相同的实例化的Pal 声明成friend, 
 
     friend class Pal<T>; //a template declaration for Pal must be in scope 
 
     //all instances of Pal2 are friends of each instance of C2, 不需要forward declaration
 
-    //Pal2 所有实例 都是C2 每个实例的友元
-
-    template<typname X> friend class Pal2;
+    template<typename X> friend class Pal2;
 
     //Pal3 nontemplate class  that is a friend of every instance of C2;
 
@@ -11666,9 +11704,9 @@ template <typename Type>class Bar{
 #### (d). Type Aliases
 
 - 可以用 ```typedef``` 在 template class refers to the <span style="color:red">**instantiated class**</span>, 比如 ```typedef Blob<string> StrBlob;```
-- 因为template 不是 type, <span style="color:red">cannot define a typedef refers to a template</span>. 不能定义 a typedef  ```typedef Blob<T> TBlob```
+- 因为template 不是 type, <span style="color:red">**cannot define a typedef refers to a template**</span>. 不能定义 a typedef  ```typedef Blob<T> TBlob```
 
-比如下面例子, ```twin``` 用户只需指定一次类型, 而不用指定两次, ```twin<string,string>```. Users 对于```partNo```  只能specify type for the first member 不能choice about second 
+
 ```c++
 typedef Blob<string> StrBlob;
 
@@ -11741,15 +11779,15 @@ ct = Foo::count(); // error: which template instantiation?
 - Template Parameters and Scope
     - 像normal scoping rules. <span style="color:red">Name of template parameter can be used 在被declared 之后直到end of template declaration or defintion</span> 
     - <span style="background-color:#FFFF00">template parameters **hides** any declaration</span> of that name <span style="background-color:#FFFF00">in an outer scope</span>
-    - 如果一个名字被 template parameter 用了, 不可以reused within the template. 所以name 不能被reused, 所以<span style="background-color:#FFFF00">**template parameter** 不能有**重名**</span>
+    - 如果一个名字被 template parameter 用了, name 不能被reused, 所以<span style="background-color:#FFFF00">**template parameter** 不能有**重名**</span>
 - Template Declarations
     - A template <span style="background-color:#FFFF00">**declaration** must include the **template parameters**</span>
     - 对于given template，每一个declaration and definition 必须有一样 number and kind (type or nontype) of parameters
 - Access class Types
     - 比如当我们用scope operator ```::```, 可以access <span style="background-color:#FFFF00">**type**</span> or <span style="background-color:#FFFF00">**static member**</span>. 但是对于template, <span style="color:red">template直到被**实例化**才知道是 type or static member</span>. 但是compiler 必须知道a name 是不是 type 才能 process. 
         - 比如 ```T::size_type *p```: compiler 需要知道我们是在define a variable named ```p``` 还是将 名为```size_type``` 的static 成员与 成员```p``` 想乘.
-	- <span style="color:red">by default, languages assume access name through scope operator is not a type</span>. 当use type member of a template type parameter, must explicitly tell compiler that the name is a type by ```typename```
-        - 克服上面问题, 必须显式告诉 compiler the name is type, by using  ```typename T::size_type *p```. When we want to <span style="color:red">inform the compiler that a name represents a **type**</span>, we must <span style="color:red">use the keyword **typename**, not class</span>.
+	- by default, languages <span style="color:red">**assume access name through scope operator is not a type**</span>. 当use type member of a template type parameter, must explicitly tell compiler that the name is a type by ```typename```
+        - 必须显式告诉 compiler the name is type, by using  ```typename T::size_type *p```. When we want to <span style="color:red">inform the compiler that a name represents a **type**</span>, we must <span style="color:red">use the keyword **typename**, not `class`</span>.
 - **Default Template Arguments**: default arguments for both function and class templates   
     -  像 function default argument, 只有它<span style="color:red">**右侧所有**parameters 都是 **default argument**</span>, 它才是default argument
     - 如果使用默认的template argment, 需要用空的 bracket pair ```<>``` following the template's name
@@ -11769,7 +11807,6 @@ template <typename A, typename B> void f(A a, B b)
 };
 
 // error: illegal reuse of template parameter name V 
-
 template <typename V, typename V> // ...
 ```
 
@@ -11808,7 +11845,7 @@ typename T::value_type top(const T& c)
 
 **Default Template Arguments**
 
-下面例子定义了a secnd type parameter 表示 callable object, specifies that ```compare``` will use library ```less``` function-object class, <span style="color:red">**instantiated** with the **same type** parameter</span> as ```compare```.  和 a new function parameter ```f``` that bound to a callable object.  The **default function** argument says that ```f``` will be a default-initialized object of type ```F```. function template parameter 可以被推断
+下面例子定义了a second type parameter 表示 callable object, specifies that ```compare``` will use library ```less``` function-object class, <span style="color:red">**instantiated** with the **same type** parameter</span> as ```compare```.  和 a new function parameter ```f``` that bound to a callable object.  The **default function** argument says that ```f``` will be a default-initialized object of type ```F```. function template parameter 可以被推断
 
 
 ```c++
@@ -11819,7 +11856,8 @@ typename T::value_type top(const T& c)
 template<typename T, typename F = less<T>>
 int compare(const T &v1, const T &v2, F f=F())
     if (f(v2, v1)) return 1;
-    if (f(v1, v2)) return -1; return 0;
+    if (f(v1, v2)) return -1; 
+    return 0;
 }
 
 //因为function template parameter 可以被推断
@@ -11853,7 +11891,6 @@ Numbers<> average_precision; // empty <> says we want the default type
 
 #### (g). Member Templates
 - 一个class (普通class or template class) 可能有<span style="color:red">member function itself is template, 这种members 叫做 **member templates**</span>. <span style="color:red">Member template **不能是** **virtual**</span>
-- 一个普通class 可以有template member
 - 一个template class 可以有template member, template class 和 template member 有各自的independent template parameters.
     - 当定义member template outside body of class tempalte, <span style="color:red">**class template parameter** list comes **first**, , followed by the **member’s** own **template parameter list**</span>:
     - **Instantiation**: 必须supply arguments for <span style="background-color:#FFFF00">**template parameters** for both **class** and **function templates**</span>
@@ -11864,7 +11901,7 @@ Numbers<> average_precision; // empty <> says we want the default type
 
 - a member template starts with its own **template parameter list**
 
-比如定义类似 ```unique_ptr``` 的default deleter. class 有个 overloaded function-call operator that take a pointer and execute ```delete``` on given pointer. 因为想让deleter for any type, make call operator a template.  <span style="color:red">因为member function 是 template, compiler 可以从推断call 的类型</span>. 可以把```DebugDelete``` 用于 deleter of a ```unique_ptr```. 
+比如定义类似 ```unique_ptr``` 的default deleter. class 有个 overloaded function-call operator that take a pointer and execute ```delete``` on given pointer. 因为想让deleter for any type, make call operator a template.  <span style="color:red">member function 是 template, compiler 可以从推断call 的类型</span>. 可以把```DebugDelete``` 用于 deleter of a ```unique_ptr```. 
 ```c++
 class DebugDelete { 
 public: 
@@ -11972,18 +12009,15 @@ Blob<int> a2(vi.begin(), vi.end());
     - 可以avoid this overhead through an **explicit instantiation** which suppress implicit instantiation. 包括了two parts: **explicit instantiation declaration** and **explicit instantiation definition** (Implicit instantiation 是：只有用到时候才instantiation )
         - 当<span style="color:red">
 compile 看见 **extern template declaration**, **不会generate code** for that instantiation in that file</span> 
-        -  Declaring an <span style="color:red">instantiation as **extern** 保证不会有 nonextern use</span> of that instantiation elsewhere in program. <span style="color:red">可以有多个 extern declarations for a given instantiation but **只能有一个 definition**</span> for that instantiation
+        -   <span style="color:red">可以有多个 extern declarations for a given instantiation but **只能有一个 definition**</span> for that instantiation
         -  因为compiler 自动instantiates a template when use it, 所以 <span style="color:red">**extern declaration** 必须出现在code 使用实例化之前</span>
-        -  file 的 ```.o``` 文件不会包括 被定义了 extern template classs的instantiation, 会包括没有被定义extern template class 的实例化. 
-        -  There <span style="color:red">must be an **explicit instantiation definition(实例化定义)** somewhere in the program</span> for every instantiation declaration.
-        -  当compiler 看见instantiation 定义(as opposed to a declaration), it generates code. 当build application, <span style="color:red">必须 link 有extern template definition 的 ```.o``` with 用到extern template的file</span> (e.g```Application.o```)
+        -  当compiler 看见instantiation 定义(as opposed to a declaration), it generates code.
 - <span style="background-color:#FFFF00">**Explicit Instantiation Definitions Instantiate All Members**</span>: 与普通class template instantiations 不同, <span style="color:red">compiler instantiates all member of that class 因为不知道which member functions the program uses. 即使没有用到这个member, member也会被实例化</span>. 
   - 因此, An instantiation definition can be <span style="color:red">used only for **types**</span> that can be used with <span style="color:red">**every member function**</span> of a class template.
 
 
-> From StackOverflow <br/> <br/>
-> <span style="color:red">**explicit instantiation** is useful **when creating library(.lib) files that uses templates** for distribution</span>, uninstantiated template definitions are not put into object (.obj) files.<br/><br/>
-> 比如: ```std::basic_string<char,char_traits<char>,allocator<char> >``` (which is ```std::string```) so every time you use functions of std::string, <span style="color:red">the same function code doesn't need to be copied to objects</span>. The compiler only need to refer (link) those to ```libstdc++```.)
+
+
 
 **An explicit instantiation**: 用下面的形式
 
@@ -12001,6 +12035,27 @@ extern template class Blob<string>; // declaration
 template int compare(const int&, const int&); // definition
 
 ```
+
+
+> From StackOverflow <br/> <br/>
+> <span style="color:red">**explicit instantiation** is useful **when creating library(.lib) files that uses templates** for distribution</span>, uninstantiated template definitions are not put into object (.obj) files.<br/><br/>
+> 比如: ```std::basic_string<char,char_traits<char>,allocator<char> >``` (which is ```std::string```) so every time you use functions of std::string, <span style="color:red">the same function code doesn't need to be copied to objects</span>. The compiler only need to refer (link) those to ```libstdc++```.)
+
+- Explicit instantiation allows you to leave definitions in the .cpp file.
+- Putting definitions in .cpp files downside: external libraries can't reuse the template with their own new classes. 只能用explicit instantiation 的 class 不能是自己定义type的 class
+- extern template prevents a completely defined template from being instantiated by compilation units, except for our explicit instantiation. This way, only our explicit instantiation will be defined in the final objects:
+
+```c++
+extern template class A<long>;
+```
+
+This line says that `A<long>` is to be <span style="background-color:#FFFF00">**explicitly instantiated**</span> according to the definitions the compiler has already seen. 
+
+
+
+
+
+
 
 例子1: 比如一个```Application.cc``` file: 比如 ```sa1```,```sa2```,```i``` 的instantiation 会出现在任其他位置, 而```a1```, ```a2```实例化 会只出现在这个file (```Application.cc```). <span style="background-color:#FFFF00">```Application.o``` 会包括了 ```Blob<int>``` along with the ```initializer_list``` 和 copy constructor. 但是```compare<int>``` function 和 ```Blob<string>```class 不会instantiated in ```Application.o```</span>. <span style="color:red">```compare<int>``` 和 ```Blob<string>```的  definitions 在其他 program file 中</span> 
 
@@ -12089,6 +12144,72 @@ X<float> b;
 X<float> c;
 a.v //实例化 static member v
 
+```
+
+
+
+If you define a template class that you only want to work for a couple of explicit types.
+
+Put the template <span style="color:red">declaration</span> in the <span style="color:red">header file</span> just like a normal class.
+
+Put the<span style="color:red"> template definition</span> in a <span style="color:red">source file</span> just like a normal class.
+
+Then, at the end of the <span style="background-color:#FFFF00">**source file**</span>, <span style="background-color:#FFFF00">**explicitly instantiate only the version**</span> you want to be available.
+
+example:
+
+```c++
+// StringAdapter.h
+template<typename T>
+class StringAdapter
+{
+     public:
+         StringAdapter(T* data);
+         void doAdapterStuff();
+     private:
+         std::basic_string<T> m_data;
+};
+typedef StringAdapter<char>    StrAdapter;
+typedef StringAdapter<wchar_t> WStrAdapter;
+```
+
+Source 
+
+```c++
+// StringAdapter.cpp
+#include "StringAdapter.h"
+
+template<typename T>
+StringAdapter<T>::StringAdapter(T* data)
+    :m_data(data)
+{}
+
+template<typename T>
+void StringAdapter<T>::doAdapterStuff()
+{
+    /* Manipulate a string */
+}
+
+// Explicitly instantiate only the classes you want to be defined.
+// In this case I only want the template to work with characters but
+// I want to support both char and wchar_t with the same code.
+extern template class StringAdapter<char>;
+template class StringAdapter<char>;
+template class StringAdapter<wchar_t>;
+
+```
+
+Main
+```c++
+#include "StringAdapter.h"
+
+// Note: Main can not see the definition of the template from here (just the declaration)
+//       So it relies on the explicit instantiation to make sure it links.
+int main()
+{
+  StrAdapter  x("hi There");
+  x.doAdapterStuff();
+}
 ```
 
 

@@ -106,6 +106,12 @@ git checkout 7a7ecea -- 1.py   # -- 只有有空格
 #之后修改再commit, 会建立新的commit的，git log --oneline 显示这次在过去的commit上面，过去的commit不会像reset一样消失
 ```
 
+如果更改了file， 但还没有stages, 可以用恢复当前的files 
+```shell
+git checkout .
+```
+
+
 ## 管理分支
 
 比如master是client用的，要稳定版，自己要用一个开会的分支
@@ -228,3 +234,4 @@ git remote add origin https://      #初始url
 ```
 
 origin指得是online的管理库, history显示所有的改变, change显示每次commit发生变化, 本地的.git文件也被上传到管理库
+
