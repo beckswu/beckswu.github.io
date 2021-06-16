@@ -11,6 +11,19 @@ tags:
     - 学习笔记
 ---
 
+```shell
+git clean -fd: remove untracked directories / files.
+#-fdL means force removal of untracked files and directories
+
+
+#This will unstage all files you might have staged with git add:
+git reset
+
+#This will revert all local uncommitted changes (should be executed in repo root):
+git checkout .
+
+```
+
 
 ## 初始化
 
